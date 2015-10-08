@@ -30,6 +30,12 @@ const double mmuon = 0.1057;
 const double alphaem = 1/137.036;
 const double etafactor = 0.61;
 
+//Total proton-proton scattering cross section
+double sigmapp(double s){
+	double H = 0.2704; double sppM=pow(2*mp+M,2); double eta1=0.451; double eta2=0.549; double R1pp=12.98; double R2pp=7.38; double Ppp = 34.49;
+	return H*pow(log(s/sppM),2)+Ppp+R1pp*pow(s/sppM,-eta1)-R2pp*pow(s/sppM,-eta2);
+}
+
 /********************
  *KINETIC COUPLING
  ********************/
@@ -174,6 +180,20 @@ double brmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double
     using namespace std::placeholders;
     auto dbr = std::bind(dbrmass_to_dm_dm,mmeson, mv,mx,kappa,alphaD,_1);
     return DoubleExponential_adapt(dbr,4*mx*mx,pow(mmeson,2),100,0.1,1e-4);
+}
+
+double d2N_proton_brem_to_V(double Beam_Energy, double mA, double epsilon, double z, double pt2){
+	return pow(F_proton(mA*mA),2)*sigmapp(2*mp*(Beam_Energy-sqrt(mA*mA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, mA, epsilon);
+}
+
+//Very basic version of form factor. Maybe should move form factors from DMNscattering.cpp into their own file and include them? Probably do this when I do the big constants reorganization.
+double F_1_proton(q2){
+	return pow(1+q2/mD2,-2);
+}
+
+double wpp(double z, double pt2, double mA, double epsilon){
+	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
+	return pow(epsilon,2)*alphaem/(2*pi*H)*((1+pow(1-z,2))/z-2*z*(1-z)*((2*mp*mp+mA*mA)/H-2*pow(z*mp*mp/H,2))+2*z*(1-z)*(1+pow(1-z,2))*pow(mp*mA/H,2)+2*z*pow((1-z)*mA*mA/H,2));//I'm uncertain about this equation, (1+(1-z)^2) or (z+(1-z)^2)?
 }
 
 /********************
