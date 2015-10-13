@@ -33,6 +33,10 @@ double func_check(std::function<double(double)> f, double abscissa, double min, 
 	return fm+fp;
 }
 
+double GridTrapezoidal(std::function<double(double, double)> f, double xmin, double xmax, double xmin,double xN, double ymin, double ymax, double yN){
+
+}
+
 //h is the width between abscissa.
 double DoubleExponential(std::function<double(double)> f, double min, double max, int N, double h){
     double scale = 2.0/(max - min);

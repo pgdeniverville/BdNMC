@@ -1,6 +1,7 @@
 #ifndef GUARD_branchingratios_h
 #define GUARD_branchingratios_h
 
+//KINETIC MIXING
 double bretatoVgamma(double mv, double mx, double kappa, double alphaD);
 double d2breta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s, double theta);
 double dbreta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s);
@@ -25,6 +26,13 @@ double brpi0_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD);
 double d2brmass_to_dm_dm(double mass, double mv, double mx, double kappa, double alphaD, double s, double theta);
 double dbrmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double alphaD, double s);
 double brmass_to_dm_dm(double mass, double mv, double mx, double kappa, double alphaD);
+
+//Proton Brem
+double wpp(double z, double pt2, double mA, double epsilon);
+double d2N_proton_brem_to_V(double Beam_E, double mA, double epsilon, double z, double pt2);
+
+
+
 //BARYONIC COUPLING
 
 double GammaVB_to_dm_dm(double mv, double mx, double kappa, double alphaD);
