@@ -34,7 +34,6 @@ double func_check(std::function<double(double)> f, double abscissa, double min, 
 }
 
 double GridTrapezoidal(std::function<double(double, double)> f, double xmin, double xmax, double xmin,double xN, double ymin, double ymax, double yN){
-
 }
 
 //h is the width between abscissa.
