@@ -11,7 +11,7 @@
 #Model Parameters
 epsilon 1e-3
 dark_matter_mass 0.005
-dark_photon_mass 0.125
+dark_photon_mass 0.5
 alpha_D 0.1
 
 #Run parameters
@@ -33,7 +33,7 @@ burn_timeout 20000
 #Currently pi0_decay, eta_decay, rho_decay, omega_decay and phi_decay are supported.
 production_channel pi0_decay
 #Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
-#production_distribution pi0_sanfordwang
+production_distribution pi0_sanfordwang
 #production_distribution k0_sanfordwang
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.

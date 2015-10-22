@@ -10,6 +10,10 @@ double SimpsonsRule(std::function<double(double)>, double min, double max, int s
 double DoubleExponential(std::function<double(double)>, double min, double max, int N, double stepsize);
 double DoubleExponential_adapt(std::function<double(double)> f, double min, double max, int N, double h, double precision);
 
+//From "Numerical Algorithms with C"
+//Format is SimpsonCubature(function, xmin, xmax, x_steps/2, ymin, ymax, y_steps/2)
+double SimpsonCubature(std::function<double(double, double)> f, double a, double b, int P, double c, double d, int Q);
+
 class Linear_Interpolation{
     public:
         Linear_Interpolation(std::vector<double>, double Xmin, double Xmax);
