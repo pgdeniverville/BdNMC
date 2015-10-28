@@ -11,7 +11,7 @@
 #Model Parameters
 epsilon 1e-3
 dark_matter_mass 0.005
-dark_photon_mass 0.5
+dark_photon_mass 0.4
 alpha_D 0.1
 
 #Run parameters
@@ -45,6 +45,12 @@ production_distribution pi0_sanfordwang
 #Here we also call a second production mode.
 production_channel eta_decay
 production_distribution k0_sanfordwang
+
+production_channel V_decay
+production_distribution proton_brem
+ptmax 0.2
+zmin 0.2
+zmax 0.8
 
 #Scattering Parameters
 #Choose either NCE_nucleon or NCE_electron

@@ -29,7 +29,7 @@ double brmass_to_dm_dm(double mass, double mv, double mx, double kappa, double a
 
 //Proton Brem
 double wpp(double z, double pt2, double mA, double epsilon);
-double d2N_proton_brem_to_V(double Beam_E, double mA, double epsilon, double z, double pt2);
+//double d2N_proton_brem_to_V(double Beam_E, double mA, double epsilon, double z, double pt2);
 
 
 

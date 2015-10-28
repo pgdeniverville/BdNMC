@@ -16,12 +16,15 @@ class production_channel{
 		std::string sanfordwang_file;
 		std::string parton_V_n_file, parton_V_p_file;
 		//This map holds sanfordwang parameters.
-		std::map<std::string, std::string> sanfordwangmap;
-		double meson_per_pi0;
-		production_channel() : prod_chan(""), prod_dist("default"), particle_list_file(""), sanfordwang_file(""), parton_V_n_file(""), parton_V_p_file(""), meson_per_pi0(-1) {};
-		bool query_sanfordwang(){return (sanfordwangmap.size()!=0);}
-		bool query_sanfordwang(const std::string &, double&);
+		std::map<std::string, std::string> dist_param_map;
+		double meson_per_pi0, PTMAX, ZMIN, ZMAX;
+		production_channel() : prod_chan(""), prod_dist("default"), particle_list_file(""), sanfordwang_file(""), parton_V_n_file(""), parton_V_p_file(""), meson_per_pi0(-1), PTMAX(-1), ZMIN(-1), ZMAX(-1) {};
+		bool query_dist_param(){return (dist_param_map.size()!=0);}
+		bool query_dist_param(const std::string &, double&);
 		double Meson_Per_Pi0(){return meson_per_pi0;}
+		double ptmax(){return PTMAX;}
+		double zmin(){return ZMIN;}
+		double zmax(){return ZMAX;}
 		std::string Prod_Dist(){return prod_dist;}
 		std::string Part_List_File(){return particle_list_file;}
 		std::string Parton_V_Neutron_File(){return parton_V_n_file;}

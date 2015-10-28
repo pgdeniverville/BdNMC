@@ -25,6 +25,7 @@
 #include "BurmanSmith.h"
 #include "BMPT_dist.h"
 #include "partonsample.h"
+#include "Proton_Brem_Distribution.h"
 
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
@@ -203,6 +204,14 @@ int main(int argc, char* argv[]){
 				Vnum*=alD;
 			PartDist = parsam;
 		}
+		else if(proddist=="proton_brem"){
+			if(proditer->ptmax()<0 || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
+				cerr << "Invalid properties for production_distribution proton_brem." << endl;
+			}
+			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin()));
+			Vnum = pbd->V_prod_rate()*POT;
+			PartDist = pbd;
+		}
 		else if(outmode=="particle_list"){
 			cerr << "Invalid or missing distribution " << proddist << " declared for particle_list outmode\n Terminating run.\n";
 			return -1;
@@ -295,6 +304,12 @@ int main(int argc, char* argv[]){
 		else if(prodchoice=="parton_production_baryonic"||prodchoice=="parton_production"){
 			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv, PartDist));		
 			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
+		}
+		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"){
+			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv,PartDist));
+			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
+			Vnum *= DMGen->BranchingRatio();
+
 		}
 		else{
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";

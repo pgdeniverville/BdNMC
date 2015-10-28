@@ -38,37 +38,45 @@ double SimpsonCubature(std::function<double(double, double)> f, double a, double
 	double hx = (b-a)/(2.0*P);
 	double hy = (d-c)/(2.0*Q);
 	double hold = f(a,c)+f(b,c)+f(a,d)+f(b,d);
-	double hold2;
-	for(int p = 0, hold2=0; p<=P-1; p++)
+	double hold2=0;
+	for(int p = 0; p<=P-1; p++)
 		hold2+=f(a+(2*p+1)*hx,c)+f(a+(2*p+1)*hx,d);
 	hold+=4*hold2;
-	for(int q = 0, hold2=0; q<=Q-1; q++)
+	hold2=0;
+	for(int q = 0; q<=Q-1; q++)
 		hold2+=f(a,c+(2*q+1)*hy)+f(b,c+(2*q+1)*hy);
 	hold+=4*hold2;
-	for(int p = 1, hold2=0; p<=P-1; p++)
+	hold2=0;
+	for(int p = 1; p<=P-1; p++)
 		hold2+=f(a+2*p*hx,c)+f(a+2*p*hx,d);
 	hold+=2*hold2;
-	for(int q = 1, hold2=0; q<=Q-1; q++)
+	hold2=0;
+	for(int q = 1; q<=Q-1; q++)
 		hold2+=f(a,c+2*q*hy)+f(b,c+2*q*hy);
 	hold+=2*hold2;
-	for(int p = 1, hold2=0; p<=P-1; p++)
-		for(int q = 1, hold2=0; q<=Q-1; q++)
+	hold2=0;
+	for(int p = 1; p<=P-1; p++)
+		for(int q = 1; q<=Q-1; q++)
 			hold2+=f(a+2*p*hx,c+2*q*hy);
 	hold+=4*hold2;
-	for(int p = 0, hold2=0; p<=P-1; p++)
-		for(int q = 0, hold2=0; q<=Q-1; q++)
+	hold2=0;
+	for(int p = 0; p<=P-1; p++)
+		for(int q = 0; q<=Q-1; q++)
 			hold2+=f(a+(2*p+1)*hx,c+(2*q+1)*hy);
 	hold+=16*hold2;
-	for(int p = 1, hold2=0; p<=P-1; p++)
-		for(int q = 0, hold2=0; q<=Q-1; q++)
+	hold2=0;
+	for(int p = 1; p<=P-1; p++)
+		for(int q = 0; q<=Q-1; q++)
 			hold2+=f(a+2*p*hx,c+(2*q+1)*hy);
 	hold+=8*hold2;
-	for(int p = 0, hold2=0; p<=P-1; p++)
-		for(int q = 1, hold2=0; q<=Q-1; q++)
+	hold2=0;
+	for(int p = 0; p<=P-1; p++)
+		for(int q = 1; q<=Q-1; q++)
 			hold2+=f(a+(2*p+1)*hx,c+2*q*hy);
 	hold+=8*hold2;
+	hold2=0;
 	
-	return hold;
+	return hold*hx*hy/9.0;
 }
 
 

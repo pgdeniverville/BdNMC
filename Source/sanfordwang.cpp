@@ -17,27 +17,27 @@ const double thetamin=0, thetamax=pi/2.0;
 const int burn_max=20000;
 
 void sanfordwang::set_fit_parameters(production_channel &san){
-	if(!(san.query_sanfordwang()))
+	if(!(san.query_dist_param()))
 		return;
 	bool cval = false;
 	bool dval = false;
 	bool eval = false;
-	if(san.query_sanfordwang(pB_key,pB)){
+	if(san.query_dist_param(pB_key,pB)){
 		cval=true;
 		dval=true;
 		eval=true;
 	}
-	if(san.query_sanfordwang(mommax_key,ppimax)){
+	if(san.query_dist_param(mommax_key,ppimax)){
 		cval=true;
 		dval=true;
 		eval=true;
 	}
 	for(int i=1;i<10;i++){
-		if(san.query_sanfordwang(ckey[i],c[i]))
+		if(san.query_dist_param(ckey[i],c[i]))
 			cval=true;
-		if(san.query_sanfordwang(dkey[i],d[i]))
+		if(san.query_dist_param(dkey[i],d[i]))
 			dval=true;
-		if(san.query_sanfordwang(ekey[i],e[i]))
+		if(san.query_dist_param(ekey[i],e[i]))
 			eval=true;
 	}
 	if(cval||dval){

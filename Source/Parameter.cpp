@@ -30,6 +30,10 @@ const string meson_per_pi0_key = "meson_per_pi0";
 const string parton_V_neutron_file_key = "parton_V_neutron_file";
 const string parton_V_proton_file_key = "parton_V_proton_file";
 const string sanford_wang_key = "sanfordwang_file";
+const string distribution_parameter_key = "distribution_parameter_file";
+const string ptmax_key = "ptmax";
+const string zmin_key = "zmin";
+const string zmax_key = "zmax";
 
 const string detkey = "detector";
 const string dmkey = "dark_matter_mass";
@@ -101,10 +105,10 @@ void parse_parameter_file(const string &filename, map<string, string> &parammap)
 
 
 
-bool production_channel::query_sanfordwang(const string &key, double &var){
+bool production_channel::query_dist_param(const string &key, double &var){
     try{
-        if(sanfordwangmap.count(key)==1){
-            var = stod(sanfordwangmap[key]);
+        if(dist_param_map.count(key)==1){
+            var = stod(dist_param_map[key]);
 			return true;
 		}
     }
@@ -151,8 +155,14 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.parton_V_n_file=val;
 			else if(key==parton_V_proton_file_key)
 				tmpprod.parton_V_p_file=val;
-			else if(key == sanford_wang_key){
-				parse_parameter_file(val, tmpprod.sanfordwangmap);
+			else if(key==zmax_key)
+				tmpprod.ZMAX=stod(val);
+			else if(key==zmin_key)
+				tmpprod.ZMIN=stod(val);
+			else if(key==ptmax_key)
+				tmpprod.PTMAX=stod(val);
+			else if(key == sanford_wang_key || key == distribution_parameter_key){
+				parse_parameter_file(val, tmpprod.dist_param_map);
 				}
 			else{
 				line_num--;
