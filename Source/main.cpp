@@ -209,6 +209,8 @@ int main(int argc, char* argv[]){
 				cerr << "Invalid properties for production_distribution proton_brem." << endl;
 			}
 			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin()));
+			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
+			cout << pbd->V_prod_rate() << endl;
 			Vnum = pbd->V_prod_rate()*POT;
 			PartDist = pbd;
 		}

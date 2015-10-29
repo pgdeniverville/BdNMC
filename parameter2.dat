@@ -29,6 +29,8 @@ samplesize 5000
 burn_max 1000
 burn_timeout 20000 
 
+beam_energy 8.9
+
 #Production Parameters
 #Currently pi0_decay, eta_decay, rho_decay, omega_decay and phi_decay are supported.
 production_channel pi0_decay

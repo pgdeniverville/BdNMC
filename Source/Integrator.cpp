@@ -75,7 +75,6 @@ double SimpsonCubature(std::function<double(double, double)> f, double a, double
 			hold2+=f(a+(2*p+1)*hx,c+2*q*hy);
 	hold+=8*hold2;
 	hold2=0;
-	
 	return hold*hx*hy/9.0;
 }
 
