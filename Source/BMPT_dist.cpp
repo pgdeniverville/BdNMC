@@ -10,7 +10,7 @@ const double mpion = 0.139;
 const double mpi0 = 0.134;
 const double pi = 3.14159265359;
 
-
+//BMPT fit parameters
 const double A = 62.3;
 const double B = 1.57;
 const double alpha = 3.45;

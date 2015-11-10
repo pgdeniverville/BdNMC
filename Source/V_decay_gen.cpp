@@ -7,17 +7,17 @@
 
 const double pi = 3.14159;
 
-proton_brem::proton_brem(double MV, double MX, double kap, double alp, const std::string chan){
+V_decay_gen::V_decay_gen(double MV, double MX, double kap, double alp, const std::string chan){
     set_model_params(MV, MX, kap, alp);
 	chan_name=std::string(chan);
 }
 
-void proton_brem::Evaluate_Branching_Ratio(){
+void V_decay_gen::Evaluate_Branching_Ratio(){
 	branchingratio = brV_to_dm_dm(mv, mx, kappa, alphaD);
 	OFF_SHELL = false;
 }
 
-bool proton_brem::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator> V_prod){
+bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator> V_prod){
     double intersect1=0;
     double intersect2=0;
 

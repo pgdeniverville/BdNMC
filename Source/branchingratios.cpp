@@ -9,6 +9,7 @@
 
 using std::cout; using std::endl;
 
+const double mp = 0.938;
 const double mpion = 0.1349766;
 const double mpim = 0.139570;
 const double meta = 0.547853;
@@ -30,10 +31,10 @@ const double mmuon = 0.1057;
 const double alphaem = 1/137.036;
 const double etafactor = 0.61;
 
+
 /********************
  *KINETIC COUPLING
  ********************/
-
 
 
 double brpi0toVgamma(double mv, double mx, double kappa, double alphaD){
@@ -174,6 +175,11 @@ double brmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double
     using namespace std::placeholders;
     auto dbr = std::bind(dbrmass_to_dm_dm,mmeson, mv,mx,kappa,alphaD,_1);
     return DoubleExponential_adapt(dbr,4*mx*mx,pow(mmeson,2),100,0.1,1e-4);
+}
+
+double wpp(double z, double pt2, double mA, double epsilon){
+	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
+	return pow(epsilon,2)*alphaem/(2*pi*H)*((1+pow(1-z,2))/z-2*z*(1-z)*((2*mp*mp+mA*mA)/H-2*pow(z*mp*mp/H,2))+2*z*(1-z)*(z+pow(1-z,2))*pow(mp*mA/H,2)+2*z*pow((1-z)*mA*mA/H,2));
 }
 
 /********************

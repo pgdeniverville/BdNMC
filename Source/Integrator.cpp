@@ -32,6 +32,52 @@ double func_check(std::function<double(double)> f, double abscissa, double min, 
 		fm=0;
 	return fm+fp;
 }
+//From "Numerical Algorithms with C"
+//Format is SimpsonCubature(function, xmin, xmax, x_steps/2, ymin, ymax, y_steps/2)
+double SimpsonCubature(std::function<double(double, double)> f, double a, double b, int P, double c, double d, int Q){
+	double hx = (b-a)/(2.0*P);
+	double hy = (d-c)/(2.0*Q);
+	double hold = f(a,c)+f(b,c)+f(a,d)+f(b,d);
+	double hold2=0;
+	for(int p = 0; p<=P-1; p++)
+		hold2+=f(a+(2*p+1)*hx,c)+f(a+(2*p+1)*hx,d);
+	hold+=4*hold2;
+	hold2=0;
+	for(int q = 0; q<=Q-1; q++)
+		hold2+=f(a,c+(2*q+1)*hy)+f(b,c+(2*q+1)*hy);
+	hold+=4*hold2;
+	hold2=0;
+	for(int p = 1; p<=P-1; p++)
+		hold2+=f(a+2*p*hx,c)+f(a+2*p*hx,d);
+	hold+=2*hold2;
+	hold2=0;
+	for(int q = 1; q<=Q-1; q++)
+		hold2+=f(a,c+2*q*hy)+f(b,c+2*q*hy);
+	hold+=2*hold2;
+	hold2=0;
+	for(int p = 1; p<=P-1; p++)
+		for(int q = 1; q<=Q-1; q++)
+			hold2+=f(a+2*p*hx,c+2*q*hy);
+	hold+=4*hold2;
+	hold2=0;
+	for(int p = 0; p<=P-1; p++)
+		for(int q = 0; q<=Q-1; q++)
+			hold2+=f(a+(2*p+1)*hx,c+(2*q+1)*hy);
+	hold+=16*hold2;
+	hold2=0;
+	for(int p = 1; p<=P-1; p++)
+		for(int q = 0; q<=Q-1; q++)
+			hold2+=f(a+2*p*hx,c+(2*q+1)*hy);
+	hold+=8*hold2;
+	hold2=0;
+	for(int p = 0; p<=P-1; p++)
+		for(int q = 1; q<=Q-1; q++)
+			hold2+=f(a+(2*p+1)*hx,c+2*q*hy);
+	hold+=8*hold2;
+	hold2=0;
+	return hold*hx*hy/9.0;
+}
+
 
 //h is the width between abscissa.
 double DoubleExponential(std::function<double(double)> f, double min, double max, int N, double h){

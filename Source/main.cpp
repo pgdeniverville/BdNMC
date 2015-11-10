@@ -25,6 +25,7 @@
 #include "BurmanSmith.h"
 #include "BMPT_dist.h"
 #include "partonsample.h"
+#include "Proton_Brem_Distribution.h"
 
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
@@ -203,6 +204,16 @@ int main(int argc, char* argv[]){
 				Vnum*=alD;
 			PartDist = parsam;
 		}
+		else if(proddist=="proton_brem"){
+			if(proditer->ptmax()<0 || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
+				cerr << "Invalid properties for production_distribution proton_brem." << endl;
+				return -1;
+			}
+			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin()));
+			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
+			Vnum = pbd->V_prod_rate()*POT;
+			PartDist = pbd;
+		}
 		else if(outmode=="particle_list"){
 			cerr << "Invalid or missing distribution " << proddist << " declared for particle_list outmode\n Terminating run.\n";
 			return -1;
@@ -295,6 +306,12 @@ int main(int argc, char* argv[]){
 		else if(prodchoice=="parton_production_baryonic"||prodchoice=="parton_production"){
 			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv, PartDist));		
 			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
+		}
+		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"){
+			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv,PartDist));
+			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
+			Vnum *= DMGen->BranchingRatio();
+
 		}
 		else{
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
@@ -477,12 +494,12 @@ int main(int argc, char* argv[]){
   		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency();
 		cout << scat_list[i] << " " << trials_list[i] << " " << Vnum_list[i] << " " << SigGen->get_pMax() << " " << repeat << " "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << endl;
+			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << endl;
 		NDM+=NDM_list[i]; 
 		signal+=signal_list[i];
  	}
 	if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-		*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << endl;
+		*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
 
 
 	//cout << scattot/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency() << endl;

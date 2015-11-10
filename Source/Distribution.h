@@ -4,7 +4,7 @@
 class Distribution {
 	public:
 		Distribution(){};
-		virtual void sample_momentum(double&, double&, double&) = 0;
+		virtual void sample_momentum(double& p, double& theta, double& phi) = 0;
 };
 
 #endif
