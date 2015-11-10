@@ -57,7 +57,7 @@ double detector_sphere::Ldet (const Particle &DM) {
  *******************/
 
 
-//May want to add an extra constructure that instead asks for the coordinates of the two faces.
+//May want to add an extra constructor that instead asks for the coordinates of the two faces.
 detector_cylinder::detector_cylinder (double x, double y, double z, double detlength, double radius, double detTheta, double detPhi){
     //r points to the center of the detector
     r[0]=x;
