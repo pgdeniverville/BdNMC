@@ -18,8 +18,10 @@ void Particle_Generator::Generate_Particle(Particle &part){
 Particle::Particle(double mass){
     Set_Mass(mass);
     ThreeMomentum(0,0,0);
-    for(int i=0; i<4; i++)
-        coords[i]=0.0;
+    for(int i=0; i<4; i++){
+        origin_coords[i]=0.0;
+		end_coords[i]=0.0;
+	}	
     EVENT_SET = false;
 }
 
@@ -53,14 +55,24 @@ void Particle::Set_Mass(double m_new){
     E = sqrt(m_new*m_new+px*px+py*py+pz*pz);
 }
 
+void Particle::Set_Origin(double x, double y, double z){
+	origin_coords[0]=x;
+	origin_coords[1]=y;
+	origin_coords[2]=z;
+}
+
 void Particle::Set_Position(double x, double y, double z){
-    coords[0]=x;
-    coords[1]=y;
-    coords[2]=z;
+    end_coords[0]=x;
+    end_coords[1]=y;
+    end_coords[2]=z;
+}
+
+void Particle::Set_Creation_Time(double t){
+	origin_coords[3]=t;
 }
 
 void Particle::Set_Time(double t){
-    coords[3]=t;
+    end_coords[3]=t;
 }
 
 void Particle::Lorentz(Particle parent){
@@ -143,10 +155,10 @@ double Particle::Speed(){
 void Particle::Generate_Position(double rngpoint){
     Set_Position(px*rngpoint, py*rngpoint, pz*rngpoint);
     if(Momentum()==0.0){
-        Set_Time(0.0);
+        Set_Time(origin_coords[3]);
     }
     else{
-        Set_Time(Momentum()*rngpoint/Speed()/speed_of_light);
+        Set_Time(Momentum()*rngpoint/Speed()/speed_of_light+orgin_coords[3]);
     }
 }
 

@@ -31,10 +31,14 @@ double detector_sphere::Ldet (const Particle &DM) {
     double A, B, C;
    
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
+	o[0]=r[0]-DM.origin_coords[0];o[1]=r[1]-DM.origin_coords[1];o[2]=r[2]-DM.origin_coords[2];
 
     A = ip(b,b);
-    B = -2*ip(r,b);
-    C = ip(r,r)-pow(Rdet,2);
+   // B = -2*(ip(r,b)-ip(o,b));
+   // C = (ip(r,r)-2*ip(o,r)+ip(o,o))-pow(Rdet,2);
+    B = -2*ip(o,b);
+    C = ip(o,o)-pow(Rdet,2);
+
 
     if((pow(B,2)-4*A*C)<0||A==0){
         return 0.0;
@@ -73,6 +77,7 @@ detector_cylinder::detector_cylinder (double x, double y, double z, double detle
     
 }
 //This is a temporary setup.
+/*
 double detector_cylinder::Ldeto (const Particle &DM, const double offset[3]){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
     double ro[3];
@@ -151,10 +156,14 @@ double detector_cylinder::Ldeto (const Particle &DM, const double offset[3]){
     else
         throw crossings.size();
 }
-
+*/
 double detector_cylinder::Ldet (const Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
-    
+   
+	for(int i=0; i<3; i++){
+        o[i] = r[i] - DM.origin_coords[i];
+    }
+
     vector<double> crossings;
     double B1,B2;
     
@@ -163,7 +172,7 @@ double detector_cylinder::Ldet (const Particle &DM){
     if(ip(b,l)!=0){//if b.l==0, beam is parallel to the circular faces.
         
 
-        B1 = (ip(r,l)+ip(l,l))/ip(b,l);
+        B1 = (ip(o,l)+ip(l,l))/ip(b,l);
         double Rhold[3];//Need to hold this value for use in calculation.
         if(B1>0){
             for(int iter=0; iter <3; iter++){
@@ -175,7 +184,7 @@ double detector_cylinder::Ldet (const Particle &DM){
         }
             
 
-        B2 = (ip(r,l)-ip(l,l))/ip(b,l);//For B2 l->-l.
+        B2 = (ip(o,l)-ip(l,l))/ip(b,l);//For B2 l->-l.
         if(B2>0){ 
             
             for(int iter=0; iter <3; iter++){
@@ -193,19 +202,19 @@ double detector_cylinder::Ldet (const Particle &DM){
 
     if(crossings.size()<2){
         double X = -pow(ip(b,l),2) + ip(b,b)*ip(l,l);
-        double Y = -2*ip(r,b)*ip(l,l)+2*ip(b,l)*ip(r,l);
-        double Z = -pow(ip(r,l),2)-pow(Rdet,2)*ip(l,l)+ip(r,r)*ip(l,l);
+        double Y = -2*ip(o,b)*ip(l,l)+2*ip(b,l)*ip(o,l);
+        double Z = -pow(ip(o,l),2)-pow(Rdet,2)*ip(l,l)+ip(o,o)*ip(l,l);
         double sqr_arg=Y*Y-4*X*Z; //argument in the quadratic equation square root.
         if(sqr_arg > 0){
             B3 = (-Y+sqrt(sqr_arg))/(2*X);
             B4 = (-Y-sqrt(sqr_arg))/(2*X);
 
             
-            if(B3 > 0 && (A3 = (B3*ip(b,l)-ip(r,l))/ip(l,l) ) > -1 && A3<1){
+            if(B3 > 0 && (A3 = (B3*ip(b,l)-ip(o,l))/ip(l,l) ) > -1 && A3<1){
                 crossings.push_back(B3);
             }
              
-            if(B4 > 0 && (A4 = (B4*ip(b,l)-ip(r,l))/ip(l,l) )>-1 && A4<1){
+            if(B4 > 0 && (A4 = (B4*ip(b,l)-ip(o,l))/ip(l,l) )>-1 && A4<1){
                 crossings.push_back(B4);
             }
         }

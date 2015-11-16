@@ -443,16 +443,10 @@ int main(int argc, char* argv[]){
                     Particle scatterpart(0);//mass is placeholder until scattering completed. 
 					if(SigGen->probscatter(det, *iter, scatterpart)){
 						if((min_angle<=0||scatterpart.Theta()>min_angle)&&(max_angle>2*pi||scatterpart.Theta()<max_angle)){
-						iter->Generate_Position(Random::Flat(det->cross_point[0],det->cross_point[1]));
-                        scatterpart.Set_Position(iter->coords[0],iter->coords[1],iter->coords[2]);
-                        scatterpart.Set_Time(iter->coords[3]);
-                        scatterpart.EVENT_SET = true;
-                        iter->Set_Position(0,0,0);
-                        iter->Set_Time(0);
-                        vec.insert(std::next(iter),scatterpart);
-                         
-						scat_list[i]++;
-                        scatter_switch = true;
+                        	SigGen->Generate_Position(det, *iter, scatterpart) 
+							vec.insert(std::next(iter),scatterpart);
+							scat_list[i]++;
+                        	scatter_switch = true;
 						}
                     }   
                 }    
