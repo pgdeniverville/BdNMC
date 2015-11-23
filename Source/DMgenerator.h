@@ -2,6 +2,7 @@
 #define GUARD_DMgenerator_h
 
 #include "Particle.h"
+#include "Particle_Generator.h"
 #include <string>
 #include <vector>
 #include <list>

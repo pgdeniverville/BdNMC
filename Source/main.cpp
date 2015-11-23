@@ -26,6 +26,7 @@
 #include "BMPT_dist.h"
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
+#include "Particle_Generator.h"
 
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
@@ -220,9 +221,7 @@ int main(int argc, char* argv[]){
 		}
 		
 		if(outmode=="particle_list"){
-			double mom=0; 
-			double theta=0;
-			double phi=0;
+			Particle part(0);
 			std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
 			cout << "--------------------" << endl;
 			cout << "Run parameters:" << endl;
@@ -231,8 +230,8 @@ int main(int argc, char* argv[]){
 			cout << "Production Distribution = " << proddist << endl;
 			cout << "Writing to " << proditer->Part_List_File() << endl;
 			for(int num = 0; num < samplesize; num++){
-				PartDist->sample_momentum(mom, theta, phi);		
-				parstream  << cos(phi)*sin(theta)*mom << " " << sin(phi)*sin(theta)*mom << " " << mom*cos(theta) << " " << sqrt(mom*mom) << endl;//the energy is not accurate, but does not matter!
+				PartDist->sample_particle(part);
+				cout << part.px << " " << part.py << " " << part.pz << " " << part.E << endl;
 			}
 			parstream.close();
 			return 0;
@@ -443,7 +442,7 @@ int main(int argc, char* argv[]){
                     Particle scatterpart(0);//mass is placeholder until scattering completed. 
 					if(SigGen->probscatter(det, *iter, scatterpart)){
 						if((min_angle<=0||scatterpart.Theta()>min_angle)&&(max_angle>2*pi||scatterpart.Theta()<max_angle)){
-                        	SigGen->Generate_Position(det, *iter, scatterpart) 
+                        	SigGen->Generate_Position(det, *iter, scatterpart); 
 							vec.insert(std::next(iter),scatterpart);
 							scat_list[i]++;
                         	scatter_switch = true;

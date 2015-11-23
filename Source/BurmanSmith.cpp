@@ -113,9 +113,15 @@ double BurmanSmith::TF(double theta){
         return Tp - 140 - 2*B;
 }
 
+void BurmanSmith::sample_particle(Particle &part){
+	double mompi, thetapi, phipi;	
+	sample_momentum(mompi, thetapi, phipi);
+	part.ThreeMomentumPolar(mompi, thetapi, phipi);
+}
+
 void BurmanSmith::sample_momentum(double &mompi, double &thetapi, double &phipi){
     double Tpi, prob;
-    while(true){
+	while(true){
         thetapi = Random::Flat(0,1)*180.0;
         Tpi = Random::Flat(0,1)*Tpimax;
         prob = dsigma(Tpi,thetapi);

@@ -82,6 +82,12 @@ double BMPT::Invariant_Cross_Section_pi_minus(double p, double theta){
     return Invariant_Cross_Section(p, theta)/r0/pow(1+xR(p,theta),r1);
 }
 
+void BMPT::sample_particle(Particle &part){
+	double mom, theta, phi;
+	sample_momentum(mom, theta, phi);
+	part.ThreeMomentumPolar(mom, theta, phi);
+}
+
 void BMPT::sample_momentum(double &p, double &theta, double &phi){
     double prob;
     while(true){

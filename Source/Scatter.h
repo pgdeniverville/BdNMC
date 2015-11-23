@@ -4,6 +4,7 @@
 #include "detector.h"
 #include "Particle.h"
 #include "Integrator.h"
+#include "Random.h"
 #include <memory>
 #include <vector>
 #include <string>
@@ -25,10 +26,9 @@ class Scatter{
 		void set_pMax(double pm){pMax=pm;}
 		void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, Particle &scat){
 			DM.Generate_Position(Random::Flat(det->cross_point[0],det->cross_point[1]));
-            scat.Set_Position(iter->coords[0],iter->coords[1],iter->coords[2]);
-            scat.Set_Time(iter->coords[3]);
+            scat.Set_Position(DM.end_coords[0],DM.end_coords[1],DM.end_coords[2]);
+            scat.Set_Time(DM.end_coords[3]);
             scat.EVENT_SET = true;
-
 		}
 		//void set_scattering_energy(double emin, double emax){Escatmin=emin; Escatemax=emax;}
 		//double get_MDP(){return kap;}

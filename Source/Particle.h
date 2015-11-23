@@ -7,7 +7,6 @@
 #include <string>
 #include <iostream>
 #include <functional>
-#include "Distribution.h"
 class Particle{
 	
 public:
@@ -19,7 +18,8 @@ public:
     void     Set_Mass(double);
     void     FourMomentum(double, double, double, double);
     void     ThreeMomentum(double PX, double PY, double PZ);
-    void     Lorentz(Particle);
+    void	 ThreeMomentumPolar(double mom, double theta, double phi);
+	void     Lorentz(Particle);
     void     Rotate_x(double);
     void     Rotate_y(double);
     void     Rotate_z(double);
@@ -32,19 +32,10 @@ public:
     double Momentum();
     double Speed();
     void Generate_Position(double);//Generates an end_coords position
-    double origin_coords[4]//space-time location where the particle was created
+    double origin_coords[4];//space-time location where the particle was created
 	double end_coords[4];//Stores the space-time location where the particle scatters or is otherwise destroyed.
     bool EVENT_SET;//I am going to have to be careful with this variable.
 };
-//Not sure where else to put this.
 
-class Particle_Generator{
-public:
-	Particle_Generator(double m, std::shared_ptr<Distribution> DIST){mass_particle=m; dist=DIST;}
-	void Generate_Particle(Particle &);
-private:
-	std::shared_ptr<Distribution> dist;
-	double mass_particle;
-};
 
 #endif

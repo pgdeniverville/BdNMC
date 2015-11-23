@@ -12,7 +12,8 @@ class parton_sample : public Distribution{
 
     public:
         parton_sample(std::string &pfilenmame, std::string &nfilename, double, double);
-		virtual void sample_momentum(double&, double&, double&);
+		void sample_momentum(double&, double&, double&);
+		void sample_particle(Particle &);
         double production_neutron_cross_section(){return cross_section_n;}
 		double production_proton_cross_section(){return cross_section_p;}
 		double production_cross_section(){return cross_section_p*proton_number+cross_section_n*neutron_number;}

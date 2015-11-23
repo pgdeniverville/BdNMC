@@ -7,14 +7,6 @@
 
 const double speed_of_light = 299792458;
 
-void Particle_Generator::Generate_Particle(Particle &part){
-	part.Set_Mass(mass_particle);
-	double pmom, theta, pphi;
-	dist->sample_momentum(pmom, theta, pphi);
-	//std::cout << "pmom = " << pmom << " theta = " << theta << " phi = " << pphi << std::endl;
-	part.ThreeMomentum(pmom*cos(pphi)*sin(theta), pmom*sin(pphi)*sin(theta), pmom*cos(theta));
-}
-
 Particle::Particle(double mass){
     Set_Mass(mass);
     ThreeMomentum(0,0,0);
@@ -48,6 +40,10 @@ void Particle::ThreeMomentum(double PX, double PY, double PZ){
     pz = PZ;
     E = sqrt(m*m+px*px+py*py+pz*pz);
 
+}
+
+void Particle::ThreeMomentumPolar(double mom, double theta, double phi){
+	ThreeMomentum(mom*cos(phi)*sin(theta),mom*sin(phi)*sin(theta),mom*cos(theta));
 }
 
 void Particle::Set_Mass(double m_new){
@@ -158,7 +154,7 @@ void Particle::Generate_Position(double rngpoint){
         Set_Time(origin_coords[3]);
     }
     else{
-        Set_Time(Momentum()*rngpoint/Speed()/speed_of_light+orgin_coords[3]);
+        Set_Time(Momentum()*rngpoint/Speed()/speed_of_light+origin_coords[3]);
     }
 }
 
