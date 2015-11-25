@@ -153,6 +153,7 @@ void sanfordwang::sample_particle(Particle &part){
 	double mom, theta, phi;
 	sample_momentum(mom, theta, phi);
 	part.ThreeMomentumPolar(mom,theta,phi);
+	part.Set_Position(20,50,-100);
 }
 
 /*

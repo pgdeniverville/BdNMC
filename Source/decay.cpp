@@ -10,8 +10,8 @@ const double pi = 3.14159265;
 using std::cout; using std::endl;
 
 void Link_Particles(Particle &parent, Particle &child){
-	child.SetPosition(parent.x,parent.y,parent.z);
-	child.SetTime(parent.t);
+	child.Set_Position(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
+	child.Set_Time(parent.end_coords[3]);
 }
 
 // two body decay of parent ->  daughter + X (e.g. Pi0 -> gamma + V)
@@ -20,9 +20,8 @@ void DecayDP(Particle &daughter, Particle &parent){
 	double pdx, pdy, pdz, Ed, pd;
 	double thetad, phid;		
 	double lam;	
-	zd = Random::Flat(0,1);
 	thetad = acos(-1+2*Random::Flat(0,1));
-	phid = Random::Flat(0,2.0*pi*zd);
+	phid = Random::Flat(0,2.0*pi*Random::Flat(0,1));
 	double Md, Mp;
 	Md = daughter.m;
 	Mp = parent.m;
@@ -152,7 +151,6 @@ void Meson_Capture_Off_Shell(Particle &daughter1, Particle &daughter2, Particle 
     daughter1.Rotate_y(phid);
     daughter2.Rotate_z(thetad);
     daughter2.Rotate_y(phid);
-	Link_Particles(parent,mediator);
 	Link_Particles(mediator,daughter1);
 	Link_Particles(mediator,daughter2);
 

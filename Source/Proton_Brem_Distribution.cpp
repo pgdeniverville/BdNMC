@@ -52,16 +52,15 @@ void Proton_Brem_Distribution::calc_V_prod_rate(){
 	std::function<double(double, double)> func = std::bind(&Proton_Brem_Distribution::d2N_proton_brem_to_V,this,_1,_2);
 	vprodrate = SimpsonCubature(func,ZMIN,ZMAX,100,PTMIN,PTMAX,100);//Will need to tweak this. Hopefully come up with a more general algorithm at some point.
 	max_prod=d2N_proton_brem_to_V(ZMIN,PTMIN);
-
 };
 
-/*
+
 void Proton_Brem_Distribution::sample_particle(Particle &part){
 	double mom, theta, phi;
 	sample_momentum(mom, theta, phi);
 	part.ThreeMomentumPolar(mom, theta, phi);
 }
-*/
+
 void Proton_Brem_Distribution::sample_momentum(double &pmom, double &theta, double &phi){
 	double z, pt;
 	while(true){
