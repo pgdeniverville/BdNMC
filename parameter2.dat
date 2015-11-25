@@ -48,11 +48,11 @@ production_distribution pi0_sanfordwang
 production_channel eta_decay
 production_distribution k0_sanfordwang
 
-production_channel V_decay
-production_distribution proton_brem
-ptmax 0.2
-zmin 0.2
-zmax 0.8
+#production_channel V_decay
+#production_distribution proton_brem
+#ptmax 0.2
+#zmin 0.2
+#zmax 0.8
 
 #Scattering Parameters
 #Choose either NCE_nucleon or NCE_electron
