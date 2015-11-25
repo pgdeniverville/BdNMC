@@ -9,16 +9,20 @@ const double pi = 3.14159265;
 
 using std::cout; using std::endl;
 
+void Link_Particles(Particle &parent, Particle &child){
+	child.SetPosition(parent.x,parent.y,parent.z);
+	child.SetTime(parent.t);
+}
+
 // two body decay of parent ->  daughter + X (e.g. Pi0 -> gamma + V)
 // output momentum of daughter particle in the lab frame
 void DecayDP(Particle &daughter, Particle &parent){
 	double pdx, pdy, pdz, Ed, pd;
-	double yd, zd, thetad, phid;		
+	double thetad, phid;		
 	double lam;	
-	yd = Random::Flat(0,1);
 	zd = Random::Flat(0,1);
-	thetad = acos(-1+2*yd);
-	phid = 2.0*pi*zd;
+	thetad = acos(-1+2*Random::Flat(0,1));
+	phid = Random::Flat(0,2.0*pi*zd);
 	double Md, Mp;
 	Md = daughter.m;
 	Mp = parent.m;
@@ -30,9 +34,11 @@ void DecayDP(Particle &daughter, Particle &parent){
 	pdz = pd*cos(thetad);
 	daughter.FourMomentum(pdx,pdy,pdz,Ed);
 	// boost darkphoton to lab frame
-	daughter.Lorentz(parent);	
+	daughter.Lorentz(parent);
+	Link_Particles(parent,daughter);	
 }
 // cascade decay for parent -> mediator + X, mediator > daughter1 + daughter 2
+//This assumes no meaningful propagation before the decay occurs
 void DecayDM(Particle &daughter1, Particle &daughter2, Particle &mediator, Particle &parent){
 	double pmx, pmy, pmz, Em, pm;
 	double ym, zm, thetam, phim;	
@@ -74,6 +80,9 @@ void DecayDM(Particle &daughter1, Particle &daughter2, Particle &mediator, Parti
 	// boost dark matter particles to lab frame
 	daughter1.Lorentz(mediator);	
 	daughter2.Lorentz(mediator);
+	Link_Particles(parent,mediator);
+	Link_Particles(mediator,daughter1);
+	Link_Particles(mediator,daughter2);
 }
 
 //isotropic decay for parent -> daughter1 + daughter2
@@ -85,6 +94,8 @@ void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2){
     daughter2.ThreeMomentum(-mom*sin(thetad)*cos(phid),-mom*sin(thetad)*sin(phid),-mom*cos(thetad));
     daughter1.Lorentz(parent);
     daughter2.Lorentz(parent);
+	Link_Particles(parent,daughter1);
+	Link_Particles(parent,daughter2);
 }
 
 void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2, double thetad){
@@ -94,7 +105,8 @@ void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2, do
     daughter2.ThreeMomentum(-mom*sin(thetad)*cos(phid),-mom*sin(thetad)*sin(phid),-mom*cos(thetad));
     daughter1.Lorentz(parent);
     daughter2.Lorentz(parent);
-    
+	Link_Particles(parent,daughter1);
+	Link_Particles(parent,daughter2);
 }
 
 void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2, double thetad, double phid){
@@ -103,6 +115,8 @@ void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2, do
     daughter2.ThreeMomentum(-mom*sin(thetad)*cos(phid),-mom*sin(thetad)*sin(phid),-mom*cos(thetad));
     daughter1.Lorentz(parent);
     daughter2.Lorentz(parent);
+	Link_Particles(parent,daughter1);
+	Link_Particles(parent,daughter2);
 }
 
 void DecayDM_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &mediator, Particle &parent, double theta){
@@ -121,6 +135,9 @@ void DecayDM_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &media
     mediator.Lorentz(parent);
     daughter1.Lorentz(parent);
     daughter2.Lorentz(parent);
+	Link_Particles(parent,mediator);
+	Link_Particles(mediator,daughter1);
+	Link_Particles(mediator,daughter2);
 }
 
 void Meson_Capture_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &mediator, double theta){
@@ -135,4 +152,8 @@ void Meson_Capture_Off_Shell(Particle &daughter1, Particle &daughter2, Particle 
     daughter1.Rotate_y(phid);
     daughter2.Rotate_z(thetad);
     daughter2.Rotate_y(phid);
+	Link_Particles(parent,mediator);
+	Link_Particles(mediator,daughter1);
+	Link_Particles(mediator,daughter2);
+
 }
