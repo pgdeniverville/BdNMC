@@ -11,7 +11,7 @@
 #Model Parameters
 epsilon 1e-3
 dark_matter_mass 0.005
-dark_photon_mass 0.4
+dark_photon_mass 0.1
 alpha_D 0.1
 
 #Run parameters
@@ -45,8 +45,8 @@ production_distribution pi0_sanfordwang
 #particle_list_file particle_list.dat
 
 #Here we also call a second production mode.
-production_channel eta_decay
-production_distribution k0_sanfordwang
+#production_channel eta_decay
+#production_distribution k0_sanfordwang
 
 #production_channel V_decay
 #production_distribution proton_brem
