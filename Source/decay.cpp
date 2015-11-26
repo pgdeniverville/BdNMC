@@ -8,10 +8,17 @@ const double pi = 3.14159265;
 //std::ofstream datalog_decay("decaylog.dat",std::ios::out);
 
 using std::cout; using std::endl;
-
+//This moves a daughter particle's origin to 
 void Link_Particles(Particle &parent, Particle &child){
-	child.Set_Position(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
-	child.Set_Time(parent.end_coords[3]);
+	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
+	child.Set_Creation_Time(parent.end_coords[3]);
+}
+
+void Link_Particles_Immediate(Particle &parent, Particle &child){
+	parent.Set_Position(parent.origin_coords[0],parent.origin_coords[1],parent.origin_coords[2]);
+	parent.Set_Time(parent.origin_coords[3]);
+	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
+	child.Set_Creation_Time(parent.end_coords[3]);
 }
 
 // two body decay of parent ->  daughter + X (e.g. Pi0 -> gamma + V)
@@ -80,8 +87,8 @@ void DecayDM(Particle &daughter1, Particle &daughter2, Particle &mediator, Parti
 	daughter1.Lorentz(mediator);	
 	daughter2.Lorentz(mediator);
 	Link_Particles(parent,mediator);
-	Link_Particles(mediator,daughter1);
-	Link_Particles(mediator,daughter2);
+	Link_Particles_Immediate(mediator,daughter1);
+	Link_Particles_Immediate(mediator,daughter2);
 }
 
 //isotropic decay for parent -> daughter1 + daughter2
@@ -135,8 +142,8 @@ void DecayDM_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &media
     daughter1.Lorentz(parent);
     daughter2.Lorentz(parent);
 	Link_Particles(parent,mediator);
-	Link_Particles(mediator,daughter1);
-	Link_Particles(mediator,daughter2);
+	Link_Particles_Immediate(mediator,daughter1);
+	Link_Particles_Immediate(mediator,daughter2);
 }
 
 void Meson_Capture_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &mediator, double theta){
@@ -153,5 +160,4 @@ void Meson_Capture_Off_Shell(Particle &daughter1, Particle &daughter2, Particle 
     daughter2.Rotate_y(phid);
 	Link_Particles(mediator,daughter1);
 	Link_Particles(mediator,daughter2);
-
 }

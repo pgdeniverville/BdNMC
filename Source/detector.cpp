@@ -1,8 +1,10 @@
 #include "detector.h"
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 using std::vector;
+using std::cout;
 
 //inner product for 3-vectors
 double ip(double vec1[],double vec2[]){
@@ -28,8 +30,8 @@ detector_sphere::detector_sphere (double x, double y, double z, double radius){
 // distance DM travels through detector
 double detector_sphere::Ldet (const Particle &DM) {
 	double Ldetenter, Ldetexit;
-    double A, B, C;
-   
+    double A, B, C;	
+//cout << DM.name << " " << DM.E << " " << DM.px << " " << DM.py << " " << DM.pz << " " << DM.m << " " << DM.origin_coords[0] << " " << DM.origin_coords[1] << " " << DM.origin_coords[2] << " " << DM.origin_coords[3] << " " << DM.end_coords[0] << " " << DM.end_coords[1] << " " << DM.end_coords[2] << " " << DM.end_coords[3] << std::endl;
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
 	o[0]=r[0]-DM.origin_coords[0];o[1]=r[1]-DM.origin_coords[1];o[2]=r[2]-DM.origin_coords[2];
 
