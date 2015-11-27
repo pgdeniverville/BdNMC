@@ -230,7 +230,7 @@ int main(int argc, char* argv[]){
 			cout << "Production Distribution = " << proddist << endl;
 			cout << "Writing to " << proditer->Part_List_File() << endl;
 			for(int num = 0; num < samplesize; num++){
-				PartDist->sample_particle(part);
+				PartDist->Sample_Particle(part);
 				cout << part.px << " " << part.py << " " << part.pz << " " << part.E << endl;
 			}
 			parstream.close();
