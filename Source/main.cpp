@@ -27,6 +27,7 @@
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
 #include "Particle_Generator.h"
+#include "Position_Distributions.h"
 
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
@@ -108,7 +109,8 @@ int main(int argc, char* argv[]){
     if(summary_filename == ""){
         summary_filename = "../Events/summary.dat";
     }
-	
+
+
 	string outmode; 
 	std::unique_ptr<std::ofstream> comprehensive_out; 
 
@@ -316,6 +318,13 @@ int main(int argc, char* argv[]){
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
 			return -1;
 		}
+
+		std::shared_ptr<list<production_distribution> > distmodlist = proditer-> Get_Dist_Mods_List();
+		for(list<production_distribution>::iterator distiter = distmodlist->begin(); distiter!=distmodlist->end();distiter++){
+			if(distiter->name()=="position_offset"){
+				PartDist->Add_Dist(Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
+			}
+		}	
 		proddist_vec.push_back(proddist);
 		DMGen_list.push_back(DMGen);
 		ParGen_list.push_back(ParGen);

@@ -37,7 +37,7 @@ const string zmin_key = "zmin";
 const string zmax_key = "zmax";
 const string part_list_pos_key = "particle_list_position";
 
-const string dist_mod_key = "dist_mod_key";
+const string dist_mod_key = "dist_mod";
 const string pos_offset_key = "position_offset";
 
 const string detkey = "detector";
@@ -139,6 +139,8 @@ production_distribution parse_distribution_mod(std::ifstream &instream, string &
 	tmpdist.dist_mod=val;
 	while(getline(instream, hold)){
 		line_num++;
+		//cout << "Position: " << instream.tellg() << endl;
+		//cout << "Distribution parser " << line_num << ": " << hold << endl;
         if((error_state=split_string(hold, key, val))==0){
             last_pos = instream.tellg();
 			continue;
@@ -177,8 +179,9 @@ production_distribution parse_distribution_mod(std::ifstream &instream, string &
             cerr << hold << endl;
         }
 		last_pos = instream.tellg();
+		//cout << "last_pos = " <<  last_pos << endl;
     }
-	//cout << last_pos << endl;
+	//cout << "end of dist parser position = " << last_pos << endl;
     return tmpdist;
 }
 
@@ -202,7 +205,7 @@ string lowercase(const string &str){
 	string str2(str);
 	for(std::string::size_type i=0; i<str.length(); ++i)
 		str2[i] = tolower(str[i], loc);
-	return str2;
+	return str2; 
 }
 
 production_channel parse_production_channel(std::ifstream &instream, string &hold, string &key, string &val, int &line_num, int &error_state, int &last_pos){
@@ -210,6 +213,8 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 	tmpprod.prod_chan=val;
 	while(getline(instream, hold)){
 		line_num++;
+		//cout << "Position: " << instream.tellg() << endl;
+		//cout << line_num << ": " << hold << endl; 
         if((error_state=split_string(hold, key, val))==0){
             last_pos = instream.tellg();
 			continue;
@@ -250,7 +255,12 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				parse_parameter_file(val, tmpprod.dist_param_map);
 			}
 			else if(key == dist_mod_key){
+				//cout << hold << endl;
 				(tmpprod.dist_mods)->push_back(parse_distribution_mod(instream, hold, key, val, line_num, error_state, last_pos));
+				instream.seekg(last_pos);
+                continue;
+
+			//	cout << hold << endl;
 			}
 			else{
 				line_num--;
@@ -262,8 +272,9 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
             cerr << hold << endl;
         }
 		last_pos = instream.tellg();
+		//cout << "last_pos = " <<  last_pos << endl;
     }
-	//cout << last_pos << endl;
+	//cout << "end of prod parser position = " << last_pos << endl;
     return tmpprod;
 }
 
@@ -338,7 +349,8 @@ Parameter::Parameter(std::ifstream &instream){
         integrity=0;
         while(getline(instream, hold)){
 			line_num++;
-			//cout << "parameter parser line " << line_num << " " << hold << endl;
+			//cout << "Position: " << instream.tellg() << endl;
+			//cout << "parameter parser line " << line_num << ": " << hold << endl;
             if((error_state=split_string(hold, key, val))==0);
             else if(error_state==-1){
                 cerr << line_num << ": Improperly formatted input: ";

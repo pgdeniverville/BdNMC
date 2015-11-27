@@ -18,7 +18,7 @@ class Distribution {
 			for(std::list<Distribution>::iterator i = dist_list->begin(); i!=dist_list->end(); i++)
 				i->sample_particle(part);
 		}
-		void Add_Dist(Distribution &dist){dist_list->push_back(dist);}//This might be dangerous.
+		void Add_Dist(const Distribution &dist){dist_list->push_back(dist);}//This might be dangerous.
 	protected:
 		void sample_particle(Particle &part){};
 		std::shared_ptr<std::list<Distribution> > dist_list;

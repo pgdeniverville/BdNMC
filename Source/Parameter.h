@@ -16,6 +16,7 @@ class production_distribution{
 		std::string dist_mod;
 		double offset_coords[4] = {0,0,0,0};
 		double get_offset(int i);
+		std::string name(){return dist_mod;}
 		std::string DIST_MOD(){return dist_mod;}
 };
 
@@ -41,7 +42,8 @@ class production_channel{
 		std::string Parton_V_Neutron_File(){return parton_V_n_file;}
 		std::string Parton_V_Proton_File(){return parton_V_p_file;}
         std::string Production_Channel(){return prod_chan;}
-		std::unique_ptr<std::list<production_distribution> > dist_mods;
+		std::shared_ptr<std::list<production_distribution> > Get_Dist_Mods_List(){return dist_mods;}
+		std::shared_ptr<std::list<production_distribution> > dist_mods;//Should probably be private
 };
 
 class Parameter{

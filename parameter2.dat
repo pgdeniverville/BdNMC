@@ -36,6 +36,13 @@ beam_energy 8.9
 production_channel pi0_decay
 #Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
 production_distribution pi0_sanfordwang
+dist_mod position_offset
+x-offset 20
+y-offset 50
+z-offset -100
+t-offset 0.0
+
+
 #production_distribution k0_sanfordwang
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.
