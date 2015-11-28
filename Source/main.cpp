@@ -178,7 +178,9 @@ int main(int argc, char* argv[]){
 			PartDist = sw;
 		}
 		else if(proddist=="particle_list"){
-			std::shared_ptr<Particle_List> pl(new Particle_List(proditer->particle_list_file));
+			bool set_pos = proditer->par_list_pos();
+			std::shared_ptr<Particle_List> pl(new Particle_List(proditer->particle_list_file,set_pos));
+			cout << "Reading positions from particle list file\n";
 			PartDist = pl;
 		}
 		else if(proddist=="burmansmith"){
@@ -321,10 +323,15 @@ int main(int argc, char* argv[]){
 
 		std::shared_ptr<list<production_distribution> > distmodlist = proditer-> Get_Dist_Mods_List();
 		for(list<production_distribution>::iterator distiter = distmodlist->begin(); distiter!=distmodlist->end();distiter++){
+			list<std::shared_ptr<Distribution> > distlist;
 			if(distiter->name()=="position_offset"){
-				PartDist->Add_Dist(Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
+				std::shared_ptr<Distribution> tmpdist (new Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
+				PartDist->Add_Dist(tmpdist);
 			}
-		}	
+		}
+		//Particle tpart(1);
+		//PartDist->Sample_Particle(tpart);
+		//tpart.report(cout);
 		proddist_vec.push_back(proddist);
 		DMGen_list.push_back(DMGen);
 		ParGen_list.push_back(ParGen);
@@ -332,6 +339,7 @@ int main(int argc, char* argv[]){
 		Vnum_list.push_back(Vnum);
 		Vnumtot+=Vnum;
 	}//End of Production distribution loop. 
+
 
 	double EDMRES = par->EDM_RES();
 

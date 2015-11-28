@@ -106,6 +106,8 @@ void Particle_List::sample_particle(Particle &part){
 	if(POS){
 		part.Set_Origin(iter->x,iter->y,iter->z);
 		part.Set_Creation_Time(iter->t);
+		part.Set_Position(iter->x,iter->y,iter->z);
+		part.Set_Time(iter->t);
 	}
 	iter++;
 }

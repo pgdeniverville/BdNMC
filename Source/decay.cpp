@@ -86,9 +86,12 @@ void DecayDM(Particle &daughter1, Particle &daughter2, Particle &mediator, Parti
 	// boost dark matter particles to lab frame
 	daughter1.Lorentz(mediator);	
 	daughter2.Lorentz(mediator);
+	//cout << parent.name << " " << parent.end_coords[0] << " " << parent.end_coords[1] << " " << parent.end_coords[2] << endl;
 	Link_Particles(parent,mediator);
 	Link_Particles_Immediate(mediator,daughter1);
 	Link_Particles_Immediate(mediator,daughter2);
+	//cout << daughter1.name << " " << daughter1.end_coords[0] << " " << daughter1.end_coords[1] << " " << daughter1.end_coords[2] << endl;
+	//cout << daughter2.name << " " << daughter2.end_coords[0] << " " << daughter2.end_coords[1] << " " << daughter2.end_coords[2] << endl;
 }
 
 //isotropic decay for parent -> daughter1 + daughter2
