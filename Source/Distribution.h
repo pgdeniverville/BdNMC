@@ -14,8 +14,10 @@ class Distribution {
 		{
 			sample_particle(part);
 			for(std::list<std::shared_ptr<Distribution> >::iterator i = dist_list.begin(); i!=dist_list.end(); i++){
+		//		part.report(std::cout);
 				(*i)->sample_particle(part);
 			}
+		//	part.report(std::cout);
 		}
 		void Add_Dist(std::shared_ptr<Distribution> distptr){dist_list.push_back(distptr);}//This should be unique, need to figure out proper syntax.
 	protected:

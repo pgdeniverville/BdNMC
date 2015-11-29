@@ -13,7 +13,7 @@ using std::endl;
 using std::stod;
 
 Particle_List::Particle_List(const string& infile, bool set_pos){
-	POS = true;
+	POS = set_pos;
 	part_count = 0;
 	instream.open(infile, std::ifstream::in);
 	if(instream.is_open()){
