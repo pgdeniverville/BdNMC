@@ -26,6 +26,8 @@
 #include "BMPT_dist.h"
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
+#include "Particle_Generator.h"
+#include "Position_Distributions.h"
 
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
@@ -107,7 +109,8 @@ int main(int argc, char* argv[]){
     if(summary_filename == ""){
         summary_filename = "../Events/summary.dat";
     }
-	
+
+
 	string outmode; 
 	std::unique_ptr<std::ofstream> comprehensive_out; 
 
@@ -175,7 +178,11 @@ int main(int argc, char* argv[]){
 			PartDist = sw;
 		}
 		else if(proddist=="particle_list"){
-			std::shared_ptr<Particle_List> pl(new Particle_List(proditer->particle_list_file));
+			bool set_pos = proditer->par_list_pos();
+			if(set_pos){
+				cout << "position off-sets were read from particle_list file\n";
+			}
+			std::shared_ptr<Particle_List> pl(new Particle_List(proditer->particle_list_file,set_pos));
 			PartDist = pl;
 		}
 		else if(proddist=="burmansmith"){
@@ -220,9 +227,7 @@ int main(int argc, char* argv[]){
 		}
 		
 		if(outmode=="particle_list"){
-			double mom=0; 
-			double theta=0;
-			double phi=0;
+			Particle part(0);
 			std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
 			cout << "--------------------" << endl;
 			cout << "Run parameters:" << endl;
@@ -231,8 +236,8 @@ int main(int argc, char* argv[]){
 			cout << "Production Distribution = " << proddist << endl;
 			cout << "Writing to " << proditer->Part_List_File() << endl;
 			for(int num = 0; num < samplesize; num++){
-				PartDist->sample_momentum(mom, theta, phi);		
-				parstream  << cos(phi)*sin(theta)*mom << " " << sin(phi)*sin(theta)*mom << " " << mom*cos(theta) << " " << sqrt(mom*mom) << endl;//the energy is not accurate, but does not matter!
+				PartDist->Sample_Particle(part);
+				cout << part.px << " " << part.py << " " << part.pz << " " << part.E << endl;
 			}
 			parstream.close();
 			return 0;
@@ -317,6 +322,15 @@ int main(int argc, char* argv[]){
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
 			return -1;
 		}
+
+		std::shared_ptr<list<production_distribution> > distmodlist = proditer-> Get_Dist_Mods_List();
+		for(list<production_distribution>::iterator distiter = distmodlist->begin(); distiter!=distmodlist->end();distiter++){
+			list<std::shared_ptr<Distribution> > distlist;
+			if(distiter->name()=="position_offset"){
+				std::shared_ptr<Distribution> tmpdist (new Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
+				PartDist->Add_Dist(tmpdist);
+			}
+		}
 		proddist_vec.push_back(proddist);
 		DMGen_list.push_back(DMGen);
 		ParGen_list.push_back(ParGen);
@@ -324,6 +338,8 @@ int main(int argc, char* argv[]){
 		Vnum_list.push_back(Vnum);
 		Vnumtot+=Vnum;
 	}//End of Production distribution loop. 
+
+	//return 0;
 
 	double EDMRES = par->EDM_RES();
 
@@ -443,16 +459,10 @@ int main(int argc, char* argv[]){
                     Particle scatterpart(0);//mass is placeholder until scattering completed. 
 					if(SigGen->probscatter(det, *iter, scatterpart)){
 						if((min_angle<=0||scatterpart.Theta()>min_angle)&&(max_angle>2*pi||scatterpart.Theta()<max_angle)){
-						iter->Generate_Position(Random::Flat(det->cross_point[0],det->cross_point[1]));
-                        scatterpart.Set_Position(iter->coords[0],iter->coords[1],iter->coords[2]);
-                        scatterpart.Set_Time(iter->coords[3]);
-                        scatterpart.EVENT_SET = true;
-                        iter->Set_Position(0,0,0);
-                        iter->Set_Time(0);
-                        vec.insert(std::next(iter),scatterpart);
-                         
-						scat_list[i]++;
-                        scatter_switch = true;
+                        	SigGen->Generate_Position(det, *iter, scatterpart); 
+							vec.insert(std::next(iter),scatterpart);
+							scat_list[i]++;
+                        	scatter_switch = true;
 						}
                     }   
                 }    

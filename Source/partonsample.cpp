@@ -40,6 +40,12 @@ void parton_sample::parse_V_dist(std::string &filename, shared_ptr<Linear_Interp
     V_dist = shared_ptr<Linear_Interpolation>( new Linear_Interpolation(v_dist, mom_min, mom_max));
 }
 
+void parton_sample::sample_particle(Particle &part){
+	double mom, theta, phi;
+	sample_momentum(mom, theta, phi);
+	part.ThreeMomentumPolar(mom, theta, phi);
+}
+
 void parton_sample::sample_momentum(double &pmom, double &theta, double &phi){
     theta=0; 
 	phi=0; 

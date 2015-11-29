@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <exception>
 #include <time.h>
+#include <locale>
 
 using std::exception;
 using std::string;
@@ -34,6 +35,10 @@ const string distribution_parameter_key = "distribution_parameter_file";
 const string ptmax_key = "ptmax";
 const string zmin_key = "zmin";
 const string zmax_key = "zmax";
+const string part_list_pos_key = "particle_list_position";
+
+const string dist_mod_key = "dist_mod";
+const string pos_offset_key = "position_offset";
 
 const string detkey = "detector";
 const string dmkey = "dark_matter_mass";
@@ -119,16 +124,97 @@ bool production_channel::query_dist_param(const string &key, double &var){
 	return false;
 }
 
+production_distribution::production_distribution(){
+	dist_mod = "";
+}
+double production_distribution::get_offset(int i){
+	if(i>3||i<0){
+		std::cerr << "Out of domain for get_offset\n";
+	}	
+	return offset_coords[i];
+}
+
+production_distribution parse_distribution_mod(std::ifstream &instream, string &hold, string &key, string &val, int &line_num, int &error_state, int &last_pos){
+	production_distribution tmpdist;
+	tmpdist.dist_mod=val;
+	while(getline(instream, hold)){
+		line_num++;
+		//cout << "Position: " << instream.tellg() << endl;
+		//cout << "Distribution parser " << line_num << ": " << hold << endl;
+        if((error_state=split_string(hold, key, val))==0){
+            last_pos = instream.tellg();
+			continue;
+		}
+        else if(error_state==-1){
+            cerr << line_num << ": Improperly formatted input: ";
+            cerr << hold << "\n";
+            cerr << "Terminating material parsing.\n";
+            break;
+        }
+        else if(error_state!=1){
+            cerr << "Unknown error code: " << error_state << "\n";
+            cerr << "Terminating material parsing.\n";
+            break;
+        }
+        try{
+			if(key == "x-offset"){
+				tmpdist.offset_coords[0]=stoi(val);
+			}
+			else if(key == "y-offset"){
+				tmpdist.offset_coords[1]=stoi(val);
+			}
+			else if(key == "z-offset"){
+				tmpdist.offset_coords[2]=stoi(val);
+			}
+			else if(key == "t-offset"){
+				tmpdist.offset_coords[3]=stoi(val);
+			}
+			else{
+				line_num--;
+				break;
+			}
+        }
+        catch(exception& e){
+            cerr << "Exception: " << e.what() << " encountered while parsing line " << line_num << ":" << endl;
+            cerr << hold << endl;
+        }
+		last_pos = instream.tellg();
+		//cout << "last_pos = " <<  last_pos << endl;
+    }
+	//cout << "end of dist parser position = " << last_pos << endl;
+    return tmpdist;
+}
+
+production_channel::production_channel(){
+	prod_chan="";
+   	prod_dist="default"; 
+	particle_list_file="";
+   	sanfordwang_file="";
+   	parton_V_n_file=""; 
+	parton_V_p_file=""; 
+	meson_per_pi0=-1; 
+	PTMAX=-1; 
+	ZMIN=-1;
+   	ZMAX=-1;
+	particle_list_position=false;
+	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
+}
+
+string lowercase(const string &str){
+	std::locale loc;
+	string str2(str);
+	for(std::string::size_type i=0; i<str.length(); ++i)
+		str2[i] = tolower(str[i], loc);
+	return str2; 
+}
+
 production_channel parse_production_channel(std::ifstream &instream, string &hold, string &key, string &val, int &line_num, int &error_state, int &last_pos){
 	production_channel tmpprod;
 	tmpprod.prod_chan=val;
-	//cout << last_pos << endl;
-	//int tmppost = last_pos;
-	//instream.seekg(tmppost);
 	while(getline(instream, hold)){
-		//cout << last_pos << endl;
 		line_num++;
-		//cout << "prod_chan parser "  << line_num << " " << hold << endl;
+		//cout << "Position: " << instream.tellg() << endl;
+		//cout << line_num << ": " << hold << endl; 
         if((error_state=split_string(hold, key, val))==0){
             last_pos = instream.tellg();
 			continue;
@@ -161,9 +247,21 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.ZMIN=stod(val);
 			else if(key==ptmax_key)
 				tmpprod.PTMAX=stod(val);
+			else if(key==part_list_pos_key){
+				if(lowercase(val)=="true")
+					tmpprod.particle_list_position=true;
+			}
 			else if(key == sanford_wang_key || key == distribution_parameter_key){
 				parse_parameter_file(val, tmpprod.dist_param_map);
-				}
+			}
+			else if(key == dist_mod_key){
+				//cout << hold << endl;
+				(tmpprod.dist_mods)->push_back(parse_distribution_mod(instream, hold, key, val, line_num, error_state, last_pos));
+				instream.seekg(last_pos);
+                continue;
+
+			//	cout << hold << endl;
+			}
 			else{
 				line_num--;
 				break;
@@ -174,8 +272,9 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
             cerr << hold << endl;
         }
 		last_pos = instream.tellg();
+		//cout << "last_pos = " <<  last_pos << endl;
     }
-	//cout << last_pos << endl;
+	//cout << "end of prod parser position = " << last_pos << endl;
     return tmpprod;
 }
 
@@ -250,7 +349,8 @@ Parameter::Parameter(std::ifstream &instream){
         integrity=0;
         while(getline(instream, hold)){
 			line_num++;
-			//cout << "parameter parser line " << line_num << " " << hold << endl;
+			//cout << "Position: " << instream.tellg() << endl;
+			//cout << "parameter parser line " << line_num << ": " << hold << endl;
             if((error_state=split_string(hold, key, val))==0);
             else if(error_state==-1){
                 cerr << line_num << ": Improperly formatted input: ";

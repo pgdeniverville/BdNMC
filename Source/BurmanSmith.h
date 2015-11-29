@@ -15,7 +15,8 @@ double Bspline(int, int, double);
 
 class BurmanSmith : public Distribution {
     public:
-        void sample_momentum(double &, double &, double &);
+        void sample_particle(Particle &);
+        void sample_momentum(double &,double &, double &);
         BurmanSmith(double beam_kinetic_energy, int proton_number);
         double fpimax;
    private:

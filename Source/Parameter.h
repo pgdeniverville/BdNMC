@@ -10,6 +10,16 @@
 #include "detector.h"
 #include <memory>
 
+class production_distribution{
+	public:
+		production_distribution();
+		std::string dist_mod;
+		double offset_coords[4] = {0,0,0,0};
+		double get_offset(int i);
+		std::string name(){return dist_mod;}
+		std::string DIST_MOD(){return dist_mod;}
+};
+
 class production_channel{
 	public:
 		std::string prod_chan, prod_dist, particle_list_file;
@@ -18,9 +28,11 @@ class production_channel{
 		//This map holds sanfordwang parameters.
 		std::map<std::string, std::string> dist_param_map;
 		double meson_per_pi0, PTMAX, ZMIN, ZMAX;
-		production_channel() : prod_chan(""), prod_dist("default"), particle_list_file(""), sanfordwang_file(""), parton_V_n_file(""), parton_V_p_file(""), meson_per_pi0(-1), PTMAX(-1), ZMIN(-1), ZMAX(-1) {};
+		bool particle_list_position;
+		production_channel();
 		bool query_dist_param(){return (dist_param_map.size()!=0);}
 		bool query_dist_param(const std::string &, double&);
+		bool par_list_pos(){return particle_list_position;} 
 		double Meson_Per_Pi0(){return meson_per_pi0;}
 		double ptmax(){return PTMAX;}
 		double zmin(){return ZMIN;}
@@ -30,6 +42,8 @@ class production_channel{
 		std::string Parton_V_Neutron_File(){return parton_V_n_file;}
 		std::string Parton_V_Proton_File(){return parton_V_p_file;}
         std::string Production_Channel(){return prod_chan;}
+		std::shared_ptr<std::list<production_distribution> > Get_Dist_Mods_List(){return dist_mods;}
+		std::shared_ptr<std::list<production_distribution> > dist_mods;//Should probably be private
 };
 
 class Parameter{

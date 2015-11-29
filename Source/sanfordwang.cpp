@@ -149,6 +149,12 @@ void sanfordwang::sample_momentum(double &pmom, double &theta, double &phi){
 		std::cerr << "Unknown production distribution" << endl;
 }
 
+void sanfordwang::sample_particle(Particle &part){
+	double mom, theta, phi;
+	sample_momentum(mom, theta, phi);
+	part.ThreeMomentumPolar(mom,theta,phi);
+}
+
 /*
 void sanfordwang::etaGen(Particle &eta){
     eta.m = META;

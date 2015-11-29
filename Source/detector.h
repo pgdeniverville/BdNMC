@@ -43,6 +43,7 @@ public:
 protected:
     double r[3];
     double b[3];
+	double o[3];
     std::vector<Material> matvec;
     double p_num_tot, n_num_tot, e_num_tot;
 };

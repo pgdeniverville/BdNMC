@@ -10,6 +10,7 @@ class Proton_Brem_Distribution : public Distribution{
 		Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double ptmin=0);
 		double V_prod_rate(){return vprodrate;}
 		double d2N_proton_brem_to_V(double z, double pt2);
+		void sample_particle(Particle &);
 		void sample_momentum(double &, double &, double &);
 		void set_fit_parameters(production_channel &); 
 	private:

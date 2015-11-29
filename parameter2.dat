@@ -17,7 +17,7 @@ alpha_D 0.1
 #Run parameters
 POT 2e20
 pi0_per_POT 0.9
-samplesize 5000
+samplesize 20000
 
 #Optionally, you may specify a number of pi0s per meson
 #meson_per_pi0 0.0333
@@ -35,12 +35,20 @@ beam_energy 8.9
 #Currently pi0_decay, eta_decay, rho_decay, omega_decay and phi_decay are supported.
 production_channel pi0_decay
 #Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
-production_distribution pi0_sanfordwang
+#production_distribution pi0_sanfordwang
+#Optionally, you can choose a different starting position for particles using dist_mod position_offset. This is no different from translating the detector position in the oposite direction, and has been implemented as a test for future features.
+#dist_mod position_offset
+#x-offset 20
+#y-offset 50
+#z-offset -100
+#t-offset 0.0
+
+
 #production_distribution k0_sanfordwang
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.
 #sanfordwang_file ../sanfordwang_parameters.dat
-#Optionally, a list of 4-vectors (of pions, for example) may be provided in the format (px,py,pz,E)
+#Optionally, a list of 4-vectors (of pions, for example) may be provided in the format (px,py,pz,E).
 #production_distribution particle_list
 #particle_list_file particle_list.dat
 

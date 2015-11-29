@@ -7,19 +7,13 @@
 
 const double speed_of_light = 299792458;
 
-void Particle_Generator::Generate_Particle(Particle &part){
-	part.Set_Mass(mass_particle);
-	double pmom, theta, pphi;
-	dist->sample_momentum(pmom, theta, pphi);
-	//std::cout << "pmom = " << pmom << " theta = " << theta << " phi = " << pphi << std::endl;
-	part.ThreeMomentum(pmom*cos(pphi)*sin(theta), pmom*sin(pphi)*sin(theta), pmom*cos(theta));
-}
-
 Particle::Particle(double mass){
     Set_Mass(mass);
     ThreeMomentum(0,0,0);
-    for(int i=0; i<4; i++)
-        coords[i]=0.0;
+    for(int i=0; i<4; i++){
+        origin_coords[i]=0.0;
+		end_coords[i]=0.0;
+	}	
     EVENT_SET = false;
 }
 
@@ -48,19 +42,33 @@ void Particle::ThreeMomentum(double PX, double PY, double PZ){
 
 }
 
+void Particle::ThreeMomentumPolar(double mom, double theta, double phi){
+	ThreeMomentum(mom*cos(phi)*sin(theta),mom*sin(phi)*sin(theta),mom*cos(theta));
+}
+
 void Particle::Set_Mass(double m_new){
     m = m_new;
     E = sqrt(m_new*m_new+px*px+py*py+pz*pz);
 }
 
+void Particle::Set_Origin(double x, double y, double z){
+	origin_coords[0]=x;
+	origin_coords[1]=y;
+	origin_coords[2]=z;
+}
+
 void Particle::Set_Position(double x, double y, double z){
-    coords[0]=x;
-    coords[1]=y;
-    coords[2]=z;
+    end_coords[0]=x;
+    end_coords[1]=y;
+    end_coords[2]=z;
+}
+
+void Particle::Set_Creation_Time(double t){
+	origin_coords[3]=t;
 }
 
 void Particle::Set_Time(double t){
-    coords[3]=t;
+    end_coords[3]=t;
 }
 
 void Particle::Lorentz(Particle parent){
@@ -143,13 +151,13 @@ double Particle::Speed(){
 void Particle::Generate_Position(double rngpoint){
     Set_Position(px*rngpoint, py*rngpoint, pz*rngpoint);
     if(Momentum()==0.0){
-        Set_Time(0.0);
+        Set_Time(origin_coords[3]);
     }
     else{
-        Set_Time(Momentum()*rngpoint/Speed()/speed_of_light);
+        Set_Time(Momentum()*rngpoint/Speed()/speed_of_light+origin_coords[3]);
     }
 }
 
 void Particle::report(std::ostream& ostr){
-    ostr << name << " " << E << " " << px << " " << py << " " << pz << " " << m << std::endl;
-}
+    ostr << name << " " << E << " " << px << " " << py << " " << pz << " " << m << " " << origin_coords[0] << " " << origin_coords[1] << " " << origin_coords[2] << " " << origin_coords[3] << " " << end_coords[0] << " " << end_coords[1] << " " << end_coords[2] << " " << end_coords[3] << std::endl;
+} 
