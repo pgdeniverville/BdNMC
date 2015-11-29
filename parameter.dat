@@ -5,81 +5,96 @@
 #Uncomment this to set the seed for the Random Number Generator
 #seed 114234
 
-#run 2500
+#Give you run a name. If no name is supplied, one will be generated from the current time.
+#run 14506
 
 #Model Parameters
 epsilon 1e-3
-dark_matter_mass 0.02
-dark_photon_mass 0.08
+dark_matter_mass 0.005
+dark_photon_mass 0.1
 alpha_D 0.1
 
 #Run parameters
 POT 2e20
 pi0_per_POT 0.9
-samplesize 5000
+samplesize 20000
 
-#meson_per_pi0 30
+#Optionally, you may specify a number of pi0s per meson
+#meson_per_pi0 0.0333
 
 #The simulation generates dark matter trajectories intersecting the detector, scatters them, and 
 #throws away the results until burn_max is reached. If the number of attempts exceeds 
-#burn_max*burn_timeout, the burn_in process aborts early and an alert is written to the terminal
+#burn_max*burn_timeout, the burn_in process aborts early and an alert is written to cerr
 #before the simulation resumes.
 burn_max 1000
 burn_timeout 20000 
 
-#Production Parameters
-#Currently pi0_decay and eta_decay are supported
-#production_channel pi0_decay
-#production_distribution particle_list
-
-production_channel pi0_decay
-production_distribution particle_list
-particle_list_file Source/particle_list.dat
-
-production_channel pi0_decay
-meson_per_pi0 3
-production_distribution particle_list
-particle_list_file Source/particle_list_lsnd.dat
-
-production_channel eta_decay
-production_distribution particle_list
-particle_list_file Source/particle_list.dat
-
-#parton_V_neutron_file parton_V_n.dat
-#parton_V_proton_file parton_V_p.dat
-#proton_target_cross_section 1.1e-30
-n_num_target 52
-p_num_target 42
 beam_energy 8.9
-#Choosing a production distribution is optional. 
+
+
+
+######EXAMPLE####################
+#Production Parameters
+#Currently pi0_decay, eta_decay, rho_decay, omega_decay and phi_decay are supported.
+production_channel pi0_decay
+
+#Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
 #production_distribution pi0_sanfordwang
-#production_distribution k0_sanfordwang
 
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.
 #sanfordwang_file ../sanfordwang_parameters.dat
 
+#A list of 4-momenta (of pions, for example) may be provided in the format (px py pz E).
+#production_distribution particle_list
+#particle_list_file particle_list.dat
+#Provide an additional set of 4-vectors in the format (px py pz E x y z t) to also determine the starting position and time of a particle by setting particle_list_position true.
+#particle_list_position true
+
+#Choose a different starting position for particles using dist_mod position_offset. This is no different from translating the detector position in the oposite direction, and has been implemented as a test for future features.
+#dist_mod position_offset
+#x-offset 20
+#y-offset 50
+#z-offset -100
+#t-offset 0.0
+######END EXAMPLE################
+
+
+#Here we also call a second production mode.
+#production_channel eta_decay
+#production_distribution k0_sanfordwang
+
+
+#This invokes the bremsstrahlung production channel. This works, but is still in development, so the results may not be reliable!
+#production_channel V_decay
+#production_distribution proton_brem
+#ptmax 0.2
+#zmin 0.2
+#zmax 0.8
 
 #Scattering Parameters
 #Choose either NCE_nucleon or NCE_electron
 signal_channel NCE_nucleon
 
-#Where to write events
+#Where to write events. 
 output_file Events/events.dat
+#Where to write a summary of the run with number of events and paramaters in the format: channel_name V_mass DM_mass num_events epsilon alpha_prime scattering_channel 
 summary_file Events/summary.dat
-#In summary mode, the code appends to the output_file with the production and signal channels, as well as the model parameters.
-output_mode summary
 
 #In comprehensive mode, all particles that make up an event are written to the output file. This overwrites the output file.
-#output_mode comprehensive
+output_mode comprehensive
+#summary suppresses output to output_file (no event list), while still writing to the summary file.
+#output_mode summary
 
-
-#Generate a particle_list file of length samplesize.
+#Generate a particle_list file of length samplesize by writing to output_file for use in
+#production_distribution particle_list.
 #output_mode particle_list
 
-max_scatter_energy 1
-min_scatter_energy 0.035
-dm_energy_resolution 0.01
+#Cuts on the kinetic energy of outgoing nucleon or electron. These default to min=0 and max=1e9 GeV
+#max_scatter_energy 0.9
+#min_scatter_energy 0.035
+#Decreasing the resolution increases setup time but improves accuracy of scattering cross section
+#dm_energy_resolution 0.01
 
 #Detector Parameters
 detector sphere
