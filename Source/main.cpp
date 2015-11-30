@@ -226,22 +226,7 @@ int main(int argc, char* argv[]){
 			return -1;
 		}
 		
-		if(outmode=="particle_list"){
-			Particle part(0);
-			std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
-			cout << "--------------------" << endl;
-			cout << "Run parameters:" << endl;
-			cout << "--------------------" << endl;	
-			cout << "Number of events to be generated = " << samplesize  << endl;
-			cout << "Production Distribution = " << proddist << endl;
-			cout << "Writing to " << proditer->Part_List_File() << endl;
-			for(int num = 0; num < samplesize; num++){
-				PartDist->Sample_Particle(part);
-				cout << part.px << " " << part.py << " " << part.pz << " " << part.E << endl;
-			}
-			parstream.close();
-			return 0;
-		}
+
 		if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){ 
 			
 			if(proddist=="default"){
@@ -330,6 +315,22 @@ int main(int argc, char* argv[]){
 				std::shared_ptr<Distribution> tmpdist (new Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
 				PartDist->Add_Dist(tmpdist);
 			}
+		}
+		if(outmode=="particle_list"){
+			Particle part(0);
+			std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
+			cout << "--------------------" << endl;
+			cout << "Run parameters:" << endl;
+			cout << "--------------------" << endl;	
+			cout << "Number of events to be generated = " << samplesize  << endl;
+			cout << "Production Distribution = " << proddist << endl;
+			cout << "Writing to " << proditer->Part_List_File() << endl;
+			for(int num = 0; num < samplesize; num++){
+				PartDist->Sample_Particle(part);
+				cout << part.px << " " << part.py << " " << part.pz << " " << part.E << " " << part.end_coords[0] << " " << part.end_coords[1] << " " << part.end_coords[2] << " " << part.end_coords[3] << endl;
+			}
+			parstream.close();
+			return 0;
 		}
 		proddist_vec.push_back(proddist);
 		DMGen_list.push_back(DMGen);
