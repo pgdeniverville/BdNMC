@@ -327,7 +327,7 @@ int main(int argc, char* argv[]){
 			cout << "Writing to " << proditer->Part_List_File() << endl;
 			for(int num = 0; num < samplesize; num++){
 				PartDist->Sample_Particle(part);
-				cout << part.px << " " << part.py << " " << part.pz << " " << part.E << " " << part.end_coords[0] << " " << part.end_coords[1] << " " << part.end_coords[2] << " " << part.end_coords[3] << endl;
+				parstream << part.px << " " << part.py << " " << part.pz << " " << part.E << " " << part.end_coords[0] << " " << part.end_coords[1] << " " << part.end_coords[2] << " " << part.end_coords[3] << endl;
 			}
 			parstream.close();
 			return 0;

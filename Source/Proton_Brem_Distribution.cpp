@@ -29,9 +29,8 @@ double Proton_Brem_Distribution::F_1_proton(double q2){
 	return pow(1+q2/mD2,-2);
 }
 
-
 double Proton_Brem_Distribution::d2N_proton_brem_to_V(double z, double pt2){
-	return pow(F_1_proton(MA*MA),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA, kappa);
+	return pow(F_1_proton(MA*MA),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp_scalar(z,pt2, MA, kappa);
 }
 
 void Proton_Brem_Distribution::set_fit_parameters(production_channel &par){
@@ -54,23 +53,20 @@ void Proton_Brem_Distribution::calc_V_prod_rate(){
 	max_prod=d2N_proton_brem_to_V(ZMIN,PTMIN);
 };
 
-
-
 void Proton_Brem_Distribution::sample_particle(Particle &part){
 	double mom, theta, phi;
 	sample_momentum(mom, theta, phi);
 	part.ThreeMomentumPolar(mom, theta, phi);
 }
 
-
 void Proton_Brem_Distribution::sample_momentum(double &pmom, double &theta, double &phi){
-	double z, pt;
+	double z, pt, hold;
 	while(true){
 		z = Random::Flat(ZMIN,ZMAX);
 		pt = Random::Flat(PTMIN,PTMAX);
-		if(d2N_proton_brem_to_V(z,pt)>Random::Flat()*max_prod){
-			if(max_prod<d2N_proton_brem_to_V(z,pt))
-				std::cerr << "Maximum of Proton Brem Distribution not at expected point in phase space!\n";
+		if((hold=d2N_proton_brem_to_V(z,pt))>Random::Flat()*max_prod){
+			if(max_prod<hold)
+				max_prod=hold;
 			break;
 		}
 	}

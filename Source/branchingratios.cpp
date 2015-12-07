@@ -56,7 +56,6 @@ double rhofunc(double x){
         return exp(20*(0.77-x));
 }
 
-
 double brrho_to_V_1(double mv, double mx, double kappa, double alphaD){
     return 3.0*pow(kappa,2.0)/alphaem*Br_rho_to_e_e*pow(mrho,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
         (pow(pow(mrho,2)-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2));
@@ -176,10 +175,15 @@ double brmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double
     auto dbr = std::bind(dbrmass_to_dm_dm,mmeson, mv,mx,kappa,alphaD,_1);
     return DoubleExponential_adapt(dbr,4*mx*mx,pow(mmeson,2),100,0.1,1e-4);
 }
-
+//divide by 4?
 double wpp(double z, double pt2, double mA, double epsilon){
 	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
 	return pow(epsilon,2)*alphaem/(2*pi*H)*((1+pow(1-z,2))/z-2*z*(1-z)*((2*mp*mp+mA*mA)/H-2*pow(z*mp*mp/H,2))+2*z*(1-z)*(z+pow(1-z,2))*pow(mp*mA/H,2)+2*z*pow((1-z)*mA*mA/H,2));
+}
+
+double wpp_scalar(double z, double pt2, double mA, double epsilon){
+	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
+	return pow(epsilon,2)*alphaem/(8*pi)*(8*pow(mp,4)*(z-1)*pow(z,3)/pow(H,3)+4*pow(mp*mA,2)*(z-1)*pow(z,3)/pow(H,3)-8*pow(mp,2)*(z-1)*z/pow(H,2)+z/H);
 }
 
 /********************
