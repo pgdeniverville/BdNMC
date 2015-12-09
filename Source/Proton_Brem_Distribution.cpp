@@ -30,7 +30,7 @@ double Proton_Brem_Distribution::F_1_proton(double q2){
 }
 
 double Proton_Brem_Distribution::d2N_proton_brem_to_V(double z, double pt2){
-	return pow(F_1_proton(MA*MA),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp_scalar(z,pt2, MA, kappa);
+	return pow(F_1_proton(MA*MA),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA, kappa);
 }
 
 void Proton_Brem_Distribution::set_fit_parameters(production_channel &par){
