@@ -35,7 +35,6 @@ void Nucleon_Scatter::generate_cross_sections(){
 //	double emax; double emin;
 	double a,b,c,xmin;
     for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
-		
 		std::function<double(double)> fp = bind(dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
 		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
 		vec_proton.push_back(DoubleExponential_adapt(fp,scatmin(iter,mdm,mp),scatmax(iter),100,0.1,1e-4));

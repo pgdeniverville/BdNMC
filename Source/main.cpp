@@ -169,7 +169,7 @@ int main(int argc, char* argv[]){
 		std::shared_ptr<Distribution> PartDist;
 		std::shared_ptr<Particle_Generator> ParGen;	
 		double Vnum;
-		cout << "Setting up distribution " << proddist << endl;
+		cout << "Setting up distribution " << proddist << " for channel " << prodchoice << endl;
 		//Don't delete these without good reason! They're used immediately!
 		double p1,p2,p3;
 		if(proddist=="pi0_sanfordwang"||proddist=="k0_sanfordwang"){
@@ -399,7 +399,12 @@ int main(int argc, char* argv[]){
 	double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0; i<chan_count; i++){
    		int nburn = 0;
-		cout << "Begin Channel " << i+1 << " Burn-In" << endl;
+		if(Vnum_list[i]==0){
+			cout << "Skipping Channel " << i+1 << ", no events expected.\n";
+		}
+		else{
+			cout << "Begin Channel " << i+1 << " Burn-In" << endl;
+		}
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
 			list<Particle> vecburn;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, ParGen_list[i])){

@@ -7,6 +7,8 @@
 #include "Random.h"
 #include <algorithm>
 
+using std::cout; using std::endl;
+
 const double pi = 3.14159265359;
 const double mp = 0.938272;
 const double mn = 0.939565;
@@ -27,31 +29,43 @@ void Nucleon_Scatter_Baryonic::generate_cross_sections(){
 	std::vector<double> vec_neutron;
 	std::vector<double> vec_proton_maxima;
 	std::vector<double> vec_neutron_maxima;
-	double a,b,c,xmin;
+	double a,b,c,xmin,tmpmin,sigmatot;
     for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
-        std::function<double(double)> fp = bind(DMNscattering_Baryonic::dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
-		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
-		vec_proton.push_back(DoubleExponential_adapt(fp,std::max(DMNscattering_Baryonic::Efmin(iter,mdm,mp),Escatmin),std::min(iter,Escatmax),100,0.1,1e-4));
-        a=scatmin(iter,mdm,mp);
-		b=scatmin(iter,mdm,mp)+0.1;
-		c=mnbrak(a,b,fplim);
-		xmin=0;
-		vec_proton_maxima.push_back(-1.0*golden(a,b,c,fplim,tol_frac,tol_abs,xmin));
-	
+		std::function<double(double)> fp = bind(DMNscattering_Baryonic::dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
+		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,tmpmin,scatmax(iter));	
+		sigmatot=DoubleExponential_adapt(fp,std::max(DMNscattering_Baryonic::Efmin(iter,mdm,mp),Escatmin),std::min(iter,Escatmax),100,0.1,1e-4);
+		//Build an array of integrated proton scattering cross sections.
+		vec_proton.push_back(sigmatot);
+		if(sigmatot==0){
+			vec_proton_maxima.push_back(0);
+		}
+		else{
+			a=tmpmin;
+			b=tmpmin+0.1;
+			c=mnbrak(a,b,fplim);
+			xmin=0;
+			vec_proton_maxima.push_back(-1.0*golden(a,b,c,fplim,tol_frac,tol_abs,xmin));
+		}
 		
 		std::function<double(double)> fn = bind(DMNscattering_Baryonic::dsigmadEdmN,iter,_1,mdm,MDP,alD,kap);
         std::function<double(double)> fnlim = bind(lim_func_wrapper,_1,0.0,fn,scatmin(iter,mdm,mn),scatmax(iter));	
-        a=scatmin(iter,mdm,mn);
-		b=scatmin(iter,mdm,mn)+0.1;
-		c=mnbrak(a,b,fnlim);
-		xmin=0;
-		vec_neutron.push_back(DoubleExponential_adapt(fn,std::max(DMNscattering_Baryonic::Efmin(iter,mdm,mn),Escatmin),std::min(iter,Escatmax),100,0.1,1e-4));
+		sigmatot=DoubleExponential_adapt(fn,std::max(DMNscattering_Baryonic::Efmin(iter,mdm,mn),Escatmin),std::min(iter,Escatmax),100,0.1,1e-4);
+		vec_neutron.push_back(sigmatot);
+        if(sigmatot==0){
+			vec_neutron_maxima.push_back(0);
+		}
+		else{
+			a=scatmin(iter,mdm,mn);
+			b=scatmin(iter,mdm,mn)+0.1;
+			c=mnbrak(a,b,fnlim);
+			xmin=0;
+			vec_neutron_maxima.push_back(-1.0*golden(a,b,c,fnlim,tol_frac,tol_abs,xmin));
+		}
     }
 	proton_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton,Edmmin,Edmmax));
     neutron_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron,Edmmin,Edmmax));
 	proton_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton_maxima,Edmmin,Edmmax));
 	neutron_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron_maxima,Edmmin,Edmmax));
-
 }
 
 bool Nucleon_Scatter_Baryonic::probscatter(std::shared_ptr<detector>& det, Particle &DM){ 
