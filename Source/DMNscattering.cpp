@@ -59,7 +59,7 @@ double BesselJ1(double x){
 double CoherentFormFactor(double q, double A){
     if(q==0)
         return 1.0;
-    return 3.0/(q*RadiusFunction(A))*BesselJ1(q*RadiusFunction(A))*exp(-suppression_constant*q*q/2.0);
+    return 3.0/(q*RadiusFunction(A))*BesseJ1(q*RadiusFunction(A))*exp(-suppression_constant*q*q/2.0);
 }
 /* Returns the differential scattering cross section between a proton and 
  * a dark matter particle for initial dark matter energy E and final 

@@ -52,9 +52,18 @@ const double cmpm = 100.0;
 const double pi=3.14159;
 
 int main(int argc, char* argv[]){
-    using namespace std::placeholders;
+/*
+	for(double mv=0.001; mv<1.2; mv+=0.001){
+		cout << mv << " " << brpi0_to_gamma_dm_dm(mv,0.01,1e-3,0.1) << " " << breta_to_gamma_dm_dm(mv,0.01,1e-3,0.1) << " " << brrho_to_V(mv,0.01,1e-3,0.1) << " " << bromega_to_V(mv,0.01,1e-3,0.1) << " " << brphi_to_V(mv,0.01,1e-3,0.1) << " " << br_eta_prime_to_V(mv,0.01,1e-3,0.1) << endl;
+	}
+	return 0;
+*/
+	using namespace std::placeholders;
     string parameter_file;
+
+
 	
+
     if(argc==2)
         parameter_file = argv[1];
     else
@@ -368,7 +377,7 @@ int main(int argc, char* argv[]){
 	}
 	double min_angle = par->Min_Angle();
 	double max_angle = par->Max_Angle();
-
+	
 	//Begin Run
 	cout << "--------------------" << endl;	
     cout << "Run parameters:" << endl;	
@@ -401,6 +410,7 @@ int main(int argc, char* argv[]){
    		int nburn = 0;
 		if(Vnum_list[i]==0){
 			cout << "Skipping Channel " << i+1 << ", no events expected.\n";
+			continue;
 		}
 		else{
 			cout << "Begin Channel " << i+1 << " Burn-In" << endl;

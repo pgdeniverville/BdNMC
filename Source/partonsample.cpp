@@ -1,6 +1,7 @@
 #include <vector>
 #include "Random.h"
 #include "partonsample.h"
+#include <iostream>
 
 using std::shared_ptr;
 //No error checking here! It's awful!
