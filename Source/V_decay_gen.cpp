@@ -4,8 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-
-const double pi = 3.14159;
+#include "constants.h"
 
 V_decay_gen::V_decay_gen(double MV, double MX, double kap, double alp, const std::string chan){
     set_model_params(MV, MX, kap, alp);

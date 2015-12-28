@@ -6,12 +6,11 @@
 #include "Random.h"
 #include "Kinematics.h"
 #include <algorithm>
+#include "constants.h"
 
-const double Me = 0.000511;
-const double Pi = 3.141592653589793;
-const double alphaEM = 1/137.035999074;
+const double Me = MASS_ELECTRON;
+const double Pi = pi;
 const double convmcm = 100.0;
-const double convGeV2cm2 = 3.89e-28;
 
 void scatterevent (double MDP, double kap, double alD, Particle DM, Particle &electron);
 

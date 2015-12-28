@@ -6,13 +6,12 @@
 #include <iostream>
 #include "Random.h"
 #include <algorithm>
+#include "constants.h"
 
 using std::cout; using std::endl;
 
-const double pi = 3.14159265359;
-const double mp = 0.938272;
-const double mn = 0.939565;
-const double convGeV2cm2 = 3.89e-28;
+const double mp = MASS_PROTON;
+const double mn = MASS_NEUTRON;
 const double convmcm = 100.0;
 const double tol_abs=1e-20;
 const double tol_frac=1e-10;

@@ -1,4 +1,5 @@
 #include "DMgenerator.h"
+#include "constants.h"
 #include "branchingratios.h"
 #include "decay.h"
 #include <cstdlib>
@@ -11,8 +12,6 @@
  *
  */
 
-const double mpion = 0.1349766;
-const double pi = 3.14159;
 const int BURN_MAX = 1000;
 
 pion_decay_gen_baryonic::pion_decay_gen_baryonic(double MV, double MX, double kap, double alp){
@@ -37,7 +36,7 @@ void pion_decay_gen_baryonic::Evaluate_Branching_Ratio(){
 
     if(branchingratio>brtemp*1.30){
                 OFF_SHELL=true;
-        if(mv*mv<=mpion*mpion && mv*mv >= 4*mx*mx)
+        if(mv*mv<=mpi0*mpi0 && mv*mv >= 4*mx*mx)
             pmax =  d2brpi0_to_gamma_dm_dm_baryonic(mv, mx, kappa, alphaD, mv*mv, pi/2);
         burn_in(BURN_MAX);//skip if on shell available?
     }
@@ -47,7 +46,7 @@ void pion_decay_gen_baryonic::Evaluate_Branching_Ratio(){
 
 void pion_decay_gen_baryonic::sample_dist(double& s, double& theta){
     while(true){
-        s = Random::Flat(4*mx*mx,pow(mpion,2));
+        s = Random::Flat(4*mx*mx,pow(mpi0,2));
         theta = Random::Flat(0,pi);
         if(d2brpi0_to_gamma_dm_dm_baryonic(mv, mx, kappa, alphaD, s, theta)>pmax*Random::Flat(0,1)){
             if(d2brpi0_to_gamma_dm_dm_baryonic(mv, mx, kappa, alphaD, s, theta)>pmax)
@@ -61,7 +60,7 @@ bool pion_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<doub
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(mpion);
+    Particle meson(mpi0);
     meson_prod->Generate_Particle(meson);
     meson.name = "pion";
 
@@ -108,8 +107,6 @@ bool pion_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<doub
  *
  */
 
-const double meta = 0.547853;
-const double br_eta_to_gamma_gamma=0.3941;
 
 eta_decay_gen_baryonic::eta_decay_gen_baryonic(double MV, double MX, double kap, double alp){
     set_model_params(MV, MX, kap, alp);
@@ -198,9 +195,6 @@ bool eta_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<doubl
  *
  */
 
-
-const double momega = 0.782;
-
 omega_decay_gen_baryonic::omega_decay_gen_baryonic(double MV, double MX, double kap, double alp){
     if(MV<=2*MX)
         std::cerr << "invalid model parameters. M_A <= 2*M_DM\n";
@@ -253,8 +247,6 @@ bool omega_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<dou
  *PHI DECAY GEN
  *
  */
-
-const double mphi = 1.020;
 
 phi_decay_gen_baryonic::phi_decay_gen_baryonic(double MV, double MX, double kap, double alp){
     if(MV<=2*MX)

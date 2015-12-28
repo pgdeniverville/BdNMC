@@ -1,9 +1,9 @@
 #include "decay.h"
+#include "constants.h"
 #include <iostream>
 #include <fstream>
 #include "Kinematics.h"
 
-const double pi = 3.14159265;
 
 //std::ofstream datalog_decay("decaylog.dat",std::ios::out);
 

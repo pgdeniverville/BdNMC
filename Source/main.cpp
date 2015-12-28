@@ -9,6 +9,8 @@
 #include <numeric>
 #include <memory>
 
+#include "constants.h"
+
 #include "Distribution.h"
 #include "Integrator.h"
 #include "detector.h"
@@ -36,20 +38,12 @@ using std::list;    using std::vector;
 using std::exception;
 using std::cerr;
 
-const double microbarn = 1e-34;
-const double mp = 0.938272;
-const double mn = 0.939565;
-const double me = 0.000511;
+const double mp = MASS_PROTON;
+const double mn = MASS_NEUTRON;
+const double me = MASS_ELECTRON;
 const double EDMres = 0.1;
-const double mpi0= 0.1349766;
-const double meta=0.547862;
-const double momega=0.782;
-const double mrho = 0.77527;
-const double mphi = 1.019461;
 //cm per meter
 const double cmpm = 100.0;
-
-const double pi=3.14159;
 
 int main(int argc, char* argv[]){
 /*

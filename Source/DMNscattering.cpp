@@ -3,15 +3,13 @@
 
 #include <iostream>
 #include "Kinematics.h"
+#include "constants.h"
 
-const double pi = 3.14159265359;
-const double alphaEM = 1.0/137.035999074;
 //All masses are defined in terms of GeV.
-const double mp = 0.938272;
-const double mn = 0.939565;
+const double mp = MASS_PROTON;
+const double mn = MASS_NEUTRON;
 
 //unit conversions
-const double convGeV2cm2 = 3.89e-28;
 const double convmcm = 100.0;
 
 //Form factor fit parameters from hep-ex/0308005.
@@ -59,7 +57,7 @@ double BesselJ1(double x){
 double CoherentFormFactor(double q, double A){
     if(q==0)
         return 1.0;
-    return 3.0/(q*RadiusFunction(A))*BesseJ1(q*RadiusFunction(A))*exp(-suppression_constant*q*q/2.0);
+    return 3.0/(q*RadiusFunction(A))*BesselJ1(q*RadiusFunction(A))*exp(-suppression_constant*q*q/2.0);
 }
 /* Returns the differential scattering cross section between a proton and 
  * a dark matter particle for initial dark matter energy E and final 

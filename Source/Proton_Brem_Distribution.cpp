@@ -5,11 +5,12 @@
 #include <functional>
 #include "Integrator.h"
 #include "branchingratios.h"
+#include "constants.h"
+
 
 using std::bind;
 using namespace std::placeholders;
-const double pi = 3.14159;
-const double mp = 0.938272;
+const double mp = MASS_PROTON;
 
 
 Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double ptmin){

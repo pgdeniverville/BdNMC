@@ -1,6 +1,7 @@
 #include "DMgenerator.h"
 #include "branchingratios.h"
 #include "decay.h"
+#include "constants.h"
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -16,8 +17,6 @@
 using std::cout;
 using std::cerr;
 using std::endl;
-const double mpion = 0.1349766;
-const double pi = 3.14159;
 const int BURN_MAX = 1000;
 
 pion_decay_gen::pion_decay_gen(double MV, double MX, double kap, double alp){
@@ -32,10 +31,10 @@ void pion_decay_gen::burn_in(int runs){
 }
 
 void pion_decay_gen::Evaluate_Branching_Ratio(){
-    if(2*mx>mpion){
+    if(2*mx>mpi0){
         branchingratio = 0;
         cerr << chan_name << " forbidden by energy conservation.";
-		throw std::domain_error("mx>mpion/2, out of domain"); 
+		throw std::domain_error("mx>mpi0/2, out of domain"); 
     }
 
     branchingratio = brpi0_to_gamma_dm_dm(mv, mx, kappa, alphaD);
@@ -46,7 +45,7 @@ void pion_decay_gen::Evaluate_Branching_Ratio(){
 
     if(branchingratio>brpi0toVgamma(mv,mx,kappa,alphaD)*brV_to_dm_dm(mv, mx, kappa, alphaD)*1.30){
                 OFF_SHELL=true;
-        if(mv*mv<=mpion*mpion && mv*mv >= 4*mx*mx)
+        if(mv*mv<=mpi0*mpi0 && mv*mv >= 4*mx*mx)
             pmax =  d2brpi0_to_gamma_dm_dm(mv, mx, kappa, alphaD, mv*mv, pi/2);
 		else
         	burn_in(BURN_MAX);//skip if on shell available?
@@ -57,7 +56,7 @@ void pion_decay_gen::Evaluate_Branching_Ratio(){
 
 void pion_decay_gen::sample_dist(double& s, double& theta){
     while(true){
-        s = Random::Flat(4*mx*mx,pow(mpion,2));
+        s = Random::Flat(4*mx*mx,pow(mpi0,2));
         theta = Random::Flat(0,pi);
 		double hold;
         if((hold=d2brpi0_to_gamma_dm_dm(mv, mx, kappa, alphaD, s, theta))>pmax*Random::Flat(0,1)){
@@ -71,7 +70,7 @@ void pion_decay_gen::sample_dist(double& s, double& theta){
 bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod ){
     double intersect1=0;
     double intersect2=0;
-    Particle meson(mpion);
+    Particle meson(mpi0);
     meson_prod->Generate_Particle(meson);
     meson.name = "pion";
 
@@ -118,9 +117,6 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
  *ETA DECAY GEN
  *
  */
-
-const double meta = 0.547853;
-const double br_eta_to_gamma_gamma=0.3941;
 
 eta_decay_gen::eta_decay_gen(double MV, double MX, double kap, double alp){
     set_model_params(MV, MX, kap, alp);
@@ -222,7 +218,6 @@ bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particl
  */
 
 
-const double mrho = 0.770;
 
 rho_decay_gen::rho_decay_gen(double MV, double MX, double kap, double alp){
     if(MV<=2*MX)
@@ -277,7 +272,6 @@ bool rho_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particl
  *
  */
 
-const double momega = 0.782;
 
 omega_decay_gen::omega_decay_gen(double MV, double MX, double kap, double alp){
     if(MV<=2*MX)
@@ -332,7 +326,6 @@ bool omega_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Parti
  *
  */
 
-const double mphi = 1.020;
 
 phi_decay_gen::phi_decay_gen(double MV, double MX, double kap, double alp){
     if(MV<=2*MX)

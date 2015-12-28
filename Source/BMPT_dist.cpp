@@ -1,14 +1,12 @@
 #include "BMPT_dist.h"
 
+#include "constants.h"
 #include "Random.h"
 #include <math.h>
 #include <iostream>
 
-const double mp = 0.9382;
-const double mn = 0.9395;
-const double mpion = 0.139;
-const double mpi0 = 0.134;
-const double pi = 3.14159265359;
+const double mp = MASS_PROTON;
+const double mn = MASS_NEUTRON;
 
 //BMPT fit parameters
 const double A = 62.3;
@@ -22,7 +20,9 @@ const double r0 = 1.05;
 const double r1 = 2.65;
 const double MXBAR = 1.88;//GeV
 
-const double Be_Mass_Number = 8;//This distribution is calibrated for Beryllium, but can be scaled to other materials.
+
+//Should be moved into constants.h?
+const double Be_Mass_Number = 8; //This distribution is calibrated for Beryllium, but can be scaled to other materials.
 
 using std::cout;
 using std::endl;

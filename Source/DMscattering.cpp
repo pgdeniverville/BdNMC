@@ -4,14 +4,13 @@
 #include <iostream>
 #include "Random.h"
 #include "Kinematics.h"
+#include "constants.h"
 
 using std::cout; using std::endl;
 
-const double Me = 0.000511;
-const double Pi = 3.141592653589793;
-const double alphaEM = 1/137.035999074;
+const double Me = MASS_ELECTRON;
+const double Pi = pi;
 const double convmcm = 100.0;
-const double convGeV2cm2 = 3.89e-28;
 
 // Electron angle as a function of 
 // electron energy, angle cross and dark matter 

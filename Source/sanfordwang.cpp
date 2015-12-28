@@ -2,13 +2,13 @@
 #include "Random.h"
 #include <math.h>
 #include <iostream>
+#include "constants.h"
 
 using std::cout;
 using std::endl;
 
-const double MPI = 0.13498;
-const double META = 0.547853;
-const double pi = 3.141592653589793;
+const double MPI = mpi0;
+const double META = meta;
 const double thetamin=0, thetamax=pi/2.0;
 //const double sigswpip=158.93469618126042;
 //const double sigswpim=144.63;

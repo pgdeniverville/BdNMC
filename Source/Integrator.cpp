@@ -2,10 +2,10 @@
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
+#include "constants.h"
 
 using std::cout; using std::endl;
 
-const double pi = 3.14159265359;
 const int DDMAX = 30;
 
 using std::vector;

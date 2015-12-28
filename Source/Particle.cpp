@@ -1,11 +1,10 @@
 #include "Particle.h"
 #include "Kinematics.h"
 #include <iostream>
-
+#include "constants.h"
 
 //using std::cout; using std::endl;
 
-const double speed_of_light = 299792458;
 
 Particle::Particle(double mass){
     Set_Mass(mass);

@@ -1,18 +1,16 @@
 #include "BurmanSmith.h"
+#include "constants.h"
 #include <iostream>
 
-const double pi = 3.14159;
 const double degree = pi/180.0;
-const double MPION = 0.13957018;
 
 const double normzc[] = {0.8851, -0.1015, 0.1459, -0.0265};
 const double knots[] = {0,0,0,30,70,180,180,180};
 const double B = 25.0;//Need to double check this
 
-const double mp = 0.938272046*1000.0;
-const double md = 1.875612859*1000.0;
-const double mpion = 0.13957018*1000.0;
-const double mpi0 = 0.134;
+const double mp = MASS_PROTON*1000.0;
+const double md = MASS_DEUTERON*1000.0;
+const double mpion = MASS_PION_CHARGED*1000.0;
 
 //recursive spline definition. Slow, but it should be fine for low spline orders.
 double Bspline(int p, int i, double theta){
@@ -130,7 +128,7 @@ void BurmanSmith::sample_momentum(double &mompi, double &thetapi, double &phipi)
             if(prob>fpimax)
                 fpimax=prob;
             
-            mompi = sqrt(pow(Tpi/1000.0+MPION,2)-pow(MPION,2));
+            mompi = sqrt(pow(Tpi/1000.0+MASS_PION_CHARGED,2)-pow(MASS_PION_CHARGED,2));
             thetapi*=degree;
             phipi = Random::Flat(0,1)*2*pi;
            // std::cout << pion.E << " " << pion.px << " " << pion.py << " " << pion.pz << " " << std::endl;

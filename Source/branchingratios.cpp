@@ -2,6 +2,7 @@
 #include "Integrator.h"
 #include "Random.h"
 #include "Kinematics.h"
+#include "constants.h"
 #include <functional>
 #include <cmath>
 #include <iostream>
@@ -9,13 +10,8 @@
 
 using std::cout; using std::endl;
 
-const double mp = 0.938;
-const double mpion = 0.1349766;
-const double mpim = 0.139570;
-const double meta = 0.547853;
-const double momega = 0.782;
-const double mrho = 0.770;
-const double mphi = 1.020;
+const double mp = MASS_PROTON;
+const double mpim = MASS_PION_CHARGED;
 const double metap = 0.95778;
 const double Br_etap_to_gamma_gamma=0.022;
 const double Br_etap_to_gamma_rho=0.291;
@@ -25,7 +21,6 @@ const double Br_rho_to_e_e = 4.72e-5;
 const double brpi0to2gamma = 0.98823;
 const double bretato2gamma = 0.3941;
 const double Br_omega_to_e_e = 7.28e-5;
-const double pi = 3.14159;
 const double melec = 0.000511;
 const double mmuon = 0.1057;
 const double alphaem = 1/137.036;
@@ -38,9 +33,9 @@ const double etafactor = 0.61;
 
 
 double brpi0toVgamma(double mv, double mx, double kappa, double alphaD){
-    if(mv>mpion)
+    if(mv>mpi0)
         return 0;
-    return 2*pow(kappa,2)*pow(1-mv*mv/pow(mpion,2),3)*brpi0to2gamma;
+    return 2*pow(kappa,2)*pow(1-mv*mv/pow(mpi0,2),3)*brpi0to2gamma;
 }
 
 double bretatoVgamma(double mv, double mx, double kappa, double alphaD){
@@ -126,17 +121,17 @@ double brV_to_dm_dm(double mv, double mx, double kappa, double alphaD){
 }
 
 double d2brpi0_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s, double theta){
-    return sqrt(1-4*mx*mx/s)*pow(pow(mpion,2)-s,3)*(s-4*mx*mx)*alphaD*pow(kappa,2)*pow(sin(theta),3)/(8*pow(mpion,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)));
+    return sqrt(1-4*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4*mx*mx)*alphaD*pow(kappa,2)*pow(sin(theta),3)/(8*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)));
 }
 
 double dbrpi0_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s){
-    return sqrt(1.0-4.0*mx*mx/s)*pow(pow(mpion,2)-s,3)*(s-4.0*mx*mx)*alphaD*pow(kappa,2)/(6.0*pow(mpion,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)));
+    return sqrt(1.0-4.0*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4.0*mx*mx)*alphaD*pow(kappa,2)/(6.0*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)));
 }
 
 double brpi0_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD){
     using namespace std::placeholders;
     auto dbr = std::bind(dbrpi0_to_gamma_dm_dm,mv,mx,kappa,alphaD,_1);
-    return DoubleExponential_adapt(dbr,4*mx*mx,pow(mpion,2),100,0.1,1e-4);
+    return DoubleExponential_adapt(dbr,4*mx*mx,pow(mpi0,2),100,0.1,1e-4);
 }
 
 double d2breta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s, double theta){
@@ -162,7 +157,7 @@ double brmasstoV(double mass, double mv, double mx, double kappa, double alphaD)
 }
 
 double d2brmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double alphaD, double s, double theta){
-//   return alphaD*pow(kappa,2)*sqrt(1-4*mx*mx/s)*(1-s/pow(mpion,2))*(pow(pow(mpion,2)-s,2)-16*pow(TriangleFunction(mpion,s,0)*TriangleFunction(s,mx,mx)*cos(theta),2)*s)*Sin(theta)/(8*mpion^4*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)))
+//   return alphaD*pow(kappa,2)*sqrt(1-4*mx*mx/s)*(1-s/pow(mpi0,2))*(pow(pow(mpi0,2)-s,2)-16*pow(TriangleFunction(mpi0,s,0)*TriangleFunction(s,mx,mx)*cos(theta),2)*s)*Sin(theta)/(8*mpi0^4*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)))
     return sqrt(1-4*mx*mx/s)*pow(pow(mmeson,2)-s,3)*(s-4*mx*mx)*alphaD*pow(kappa,2)*pow(sin(theta),3)/(8*pow(mmeson,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2)));
 }
 
@@ -211,38 +206,38 @@ double brVB_to_dm_dm(double mv, double mx, double kappa, double alphaD){
 }
 
 double brpi0toVBgamma(double mv, double mx, double kappa, double alphaD){
-    if(mv>mpion)
+    if(mv>mpi0)
         return 0;
-    return 2*pow(sqrt(alphaD/alphaem)-kappa,2)*pow(1-mv*mv/pow(mpion,2),3)*brpi0to2gamma;
+    return 2*pow(sqrt(alphaD/alphaem)-kappa,2)*pow(1-mv*mv/pow(mpi0,2),3)*brpi0to2gamma;
 }
 
 double d2brpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD, double s, double theta){
-    return sqrt(1-4*mx*mx/s)*pow(pow(mpion,2)-s,3)*(s-4*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaem)-kappa,2)*pow(sin(theta),3)/(8*pow(mpion,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
+    return sqrt(1-4*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaem)-kappa,2)*pow(sin(theta),3)/(8*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
 }
 
 double dbrpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD, double s){
-    return sqrt(1.0-4.0*mx*mx/s)*pow(pow(mpion,2)-s,3)*(s-4.0*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaem)-kappa,2)/(6.0*pow(mpion,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
+    return sqrt(1.0-4.0*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4.0*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaem)-kappa,2)/(6.0*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
 }
 
 double brpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD){
     using namespace std::placeholders;
     auto dbr = std::bind(dbrpi0_to_gamma_dm_dm_baryonic,mv,mx,kappa,alphaD,_1);
-    if(mv>2*mx&&mv<mpion){
+    if(mv>2*mx&&mv<mpi0){
         double up = mv*mv+5*mv*GammaVB(mv, mx, kappa, alphaD);
         double down = mv*mv-5*mv*GammaVB(mv, mx, kappa, alphaD);
         if(down<4*mx*mx)
             down = 4*mx*mx;
 
-        if(up>pow(mpion,2))
-            up = pow(mpion,2);
+        if(up>pow(mpi0,2))
+            up = pow(mpi0,2);
 
         double low = DoubleExponential_adapt(dbr,4*mx*mx,down, 2 ,0.1,1e-4);
         double mid = DoubleExponential_adapt(dbr,down, up, 2 ,0.1,1e-5);
-        double high = DoubleExponential_adapt(dbr, up, pow(mpion,2), 2 ,0.1,1e-4);
+        double high = DoubleExponential_adapt(dbr, up, pow(mpi0,2), 2 ,0.1,1e-4);
         return low+mid+high;
     }
     else{
-        return DoubleExponential_adapt(dbr,4*mx*mx,pow(mpion,2),100,0.1,1e-4);
+        return DoubleExponential_adapt(dbr,4*mx*mx,pow(mpi0,2),100,0.1,1e-4);
     }
 }
 

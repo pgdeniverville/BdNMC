@@ -1,5 +1,8 @@
 #include "Kinematics.h"
 #include <math.h>
+
+
+
 //
 double pAbs (double px, double py, double pz, double p0) {
 	double rpAbs;
@@ -28,15 +31,15 @@ double phi (double px, double py, double pz, double p0) {
 	}
 	else if (px < 0 && py > 0) 
 	{
-		return 3.141592653589793-atan(fabs(py/px));
+		return M_PI-atan(fabs(py/px));
 	}	
 	else if (px < 0 && py < 0) 
 	{
-		return 3.141592653589793+atan(fabs(py/px));
+		return M_PI+atan(fabs(py/px));
 	}	
 	else
 	{
-		return 2*3.141592653589793 - atan(fabs(py/px));
+		return 2*M_PI - atan(fabs(py/px));
 	}	
 }
 //

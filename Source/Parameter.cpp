@@ -5,6 +5,7 @@
 #include <exception>
 #include <time.h>
 #include <locale>
+#include "constants.h"
 
 using std::exception;
 using std::string;
@@ -13,8 +14,6 @@ using std::cout; using std::cerr;
 using std::endl;
 using std::vector;
 using std::list;
-
-const double pi = 3.14159;
 
 const string beam_energy_key = "beam_energy";
 const string max_dm_energy_key = "max_dm_energy";

@@ -4,15 +4,13 @@
 #include <iostream>
 #include "Kinematics.h"
 #include "Random.h"
+#include "constants.h"
 
-const double pi = 3.14159265359;
-const double alphaEM = 1.0/137.035999074;
 //All masses are defined in terms of GeV.
-const double mp = 0.938272;
-const double mn = 0.939565;
+const double mp = MASS_PROTON;
+const double mn = MASS_NEUTRON;
 
 //unit conversions
-const double convGeV2cm2 = 3.89e-28;
 const double convmcm = 100.0;
 
 //Form factor fit parameters from hep-ex/0308005.
@@ -34,7 +32,6 @@ using std::cout; using std::endl;
 
 const double R_a=0.52;
 const double R_s=0.9;
-const double GeVtofm=0.197;
 
 
 
