@@ -355,7 +355,9 @@ int main(int argc, char* argv[]){
 	//Should add scatter angle to this as well at some point.	
 	double max_scatter_energy = par->Max_Scatter_Energy();
 	double min_scatter_energy = par->Min_Scatter_Energy();
-	
+	double min_angle = par->Min_Angle();
+	double max_angle = par->Max_Angle();
+
 	if(sigchoice=="NCE_electron"){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
 	}
@@ -369,9 +371,6 @@ int main(int argc, char* argv[]){
 		cerr << "Invalid Channel Selection: " << sigchoice << endl;
 		return -1;
 	}
-	double min_angle = par->Min_Angle();
-	double max_angle = par->Max_Angle();
-	
 	//Begin Run
 	cout << "--------------------" << endl;	
     cout << "Run parameters:" << endl;	

@@ -78,8 +78,12 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM){
         return false;
 }
 
-bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &Nucleon){ 
+
+bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, list<Particle> Nucleon, list<Particle>::iterator lit){ 
 	
+}
+
+bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &Nucleon){ 
 	using namespace std::placeholders;
     double LXDet = convmcm*(det->Ldet(DM));
     double XDMp = proton_cross->Interpolate(DM.E)*(det->PNtot());
