@@ -19,7 +19,7 @@ class Scatter{
 	public:
 		Scatter(){pMax = 0;}
 		virtual ~Scatter(){};
-		virtual bool probscatter(std::shared_ptr<detector>& det, Particle &DM, std::list<Particle>& partlist, std::list<Particle>::iterator) = 0;
+		virtual bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&) = 0;
 		virtual bool probscatter(std::shared_ptr<detector>& det, Particle &DM) = 0;
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);}
 		double get_pMax(){return pMax;}
@@ -49,7 +49,7 @@ class Nucleon_Scatter: public Scatter{
 	public:
 		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
 		~Nucleon_Scatter(){}
-		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, std::list<Particle> &partlist, std::list<Particle>::iterator it);
+		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
@@ -72,7 +72,8 @@ class Nucleon_Scatter_Baryonic: public Scatter{
 	public:
 		Nucleon_Scatter_Baryonic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
 		~Nucleon_Scatter_Baryonic(){}
-		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, std::list<Particle> &partlist, std::list<Particle>::iterator it);
+		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
@@ -94,7 +95,8 @@ class Electron_Scatter: public Scatter{
 	public:
 		Electron_Scatter(double MDM, double MV, double alphaprime, double kappa, double eEmin, double eEmax);
 		~Electron_Scatter(){}
-		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, std::list<Particle> &partlist, std::list<Particle>::iterator it);
+		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
 		void get_pMax(){}
 	private:

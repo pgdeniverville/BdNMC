@@ -371,6 +371,8 @@ int main(int argc, char* argv[]){
 		cerr << "Invalid Channel Selection: " << sigchoice << endl;
 		return -1;
 	}
+	SigGen->set_angle_limits(min_angle, max_angle);
+
 	//Begin Run
 	cout << "--------------------" << endl;	
     cout << "Run parameters:" << endl;	
@@ -466,13 +468,9 @@ int main(int argc, char* argv[]){
 						iter->report(*comprehensive_out);
 					//may need to replace this with a list<Particle> later
                     Particle scatterpart(0);//mass is placeholder until scattering completed. 
-					if(SigGen->probscatter(det, *iter, scatterpart)){
-						if((min_angle<=0||scatterpart.Theta()>min_angle)&&(max_angle>2*pi||scatterpart.Theta()<max_angle)){
-                        	SigGen->Generate_Position(det, *iter, scatterpart); 
-							vec.insert(std::next(iter),scatterpart);
-							scat_list[i]++;
-                        	scatter_switch = true;
-						}
+					if(SigGen->probscatter(det, vec, iter)){
+						scat_list[i]++;
+                        scatter_switch = true;
                     }   
                 }    
             }
