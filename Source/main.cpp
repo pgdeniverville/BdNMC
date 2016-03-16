@@ -46,12 +46,6 @@ const double EDMres = 0.1;
 const double cmpm = 100.0;
 
 int main(int argc, char* argv[]){
-/*
-	for(double mv=0.001; mv<1.2; mv+=0.001){
-		cout << mv << " " << brpi0_to_gamma_dm_dm(mv,0.01,1e-3,0.1) << " " << breta_to_gamma_dm_dm(mv,0.01,1e-3,0.1) << " " << brrho_to_V(mv,0.01,1e-3,0.1) << " " << bromega_to_V(mv,0.01,1e-3,0.1) << " " << brphi_to_V(mv,0.01,1e-3,0.1) << " " << br_eta_prime_to_V(mv,0.01,1e-3,0.1) << endl;
-	}
-	return 0;
-*/
 	using namespace std::placeholders;
     string parameter_file;
 
