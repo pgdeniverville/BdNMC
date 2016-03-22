@@ -173,7 +173,7 @@ double brmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double
 //divide by 4?
 double wpp(double z, double pt2, double mA, double epsilon){
 	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
-	return pow(epsilon,2)*alphaem/(2*pi*H)*((1+pow(1-z,2))/z-2*z*(1-z)*((2*mp*mp+mA*mA)/H-2*pow(z*mp*mp/H,2))+2*z*(1-z)*(z+pow(1-z,2))*pow(mp*mA/H,2)+2*z*pow((1-z)*mA*mA/H,2));
+	return 1.0/4.0*pow(epsilon,2)*alphaem/(2*pi*H)*((1+pow(1-z,2))/z-2*z*(1-z)*((2*mp*mp+mA*mA)/H-2*pow(z*mp*mp/H,2))+2*z*(1-z)*(z+pow(1-z,2))*pow(mp*mA/H,2)+2*z*pow((1-z)*mA*mA/H,2));
 }
 
 double wpp_scalar(double z, double pt2, double mA, double epsilon){
