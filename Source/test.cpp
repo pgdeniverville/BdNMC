@@ -1,11 +1,15 @@
-#include "branchingratios.h"
+#include "constants.h"
+#include "Kinematics.h"
+
 #include <iostream>
 #include <functional>
+
 
 using std::cout;
 using std::endl;
 using namespace std::placeholders;
 
 int main(){
-	cout << d2N_proton_brem_to_V(70, 0.2, 1, 0.2, 0.5) << endl;
+	cout << Enmin(1,0.01,0.938) << endl;
+	cout << Enmax(1,0.01,0.938) << endl;
 }

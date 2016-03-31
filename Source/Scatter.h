@@ -1,3 +1,4 @@
+
 #ifndef GUARD_scatter_h
 #define GUARD_scatter_h
 #include <iostream>
@@ -105,4 +106,31 @@ class Electron_Scatter: public Scatter{
 		double scatmin(double, double);
 };
 
+class Pion_Inelastic: public Scatter{
+	public:
+		Pion_Inelastic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
+		~Pion_Inelastic(){}
+		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
+		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
+			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
+			generate_cross_sections();
+		}
+	private:
+		double Ermax(double DM_Energy, double DM_Mass, double Nucleon_Mass);
+		double Ermin(double DM_Energy, double DM_Mass, double Nucleon_Mass);
+		double Er_to_theta(double DM_Energy, double Delta_Energy, double DM_Mass, double Nucleon_Mass);
+		double dsigma_dER_N(double En, double ER, double mx, double mA, double alphaprime, double kappa, double mN);
+		double GM(double q2);
+		double Edmmin, Edmmax, Edmres;
+		std::unique_ptr<Linear_Interpolation> proton_cross_maxima;
+		std::unique_ptr<Linear_Interpolation> neutron_cross_maxima;
+		std::unique_ptr<Linear_Interpolation> proton_cross;
+		std::unique_ptr<Linear_Interpolation> neutron_cross;
+		std::shared_ptr<Linear_Interpolation> form_factor;
+		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&, double nuclmass);
+		void generate_cross_sections();
+		void load_form_factor(const std::string &filename, std::shared_ptr<Linear_Interpolation> &form);
+};
 #endif
