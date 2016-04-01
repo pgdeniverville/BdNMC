@@ -131,6 +131,6 @@ class Pion_Inelastic: public Scatter{
 		std::shared_ptr<Linear_Interpolation> form_factor;
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&, double nuclmass);
 		void generate_cross_sections();
-		void load_form_factor(const std::string &filename, std::shared_ptr<Linear_Interpolation> &form);
+		void load_form_factor(const std::string &filename, std::shared_ptr<Linear_Interpolation> form);
 };
 #endif
