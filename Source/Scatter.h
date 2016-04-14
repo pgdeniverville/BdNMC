@@ -22,12 +22,12 @@ class Scatter{
 		virtual ~Scatter(){};
 		virtual bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&) = 0;
 		virtual bool probscatter(std::shared_ptr<detector>& det, Particle &DM) = 0;
-		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);}
+		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
+			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);}
 		double get_pMax(){return pMax;}
 		void set_pMax(double pm){pMax=pm;}
 		void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, Particle &scat){
 			DM.Generate_Position(Random::Flat(det->cross_point[0],det->cross_point[1]));
-            scat.Set_Position(DM.end_coords[0],DM.end_coords[1],DM.end_coords[2]);
             scat.Set_Time(DM.end_coords[3]);
             scat.EVENT_SET = true;
 		}
@@ -120,6 +120,7 @@ class Pion_Inelastic: public Scatter{
 	private:
 		double Ermax(double DM_Energy, double DM_Mass, double Nucleon_Mass);
 		double Ermin(double DM_Energy, double DM_Mass, double Nucleon_Mass);
+		void prep_ab(double &, double &, double, double, double);
 		double Er_to_theta(double DM_Energy, double Delta_Energy, double DM_Mass, double Nucleon_Mass);
 		double dsigma_dER_N(double En, double ER, double mx, double mA, double alphaprime, double kappa, double mN);
 		double GM(double q2);
@@ -131,6 +132,6 @@ class Pion_Inelastic: public Scatter{
 		std::shared_ptr<Linear_Interpolation> form_factor;
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&, double nuclmass);
 		void generate_cross_sections();
-		void load_form_factor(const std::string &filename, std::shared_ptr<Linear_Interpolation> form);
+		void load_form_factor(const std::string &filename, std::shared_ptr<Linear_Interpolation>& form);
 };
 #endif

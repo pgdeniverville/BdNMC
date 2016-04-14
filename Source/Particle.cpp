@@ -5,7 +5,7 @@
 
 //using std::cout; using std::endl;
 
-
+//Should update to use Set_Origin and Set_Time
 Particle::Particle(double mass){
     Set_Mass(mass);
     ThreeMomentum(0,0,0);
@@ -49,24 +49,31 @@ void Particle::Set_Mass(double m_new){
     m = m_new;
     E = sqrt(m_new*m_new+px*px+py*py+pz*pz);
 }
-
+//Currently, I am not enforcing any joining of the origin coordinates to the end coordinates.
+//This should be corrected. Probably by not allowing end point to be set at all, only the time?
+//Need to update end point to reflect new origin point.
 void Particle::Set_Origin(double x, double y, double z){
 	origin_coords[0]=x;
 	origin_coords[1]=y;
 	origin_coords[2]=z;
 }
-
+//This should be handled by Set_Time.
+//It's been removed, will probably break a bunch of things, but that's okay.
+/*
 void Particle::Set_Position(double x, double y, double z){
     end_coords[0]=x;
     end_coords[1]=y;
     end_coords[2]=z;
 }
-
+*/
 void Particle::Set_Creation_Time(double t){
 	origin_coords[3]=t;
 }
 
 void Particle::Set_Time(double t){
+	end_coords[0]=(t-origin_coords[3])*Speed()*speed_of_light*px/Momentum()+origin_coords[0];
+    end_coords[1]=(t-origin_coords[3])*Speed()*speed_of_light*py/Momentum()+origin_coords[1];
+	end_coords[2]=(t-origin_coords[3])*Speed()*speed_of_light*pz/Momentum()+origin_coords[2];	
     end_coords[3]=t;
 }
 
@@ -148,7 +155,8 @@ double Particle::Speed(){
 }
 
 void Particle::Generate_Position(double rngpoint){
-    Set_Position(px*rngpoint, py*rngpoint, pz*rngpoint);
+	//This should be removed.
+    //Set_Position(px*rngpoint+origin_coords[0], py*rngpoint+origin_coords[1], pz*rngpoint+origin_coords[2]);
     if(Momentum()==0.0){
         Set_Time(origin_coords[3]);
     }

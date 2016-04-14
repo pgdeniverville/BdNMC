@@ -5,7 +5,7 @@
 // Taken from 
 // http://arxiv.org/abs/0806.1449
 
-#include "Parameter.h"
+#include "Parameter.h"//This is annoying. I should get rid of it if I refactor.
 #include "Distribution.h"
 #include <string>
 
@@ -14,16 +14,16 @@ public:
     sanfordwang(const std::string p_choice){production_choice=p_choice;}
 	void sample_momentum(double &, double &, double &);
 	void sample_particle(Particle &);
-	void pi0sample (double &, double &, double &);
+	void pi0sample(double &, double &, double &);
     void pi0burnin();
 	void K0sample (double &, double &, double &);
 	void K0burnin();	
 	void set_fit_parameters(production_channel &);
+	double swpip (const double p, const double theta);
+	double swpim (const double p, const double theta);
+	double swK(const double p, const double theta);
 	void report();
 private:
-	double swpip (const double, const double);
-    double swpim (const double p, const double theta);
-	double swK(const double p, const double theta);
 	//These aren't exact, they're a little higher than you'd think	
 	double fpi0max=54.25;
 	double sigKmax=0.6506;

@@ -26,12 +26,14 @@ public:
     void     report(std::ostream&);
     void    Generate_4Vector(double s);
 	void 	Set_Origin(double x, double y, double z);
-    void    Set_Position(double x, double y, double z);
+//    void    Set_Position(double x, double y, double z);
 	void 	Set_Creation_Time(double t);
     void    Set_Time(double t); 
     double Momentum();
     double Speed();
+    double Kinetic_Energy(){return E-m;}
     void Generate_Position(double);//Generates an end_coords position
+    //I should design custom 4 vector objects. Also 3 vector objects which 4-vectors hold.
     double origin_coords[4];//space-time location where the particle was created
 	double end_coords[4];//Stores the space-time location where the particle scatters or is otherwise destroyed.
     bool EVENT_SET;//I am going to have to be careful with this variable.
