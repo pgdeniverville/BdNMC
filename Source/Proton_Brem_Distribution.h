@@ -16,7 +16,7 @@ class Proton_Brem_Distribution : public Distribution{
 	private:
 		void calc_V_prod_rate();
 		double sigmapp(double s);
-		double F_1_proton(double q2);
+		// double F_1_proton(double q2);
 			
 		double Beam_Energy, kappa, PTMIN, PTMAX, ZMAX, ZMIN, MA;
 		double vprodrate, max_prod;

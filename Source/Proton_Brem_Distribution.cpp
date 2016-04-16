@@ -7,6 +7,9 @@
 #include "branchingratios.h"
 #include "constants.h"
 
+#include <complex>
+
+using std::complex;
 
 using std::bind;
 using namespace std::placeholders;
@@ -25,18 +28,43 @@ double Proton_Brem_Distribution::sigmapp(double s){
 }
 
 //Very basic version of form factor. Maybe should move form factors from DMNscattering.cpp into their own file and include them? Probably do this when I do the big constants reorganization.
-
+/*
 double Proton_Brem_Distribution::F_1_proton(double q2){
 	return pow(1+q2/mD2,-2);
 }
+*/
+
+/*
+	This is the timelike electromagnetic form factor established in 
+	arXiv:0910.5589. 
+*/
+
+double mrh = 0.77, mome = 0.77, mrhop = 1.25, mrhopp = 1.45, momep = 1.25, momepp = 1.45, gammarho= 0.15, gammaome = 0.0085, gammarhop=0.3, gammaomep= 0.3, gammarhopp = 0.5, gammaomepp = 0.5;
+
+double f1ra = 0.6165340033101271; double f1rb = 0.22320420111672623; double f1rc = -0.33973820442685326;
+double f1wa = 1.0117544786579074; double f1wb = -0.8816565944110686; double f1wc = 0.3699021157531611;
+
+complex<double> F1r(double q2){
+ 	return f1ra*mrh*mrh/(mrh*mrh-complex<double>(q2,mrh*gammarho))+f1rb*mrhop*mrhop/(mrhop*mrhop-complex<double>(q2,mrhop*gammarhop))\
+ 	+f1rc*mrhopp*mrhopp/(mrhopp*mrhopp-complex<double>(q2,mrhopp*gammarhopp));
+ } 
+
+complex<double> F1w(double q2){
+ 	return f1wa*mome*mome/(mome*mome-complex<double>(q2,mome*gammaome))+f1wb*momep*momep/(momep*momep-complex<double>(q2,momep*gammaomep))\
+ 	+f1wc*momepp*momepp/(momepp*momepp-complex<double>(q2,momepp*gammaomepp));
+ }
+
+complex<double> F_1_proton(double q2){
+	return F1r(q2)+F1w(q2);
+}
 
 double Proton_Brem_Distribution::d2N_proton_brem_to_V(double z, double pt2){
-	return pow(F_1_proton(MA*MA),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA, kappa);
+	return pow(std::abs(F_1_proton(MA*MA)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA, kappa);
 }
 
 void Proton_Brem_Distribution::set_fit_parameters(production_channel &par){
 	par.query_dist_param("rD",rD);
-	par.query_dist_param("mD2",mD2);
+	// par.query_dist_param("mD2",mD2);
 	par.query_dist_param("H",Hpp);
 	par.query_dist_param("M",Mpp);
 	par.query_dist_param("eta1",eta1pp);
