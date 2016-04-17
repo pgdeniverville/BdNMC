@@ -7,7 +7,9 @@
 #include "Random.h"
 #include <algorithm>
 #include "constants.h"
+#include <list>
 
+using std::list;
 using std::cout; using std::endl;
 
 const double mp = MASS_PROTON;
@@ -65,6 +67,16 @@ void Nucleon_Scatter_Baryonic::generate_cross_sections(){
     neutron_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron,Edmmin,Edmmax));
 	proton_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton_maxima,Edmmin,Edmmax));
 	neutron_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron_maxima,Edmmin,Edmmax));
+}
+
+bool Nucleon_Scatter_Baryonic::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
+	Particle nucleon(0);
+	if(probscatter(det, *DMit, nucleon)&&(min_angle<=0||nucleon.Theta()>min_angle)&&(max_angle>2*pi||nucleon.Theta()<max_angle)){
+		Generate_Position(det, *DMit, nucleon);
+		partlist.insert(std::next(DMit),nucleon);
+		return true;
+	}
+	return false;
 }
 
 bool Nucleon_Scatter_Baryonic::probscatter(std::shared_ptr<detector>& det, Particle &DM){ 

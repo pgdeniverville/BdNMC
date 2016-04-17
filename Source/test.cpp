@@ -13,12 +13,20 @@ using namespace std::placeholders;
 
 int main(){
 	Random();
+<<<<<<< HEAD
 	Proton_Brem_Distribution test(8,1e-3,0.1,0.2,0.7,0.3,0.0);
 	//sanfordwang sw("pi0_sanfordwang");
 	//BMPT bmpt(400,184);
 	//BurmanSmith bs(0.8,6);
 	//double angle[] = {0.05, 0.15, 0.3};
 /*	for(double i = 0; i<=0.8; i+=0.01){
+=======
+	//sanfordwang sw("pi0_sanfordwang");
+	//BMPT bmpt(400,184);
+	BurmanSmith bs(0.8,6);
+	double angle[] = {0.05, 0.15, 0.3};
+	for(double i = 0; i<=0.8; i+=0.01){
+>>>>>>> inelastic-pion-dev
 //	cout << i << " " << 0.5*(sw.swpip(i,angle[0])+sw.swpim(i,angle[0])) << " " << 0.5*(sw.swpip(i,angle[1])+sw.swpim(i,angle[1]))<< " " << 0.5*(sw.swpip(i,angle[2])+sw.swpim(i,angle[2])) << endl;
 		cout << i;
 	   	for(int j = 0; j<sizeof(angle)/sizeof(double); j++){
@@ -28,7 +36,11 @@ int main(){
 		cout << endl;
 
 	}
+<<<<<<< HEAD
 */	//	 << " " << 0.5*(bmpt.Invariant_Cross_Section(i,angle[1])+bmpt.Invariant_Cross_Section_pi_minus(i,angle[1]))<< " " << 0.5*(bmpt.Invariant_Cross_Section(i,angle[2])+bmpt.Invariant_Cross_Section_pi_minus(i,angle[2])) << endl;
+=======
+	//	 << " " << 0.5*(bmpt.Invariant_Cross_Section(i,angle[1])+bmpt.Invariant_Cross_Section_pi_minus(i,angle[1]))<< " " << 0.5*(bmpt.Invariant_Cross_Section(i,angle[2])+bmpt.Invariant_Cross_Section_pi_minus(i,angle[2])) << endl;
+>>>>>>> inelastic-pion-dev
 //	}
 
 /*

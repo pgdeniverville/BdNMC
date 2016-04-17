@@ -7,7 +7,10 @@
 #include "Kinematics.h"
 #include <algorithm>
 #include "constants.h"
+#include <list>
 
+
+using std::list;
 const double Me = MASS_ELECTRON;
 const double Pi = pi;
 const double convmcm = 100.0;
@@ -44,6 +47,17 @@ bool Electron_Scatter::probscatter (std::shared_ptr<detector>& det, Particle &DM
     }
     return false;
 }
+
+bool Electron_Scatter::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
+	Particle electron(0);
+	if(probscatter(det, *DMit, electron)&&(min_angle<=0||electron.Theta()>min_angle)&&(max_angle>2*pi||electron.Theta()<max_angle)){
+		Generate_Position(det, *DMit, electron);
+		partlist.insert(std::next(DMit),electron);
+		return true;
+	}
+	return false;
+}
+
 
 double Electron_Scatter::scatmax(double DME, double DMM){
 	return std::min(Escatmax,EeTMax(DME,DMM));

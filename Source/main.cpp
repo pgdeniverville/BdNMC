@@ -46,7 +46,6 @@ const double EDMres = 0.1;
 const double cmpm = 100.0;
 
 int main(int argc, char* argv[]){
-	
 	using namespace std::placeholders;
     string parameter_file;
 
@@ -234,8 +233,9 @@ int main(int argc, char* argv[]){
 			if(prodchoice=="pi0_decay"){
 				DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen(mv, mdm, kappa, alD));
 			}
-			else
+			else{
 				DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen_baryonic(mv, mdm, kappa, alD));
+			}
 			if(proditer->Meson_Per_Pi0()<=0)
 				Vnum = DMGen->BranchingRatio()*num_pi0;
 			else
@@ -251,9 +251,9 @@ int main(int argc, char* argv[]){
 			
 			if(prodchoice=="eta_decay") 
 				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen(mv, mdm, kappa, alD));
-			else
+			else{
 				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen_baryonic(mv, mdm, kappa, alD));
-
+			}
 			if(proditer->Meson_Per_Pi0()<=0)
 				Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
 			else
@@ -347,7 +347,9 @@ int main(int argc, char* argv[]){
 	//Should add scatter angle to this as well at some point.	
 	double max_scatter_energy = par->Max_Scatter_Energy();
 	double min_scatter_energy = par->Min_Scatter_Energy();
-	
+	double min_angle = par->Min_Angle();
+	double max_angle = par->Max_Angle();
+
 	if(sigchoice=="NCE_electron"){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
 	}
@@ -355,15 +357,18 @@ int main(int argc, char* argv[]){
 		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));	
 	}
 	else if(sigchoice=="NCE_nucleon_baryonic"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter_Baryonic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));	
+		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter_Baryonic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
+	}
+	else if(sigchoice=="Pion_Inelastic"){
+		//I might need some checking for allowed energies.i
+		SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
 	}
 	else{
 		cerr << "Invalid Channel Selection: " << sigchoice << endl;
 		return -1;
 	}
-	double min_angle = par->Min_Angle();
-	double max_angle = par->Max_Angle();
-	
+	SigGen->set_angle_limits(min_angle, max_angle);
+
 	//Begin Run
 	cout << "--------------------" << endl;	
     cout << "Run parameters:" << endl;	
@@ -459,13 +464,9 @@ int main(int argc, char* argv[]){
 						iter->report(*comprehensive_out);
 					//may need to replace this with a list<Particle> later
                     Particle scatterpart(0);//mass is placeholder until scattering completed. 
-					if(SigGen->probscatter(det, *iter, scatterpart)){
-						if((min_angle<=0||scatterpart.Theta()>min_angle)&&(max_angle>2*pi||scatterpart.Theta()<max_angle)){
-                        	SigGen->Generate_Position(det, *iter, scatterpart); 
-							vec.insert(std::next(iter),scatterpart);
-							scat_list[i]++;
-                        	scatter_switch = true;
-						}
+					if(SigGen->probscatter(det, vec, iter)){
+						scat_list[i]++;
+                        scatter_switch = true;
                     }   
                 }    
             }
@@ -506,7 +507,7 @@ int main(int argc, char* argv[]){
   		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency();
 		cout << scat_list[i] << " " << trials_list[i] << " " << Vnum_list[i] << " " << SigGen->get_pMax() << " " << repeat << " "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << endl;
+			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
 		NDM+=NDM_list[i]; 
 		signal+=signal_list[i];
  	}

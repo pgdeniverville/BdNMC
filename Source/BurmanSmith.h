@@ -19,8 +19,8 @@ class BurmanSmith : public Distribution {
         void sample_momentum(double &,double &, double &);
         BurmanSmith(double beam_kinetic_energy, int proton_number);
         double fpimax;
-   private:
         double dsigma(double Tpi, double theta);
+   private:
         double Tp, Ep, NormZ, TA, TAZ730, TAZ585, sigmaAZ585, sigmaAZ730;
         double sigmaA;
         double sigmamax, Tpimax;

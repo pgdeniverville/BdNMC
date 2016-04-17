@@ -15,6 +15,7 @@ const double convmcm = 100.0;
 const double tol_abs=1e-20;
 const double tol_frac=1e-10;
 
+using std::list;
 using std::cout;
 using std::endl;
 using namespace std::placeholders;
@@ -23,6 +24,8 @@ Nucleon_Scatter::Nucleon_Scatter(double Emini, double Emaxi, double Eresi, doubl
 	Edmmin=Emini; Edmmax=Emaxi; Edmres=Eresi;
 	Escatmin=NEmin;
 	Escatmax=NEmax;
+	min_angle=-1;//Set min_angle to less than zero so it always passes cut.
+	max_angle=2*pi+1;//Set max_angle to larger than 2*pi so it always passes cut.
 	//std::cout << Edmmax << " " << Edmmin << endl;
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
 }
@@ -78,8 +81,18 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM){
         return false;
 }
 
+
+bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
+	Particle nucleon(0);
+	if(probscatter(det, *DMit, nucleon)&&(min_angle<=0||nucleon.Theta()>min_angle)&&(max_angle>2*pi||nucleon.Theta()<max_angle)){
+		Generate_Position(det, *DMit, nucleon);
+		partlist.insert(std::next(DMit),nucleon);
+		return true;
+	}
+	return false;
+}
+
 bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &Nucleon){ 
-	
 	using namespace std::placeholders;
     double LXDet = convmcm*(det->Ldet(DM));
     double XDMp = proton_cross->Interpolate(DM.E)*(det->PNtot());

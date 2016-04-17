@@ -120,7 +120,7 @@ double golden(double ax, double bx, double cx, std::function<double(double)> f, 
 	return 0;
 }
 
-//Evaluates to zero outside of [xmin, xmax]. Flips the sign of func.
+//Evaluates to def outside of [xmin, xmax]. Flips the sign of func.
 double lim_func_wrapper(double x, double def, std::function<double(double)> func, double xmin, double xmax){
 	if(x<xmin||x>xmax)
 		return def;

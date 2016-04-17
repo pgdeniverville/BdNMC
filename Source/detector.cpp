@@ -159,6 +159,12 @@ double detector_cylinder::Ldeto (const Particle &DM, const double offset[3]){
         throw crossings.size();
 }
 */
+
+//I should write a 3 vector class, and overload multiplication and addition.
+//This can also be improved by allowing the intersection points to be negative, but
+//setting them to zero is so. That means the intersection happened in the past, and we either
+//originating in the detector, or going in the opposite direction. Both cases are handled
+//properly by the Ldet calculation.
 double detector_cylinder::Ldet (const Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
    
@@ -168,7 +174,6 @@ double detector_cylinder::Ldet (const Particle &DM){
 
     vector<double> crossings;
     double B1,B2;
-    
 
     //Checking crossing point of circular faces.
     if(ip(b,l)!=0){//if b.l==0, beam is parallel to the circular faces.
@@ -178,7 +183,7 @@ double detector_cylinder::Ldet (const Particle &DM){
         double Rhold[3];//Need to hold this value for use in calculation.
         if(B1>0){
             for(int iter=0; iter <3; iter++){
-                Rhold[iter] = B1*b[iter]-l[iter]-r[iter];
+                Rhold[iter] = B1*b[iter]-l[iter]-o[iter];
             }
             if(sqrt(ip(Rhold,Rhold))<=Rdet){
                 crossings.push_back(B1);
@@ -190,7 +195,7 @@ double detector_cylinder::Ldet (const Particle &DM){
         if(B2>0){ 
             
             for(int iter=0; iter <3; iter++){
-                Rhold[iter] = B2*b[iter]+l[iter]-r[iter];
+                Rhold[iter] = B2*b[iter]+l[iter]-o[iter];
             }
             
             if(sqrt(ip(Rhold,Rhold))<=Rdet){

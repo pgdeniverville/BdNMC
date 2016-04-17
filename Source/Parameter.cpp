@@ -147,12 +147,12 @@ production_distribution parse_distribution_mod(std::ifstream &instream, string &
         else if(error_state==-1){
             cerr << line_num << ": Improperly formatted input: ";
             cerr << hold << "\n";
-            cerr << "Terminating material parsing.\n";
+            cerr << "Terminating distribution parsing.\n";
             break;
         }
         else if(error_state!=1){
             cerr << "Unknown error code: " << error_state << "\n";
-            cerr << "Terminating material parsing.\n";
+            cerr << "Terminating distribution parsing.\n";
             break;
         }
         try{
@@ -221,12 +221,12 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
         else if(error_state==-1){
             cerr << line_num << ": Improperly formatted input: ";
             cerr << hold << "\n";
-            cerr << "Terminating material parsing.\n";
+            cerr << "Terminating production channel parsing.\n";
             break;
         }
         else if(error_state!=1){
             cerr << "Unknown error code: " << error_state << "\n";
-            cerr << "Terminating material parsing.\n";
+            cerr << "Terminating production channel parsing.\n";
             break;
         }
         try{

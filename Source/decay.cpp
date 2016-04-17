@@ -8,14 +8,14 @@
 //std::ofstream datalog_decay("decaylog.dat",std::ios::out);
 
 using std::cout; using std::endl;
-//This moves a daughter particle's origin to 
+//This moves a daughter particle's origin to the parent particle's end.
 void Link_Particles(Particle &parent, Particle &child){
 	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
 	child.Set_Creation_Time(parent.end_coords[3]);
 }
 
 void Link_Particles_Immediate(Particle &parent, Particle &child){
-	parent.Set_Position(parent.origin_coords[0],parent.origin_coords[1],parent.origin_coords[2]);
+	//parent.Set_Position(parent.origin_coords[0],parent.origin_coords[1],parent.origin_coords[2]);
 	parent.Set_Time(parent.origin_coords[3]);
 	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
 	child.Set_Creation_Time(parent.end_coords[3]);
@@ -107,6 +107,7 @@ void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2){
 	Link_Particles(parent,daughter2);
 }
 
+//Non-isotropic decay for parent -> daughter1 + daughter2.
 void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2, double thetad){
     double phid = Random::Flat(0,1)*2*pi;
     double mom = TriangleFunc(parent.m, daughter1.m, daughter2.m);
@@ -128,6 +129,9 @@ void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2, do
 	Link_Particles(parent,daughter2);
 }
 
+/*I should check that this is handled properly. Not quite sure that it is, though
+it probably won't change very much if the angle is handled differently.
+*/
 void DecayDM_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &mediator, Particle &parent, double theta){
     TwoBodyDecay(mediator, daughter1, daughter2, theta);
     mediator.ThreeMomentum(0,0,TriangleFunc(parent.m,mediator.m,0));

@@ -1,3 +1,4 @@
+
 #ifndef constants_h
 #define constants_h
 
@@ -21,6 +22,8 @@ const double MASS_PROTON = 0.938272;
 const double MASS_NEUTRON = 0.939565;
 const double MASS_ELECTRON = 0.000511;
 const double MASS_DEUTERON = 1.875612859;
+const double MASS_DELTA = 1.232;
+
 //Mesons
 const double mpi0= 0.1349766;
 const double MASS_PION_CHARGED=0.13957018;
