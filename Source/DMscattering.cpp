@@ -49,7 +49,7 @@ double F1 (double Ee, double EDM, double MDM, double MDP) {
 	double rF1;
 	double F1N, F1D;
 	F1N = 2.0*Me*EDM*EDM-(2.0*Me*EDM+MDM*MDM)*(Ee-Me);
-	F1D = (EDM*EDM-MDM*MDM)*(MDP*MDP+2*Me*Ee-2*Me*Me)*(MDP*MDP+2*Me*Ee-2*Me*Me);
+	F1D = (EDM*EDM-MDM*MDM)*pow(MDP*MDP+2*Me*Ee-2*Me*Me,2);
 	rF1 = F1N/F1D;
 	return(rF1);
 }

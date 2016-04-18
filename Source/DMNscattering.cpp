@@ -100,7 +100,7 @@ double A(double E, double Edm, double mdm, const double mN){
 double B(double E, double Edm, double mdm, const double mN){
     return (Edm-E)*(pow((Edm+E),2)+2*mN*(Edm-E)-4*pow(mdm,2));
 }
-
+    
 double C(double E, double Edm, double mdm, const double mN){
     return (Edm - E) * (mN*(E-Edm)+2*pow(mdm,2));
 }
