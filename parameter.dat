@@ -65,16 +65,20 @@ production_channel pi0_decay
 #production_distribution k0_sanfordwang
 
 
-#This invokes the bremsstrahlung production channel. This works, but is still in development, so the results may not be reliable!
+#This invokes the bremsstrahlung production channel. This works, but may be 
+#unreliable around the rho resonance. The zmin/zmax values seem reasonable for MiniBooNE energies.
+#ptmax could be as large as the proton mass, but probably would not change signal much. 
 #production_channel V_decay
 #production_distribution proton_brem
 #ptmax 0.2
-#zmin 0.2
-#zmax 0.8
+#zmin 0.3
+#zmax 0.7
 
 #Scattering Parameters
 #Choose either NCE_nucleon or NCE_electron
 signal_channel NCE_nucleon
+
+#New channel available: Pion_Inelastic. Still in testing.
 
 #Where to write events. 
 output_file Events/events.dat
