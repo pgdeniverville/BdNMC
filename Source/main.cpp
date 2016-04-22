@@ -55,10 +55,14 @@ int main(int argc, char* argv[]){
 /**************************************
 	Making plots!
 **************************************/
-//double mx=0.01, mv=0.1, alphaD=0.1, kappa=1e-3;
-//double Edm=1;
 
-//Pion_Inelastic p_i(0.01,6,0.01,mx,mv,alphaD,kappa,1000,0);
+/*
+double mx=0.01, mv=0.1, alphaD=0.1, kappa=1e-3;
+double Edm=1;
+
+Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
+//std::unique_ptr<Scatter> nce(new Nucleon_Scatter(mx+0.01/100.0,30,0.01,mx,mv,alphaD,kappa,1000,0.0));
+
 
 //for(double i = EeTMin(Edm, mx); i<EeTMax(Edm,mx); i+=0.001)
 	//cout << i << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, mv, kappa, alphaD) << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, 0.5, kappa, alphaD) << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, 1, kappa, alphaD) << endl;
@@ -66,11 +70,11 @@ int main(int argc, char* argv[]){
 
 //for(double i = 0.05; i < 1.0; i+=0.01)
 //	cout << i << " " << convGeV2cm2*sigma(i, mx, mv, kappa, alphaD) << " " << convGeV2cm2*sigma(i, mx, 0.5, kappa, alphaD) << " " << convGeV2cm2*sigma(i, mx, 1, kappa, alphaD) << endl;
-//return 0;
-//}
+*/
 /*************************************
 	End plot stuff
 **************************************/
+
 
 	using namespace std::placeholders;
     string parameter_file;

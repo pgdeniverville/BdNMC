@@ -59,6 +59,10 @@ double TriangleFunc(double m1, double m2, double m3){
     return 1/(2*m1)*sqrt(pow(m1,4)+pow(m2,4)+pow(m3,4)-2*pow(m1*m2,2)-2*pow(m1*m3,2)-2*pow(m2*m3,2));
 }
 
+double TriangleFunc2(double m1, double m2, double m3){
+	return pow(m1,4)+pow(m2,4)+pow(m3,4)-2*pow(m1*m2,2)-2*pow(m1*m3,2)-2*pow(m2*m3,2);
+}
+
 //Kinematics for DM+X->DM+X scattering, with X at rest.
 
 // X Angle as a function of X final energy, DM initial energy, and masses.

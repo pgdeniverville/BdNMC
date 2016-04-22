@@ -61,6 +61,9 @@ void Nucleon_Scatter::generate_cross_sections(){
     neutron_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron,Edmmin,Edmmax));
 	proton_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton_maxima,Edmmin,Edmmax));
 	neutron_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron_maxima,Edmmin,Edmmax));
+
+	//for(double i=Edmmin; i<=Edmmax; i+=0.01)
+    //	cout << i << " " << proton_cross->Interpolate(i) << " " << neutron_cross->Interpolate(i) << endl;
 }
 
 bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM){ 

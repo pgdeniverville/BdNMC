@@ -133,5 +133,7 @@ class Pion_Inelastic: public Scatter{
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&, double nuclmass);
 		void generate_cross_sections();
 		void load_form_factor(const std::string &filename, std::shared_ptr<Linear_Interpolation>& form);
+		double MAX_Q2;
+		bool MAX_Q2_WARNING;
 };
 #endif

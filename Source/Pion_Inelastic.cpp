@@ -65,10 +65,18 @@ return -(alphaEM*alphaprime*pow(Mdelta + mN,2)*
        *pi*pow(kappa,2)*pow(GM(-pow(Mdelta,2) + 2*ER*mN - pow(mN,2)),2))/
    (2.*mN*pow(pow(mA,2) - pow(Mdelta,2) + 2*ER*mN - pow(mN,2),2)*
      (-pow(Mdelta,2) + 2*ER*mN - pow(mN,2) + pow(Mdelta + mN,2))*
-     TriangleFunc(sqrt(2*En*mN + pow(mN,2) + pow(mx,2)),mx,mN))*Delta_to_pi0;
+     TriangleFunc2(sqrt(2*En*mN + pow(mN,2) + pow(mx,2)),mx,mN))*Delta_to_pi0;
 }
 
 double Pion_Inelastic::GM(double q2){
+    if(q2>MAX_Q2){
+        if(!MAX_Q2_WARNING){
+            MAX_Q2_WARNING=true;
+            std::cerr << "First request of out of bounds q^2 for pion inelastic form factor.\n";
+            std::cerr << "q^2 tried =" << q2 << "\nMAX_Q2 = " <<  MAX_Q2 << endl;
+        }
+        return 0.0;
+    }
     return form_factor->Interpolate(q2);
 }
 
@@ -83,7 +91,7 @@ particle, and the energy resolution that should be used to build
 the scattering interpolation function.
 */
 Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double MDM, double MV, double alphaprime, double kappa, double NEmax, double NEmin){
-
+    MAX_Q2_WARNING = false;
 
     Edmmin=std::max(Emini,std::max(Edm_kinetic_min(MDM, mn),Edm_kinetic_min(MDM, mp))); Edmmax=Emaxi; Edmres=Eresi;
 	Escatmin=NEmin;
@@ -95,7 +103,7 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
     //cout << "Load Model Params\n";
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
     //cout << "Parameters loaded\n";
-    /*for(double i = Ermin(1,0.01,mp); i < Ermax(1,0.01,mp); i+=0.001){
+/*    for(double i = Ermin(1,0.01,mp); i < Ermax(1,0.01,mp); i+=0.001){
         cout << i; 
         double mxvals[]={0.01,0.1,0.2};
         for(int j = 0; j<3; j++)
@@ -121,6 +129,9 @@ void Pion_Inelastic::load_form_factor(const string& filename, shared_ptr<Linear_
         instream >> in;
         q2_dist.push_back(in);
     }
+
+    MAX_Q2 = q2_max;
+
     ff = shared_ptr<Linear_Interpolation>( new Linear_Interpolation(q2_dist, q2_min, q2_max));
 }
 
@@ -181,6 +192,10 @@ void Pion_Inelastic::generate_cross_sections(){
     neutron_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron,Edmmin,Edmmax));
 	proton_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton_maxima,Edmmin,Edmmax));
 	neutron_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron_maxima,Edmmin,Edmmax));
+
+
+   //for(double i=Edmmin; i<=Edmmax; i+=0.01)
+   //     cout << i << " " << proton_cross->Interpolate(i) << " " << neutron_cross->Interpolate(i) << endl;
 }
 
 
