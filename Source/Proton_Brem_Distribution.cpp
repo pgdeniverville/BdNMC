@@ -24,10 +24,9 @@ Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon
 	Beam_Energy=Beam_E; kappa=epsilon; PTMIN=ptmin; PTMAX=ptmax; ZMAX = zmax; ZMIN = zmin; MA=mA;
 	sppM = pow(2*mp+Mpp,2);
 	calc_V_prod_rate();
-	for(double i =0; i<=1.1; i+=0.001){
-		std::cout << i << " " << std::abs(F_1_proton(i)) << std::endl;
-
-	}
+	//for(double i =0; i<=1.1; i+=0.001){
+	//	std::cout << i << " " << std::abs(F_1_proton(i)) << std::endl;
+	//}
 }
 
 //Total proton-proton scattering cross section

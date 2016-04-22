@@ -105,7 +105,7 @@ def ship_eval(mass_arr):
     subp.call(["rm", parfile])
 
 
-def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=False,brem_switch=False):
+def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=False,brem_switch=True):
     MV=mass_arr[0]
     MX=mass_arr[1]
     t0 = time.time()
@@ -144,7 +144,7 @@ def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=False,brem_sw
    #     partlistfile.append("Source/particle_list.dat")
 
 
-    write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon",sumlog="Events/miniboone_paper.dat")
+    write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,min_scatter_energy=0,max_scatter_energy=1000.0,partlistfile=partlistfile,outfile=parfile,signal_chan="Pion_Inelastic",sumlog="Events/pion_inelastic_paper_miniboone.dat")
     subp.call(["./Source/main", parfile])
     t1 = time.time()
     print "\ntime={}\n".format(t1-t0) 
@@ -244,7 +244,7 @@ def execute_miniboone_parallel(genlist=True):
     #vmassarr=[300]
     chimassarr=[10]
     vmassarr=[15,16,17,18,19,21,22,23,24,25]
-    #vmassarr=[10*i for i in xrange(1,14)]+[10*i for i in xrange(15,90,2)]
+    vmassarr=vmassarr+[10*i for i in xrange(1,14)]+[10*i for i in xrange(15,90,2)]
     #+[775,774,776,777,778,779,781,782,783,785,787]
     #chimassarr=[i for i in xrange(10,270,10)]+[132,134,136]+[1,5]
     #chimassarr=[173,175,178]
@@ -308,7 +308,7 @@ def execute_lsnd_parallel(genlist=True):
     #pool=Pool(processes=4)
     #pool.map(lsnd_eval,massarr) 
 
-execute_miniboone_baryonic_parallel(genlist=True)
-#execute_miniboone_parallel(genlist=True)
+#execute_miniboone_baryonic_parallel(genlist=True)
+execute_miniboone_parallel(genlist=True)
 #execute_ship_parallel(genlist=True)
 #execute_lsnd_parallel(genlist=False)
