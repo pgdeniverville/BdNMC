@@ -364,7 +364,10 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 		Vnum_list.push_back(Vnum);
 		Vnumtot+=Vnum;
 	}//End of Production distribution loop. 
-
+	if(Vnumtot==0){
+		cout << "No DM production expected. Terminating run.\n";
+		return 0;
+	}
 	//return 0;
 
 	double EDMRES = par->EDM_RES();
