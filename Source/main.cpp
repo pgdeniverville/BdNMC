@@ -240,6 +240,7 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 				cerr << "Invalid properties for production_distribution proton_brem." << endl;
 				return -1;
 			}
+			//cout << "Breaking here.\n";
 			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin()));
 			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
 			Vnum = pbd->V_prod_rate()*POT;
@@ -496,11 +497,14 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 					if(outmode=="dm_detector_distribution")
 						iter->report(*comprehensive_out);
 					//may need to replace this with a list<Particle> later
-                    Particle scatterpart(0);//mass is placeholder until scattering completed. 
+                    //Particle scatterpart(0);//mass is placeholder until scattering completed. 
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
-                        scatter_switch = true;
-                    }   
+                      	//This is a temporary solution. Every scatter object needs to implement its
+						//own version, but most will be identical. Should be an efficient way
+						//to handle that.
+						scatter_switch = true;	
+                    }
                 }    
             }
             

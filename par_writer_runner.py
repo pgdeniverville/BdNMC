@@ -405,18 +405,20 @@ def execute_nd280_parallel(genlist=True):
         #write_ship(prod_chan=["parton_production"],proddist=["parton_V"],samplesize=2e5,output_mode="particle_list",partlistfile=["Source/particle_list_ship_parton.dat"])
         #write_ship(prod_chan=["V_decay"],proddist=["proton_brem"],samplesize=4e6,output_mode="particle_list",partlistfile=["Source/particle_list_ship_brem.dat"])
         subp.call(["./Source/main", "parameter_run.dat"])
-    vmassarr=[i for i in xrange(20,140,10)]+[i for i in xrange(150,1000,50)]+[770,22,24]+[1000,1100,1150,1200,1300]+[i for i in xrange(1000,4100,250)]+[390,395,405,410]
+    #vmassarr=[i for i in xrange(20,140,10)]+[i for i in xrange(150,1000,50)]+[770,22,24]+[1000,1100,1150,1200,1300]+[i for i in xrange(1000,4100,250)]+[390,395,405,410]
     #chimassarr=[1,5]+[10*i for i in xrange(1,27)]
     #vmassarr=[600,700,800,900]
-    chimassarr=[10]
+    chimassarr=[100]
+    vmassarr=[300]
     massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     for marr in massarr:
-        t2k_eval(marr)
+        #t2k_eval(marr)
+        t2k_FD_eval(marr)
     #pool=Pool(processes=4)
     #pool.map(ship_eval,massarr)
 
-#execute_nd280_parallel(genlist=True)
+execute_nd280_parallel(genlist=True)
 #execute_miniboone_baryonic_parallel(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_ship_parallel(genlist=True)
-execute_lsnd_parallel(genlist=False)
+#execute_lsnd_parallel(genlist=False)
