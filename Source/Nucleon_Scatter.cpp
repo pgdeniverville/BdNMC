@@ -20,6 +20,7 @@ using std::cout;
 using std::endl;
 using namespace std::placeholders;
 
+//NEmin and NEmax are kinetic energies!
 Nucleon_Scatter::Nucleon_Scatter(double Emini, double Emaxi, double Eresi, double MDM, double MV, double alphaprime, double kappa, double NEmax, double NEmin){
 	Edmmin=Emini; Edmmax=Emaxi; Edmres=Eresi;
 	Escatmin=NEmin;

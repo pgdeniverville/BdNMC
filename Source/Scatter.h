@@ -122,6 +122,7 @@ class Pion_Inelastic: public Scatter{
 		double Ermin(double DM_Energy, double DM_Mass, double Nucleon_Mass);
 		void prep_ab(double &, double &, double, double, double);
 		double Er_to_theta(double DM_Energy, double Delta_Energy, double DM_Mass, double Nucleon_Mass);
+		
 		double dsigma_dER_N(double En, double ER, double mx, double mA, double alphaprime, double kappa, double mN);
 		double GM(double q2);
 		double Edmmin, Edmmax, Edmres;

@@ -105,8 +105,8 @@ def ship_eval(mass_arr):
     subp.call(["rm", parfile])
 
 
-def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_switch=True):
-    signal_channel = "NCE_nucleon"
+def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_switch=True,signal_channel = "NCE_nucleon"):
+    
     MV=mass_arr[0]
     MX=mass_arr[1]
     t0 = time.time()
@@ -157,6 +157,57 @@ def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_swi
     #    t1 = time.time()
     #    print "\ntime={}\n".format(t1-t0)
     subp.call(["rm", parfile])
+
+def t2k_FD_eval(mass_arr,signal_channel="Pion_Inelastic"):
+    MV=mass_arr[0]
+    MX=mass_arr[1]
+    t0 = time.time()
+    parfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
+    #if MX/1000.0<mpi0/2.0:
+    
+    rho_decay_switch=False
+
+    proddist = []
+    prodchan = []
+    partlistfile = []
+    if MX/1000.0<mpi0/2.0:
+        proddist.append("particle_list")
+        prodchan.append("pi0_decay")
+        partlistfile.append("Source/particle_list.dat")
+    if MX/1000.0<meta/2.0:
+        proddist.append("particle_list")
+        prodchan.append("eta_decay")
+        partlistfile.append("Source/particle_list.dat")
+    if MV/1000.0>=mrho:
+	proddist.append("parton_V")
+	prodchan.append("parton_production")
+	partlistfile.append("")
+    if MV/1000.0<=2:
+	proddist.append("proton_brem")
+	prodchan.append("V_decay")
+ 	partlistfile.append("")
+    if ((MV<1200) and (MV>500)) and rho_decay_switch:
+        proddist.append("particle_list")
+        prodchan.append("rho_decay")
+        partlistfile.append("Source/particle_list_k0.dat")
+    if signal_channel=="NCE_nucleon":
+        write_t2kFD(mdm=MX/1000.0,mv=MV/1000.0,samplesize=1000,proddist=proddist,prod_chan=prodchan,signal_chan="NCE_nucleon",min_scatter_energy=0.0014,max_scatter_energy=1000.0,partlistfile=partlistfile,outfile=parfile)
+    elif signal_channel == "Pion_Inelastic":
+        write_t2kFD(mdm=MX/1000.0,mv=MV/1000.0,samplesize=1000,proddist=proddist,signal_chan="Pion_Inelastic",min_scatter_energy=0.0,max_scatter_energy=1000.0,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile)
+    elif signal_channel == "NCE_electron": 
+        write_t2kFD(mdm=MX/1000.0,mv=MV/1000.0,samplesize=1000,proddist=proddist,signal_chan="NCE_electron",min_scatter_energy=0.0,max_scatter_energy=1000.0,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile)
+    subp.call(["./Source/main", parfile])
+    t1 = time.time()
+    print "\ntime={}\n".format(t1-t0) 
+    t0 = time.time() 
+    #if MX/1000.0<meta/2.0:
+    #    write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist="particle_list",prod_chan="eta_decay",outfile=parfile)
+    #    subp.call(["./Source/main", parfile])
+    #    t1 = time.time()
+    #    print "\ntime={}\n".format(t1-t0)
+    subp.call(["rm", parfile])
+
+
 
 def t2k_eval(mass_arr,signal_channel="Pion_Inelastic"):
     MV=mass_arr[0]

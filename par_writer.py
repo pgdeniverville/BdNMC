@@ -31,6 +31,8 @@ meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay'
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
+Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneutron_number 8\nelectron_number 8\nmass 0.94578\nmaterial Hydrogen\nnumber_density 6.68368e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
+
 Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
 
 Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
@@ -97,12 +99,21 @@ def miniboone_detector(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=5.0):
 
 #temp detector until I implement proper geometry handling
 #This is actually the P0D, with only the proper number of neutrons and protons. NO ATOMS IMPLEMENTED
+#Double check the fiducial mass on the pod. Is it 3 tons of water? 13 tons of stuff?
 def t2k_ND280(f):
-    xpos=11;ypos=0;zpos=240;detphi=0;radius=0.9413;dettheta=0.0436332;length=1.7;
+    xpos=11;ypos=0;zpos=280;detphi=0;radius=0.9413;dettheta=0.0436332;length=1.7;
     f.write("\ndetector cylinder\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\ndet-theta {4}\ndet-phi {5}\nlength {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(dettheta),str(detphi),str(length),str(length)))
     f.write('\n')
     f.write(ND280_string)
+
+def t2k_superK(f):
+    xpos=12867.7;ypos=0;zpos=294719;detphi=0;radius=19.5;dettheta=1.5708;length=41;
+    f.write("\ndetector cylinder\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\ndet-theta {4}\ndet-phi {5}\nlength {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(dettheta),str(detphi),str(length),str(length)))
+    f.write('\n')
+    f.write(Water_string)
+
 
 def write_miniboone(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi):
     POT=2e20
@@ -116,6 +127,15 @@ def write_nd280(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0
     #Don't take this too seriously
     p_cross=15*mb
     write_experiment(write_detector=t2k_ND280,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross)
+
+def write_t2kFD(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["Source/particle_list.dat"],sumlog="Events/t2k_FD.dat",outlog="Events/t2k_FD_events.dat", output_mode="summary",samplesize=500, min_scatter_energy=0.035, max_scatter_energy=1000, dm_energy_resolution=0.01, efficiency=0.66,beam_energy=30, n_num_target=6,p_num_target=6,max_trials=80e6,ptmax=1,zmin=0.2,zmax=0.8,run=-1):
+    POT=5e21
+    pi0_per_POT=1.0
+    #Don't take this too seriously
+    p_cross=15*mb
+    write_experiment(write_detector=t2k_superK,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross)
+
+
 
 def ship_detector(f,xpos=0.0,ypos=0,zpos=100.0,radius=0.52,length=2.1,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
