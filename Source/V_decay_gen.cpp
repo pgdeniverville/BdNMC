@@ -12,7 +12,10 @@ V_decay_gen::V_decay_gen(double MV, double MX, double kap, double alp, const std
 }
 
 void V_decay_gen::Evaluate_Branching_Ratio(){
-	branchingratio = brV_to_dm_dm(mv, mx, kappa, alphaD);
+	if(chan_name=="V_decay_baryonic")
+        branchingratio= brVB_to_dm_dm(mv,mx,kappa,alphaD);
+    else
+        branchingratio = brV_to_dm_dm(mv, mx, kappa, alphaD);
 	OFF_SHELL = false;
 }
 

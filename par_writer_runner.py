@@ -1,11 +1,12 @@
 from par_writer import *
+import sys
 
 import time
 
 #write_miniboone(mdm=0.005,mv=0.4,proddist=["","","proton_brem"],prod_chan=["pi0_decay","eta_decay","V_decay"],partlistfile=["","",""])
 rho_decay_switch=False
 
-def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=False,brem_switch=False):
+def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_switch=True):
     MV=mass_arr[0]
     MX=mass_arr[1]
     t0 = time.time()
@@ -31,13 +32,16 @@ def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=Fals
         proddist.append("particle_list")
         prodchan.append("omega_decay_baryonic")
         partlistfile.append("Source/particle_list.dat")
-    if MV/1000.0>=mrho and MV<=1250 and rho_decay_switch:
-        proddist.append("particle_list")
-        prodchan.append("phi_decay_baryonic")
-        partlistfile.append("Source/particle_list.dat")
+    if MV/1000.0<=1 and MV/2.0>MX and brem_switch:
+        proddist.append("proton_brem_baryonic")
+        prodchan.append("V_decay_baryonic")
+        partlistfile.append("")
+    #if MV/1000.0>=mrho and MV<=1250:
+    #    proddist.append("particle_list")
+    #    prodchan.append("phi_decay_baryonic")
+    #    partlistfile.append("Source/particle_list.dat")
 
-
-    write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-4,dm_energy_resolution=0.01,sumlog="Events/miniboone_baryonic_paper.dat")
+    write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-4,dm_energy_resolution=0.01,sumlog="Events/NCE_nucleon_baryonic_paper_miniboone.dat",output_mode="comprehensive")
     subp.call(["./Source/main", parfile])
     t1 = time.time()
     print "\ntime={}\n".format(t1-t0) 
@@ -125,13 +129,13 @@ def miniboone_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_swi
         prodchan.append("eta_decay")
         partlistfile.append("Source/particle_list_k0.dat")
     if MV/1000.0>=mrho and partonic_switch:
-	proddist.append("parton_V")
-	prodchan.append("parton_production")
-	partlistfile.append("")
+	    proddist.append("parton_V")
+	    prodchan.append("parton_production")
+	    partlistfile.append("")
     if MV/1000.0<=1 and MV/2.0>MX and brem_switch:
-	proddist.append("proton_brem")
-	prodchan.append("V_decay")
- 	partlistfile.append("")
+        proddist.append("proton_brem")
+        prodchan.append("V_decay")
+        partlistfile.append("")
     if ((MV<1200) and (MV>=350)) and rho_decay_switch:
         proddist.append("particle_list")
         prodchan.append("rho_decay")
@@ -190,7 +194,7 @@ def t2k_FD_baryonic_eval(mass_arr,signal_channel="NCE_nucleon_baryonic"):
         partlistfile.append("Source/particle_list_t2k.dat")
     if MV/1000.0<=2:
         proddist.append("proton_brem_baryonic")
-        prodchan.append("V_decay")
+        prodchan.append("V_decay_baryonic")
         partlistfile.append("")
     if MV/1000.0>=mrho:
 	   proddist.append("parton_V_baryonic")
@@ -380,20 +384,25 @@ def execute_miniboone_parallel(genlist=True):
     #vmassarr=[600,700,800,900]
     #vmassarr=[300]
     chimassarr=[10]
-    vmassarr=[15,16,17,18,19,21,22,23,24,25]
-    #vmassarr=vmassarr+[10*i for i in xrange(1,14)]+[10*i for i in xrange(15,90,2)] 
-    vmassarr=vmassarr+[i for i in xrange(20,140,10)]+[i for i in xrange(150,1000,50)]+[770,22,24]+[1000,1100,1150,1200,1300]+[i for i in xrange(1000,4100,250)]
-   #+[775,774,776,777,778,779,781,782,783,785,787]
+    #vmassarr = [772]
+    #vmassarr=[15,16,17,18,19,21,22,23,24,25]+[772,768,762,778]
+    vmassarr=[772,768,762,778]+[21,22,23,24,25]
+    vmassarr=vmassarr+[i for i in xrange(30,140,10)]+[i for i in xrange(150,1000,50)]+[770]+[1000,1100,1150,1200,1300]+[i for i in xrange(1000,2100,250)]
+    #+[775,774,776,777,778,779,781,782,783,785,787]
     #chimassarr=[i for i in xrange(10,270,10)]+[132,134,136]+[1,5]
     #chimassarr=[173,175,178]
     massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
-    vmassarr=[300]
-    chimassarr=[i for i in xrange(10,270,10)]+[132,134,136]+[1,5]
-    massarr=massarr+[[MV,MX] for MV in vmassarr for MX in chimassarr]
+    #vmassarr=[300]
+    #chimassarr=[i for i in xrange(10,270,10)]+[132,134,136]+[1,5]
+    #massarr=massarr+[[MV,MX] for MV in vmassarr for MX in chimassarr]
     for marr in massarr:
-        miniboone_eval(marr,signal_channel="NCE_electron")
+        if len(sys.argv)>1 and sys.argv[1]=="b":
+            miniboone_baryonic_eval(marr)
+        else:
+            miniboone_eval(marr,signal_channel="NCE_nucleon")
     #pool=Pool(processes=3)
     #pool.map(miniboone_eval,massarr) 
+
 
 def execute_ship_parallel(genlist=True):
     if genlist:
@@ -496,6 +505,6 @@ def execute_t2k_parallel(genlist=True):
 
 #execute_t2k_parallel(genlist=False)
 #execute_miniboone_baryonic_parallel(genlist=True)
-#execute_miniboone_parallel(genlist=False)
-execute_ship_parallel(genlist=False)
+execute_miniboone_parallel(genlist=False)
+#execute_ship_parallel(genlist=False)
 #execute_lsnd_parallel(genlist=False)

@@ -65,8 +65,6 @@ double CoherentFormFactor(double q, double A){
  * I may need to implement a more general equation that contains nucleon angle. 
 */
 
-
-
 double dsigmadEdmP(double E, double Edm,  double mdm, double mV, double alphaprime, double kappa)
 {
     return alphaprime * alphaEM * pow(kappa,2) * 4 * pi * \

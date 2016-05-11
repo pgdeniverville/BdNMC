@@ -57,13 +57,13 @@ def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.
             	f.write("production_distribution {}\n".format(proddist[i]))
 	    if(partlistfile[i]!=""):
 		f.write("particle_list_file {}\n".format(partlistfile[i]))
-	    if(prod_chan[i]!='parton_production_baryonic' and prod_chan[i]!='parton_production' and prod_chan[i]!='V_decay'):
-            	f.write('meson_per_pi0 {}\n'.format(str(meson_per_pi0[prod_chan[i]])))
-	    if(proddist[i]=='proton_brem'):
-		f.write('ptmax {}\n'.format(str(ptmax)))	
-		f.write('zmax {}\n'.format(str(zmax)))	
-	        f.write('zmin {}\n'.format(str(zmin)))
-            f.write('\n')
+	    if prod_chan[i] in meson_per_pi0:
+                f.write('meson_per_pi0 {}\n'.format(str(meson_per_pi0[prod_chan[i]])))
+	    if proddist[i]=='proton_brem' or proddist[i]=='proton_brem_baryonic':
+                f.write('zmax {}\n'.format(str(zmax)))
+                f.write('zmin {}\n'.format(str(zmin)))
+                f.write('ptmax {}\n'.format(str(ptmax)))
+                f.write('\n')
         if repeat!=1:
             f.write("repeat {}\n".format(str(repeat)))
         if timing!=0.0:

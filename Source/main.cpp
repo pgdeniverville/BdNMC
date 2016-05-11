@@ -107,7 +107,7 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
             return -1;
         }
 		if(e_int==-2){
-			cerr << "No particle_list_file supplied for particle_list distribution. Terminating run." << endl; 
+			cerr << "No partic/le_list_file supplied for particle_list distribution. Terminating run." << endl; 
             parstream.close();      
             return -1;
 		}
@@ -336,7 +336,7 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv, PartDist));		
 			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
 		}
-		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"){
+		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||prodchoice=="V_decay_baryonic"){
 			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv,PartDist));
 			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
 			Vnum *= DMGen->BranchingRatio();

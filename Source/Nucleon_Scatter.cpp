@@ -1,3 +1,4 @@
+
 #include "Scatter.h"
 #include "minimization.h"
 #include "DMNscattering.h"
@@ -39,6 +40,7 @@ void Nucleon_Scatter::generate_cross_sections(){
 //	double emax; double emin;
 	double a,b,c,xmin;
     for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
+		iter = 4;
 		std::function<double(double)> fp = bind(dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
 		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
 		vec_proton.push_back(DoubleExponential_adapt(fp,scatmin(iter,mdm,mp),scatmax(iter),50,0.1,1e-2));
@@ -55,11 +57,14 @@ void Nucleon_Scatter::generate_cross_sections(){
 		c=mnbrak(a,b,fnlim);
 		xmin=0;
 		vec_neutron_maxima.push_back(-1.0*golden(a,b,c,fnlim,tol_frac,tol_abs,xmin));
+		//cout << iter << " " << vec_proton.back() << endl; 
+		//cout << "scatmin and max = " << scatmin(iter,mdm,mp) << " " << scatmax(iter) << endl;
     }
 	proton_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton,Edmmin,Edmmax));
     neutron_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron,Edmmin,Edmmax));
 	proton_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton_maxima,Edmmin,Edmmax));
 	neutron_cross_maxima = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron_maxima,Edmmin,Edmmax));
+	throw -1;
 }
 
 bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM){ 

@@ -14,11 +14,22 @@
 using std::complex;
 
 using std::bind;
+using std::cout;
+using std::endl;
 using namespace std::placeholders;
 const double mp = MASS_PROTON;
 
 
+complex<double> F_1_proton_baryonic(double q2, double kappa, double alD);
 complex<double> F_1_proton(double);
+
+double gu(double alD, double kappa){
+    return sqrt(4*pi*alD)/3-2*kappa*sqrt(4*pi*alphaEM)/3;
+}
+
+double gd(double alD, double kappa){
+    return sqrt(4*pi*alD)/3+kappa*sqrt(4*pi*alphaEM)/3;
+}
 
 Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double alphaD,  std::string &mode, double ptmin){
 	Beam_Energy=Beam_E; kappa=epsilon; PTMIN=ptmin; PTMAX=ptmax; ZMAX = zmax; ZMIN = zmin; MA=mA; model=mode; alpha_D = alphaD;
@@ -27,6 +38,9 @@ Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon
 	//for(double i =0; i<=1.1; i+=0.001){
 	//	std::cout << i << " " << std::abs(F_1_proton(i)) << std::endl;
 	//}
+	//cout << gu(alpha_D, kappa) << endl;
+	//cout << F_1_proton_baryonic(0, kappa, alpha_D) << endl; 
+	//throw -1;
 }
 
 //Total proton-proton scattering cross section
@@ -63,14 +77,6 @@ complex<double> F1w(double q2){
 
 complex<double> F_1_proton(double q2){
 	return F1r(q2)+F1w(q2);
-}
-
-double gu(double alD, double kappa){
-    return sqrt(4*pi*alD)/3-2*kappa*sqrt(4*pi*alphaEM)/3;
-}
-
-double gd(double alD, double kappa){
-    return sqrt(4*pi*alD)/3+kappa*sqrt(4*pi*alphaEM)/3;
 }
 
 complex<double> F_1_proton_baryonic(double q2, double kappa, double alD){
