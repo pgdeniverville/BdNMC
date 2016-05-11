@@ -92,17 +92,13 @@ the scattering interpolation function.
 */
 Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double MDM, double MV, double alphaprime, double kappa, double NEmax, double NEmin){
     MAX_Q2_WARNING = false;
-
     Edmmin=std::max(Emini,std::max(Edm_kinetic_min(MDM, mn),Edm_kinetic_min(MDM, mp))); Edmmax=Emaxi; Edmres=Eresi;
 	Escatmin=NEmin;
 	Escatmax=NEmax;
-
 	//std::cout << Edmmax << " " << Edmmin << endl;
     form_factor = shared_ptr<Linear_Interpolation>();
     load_form_factor(form_factor_filename, form_factor);
-    //cout << "Load Model Params\n";
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
-    //cout << "Parameters loaded\n";
 /*    for(double i = Ermin(1,0.01,mp); i < Ermax(1,0.01,mp); i+=0.001){
         cout << i; 
         double mxvals[]={0.01,0.1,0.2};
@@ -149,9 +145,9 @@ void Pion_Inelastic::generate_cross_sections(){
 	std::vector<double> vec_proton;
 	std::vector<double> vec_neutron;
 //	double emax; double emin;
-    //cout << "Start of loop\n";
+	
 	double a,b,c,xmin;
-    for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
+    for(double iter=Edmmin+Edmres; iter<=Edmmax; iter+=Edmres){
         //cout << "Edm=" << iter << " Ermin=" <<  Ermin(iter,mdm,mp) << " Ermax=" << Ermax(iter,mdm,mp) << endl;
         if(Ermax(iter,mdm,mp)<=Ermin(iter,mdm,mp)){
             vec_proton.push_back(0);
@@ -162,7 +158,7 @@ void Pion_Inelastic::generate_cross_sections(){
             //lim_func_wrapper comes from minimization.h. It evaluates to zero outside
             //specified boundaries, and flips the sign of its function for use by
             //minimization.
-    		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,Ermin(iter,mdm,mp),Ermax(iter,mdm,mp));
+			std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,Ermin(iter,mdm,mp),Ermax(iter,mdm,mp));
     		vec_proton.push_back(DoubleExponential_adapt(fp,Ermin(iter,mdm,mp),Ermax(iter,mdm,mp),100,0.1,1e-4));
             prep_ab(a,b,iter,mdm,mp);
     		//cout << "a=" << a << "b=" << b << "Ermax=" << Ermax(iter,mdm,mp) << endl; 

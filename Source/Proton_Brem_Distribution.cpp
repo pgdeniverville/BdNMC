@@ -20,8 +20,8 @@ const double mp = MASS_PROTON;
 
 complex<double> F_1_proton(double);
 
-Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double ptmin){
-	Beam_Energy=Beam_E; kappa=epsilon; PTMIN=ptmin; PTMAX=ptmax; ZMAX = zmax; ZMIN = zmin; MA=mA;
+Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double alphaD,  std::string &mode, double ptmin){
+	Beam_Energy=Beam_E; kappa=epsilon; PTMIN=ptmin; PTMAX=ptmax; ZMAX = zmax; ZMIN = zmin; MA=mA; model=mode; alpha_D = alphaD;
 	sppM = pow(2*mp+Mpp,2);
 	calc_V_prod_rate();
 	//for(double i =0; i<=1.1; i+=0.001){
@@ -65,8 +65,24 @@ complex<double> F_1_proton(double q2){
 	return F1r(q2)+F1w(q2);
 }
 
+double gu(double alD, double kappa){
+    return sqrt(4*pi*alD)/3-2*kappa*sqrt(4*pi*alphaEM)/3;
+}
+
+double gd(double alD, double kappa){
+    return sqrt(4*pi*alD)/3+kappa*sqrt(4*pi*alphaEM)/3;
+}
+
+complex<double> F_1_proton_baryonic(double q2, double kappa, double alD){
+	return 0.5*(gu(alD, kappa)-gd(alD, kappa))*F1r(q2) + 1.5*(gu(alD, kappa)+gd(alD, kappa))*F1w(q2);
+}
+
 double Proton_Brem_Distribution::d2N_proton_brem_to_V(double z, double pt2){
-	return pow(std::abs(F_1_proton(MA*MA)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA, kappa);
+	if(model=="proton_brem_baryonic"){
+		return pow(std::abs(F_1_proton_baryonic(MA*MA,kappa,alpha_D)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA)/4.0/pi;
+	}
+	else 
+		return pow(std::abs(F_1_proton(MA*MA)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*pow(kappa,2)*alphaEM*wpp(z,pt2, MA);
 }
 
 void Proton_Brem_Distribution::set_fit_parameters(production_channel &par){

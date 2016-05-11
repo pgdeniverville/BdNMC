@@ -3,11 +3,12 @@
 
 #include "Parameter.h"
 #include "Distribution.h"
+#include <string>
 
 class Proton_Brem_Distribution : public Distribution{
 	
 	public:
-		Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double ptmin=0);
+		Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double alphaD, std::string &mode, double ptmin=0);
 		double V_prod_rate(){return vprodrate;}
 		double d2N_proton_brem_to_V(double z, double pt2);
 		void sample_particle(Particle &);
@@ -16,9 +17,10 @@ class Proton_Brem_Distribution : public Distribution{
 	private:
 		void calc_V_prod_rate();
 		double sigmapp(double s);
+		std::string model;
 		// double F_1_proton(double q2);
 			
-		double Beam_Energy, kappa, PTMIN, PTMAX, ZMAX, ZMIN, MA;
+		double Beam_Energy, kappa, alpha_D, PTMIN, PTMAX, ZMAX, ZMIN, MA;
 		double vprodrate, max_prod;
 			
 		//Proton Form Factor parameters
@@ -33,7 +35,6 @@ class Proton_Brem_Distribution : public Distribution{
 		double R1pp=12.98; 
 		double R2pp=7.38; 
 		double Ppp = 34.49;
-
 };
 
 #endif

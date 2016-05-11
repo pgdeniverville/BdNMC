@@ -107,20 +107,34 @@ double C(double E, double Edm, double mdm, const double mN){
 
 /*BBA-03 form factors for neutrino-nucleon scattering from hep-ex/0308005.*/
 
+//These fits seem to get weird at large q^2. The data the fit is based on stops are
+//q^2=10 GeV, so I will cut off the form factors there. Shouldn't be evaluating this stuff for that range anyway.
 double F1P(double q2){
-   return (GEP03(q2) + q2/(4*pow(mp,2)) * GMP03(q2))/(1+q2/(4 * pow(mp,2) )); 
+	if(q2>10)
+		return 0;
+	else
+   		return (GEP03(q2) + q2/(4*pow(mp,2)) * GMP03(q2))/(1+q2/(4 * pow(mp,2) )); 
 }
 
 double F2P(double q2){
-    return (GMP03(q2)-GEP03(q2))/(1+q2/(4*pow(mp,2)));
+    if(q2>10)
+		return 0;
+	else
+		return (GMP03(q2)-GEP03(q2))/(1+q2/(4*pow(mp,2)));
 }
 
 double F1N(double q2){
-    return (GEN03(q2) + q2/(4*pow(mn,2)) * GMN03(q2))/(1+q2/(4 * pow(mn,2) )); 
+    if(q2>10)
+		return 0;
+	else
+		return (GEN03(q2) + q2/(4*pow(mn,2)) * GMN03(q2))/(1+q2/(4 * pow(mn,2) )); 
 }
 
 double F2N(double q2){
-    return (GMN03(q2)-GEN03(q2))/(1+q2/(4*pow(mn,2)));
+    if(q2>10)
+		return 0;
+	else
+		return (GMN03(q2)-GEN03(q2))/(1+q2/(4*pow(mn,2)));
 }
 
 double GEPact(double q2){

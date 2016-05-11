@@ -65,21 +65,33 @@ double DMNscattering_Baryonic::C(double E, double Edm, double mdm, const double 
 }
 
 /*BBA-03 form factors for neutrino-nucleon scattering from hep-ex/0308005.*/
-
+//Cut off at q2>10 GeV^2. These form factors are not well callibrated beyond this point.
 double DMNscattering_Baryonic::F1P(double q2){
-   return (GEP03(q2) + q2/(4*pow(mp,2)) * GMP03(q2))/(1+q2/(4 * pow(mp,2) )); 
+   if(q2>10)
+	   return 0;
+   else
+		return (GEP03(q2) + q2/(4*pow(mp,2)) * GMP03(q2))/(1+q2/(4 * pow(mp,2) )); 
 }
 
 double DMNscattering_Baryonic::F2P(double q2){
-    return (GMP03(q2)-GEP03(q2))/(1+q2/(4*pow(mp,2)));
+    if(q2>10)
+	   return 0;
+   else
+	return (GMP03(q2)-GEP03(q2))/(1+q2/(4*pow(mp,2)));
 }
 
 double DMNscattering_Baryonic::F1N(double q2){
-    return (GEN03(q2) + q2/(4*pow(mn,2)) * GMN03(q2))/(1+q2/(4 * pow(mn,2) )); 
+    if(q2>10)
+	   return 0;
+   else
+	return (GEN03(q2) + q2/(4*pow(mn,2)) * GMN03(q2))/(1+q2/(4 * pow(mn,2) )); 
 }
 
 double DMNscattering_Baryonic::F2N(double q2){
-    return (GMN03(q2)-GEN03(q2))/(1+q2/(4*pow(mn,2)));
+    if(q2>10)
+	   return 0;
+   else
+	return (GMN03(q2)-GEN03(q2))/(1+q2/(4*pow(mn,2)));
 }
 
 double DMNscattering_Baryonic::Fs1(double q2){

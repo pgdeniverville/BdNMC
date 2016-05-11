@@ -22,6 +22,7 @@ const string min_scatter_energy_key = "min_scatter_energy";
 const string max_scatter_energy_key = "max_scatter_energy";
 const string angle_lower_limit_key = "min_scatter_angle";
 const string angle_upper_limit_key = "max_scatter_angle";
+const string timing_key = "timing_cut";
 
 const string production_distribution_key = "production_distribution";
 const string particle_list_file_key = "particle_list_file";
@@ -430,7 +431,8 @@ Parameter::Parameter(std::ifstream &instream){
 		Set_Double(dm_energy_res_key, edmres, keymap, 0.1);
 		Set_Double(angle_lower_limit_key, angle_lower_limit, keymap, 0);
 		Set_Double(angle_upper_limit_key, angle_upper_limit, keymap, 2.1*pi);
-		
+		Set_Double(timing_key, timing_cut, keymap, 0);
+
 		Set_Target_Parameters(keymap);
 
 		Set_Double(p_cross_key, p_cross, keymap, 0);

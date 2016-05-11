@@ -50,6 +50,15 @@ const double EDMres = 0.1;
 //cm per meter
 const double cmpm = 100.0;
 
+
+double t_delay_fraction(double tcut, double pos, double speed){
+	double tdelay=pos/speed/speed_of_light-pos/speed_of_light;
+	if(tdelay>tcut)
+		return 1;
+	else
+		return 1 - (tcut-tdelay)/tcut;
+}
+
 int main(int argc, char* argv[]){
 
 /**************************************
@@ -124,6 +133,10 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 		Random(par->Seed());
 	else
 		Random();
+
+
+	//Timing cut in seconds	
+	double timing_cut = par->Timing_Cut();
 
     string output_filename = par->Output_File();
     if(output_filename == ""){
@@ -235,13 +248,12 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 				Vnum*=alD;
 			PartDist = parsam;
 		}
-		else if(proddist=="proton_brem"){
+		else if(proddist=="proton_brem"||proddist=="proton_brem_baryonic"){
 			if(proditer->ptmax()<0 || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
 				cerr << "Invalid properties for production_distribution proton_brem." << endl;
 				return -1;
 			}
-			//cout << "Breaking here.\n";
-			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin()));
+			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist));
 			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
 			Vnum = pbd->V_prod_rate()*POT;
 			PartDist = pbd;
@@ -280,8 +292,9 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 			}
 			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(meta,PartDist));
 			
-			if(prodchoice=="eta_decay") 
+			if(prodchoice=="eta_decay"){ 
 				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen(mv, mdm, kappa, alD));
+			}
 			else{
 				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen_baryonic(mv, mdm, kappa, alD));
 			}
@@ -383,7 +396,7 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 	double min_scatter_energy = par->Min_Scatter_Energy();
 	double min_angle = par->Min_Angle();
 	double max_angle = par->Max_Angle();
-
+	cout << "Preparing signal channel " << sigchoice << endl;
 	if(sigchoice=="NCE_electron"){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
 	}
@@ -427,7 +440,7 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
  	cout << "Beam Energy = " << beam_energy << " GeV" << endl;
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
 	cout << "Minimum Scattering Energy = " << min_scatter_energy << " GeV" <<  endl;
-
+	cout << "Timing Cut = " << timing_cut << " s\n";
 	
 	double BURN_MAX = par->Burn_In();
 	double BURN_OVERRIDE = par->Burn_Timeout();
@@ -472,37 +485,52 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 	vector<int> scat_list(chan_count,0);
     int nevent=0;
     vector<int> NDM_list(chan_count,0);
-    //int escat=0;
+    vector<double> timing_efficiency(chan_count,0.0);
+	
+	//int escat=0;
     bool scatter_switch;
     int trials_max = par->Max_Trials();
-	
 	for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
         int i;
 		scatter_switch = false;
-		double vrnd = Random::Flat(0.0,Vnumtot);
+		double vrnd = Random::Flat(0.0,1)*Vnumtot;
 		for(i=0; i<chan_count; i++){
-			if(vrnd<=Vnum_list[i])
+			//cout << i << " vrnd=" <<  vrnd << " vs Vnum_list " << Vnum_list[i] <<  endl;
+			if(vrnd<=Vnum_list[i]){
 				break;
-			else
+			}
+			else{
 				vrnd-=Vnum_list[i];
+			}
 		}
-		trials_list[i]++;
-        list<Particle> vec;
+		trials_list[i]++; 
+		list<Particle> vec;
 		if(DMGen_list[i]->GenDM(vec, det_int, ParGen_list[i])){
 			//Yes, this list is named vec.  
+			//cout << "trial " << trials << " for channel " << DMGen_list[i]->Channel_Name() << " total for part = " << trials_list[i] << endl;
+			//cout << "Generated list" << endl;
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
+				//cout << "looping particles\n";
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
                 if(iter->name.compare("DM")==0){
 					NDM_list[i]++;
+					//iter->report(cout);
 					if(outmode=="dm_detector_distribution")
 						iter->report(*comprehensive_out);
 					//may need to replace this with a list<Particle> later
                     //Particle scatterpart(0);//mass is placeholder until scattering completed. 
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
+						//cout << "nevent " << nevent+1 << endl;
                       	//This is a temporary solution. Every scatter object needs to implement its
 						//own version, but most will be identical. Should be an efficient way
 						//to handle that.
+						//cout << DMGen_list[i]->Channel_Name() << endl;
+						timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
+						//cout << "t_delay_frac=" << t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed()) << endl;
+						//iter->report(cout);
+						//cout << "Speed = " << iter->Speed() << endl;
+						//cout << "Time = " << iter->end_coords[3] << endl;
 						scatter_switch = true;	
                     }
                 }    
@@ -539,9 +567,13 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 	int NDM = 0;
 	cout << "Some debug information:\n"; 
 	for(int i=0; i<chan_count; i++){
+		if(scat_list[i]==0)
+			signal_list[i]=0;
+		else
+			signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
 		scattot+=scat_list[i];
-    	signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency();
-  		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency();
+  		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
+		cout << " Timing_Efficiency: " << timing_efficiency[i]/scat_list[i] << " ";
 		cout << scat_list[i] << " " << trials_list[i] << " " << Vnum_list[i] << " " << SigGen->get_pMax() << " " << repeat << " "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
 			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;

@@ -39,7 +39,7 @@ Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutro
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 
-def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi):
+def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1):
     with open(outfile,'w') as f:
         if run>=0:
             f.write('run {}\n'.format(run))
@@ -64,6 +64,12 @@ def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.
 		f.write('zmax {}\n'.format(str(zmax)))	
 	        f.write('zmin {}\n'.format(str(zmin)))
             f.write('\n')
+        if repeat!=1:
+            f.write("repeat {}\n".format(str(repeat)))
+        if timing!=0.0:
+            f.write("timing_cut {}\n".format(str(timing)))
+        if burn_max!=-1:
+            f.write("burn_max {}\n".format(str(burn_max)))
         f.write('proton_target_cross_section {}\n'.format(str(p_cross)))
         f.write('max_trials {}\n'.format(str(max_trials)))
         f.write("efficiency {}\n".format(str(efficiency)))
@@ -108,7 +114,7 @@ def t2k_ND280(f):
     f.write(ND280_string)
 
 def t2k_superK(f):
-    xpos=12867.7;ypos=0;zpos=294719;detphi=0;radius=19.5;dettheta=1.5708;length=41;
+    xpos=12867.7;ypos=0;zpos=294719;detphi=0;radius=190.5;dettheta=1.5708;length=410;
     f.write("\ndetector cylinder\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\ndet-theta {4}\ndet-phi {5}\nlength {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(dettheta),str(detphi),str(length),str(length)))
     f.write('\n')
@@ -128,14 +134,12 @@ def write_nd280(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0
     p_cross=15*mb
     write_experiment(write_detector=t2k_ND280,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross)
 
-def write_t2kFD(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["Source/particle_list.dat"],sumlog="Events/t2k_FD.dat",outlog="Events/t2k_FD_events.dat", output_mode="summary",samplesize=500, min_scatter_energy=0.035, max_scatter_energy=1000, dm_energy_resolution=0.01, efficiency=0.66,beam_energy=30, n_num_target=6,p_num_target=6,max_trials=80e6,ptmax=1,zmin=0.2,zmax=0.8,run=-1):
+def write_t2kFD(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["Source/particle_list.dat"],sumlog="Events/t2k_FD.dat",outlog="Events/t2k_FD_events.dat", output_mode="comprehensive",samplesize=500, min_scatter_energy=0.0014, max_scatter_energy=1000, dm_energy_resolution=0.1, efficiency=0.66/1000,beam_energy=30, n_num_target=6,p_num_target=6,max_trials=80e6,ptmax=1,zmin=0.2,zmax=0.8,run=-1,repeat=10,timing=5e-8,burn_max=300):
     POT=5e21
     pi0_per_POT=1.0
     #Don't take this too seriously
     p_cross=15*mb
-    write_experiment(write_detector=t2k_superK,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross)
-
-
+    write_experiment(write_detector=t2k_superK,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross,repeat=10,timing=timing,burn_max=100)
 
 def ship_detector(f,xpos=0.0,ypos=0,zpos=100.0,radius=0.52,length=2.1,theta=0,phi=0):
     f.write("\ndetector cylinder\n");

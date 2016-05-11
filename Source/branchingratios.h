@@ -28,7 +28,7 @@ double dbrmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, doubl
 double brmass_to_dm_dm(double mass, double mv, double mx, double kappa, double alphaD);
 
 //Proton Brem
-double wpp(double z, double pt2, double mA, double epsilon);
+double wpp(double z, double pt2, double mA);
 double wpp_scalar(double z, double pt2, double mA, double epsilon);
 //double d2N_proton_brem_to_V(double Beam_E, double mA, double epsilon, double z, double pt2);
 

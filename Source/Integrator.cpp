@@ -6,7 +6,7 @@
 
 using std::cout; using std::endl;
 
-const int DDMAX = 30;
+const int DDMAX = 20;
 
 using std::vector;
 
@@ -25,9 +25,11 @@ long double res_int(double x, double min, double max){
 double func_check(std::function<double(double)> f, double abscissa, double min, double max){
 	double fp,fm;
 	fp=f(res_int(abscissa,min,max));
+	//cout << "fp=" << fp << endl;
 	if(isnan(fp))
 		fp=0;
 	fm=f(res_int(-abscissa,min,max));
+	//cout << "fm = " << fm<< endl;
 	if(isnan(fm))
 		fm=0;
 	return fm+fp;
@@ -92,7 +94,9 @@ double DoubleExponential(std::function<double(double)> f, double min, double max
 		//cout << " k=" << k << " ddweight=" << ddweight(k,h) << " f+=" << f(res_int(abscissa,min,max)) << " res_int+=" << res_int(+abscissa,min,max) << " f-=" << f(res_int(-abscissa,min,max)) <<  " res_int-=" << res_int(-abscissa,min,max) << endl;
         //sum+=ddweight(k,h)*(f(res_int(abscissa,min,max))+f(res_int(-abscissa,min,max)));
         sum+=ddweight(k,h)*func_check(f,abscissa,min,max);
+		//cout << "cumulative sum " << sum << endl;
     }
+	//cout << "double exp sum = " << sum << " double exp scale " << scale << endl;
     return sum/scale;
 }
 
@@ -117,12 +121,16 @@ double DoubleExponential_hdub(std::function<double(double)> f, double min, doubl
     if(min>=max)
         return 0;
     double sum = 0; double abscissa = 0;
-    for(int k=1; k<=N-1; k+=2){
+    //cout << "hdub\n";
+	for(int k=1; k<=N-1; k+=2){
         if((abscissa=ddabscissa(k,h))>=1)
             break;
         //sum+=ddweight(k,h)*(f(res_int(abscissa,min,max))+f(res_int(-abscissa,min,max)));
-        sum+=ddweight(k,h)*func_check(f,abscissa,min,max);
+        //cout << "k=" << k << " ddweight = " << ddweight(k,h) << endl;
+		sum+=ddweight(k,h)*func_check(f,abscissa,min,max);
+		//cout << "cumulative sum= " << sum << endl;
     }
+	//cout << "hdub sum = " << sum << " hdub scale = " << scale  << endl;
     return sum/scale;
 }
 //slow and inefficient. Still good enough. Could be improved by adding a means of subdividing the integration region.
@@ -134,7 +142,8 @@ double DoubleExponential_adapt(std::function<double(double)> f, double min, doub
 	if(min>=max)
 		return 0;
     //cout << "N=" << N << " h=" << h << " dd0=" << dd0 << endl;
-    for(attempts=0; attempts<DDMAX; attempts++){ 
+    for(attempts=0; attempts<DDMAX; attempts++){
+	   	//cout << "attempts=" << attempts << endl;	
         if(fabs(dd0-(dd1 = dd0+DoubleExponential_Nout(f, min, max, N*2.0, N, h)))>dd0*precision){
             dd0=dd1;
             N*=2.0;
@@ -143,7 +152,10 @@ double DoubleExponential_adapt(std::function<double(double)> f, double min, doub
         else if(fabs(dd0-(dd2 = 0.5*dd0+DoubleExponential_hdub(f, min, max, 2*N, h/2.0)))>dd0*precision){
             dd0=dd2;
             h*=0.5; N*=2.0;
-            //cout << "N=" << N << " h=" << h << " dd1=" << dd0 << endl;
+            //cout << "N=" << N << " h=" << h << " dd2=" << dd0 << endl;
+			//cout << "double exp comparison\n";
+			//double tmp = DoubleExponential(f, min, max, N, h);
+			//cout << "double exp out = " << tmp << endl;
         }
         else
             break;

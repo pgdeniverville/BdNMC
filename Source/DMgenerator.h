@@ -124,7 +124,7 @@ class omega_decay_gen_baryonic: public DMGenerator{
 
 class parton_V_gen: public DMGenerator{
     public:
-        parton_V_gen(double MV, double MX, double kap, double alp,const std::string chan);
+        parton_V_gen(double MV, double MX, double kap, double alp, const std::string chan);
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod);
     private:
         void Evaluate_Branching_Ratio();

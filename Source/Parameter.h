@@ -64,6 +64,8 @@ class Parameter{
 		double Max_Scatter_Energy(){return max_scatter_energy;}
 		double Max_Angle(){return angle_upper_limit;}
 		double Min_Angle(){return angle_lower_limit;}
+		double Timing_Cut(){return timing_cut;}
+
 
 		double Target_E_Num(){return target_e_num;}
 		double Target_N_Num(){return target_n_num;}
@@ -120,6 +122,7 @@ class Parameter{
 		double max_scatter_energy;
 		double min_scatter_energy;
 		double max_dm_energy;
+		double timing_cut;
 
 		double target_length;
 		double target_n_density;
