@@ -17,7 +17,7 @@ alpha_D 0.1
 #Run parameters
 POT 2e20
 pi0_per_POT 0.9
-samplesize 20000
+samplesize 1000
 
 #Optionally, you may specify a number of pi0s per meson
 #meson_per_pi0 0.0333
@@ -76,7 +76,8 @@ production_channel pi0_decay
 
 #Scattering Parameters
 #Choose either NCE_nucleon or NCE_electron
-signal_channel NCE_nucleon
+signal_channel Inelastic_Nucleon_Scattering
+scatter_dist_filename Source/data/DIS.dat
 
 #New channel available: Pion_Inelastic. Still in testing.
 
@@ -86,7 +87,7 @@ output_file Events/events.dat
 summary_file Events/summary.dat
 
 #In comprehensive mode, all particles that make up an event are written to the output file. This overwrites the output file.
-output_mode comprehensive
+output_mode summary
 #summary suppresses output to output_file (no event list), while still writing to the summary file.
 #output_mode summary
 

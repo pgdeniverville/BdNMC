@@ -19,7 +19,7 @@ public:
     void     FourMomentum(double, double, double, double);
     void     ThreeMomentum(double PX, double PY, double PZ);
     void	 ThreeMomentumPolar(double mom, double theta, double phi);
-	void     Lorentz(Particle);
+	void     Lorentz(Particle&);
     void     Rotate_x(double);
     void     Rotate_y(double);
     void     Rotate_z(double);

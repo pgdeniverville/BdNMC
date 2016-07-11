@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 from multiprocessing import Pool
 
+import Parsing_inelastic
+
 @contextmanager
 def cd(newdir):
     prevdir = os.getcwd()
@@ -39,7 +41,7 @@ Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutro
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 
-def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1):
+def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1,inelastic_dist="Source/data/DIS.dat"):
     with open(outfile,'w') as f:
         if run>=0:
             f.write('run {}\n'.format(run))
@@ -87,6 +89,9 @@ def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.
         f.write('alpha_D {}\n'.format(str(alpha_D)))
         f.write('POT {}\n'.format(str(POT)))
         f.write('signal_channel {}\n'.format(signal_chan))
+        if signal_chan=="Inelastic_Nucleon_Scattering" or signal_chan == "Inelastic_Nucleon_Scattering_Baryonic":
+            Parsing_inelastic.gen_cross_section(mv,eps=eps,alpha_d=alpha_D,model=signal_chan,output=inelastic_dist)
+            f.write('scatter_dist_filename {}\n'.format(inelastic_dist))
         f.write('output_file {}\n'.format(outlog))
         f.write('summary_file {}\n'.format(sumlog))
         f.write('output_mode {}\n'.format(output_mode))
@@ -102,6 +107,12 @@ def miniboone_detector(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=5.0):
     f.write(Hydrogen_string)
     f.write('\n')
     f.write(Carbon_string)
+
+def SBND_detector(f,xpos=0.0,ypos=0,zpos=60.0,radius=2.38,length=4.76,theta=0,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
 
 #temp detector until I implement proper geometry handling
 #This is actually the P0D, with only the proper number of neutrons and protons. NO ATOMS IMPLEMENTED
@@ -120,6 +131,11 @@ def t2k_superK(f):
     f.write('\n')
     f.write(Water_string)
 
+def write_sbnd(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/sbnd.dat",outlog="Events/sbnd_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=2, dm_energy_resolution=0.01, efficiency=0.6,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi):
+    POT=2e20
+    pi0_per_POT=0.9
+    p_cross=25*mb
+    write_experiment(write_detector=SBND_detector,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross)
 
 def write_miniboone(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi):
     POT=2e20

@@ -1,5 +1,6 @@
 
 
+
 #ifndef constants_h
 #define constants_h
 
@@ -14,6 +15,7 @@ const double speed_of_light = 299792458;
 
 //Units
 const double microbarn = 1e-34;//In m^2
+const double femtobarn = 1e-43;//In m^2
 const double RADIANS_PER_DEGREE = pi/180.0; 
 const double convGeV2cm2 = 3.89e-28;
 const double GeVtofm=0.197;

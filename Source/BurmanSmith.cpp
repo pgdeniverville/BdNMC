@@ -101,7 +101,7 @@ double BurmanSmith::dsigma(double Tpi, double theta){
  //   std::cout << Tpi  << " "  << theta << " " <<  Amp(theta) << " " << exp(-1*pow((Tbar(theta)-Tpi)/sqrt(2.0)/sigma(theta),2)) << " " << (1.0+exp((Tpi-TF(theta))/B)) << " " << sin(theta*degree)*Amp(theta)*exp(-1*pow((Tbar(theta)-Tpi)/sqrt(2.0)/sigma(theta),2))/(1.0+exp((Tpi-TF(theta))/B)) << std::endl;
     return Z1coefficient*sin(theta*degree)*Amp(theta)*exp(-1*pow((Tbar(theta)-Tpi)/sqrt(2.0)/sigma(theta),2))/(1.0+exp((Tpi-TF(theta))/B));
 }
-
+//
 double BurmanSmith::TF(double theta){
     if(Z==1){
         double pionE = -(((Ep + mp)*(-md*md + 2*mp*(Ep + mp) + pow(mpion,2)) + sqrt((Ep - mp)*(Ep + mp)*pow(cos(theta*degree),2)*(pow(md*md - 2*mp*(Ep + mp),2) - 2*(md*md + 2*Ep*(Ep + mp))*pow(mpion,2) + pow(mpion,4) + 4*(Ep - mp)*(Ep +mp)*pow(mpion,2)*pow(cos(theta*degree),2))))/((Ep + mp)*(-Ep - 3*mp + (Ep - mp)*cos(2*theta*degree))));
@@ -124,7 +124,6 @@ void BurmanSmith::sample_momentum(double &mompi, double &thetapi, double &phipi)
         Tpi = Random::Flat(0,1)*Tpimax;
         prob = dsigma(Tpi,thetapi);
         if(prob>Random::Flat(0,1)*fpimax){
-            
             if(prob>fpimax)
                 fpimax=prob;
             

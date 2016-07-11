@@ -50,7 +50,6 @@ const double EDMres = 0.1;
 //cm per meter
 const double cmpm = 100.0;
 
-
 double t_delay_fraction(double tcut, double pos, double speed){
 	double tdelay=pos/speed/speed_of_light-pos/speed_of_light;
 	if(tdelay>tcut)
@@ -84,6 +83,14 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 	End plot stuff
 **************************************/
 
+
+	// double MX=0.01;
+	// double MV=0.04;
+
+	// Nucleon_Scatter_Baryonic nsc(MX+0.001,8,0.01,MX,MV,1e-5,0.0,1,0.035);
+
+
+	// return 0;
 
 	using namespace std::placeholders;
     string parameter_file;
@@ -410,6 +417,19 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 		//I might need some checking for allowed energies.i
 		SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
 	}
+	else if(sigchoice=="Inelastic_Nucleon_Scattering_Baryonic" || sigchoice=="Inelastic_Nucleon_Scattering"){
+		if(par->Scatter_Dist_Filename()==""){
+			cerr << "No scatter_dist_filename provided for " << sigchoice << endl;
+			return -1;
+		}
+		if(outmode=="comprehensive"){
+			cerr << sigchoice << " does not support comprehensive output. Use summary mode instead.\n";
+			return -1;
+		}
+		SigGen = std::unique_ptr<Scatter>(new Inelastic_Nucleon_Scatter(mdm,mv,alD,kappa,sigchoice,par->Scatter_Dist_Filename()));
+		min_scatter_energy=0;
+		max_scatter_energy=1e9;
+	}
 	else{
 		cerr << "Invalid Channel Selection: " << sigchoice << endl;
 		return -1;
@@ -507,25 +527,18 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 		list<Particle> vec;
 		if(DMGen_list[i]->GenDM(vec, det_int, ParGen_list[i])){
 			//Yes, this list is named vec.  
-			//cout << "trial " << trials << " for channel " << DMGen_list[i]->Channel_Name() << " total for part = " << trials_list[i] << endl;
-			//cout << "Generated list" << endl;
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
-				//cout << "looping particles\n";
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
                 if(iter->name.compare("DM")==0){
 					NDM_list[i]++;
-					//iter->report(cout);
 					if(outmode=="dm_detector_distribution")
 						iter->report(*comprehensive_out);
 					//may need to replace this with a list<Particle> later
-                    //Particle scatterpart(0);//mass is placeholder until scattering completed. 
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
-						//cout << "nevent " << nevent+1 << endl;
                       	//This is a temporary solution. Every scatter object needs to implement its
 						//own version, but most will be identical. Should be an efficient way
 						//to handle that.
-						//cout << DMGen_list[i]->Channel_Name() << endl;
 						timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
 						//cout << "t_delay_frac=" << t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed()) << endl;
 						//iter->report(cout);
@@ -574,7 +587,7 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
 		scattot+=scat_list[i];
   		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
 		cout << " Timing_Efficiency: " << timing_efficiency[i]/scat_list[i] << " ";
-		cout << scat_list[i] << " " << trials_list[i] << " " << Vnum_list[i] << " " << SigGen->get_pMax() << " " << repeat << " "  << par->Efficiency() << endl;;
+		cout << "Scatterings: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
 			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
 		NDM+=NDM_list[i]; 

@@ -13,12 +13,12 @@ const double Pi = pi;
 const double convmcm = 100.0;
 
 // Electron angle as a function of 
-// electron energy, angle cross and dark matter 
+// electron energy and dark matter energy and mass  
 double ThetaEe (double Ee, double EDM, double MDM) {
 	return(acos(sqrt((Ee-Me)/(Ee+Me))*(EDM+Me)/sqrt(EDM*EDM-MDM*MDM)));
 }
 // Electron energy as a function of 
-// electron scattering angle cross and dark matter energy
+// electron scattering angle and dark matter energy
 double EeTheta (double EDM, double Thetael, double MDM) {
 	double rEeTheta;
 	double EeThetaN, EeThetaD;

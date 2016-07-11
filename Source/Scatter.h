@@ -1,4 +1,3 @@
-
 #ifndef GUARD_scatter_h
 #define GUARD_scatter_h
 #include <iostream>
@@ -68,6 +67,25 @@ class Nucleon_Scatter: public Scatter{
 		std::unique_ptr<Linear_Interpolation> neutron_cross;
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void generate_cross_sections();
+};
+
+//This is good for inelastic
+class Inelastic_Nucleon_Scatter: public Scatter{
+	public:
+		Inelastic_Nucleon_Scatter(double MDM, double mv, double alphaprime, double kappa, const std::string &chan_name, const std::string &filename);
+		~Inelastic_Nucleon_Scatter(){}
+		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
+		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
+			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
+		}
+	private:
+		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
+		void load_cross_sections(const std::string &filename);
+		std::unique_ptr<Linear_Interpolation> scatter_dist;//Proton
+		std::unique_ptr<Linear_Interpolation> scatter_dist_n;//Neutron
+		std::string channel_name;
+		double E_min, E_max;
 };
 
 class Nucleon_Scatter_Baryonic: public Scatter{

@@ -77,7 +77,7 @@ void Particle::Set_Time(double t){
     end_coords[3]=t;
 }
 
-void Particle::Lorentz(Particle parent){
+void Particle::Lorentz(Particle& parent){
 	
 	double M1 = parent.m;	
 	double E1 = parent.E;
