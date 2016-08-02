@@ -35,12 +35,6 @@ Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon
 	Beam_Energy=Beam_E; kappa=epsilon; PTMIN=ptmin; PTMAX=ptmax; ZMAX = zmax; ZMIN = zmin; MA=mA; model=mode; alpha_D = alphaD;
 	sppM = pow(2*mp+Mpp,2);
 	calc_V_prod_rate();
-	//for(double i =0; i<=1.1; i+=0.001){
-	//	std::cout << i << " " << std::abs(F_1_proton(i)) << std::endl;
-	//}
-	//cout << gu(alpha_D, kappa) << endl;
-	//cout << F_1_proton_baryonic(0, kappa, alpha_D) << endl; 
-	//throw -1;
 }
 
 //Total proton-proton scattering cross section
@@ -102,12 +96,18 @@ void Proton_Brem_Distribution::set_fit_parameters(production_channel &par){
 	par.query_dist_param("R2pp",R2pp);
 	par.query_dist_param("Ppp",Ppp);
 	sppM = pow(2*mp+Mpp,2);
+	calc_V_prod_rate();
 	max_prod = d2N_proton_brem_to_V(ZMIN,PTMIN);
 }
 
 void Proton_Brem_Distribution::calc_V_prod_rate(){
 	std::function<double(double, double)> func = std::bind(&Proton_Brem_Distribution::d2N_proton_brem_to_V,this,_1,_2);
-	vprodrate = SimpsonCubature(func,ZMIN,ZMAX,100,PTMIN,PTMAX,100);//Will need to tweak this. Hopefully come up with a more general algorithm at some point.
+	if(ZMIN>ZMAX){
+		vprodrate=0;
+	}
+	else
+		vprodrate = SimpsonCubature(func,ZMIN,ZMAX,100,PTMIN,PTMAX,100);//Will need to tweak this. Hopefully come up with a more general algorithm at some point.
+
 	max_prod=d2N_proton_brem_to_V(ZMIN,PTMIN);
 };
 

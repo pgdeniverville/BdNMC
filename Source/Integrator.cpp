@@ -5,6 +5,7 @@
 #include "constants.h"
 
 using std::cout; using std::endl;
+using std::isnan;
 
 const int DDMAX = 20;
 

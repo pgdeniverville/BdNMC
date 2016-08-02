@@ -60,38 +60,22 @@ double t_delay_fraction(double tcut, double pos, double speed){
 
 int main(int argc, char* argv[]){
 
+
+
 /**************************************
 	Making plots!
 **************************************/
-
-/*
-double mx=0.01, mv=0.1, alphaD=0.1, kappa=1e-3;
-double Edm=1;
-
-Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
-//std::unique_ptr<Scatter> nce(new Nucleon_Scatter(mx+0.01/100.0,30,0.01,mx,mv,alphaD,kappa,1000,0.0));
-
-
-//for(double i = EeTMin(Edm, mx); i<EeTMax(Edm,mx); i+=0.001)
-	//cout << i << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, mv, kappa, alphaD) << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, 0.5, kappa, alphaD) << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, 1, kappa, alphaD) << endl;
-	//cout << i << " " << convGeV2cm2*dsigmadEe(i, Edm, mx, mv, kappa, alphaD) << " " << convGeV2cm2*dsigmadEe(i, 0.5, mx, mv, kappa, alphaD) << " " << convGeV2cm2*dsigmadEe(i, 2, mx, 1, kappa, alphaD) << endl;
-
-//for(double i = 0.05; i < 1.0; i+=0.01)
-//	cout << i << " " << convGeV2cm2*sigma(i, mx, mv, kappa, alphaD) << " " << convGeV2cm2*sigma(i, mx, 0.5, kappa, alphaD) << " " << convGeV2cm2*sigma(i, mx, 1, kappa, alphaD) << endl;
+	/*
+	double beam_energy2=400; double epsilon=1; double alphaD=1; double ptmax=1;
+	std::string model = "proton_brem";
+	for(double mv = 0.001; mv<=2; mv+=0.001){
+		double zmin = std::max(3*mv/beam_energy2,0.1);
+		double zmax = 1-zmin;
+		Proton_Brem_Distribution pbd(beam_energy2,epsilon,mv,ptmax,zmax,zmin,alphaD,model);
+		cout << mv << " " <<  pbd.V_prod_rate() << " " << zmin << " " << zmax << endl;
+	}
+	return 0;
 */
-/*************************************
-	End plot stuff
-**************************************/
-
-
-	// double MX=0.01;
-	// double MV=0.04;
-
-	// Nucleon_Scatter_Baryonic nsc(MX+0.001,8,0.01,MX,MV,1e-5,0.0,1,0.035);
-
-
-	// return 0;
-
 	using namespace std::placeholders;
     string parameter_file;
 
@@ -531,8 +515,11 @@ Pion_Inelastic p_i(0.01,7,0.01,mx,mv,alphaD,kappa,1000,0);
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
                 if(iter->name.compare("DM")==0){
 					NDM_list[i]++;
-					if(outmode=="dm_detector_distribution")
+					if(outmode=="dm_detector_distribution"){
 						iter->report(*comprehensive_out);
+						scatter_switch=true;
+						continue;
+					}
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;

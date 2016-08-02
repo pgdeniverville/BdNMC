@@ -48,6 +48,9 @@ double detector_sphere::Ldet (const Particle &DM) {
 
     Ldetenter = (-B-sqrt(pow(B,2)-4*A*C))/(2*A); 
 	Ldetexit = (-B+sqrt(pow(B,2)-4*A*C))/(2*A);
+	
+	if(Ldetenter<0)
+		Ldetenter=0;
 
     if(Ldetenter<Ldetexit){
         cross_point[0] = Ldetenter;

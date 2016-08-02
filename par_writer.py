@@ -45,7 +45,7 @@ def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.
     with open(outfile,'w') as f:
         if run>=0:
             f.write('run {}\n'.format(run))
-	for i in xrange(len(prod_chan)):
+	for i in range(len(prod_chan)):
 	    f.write('production_channel {}\n'.format(prod_chan[i]))
 	    if(prod_chan[i]=="parton_production"):
             	prepare_parton(mA=mv,energy=beam_energy,file_path=v_parton_kinetic)
@@ -158,16 +158,23 @@ def write_t2kFD(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0
     write_experiment(write_detector=t2k_superK,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross,repeat=10,timing=timing,burn_max=100)
 
 def ship_detector(f,xpos=0.0,ypos=0,zpos=100.0,radius=0.52,length=2.1,theta=0,phi=0):
+    #def ship_detector(f,xpos=0.0,ypos=0,zpos=30.0,radius=0.655,length=2.645,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
     f.write(Argon_string)
 
-def write_ship(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_electron", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["Source/particle_list_ship.dat"],outlog="Events/ship_events.dat", output_mode="summary",samplesize=1000,beam_energy=400,n_num_target=54,p_num_target=42,min_scatter_energy=2,max_scatter_energy=20,min_scatter_angle=0.01,max_scatter_angle=0.02,efficiency=0.5,sumlog="Events/ship_run.dat",max_trials=80e6,ptmax=1,zmin=0.1,zmax=0.9,run=-1,dm_energy_resolution=0.01):
+def test_detector(f,xpos=0.0,ypos=0.0,zpos=0.0,radius=1):
+    f.write("\ndetector sphere\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
+    f.write('\n')
+    f.write(Hydrogen_string)
+
+def write_ship(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_electron", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["Source/particle_list_ship.dat"],outlog="Events/ship_events.dat", output_mode="summary",samplesize=1000,beam_energy=400,n_num_target=54,p_num_target=42,min_scatter_energy=2,max_scatter_energy=20,min_scatter_angle=0.01,max_scatter_angle=0.02,efficiency=0.5,sumlog="Events/ship_run.dat",max_trials=80e6,ptmax=1,zmin=0.1,zmax=0.9,run=-1,dm_energy_resolution=0.01,det=ship_detector):
     POT=2e20
     pi0_per_POT=1.8
     p_cross=11*mb
-    write_experiment(write_detector=ship_detector,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross,meson_per_pi0=meson_per_pi0_ship,min_scatter_angle=min_scatter_angle,max_scatter_angle=max_scatter_angle)
+    write_experiment(write_detector=det,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross,meson_per_pi0=meson_per_pi0_ship,min_scatter_angle=min_scatter_angle,max_scatter_angle=max_scatter_angle)
 
 def lsnd_detector(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3,theta=0,phi=0):
     f.write("\ndetector cylinder\n");

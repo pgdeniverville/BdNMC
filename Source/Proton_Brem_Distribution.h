@@ -6,7 +6,7 @@
 #include <string>
 
 class Proton_Brem_Distribution : public Distribution{
-	
+		
 	public:
 		Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double alphaD, std::string &mode, double ptmin=0);
 		double V_prod_rate(){return vprodrate;}
@@ -17,7 +17,7 @@ class Proton_Brem_Distribution : public Distribution{
 	private:
 		void calc_V_prod_rate();
 		double sigmapp(double s);
-		std::string model;
+		std::string model;//proton_brem_baryonic triggers leptophobic behavior
 		// double F_1_proton(double q2);
 			
 		double Beam_Energy, kappa, alpha_D, PTMIN, PTMAX, ZMAX, ZMIN, MA;

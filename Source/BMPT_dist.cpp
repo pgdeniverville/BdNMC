@@ -38,8 +38,9 @@ BMPT::BMPT(double beamE, int mass_number){
     theta_max = pi/2.0;//Kinematics often make this smaller, hopefully I am sampling correctly.
     double p, t, phi;
     //Burn-In
-    for(int i=0; i<10000; i++)
+    for(int i=0; i<10000; i++){
         sample_momentum(p, t, phi);
+    }
 }
 
 double BMPT::xR(double p, double theta){
