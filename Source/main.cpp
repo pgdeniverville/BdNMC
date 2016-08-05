@@ -12,9 +12,12 @@
 #include "constants.h"
 
 #include "Distribution.h"
+#include "sanfordwang.h"
+#include "BurmanSmith.h"
+#include "BMPT_dist.h"
+
 #include "Integrator.h"
 #include "detector.h"
-#include "sanfordwang.h"
 #include "record.h"
 #include "Particle.h"
 #include "Random.h"
@@ -24,8 +27,6 @@
 #include "DMgenerator.h"
 #include "Scatter.h"
 #include "Particle_List.h"
-#include "BurmanSmith.h"
-#include "BMPT_dist.h"
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
 #include "Particle_Generator.h"
