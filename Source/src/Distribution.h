@@ -9,7 +9,6 @@
 class Distribution {
 	public:
 		Distribution(){};
-		//virtual void sample_momentum(double& p, double& theta, double& phi) = 0;
 		void Sample_Particle(Particle &part)
 		{
 			sample_particle(part);
@@ -17,7 +16,6 @@ class Distribution {
 		//		part.report(std::cout);
 				(*i)->sample_particle(part);
 			}
-		//	part.report(std::cout);
 		}
 		void Add_Dist(std::shared_ptr<Distribution> distptr){dist_list.push_back(distptr);}//This should be unique, need to figure out proper syntax.
 	protected:
