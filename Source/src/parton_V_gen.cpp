@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include "constants.h"
+#include "Integrator.h"
 
 parton_V_gen::parton_V_gen(double MV, double MX, double kap, double alp, const std::string chan){
     set_model_params(MV, MX, kap, alp);
@@ -19,18 +20,17 @@ void parton_V_gen::Evaluate_Branching_Ratio(){
 	OFF_SHELL = false;
 }
 
-bool parton_V_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator> V_prod){
+bool parton_V_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle &part){
     double intersect1=0;
     double intersect2=0;
 
-    Particle darkphoton(mv);
+    Particle darkphoton = part;
     darkphoton.name = "V";
     Particle darkmatter1(mx);
     darkmatter1.name = "DM";
     Particle darkmatter2(mx);
     darkmatter2.name = "DM";
 
-    V_prod->Generate_Particle(darkphoton);
 	//darkphoton.report(std::cout);
     double thetad;
 

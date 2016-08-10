@@ -11,6 +11,12 @@ class Particle{
 	
 public:
     Particle(double);
+    Particle(){Particle(0);}
+    Particle(const Particle &);
+
+    Particle& operator=(const Particle& part);
+    
+
     double   m, px, py, pz, E;//Eventually, these variables are going to be made private.
     std::string name;
     double   Theta();
@@ -24,7 +30,7 @@ public:
     void     Rotate_y(double);
     void     Rotate_z(double);
     void     report(std::ostream&);
-    void    Generate_4Vector(double s);
+    //void    Generate_4Vector(double s);
 	void 	Set_Origin(double x, double y, double z);
 //    void    Set_Position(double x, double y, double z);
 	void 	Set_Creation_Time(double t);

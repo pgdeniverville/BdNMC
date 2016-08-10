@@ -19,18 +19,19 @@ void V_decay_gen::Evaluate_Branching_Ratio(){
 	OFF_SHELL = false;
 }
 
-bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator> V_prod){
+bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
 
-    Particle darkphoton(mv);
+    Particle darkphoton = part;
     darkphoton.name = "V";
     Particle darkmatter1(mx);
     darkmatter1.name = "DM";
     Particle darkmatter2(mx);
     darkmatter2.name = "DM";
 
-    V_prod->Generate_Particle(darkphoton);
+
+
 	//darkphoton.report(std::cout);
 
     TwoBodyDecay(darkphoton, darkmatter1, darkmatter2);
