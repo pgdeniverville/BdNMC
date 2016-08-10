@@ -39,7 +39,7 @@ beam_energy 8.9
 production_channel pi0_decay
 
 #Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
-#production_distribution pi0_sanfordwang
+production_distribution pi0_sanfordwang
 
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.
@@ -76,8 +76,8 @@ production_channel pi0_decay
 
 #Scattering Parameters
 #Choose either NCE_nucleon or NCE_electron
-signal_channel Inelastic_Nucleon_Scattering
-scatter_dist_filename Source/data/DIS.dat
+signal_channel NCE_nucleon
+#scatter_dist_filename Source/data/DIS.dat
 
 #New channel available: Pion_Inelastic. Still in testing.
 
@@ -87,7 +87,7 @@ output_file Events/events.dat
 summary_file Events/summary.dat
 
 #In comprehensive mode, all particles that make up an event are written to the output file. This overwrites the output file.
-output_mode summary
+output_mode comprehensive
 #summary suppresses output to output_file (no event list), while still writing to the summary file.
 #output_mode summary
 
