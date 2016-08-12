@@ -488,13 +488,13 @@ def execute_ship_parallel(genlist=True):
     #vmassarr=[i for i in range(2000,3200,200)]
     #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]
     #massarr=[[MV,MV/5.0] for MV in vmassarr]
-    vmassarr=[30,210,420,600,810,1020,1200,1500,1710]
-    massarr=[[MV,MV/3.0] for MV in vmassarr]
+    #vmassarr=[30,210,420,600,810,1020,1200,1500,1710]
+    #massarr=[[MV,MV/3.0] for MV in vmassarr]
     #massarr=[[1,1.0/3.0]]
-    #massarr=[[300,100]]
+    massarr=[[1000,200]]
     for marr in massarr:
-        #ship_eval(marr,signal_channel="NCE_electron")
-        ship_eval(marr,signal_channel="test")
+        ship_eval(marr,signal_channel="NCE_electron")
+        #ship_eval(marr,signal_channel="test")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering_Baryonic")
     #pool=Pool(processes=4)
@@ -586,6 +586,6 @@ def execute_t2k_parallel(genlist=True):
     #pool.map(ship_eval,massarr)
 
 #execute_t2k_parallel(genlist=True)
-execute_miniboone_parallel(genlist=False)
-#execute_ship_parallel(genlist=False)
+#execute_miniboone_parallel(genlist=False)
+execute_ship_parallel(genlist=False)
 #execute_lsnd_parallel(genlist=False)
