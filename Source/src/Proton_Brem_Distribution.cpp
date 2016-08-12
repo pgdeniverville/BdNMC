@@ -34,6 +34,7 @@ double gd(double alD, double kappa){
 Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double alphaD,  std::string &mode, double ptmin){
 	Beam_Energy=Beam_E; kappa=epsilon; PTMIN=ptmin; PTMAX=ptmax; ZMAX = zmax; ZMIN = zmin; MA=mA; model=mode; alpha_D = alphaD;
 	sppM = pow(2*mp+Mpp,2);
+	set_mass(mA);
 	calc_V_prod_rate();
 }
 
