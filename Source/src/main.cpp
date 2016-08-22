@@ -452,7 +452,11 @@ int main(int argc, char* argv[]){
         parstream.close();
         return 1;
     }
-	
+
+	////////////////////
+	//START OF BURN-IN//
+	////////////////////
+
 	double BURN_MAX = par->Burn_In();
 	double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0; i<chan_count; i++){
@@ -466,16 +470,16 @@ int main(int argc, char* argv[]){
 		}
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
 			list<Particle> vecburn;
-			Particle dist_part;
+			Particle dist_part (0);
+			//dist_part.report(std::cout);
 			PartDist_list[i]->Sample_Particle(dist_part);
+			//dist_part.report(cout);
+			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
 					if(burniter->name.compare("DM")==0){
-						//burniter->report(cout);
-						//nburn++;
 						SigGen->probscatter(det, *burniter);
 						nburn++;
-						
 					}
 				}
 			}
@@ -486,8 +490,10 @@ int main(int argc, char* argv[]){
 
 		cout << "pMax at end of Burn-In = " << SigGen->get_pMax() << endl;
 	}
-    //actual run
- 
+
+	//////////////////
+    //SIMULATION RUN//
+ 	//////////////////
     cout << "Run " << par->Run_Name()  << " Start" << endl;
 
     if(outmode=="comprehensive")
@@ -518,8 +524,9 @@ int main(int argc, char* argv[]){
 		}
 		trials_list[i]++; 
 		list<Particle> vec;
-		Particle dist_part;
+		Particle dist_part (0);
 		PartDist_list[i]->Sample_Particle(dist_part);
+
 		if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
 			//Yes, this list is named vec.  
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
@@ -534,14 +541,10 @@ int main(int argc, char* argv[]){
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
-                      	//This is a temporary solution. Every scatter object needs to implement its
-						//own version, but most will be identical. Should be an efficient way
-						//to handle that.
-						timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
-						//cout << "t_delay_frac=" << t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed()) << endl;
-						//iter->report(cout);
-						//cout << "Speed = " << iter->Speed() << endl;
-						//cout << "Time = " << iter->end_coords[3] << endl;
+						if(timing_cut>0)
+							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
+						else
+							timing_efficiency[i]+=1;
 						scatter_switch = true;	
                     }
                 }    

@@ -14,7 +14,7 @@ class Distribution {
 			part.Set_Mass(part_mass);
 			sample_particle(part);
 			for(std::list<std::shared_ptr<Distribution> >::iterator i = dist_list.begin(); i!=dist_list.end(); i++){
-		//		part.report(std::cout);
+				part.report(std::cout);
 				(*i)->sample_particle(part);
 			}
 		}

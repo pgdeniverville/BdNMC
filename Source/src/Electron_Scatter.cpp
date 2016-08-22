@@ -11,6 +11,8 @@
 
 
 using std::list;
+using std::cout;
+using std::endl;
 const double Me = MASS_ELECTRON;
 const double Pi = pi;
 const double convmcm = 100.0;
@@ -82,9 +84,9 @@ void Electron_Scatter::scatterevent (Particle &DM, Particle &electron) {
             phie = Random::Flat(0,1)*2*Pi;
             pe = sqrt(xe*xe-pow(electron.m,2));
             electron.ThreeMomentum(pe*sin(thetae)*cos(phie),pe*sin(thetae)*sin(phie),pe*cos(thetae));
-            electron.Rotate_y(DM.Theta());
-            electron.Rotate_z(DM.Phi());
-            break;
+			electron.Rotate_y(DM.Theta()); 
+			electron.Rotate_z(DM.Phi());
+			break;
         }
     }    
 }

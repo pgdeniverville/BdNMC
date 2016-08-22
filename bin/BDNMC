@@ -13,16 +13,17 @@ then
 	make main
 fi
 cd ..
-#if (($# != 0))
-#then
-#    for arg in "$@"
-#    do
-#        ./Source/main $arg
-#    done
-#else
-#    ./Source/main
-#fi
-#
+
+if (($# != 0))
+then
+    for arg in "$@"
+    do
+        ./Source/main $arg
+    done
+else
+    ./Source/main
+fi
+
 #END=$(date +%s)
 #DIFF=$(( $END - $START ))
 #echo "Execution time = $DIFF s"

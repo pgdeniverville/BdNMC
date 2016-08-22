@@ -11,7 +11,7 @@ Particle::Particle(double mass){
     for(int i=0; i<4; i++){
         origin_coords[i]=0.0;
 		end_coords[i]=0.0;
-	}	
+	}
     EVENT_SET = false;
 }
 

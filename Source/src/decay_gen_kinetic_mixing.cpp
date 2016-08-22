@@ -81,7 +81,6 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
     darkmatter2.name = "DM";
 
     if(OFF_SHELL&&!((mx*2<=mv)&&(mv<meson.m)&&(2*mx>=0.97*mv))){
-        //cout << "Triggering this shit\n";
 		double s, theta;//theta is the angle relative to the gamma in the V* rest frame
         sample_dist(s, theta);
         darkphoton.Set_Mass(sqrt(s));
@@ -96,7 +95,11 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
     meson.report(cout);
 */
     vec.push_back(meson);
-    if((intersect1=det_int(darkmatter1))>0 || (intersect2=det_int(darkmatter2))>0){
+ 	intersect1=det_int(darkmatter1);
+    intersect2=det_int(darkmatter2);
+
+    vec.push_back(meson);
+    if((intersect1)>0 || (intersect2)>0){
         vec.push_back(darkphoton);
         if(intersect1>0){
             vec.push_back(darkmatter1);
@@ -104,10 +107,8 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
         if(intersect2>0){
             vec.push_back(darkmatter2);
         }
-        //datalog << "Event_Start" << endl;
-        
         return true;
-    }
+    }  
     else
         return false;
 }
@@ -192,19 +193,22 @@ bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particl
     else
         DecayDM(darkmatter1, darkmatter2, darkphoton, meson);
 
+
+	intersect1=det_int(darkmatter1);
+    intersect2=det_int(darkmatter2);
+
+
     vec.push_back(meson);
-    if((intersect1=det_int(darkmatter1))>0 || (intersect2=det_int(darkmatter2))>0){
-        vec.push_back(darkphoton);
+    if((intersect1)>0 || (intersect2)>0){
+		vec.push_back(darkphoton);
         if(intersect1>0){
             vec.push_back(darkmatter1);
         }
         if(intersect2>0){
             vec.push_back(darkmatter2);
         }
-        //datalog << "Event_Start" << endl;
-        
         return true;
-    }
+    }	
     else
         return false;
 }
