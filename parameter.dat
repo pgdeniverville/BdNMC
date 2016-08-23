@@ -64,7 +64,6 @@ production_distribution pi0_sanfordwang
 #production_channel eta_decay
 #production_distribution k0_sanfordwang
 
-
 #This invokes the bremsstrahlung production channel. This works, but may be 
 #unreliable around the rho resonance. The zmin/zmax values seem reasonable for MiniBooNE energies.
 #ptmax could be as large as the proton mass, but probably would not change signal much. 
@@ -98,7 +97,7 @@ output_mode comprehensive
 #Cuts on the kinetic energy of outgoing nucleon or electron. These default to min=0 and max=1e9 GeV
 max_scatter_energy 0.9
 min_scatter_energy 0.035
-#Decreasing the resolution increases setup time but improves accuracy of scattering cross section
+#Decreasing the resolution increases setup time but improves accuracy of scattering cross sections
 #dm_energy_resolution 0.01
 
 #Detector Parameters
