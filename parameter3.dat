@@ -1,107 +1,56 @@
-#Parameter Card
-#All masses should be provided in GeV, all lengths in meters.
-#Lines preceded by a # are ignored by the parser.
+#Model Paramaters
+epsilon 0.001
+dark_matter_mass 0.2
+dark_photon_mass 0.6
+alpha_D 0.5
 
-#Uncomment this to set the seed for the Random Number Generator
-#seed 114234
+max_trials 80000000.0
+samplesize 1000
 
-#run 2500
+POT 2e+20
+pi0_per_POT 1.8
 
-#Model Parameters
-epsilon 1e-3
-dark_matter_mass 0.02
-dark_photon_mass 0.08
-alpha_D 0.1
-
-#Run parameters
-POT 2e20
-pi0_per_POT 0.9
-samplesize 5000
-
-#meson_per_pi0 30
-
-#The simulation generates dark matter trajectories intersecting the detector, scatters them, and 
-#throws away the results until burn_max is reached. If the number of attempts exceeds 
-#burn_max*burn_timeout, the burn_in process aborts early and an alert is written to the terminal
-#before the simulation resumes.
-burn_max 1000
-burn_timeout 20000 
-
-#Production Parameters
-#Currently pi0_decay and eta_decay are supported
-#production_channel pi0_decay
-#production_distribution particle_list
-
-production_channel pi0_decay
-production_distribution particle_list
-particle_list_file Source/particle_list.dat
-
-production_channel pi0_decay
-meson_per_pi0 3
-production_distribution particle_list
-particle_list_file Source/particle_list_lsnd.dat
 
 production_channel eta_decay
-production_distribution particle_list
-particle_list_file Source/particle_list.dat
+production_distribution bmpt
+meson_per_pi0 0.078
 
-#parton_V_neutron_file parton_V_n.dat
-#parton_V_proton_file parton_V_p.dat
-#proton_target_cross_section 1.1e-30
-n_num_target 52
-p_num_target 42
-beam_energy 8.9
-#Choosing a production distribution is optional. 
-#production_distribution pi0_sanfordwang
-#production_distribution k0_sanfordwang
+production_channel V_decay
+production_distribution proton_brem
+zmax 0.9
+zmin 0.1
+ptmax 1
 
-#Choose your own fit for the sanfordwang distribution. An example set is provided.
-#If this is not set, the default values will be used.
-#sanfordwang_file ../sanfordwang_parameters.dat
+proton_target_cross_section 1.1e-30
 
-
-#Scattering Parameters
-#Choose either NCE_nucleon or NCE_electron
-signal_channel NCE_nucleon
-
-#Where to write events
-output_file Events/events.dat
-summary_file Events/summary.dat
-#In summary mode, the code appends to the output_file with the production and signal channels, as well as the model parameters.
-output_mode summary
-
-#In comprehensive mode, all particles that make up an event are written to the output file. This overwrites the output file.
-#output_mode comprehensive
-
-
-#Generate a particle_list file of length samplesize.
-#output_mode particle_list
-
-max_scatter_energy 1
-min_scatter_energy 0.035
+efficiency 0.5
+min_scatter_energy 2
+max_scatter_energy 20
+min_scatter_angle 0.01
+max_scatter_angle 0.02
 dm_energy_resolution 0.01
 
-#Detector Parameters
-detector sphere
+n_num_target 54
+p_num_target 42
+beam_energy 400
+signal_channel NCE_electron
+output_file Events/ship_events.dat
+summary_file Events/ship_test.dat
+output_mode comprehensive
+
+
+detector cylinder
 x-position 0.0
-y-position -1.9
-z-position 491.0
-radius 5.0
+y-position 0
+z-position 100.0
+radius 0.52
+length 2.1
+det-theta 0
+det-phi 0
 
-#Material parameters
-#Mass is set in GeV.
-#mass is only important for coherent scattering, can be set to anything.
-#anything not defined will be set to zero.
-material Carbon
-number_density 3.63471e22
-proton_number 6
-neutron_number 6
-electron_number 6
-mass 11.2593
-
-material Hydrogen
-number_density 7.26942e22
-proton_number 1
-neutron_number 0
-electron_number 1
-mass 0.945778
+material Argon
+number_density 2.11e22
+proton_number 18
+neutron_number 22
+electron_number 18
+mass 37.471224
