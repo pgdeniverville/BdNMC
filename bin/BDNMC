@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+RUN_DIRECTORY=${PWD##*/}
+
+if [ $RUN_DIRECTORY = "bin" ]
+then
+	cd ..
+fi
+
+
 START=$(date +%s)
 if [ ! -d "Events" ]
 then
