@@ -12,6 +12,7 @@
 class sanfordwang: public Distribution{
 public:
     sanfordwang(const std::string p_choice){production_choice=p_choice;}
+    //Many of these could be made private
 	void sample_momentum(double &, double &, double &);
 	void sample_particle(Particle &);
 	void pi0sample(double &, double &, double &);

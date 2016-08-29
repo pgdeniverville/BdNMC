@@ -5,6 +5,7 @@
 
 using std::vector;
 using std::cout;
+using std::endl;
 
 //inner product for 3-vectors
 double ip(double vec1[],double vec2[]){
@@ -34,23 +35,43 @@ double detector_sphere::Ldet (const Particle &DM) {
 //cout << DM.name << " " << DM.E << " " << DM.px << " " << DM.py << " " << DM.pz << " " << DM.m << " " << DM.origin_coords[0] << " " << DM.origin_coords[1] << " " << DM.origin_coords[2] << " " << DM.origin_coords[3] << " " << DM.end_coords[0] << " " << DM.end_coords[1] << " " << DM.end_coords[2] << " " << DM.end_coords[3] << std::endl;
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
 	o[0]=r[0]-DM.origin_coords[0];o[1]=r[1]-DM.origin_coords[1];o[2]=r[2]-DM.origin_coords[2];
+	/*
+	for(int i=0; i<3; i++)
+		cout << " r" << i << "=" << r[i];
+	
+	for(int i=0; i<3; i++)
+		cout << " DM.origin_coords" << i << "=" << DM.origin_coords[i];
 
+
+	for(int i=0; i<3; i++)
+		cout << " o" << i << "=" << o[i];
+	cout << endl;	
+	*/
     A = ip(b,b);
    // B = -2*(ip(r,b)-ip(o,b));
    // C = (ip(r,r)-2*ip(o,r)+ip(o,o))-pow(Rdet,2);
     B = -2*ip(o,b);
     C = ip(o,o)-pow(Rdet,2);
 
-
-    if((pow(B,2)-4*A*C)<0||A==0){
+	/*
+	cout << "A = " << A << " B = " << B << " C = " << C << endl;
+    */
+	
+	if((pow(B,2)-4*A*C)<0||A==0){
         return 0.0;
     }
+	
+	//DM.report(std::cout);
 
     Ldetenter = (-B-sqrt(pow(B,2)-4*A*C))/(2*A); 
 	Ldetexit = (-B+sqrt(pow(B,2)-4*A*C))/(2*A);
 	
+	//std::cout << Ldetenter << " " << Ldetexit << std::endl;
 	if(Ldetenter<0)
 		Ldetenter=0;
+
+	if(Ldetexit<0)
+		Ldetexit=0;
 
     if(Ldetenter<Ldetexit){
         cross_point[0] = Ldetenter;

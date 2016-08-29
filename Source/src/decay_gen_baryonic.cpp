@@ -56,12 +56,11 @@ void pion_decay_gen_baryonic::sample_dist(double& s, double& theta){
     }
 }
 
-bool pion_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator> meson_prod){
+bool pion_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(mpi0);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "pion";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -149,12 +148,11 @@ void eta_decay_gen_baryonic::sample_dist(double& s, double& theta){
     }
 }
 
-bool eta_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator> meson_prod){
+bool eta_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(meta);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "eta";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -207,12 +205,11 @@ void omega_decay_gen_baryonic::Evaluate_Branching_Ratio(){
     branchingratio = bromega_to_Vb(mv, mx, kappa,alphaD);
 }
 
-bool omega_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod ){
+bool omega_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part ){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(momega);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "omega";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -260,12 +257,11 @@ void phi_decay_gen_baryonic::Evaluate_Branching_Ratio(){
     branchingratio = brphi_to_Vb(mv, mx, kappa,alphaD)*brVB_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool phi_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod){
+bool phi_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(mphi);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "phi";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)

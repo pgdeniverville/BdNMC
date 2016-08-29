@@ -1,0 +1,56 @@
+#Model Paramaters
+epsilon 0.001
+dark_matter_mass 0.2
+dark_photon_mass 0.6
+alpha_D 0.5
+
+max_trials 80000000.0
+samplesize 1000
+
+POT 2e+20
+pi0_per_POT 1.8
+
+
+production_channel eta_decay
+production_distribution bmpt
+meson_per_pi0 0.078
+
+production_channel V_decay
+production_distribution proton_brem
+zmax 0.9
+zmin 0.1
+ptmax 1
+
+proton_target_cross_section 1.1e-30
+
+efficiency 0.5
+min_scatter_energy 2
+max_scatter_energy 20
+min_scatter_angle 0.01
+max_scatter_angle 0.02
+dm_energy_resolution 0.01
+
+n_num_target 54
+p_num_target 42
+beam_energy 400
+signal_channel NCE_electron
+output_file Events/ship_events.dat
+summary_file Events/ship_test.dat
+output_mode comprehensive
+
+
+detector cylinder
+x-position 0.0
+y-position 0
+z-position 100.0
+radius 0.52
+length 2.1
+det-theta 0
+det-phi 0
+
+material Argon
+number_density 2.11e22
+proton_number 18
+neutron_number 22
+electron_number 18
+mass 37.471224

@@ -29,7 +29,6 @@
 #include "Particle_List.h"
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
-#include "Particle_Generator.h"
 #include "Position_Distributions.h"
 
 
@@ -177,7 +176,6 @@ int main(int argc, char* argv[]){
 	//Production Mode
 	vector<std::shared_ptr<DMGenerator> > DMGen_list;//Should be a unique_ptr
 	vector<std::shared_ptr<Distribution> > PartDist_list;//This is an abstract class from which all distributions inherit.
-	vector<std::shared_ptr<Particle_Generator> > ParGen_list;//This class samples the distribution PartDist and generates particles of the specified mass.
 	vector<double> Vnum_list;
 	vector<string> proddist_vec;
 	
@@ -196,7 +194,6 @@ int main(int argc, char* argv[]){
 		string proddist = proditer->Prod_Dist();
 		std::shared_ptr<DMGenerator> DMGen;
 		std::shared_ptr<Distribution> PartDist;
-		std::shared_ptr<Particle_Generator> ParGen;	
 		double Vnum;
 		cout << "Setting up distribution " << proddist << " for channel " << prodchoice << endl;
 		//Don't delete these without good reason! They're used immediately!
@@ -264,7 +261,7 @@ int main(int argc, char* argv[]){
 				sw->sample_momentum(p1,p2,p3);//Can I remove this line now?
 				PartDist = sw; //std::shared_ptr<Distribution>(&sw);
 			}
-			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mpi0,PartDist));
+			PartDist->set_mass(mpi0);
 			if(prodchoice=="pi0_decay"){
 				DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen(mv, mdm, kappa, alD));
 			}
@@ -282,7 +279,8 @@ int main(int argc, char* argv[]){
 				sw->set_fit_parameters(*proditer);
 				PartDist = sw;
 			}
-			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(meta,PartDist));
+
+			PartDist->set_mass(meta);
 			
 			if(prodchoice=="eta_decay"){ 
 				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen(mv, mdm, kappa, alD));
@@ -303,33 +301,33 @@ int main(int argc, char* argv[]){
 				PartDist = sw; //std::shared_ptr<Distribution>(&sw);
 			}
 			if(prodchoice=="omega_decay"){
-				ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(momega,PartDist));
+				PartDist->set_mass(momega);
 				DMGen = std::shared_ptr<DMGenerator>(new omega_decay_gen(mv, mdm, kappa, alD));
 			}
 			else if(prodchoice=="rho_decay"){
-				ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mrho,PartDist));
+				PartDist->set_mass(mrho);
 				DMGen = std::shared_ptr<DMGenerator>(new rho_decay_gen(mv, mdm, kappa, alD));
 			}
 			else if(prodchoice=="phi_decay"){
-				ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mphi,PartDist));
+				PartDist->set_mass(mphi);
 				DMGen = std::shared_ptr<DMGenerator>(new phi_decay_gen(mv, mdm, kappa, alD));
 			}
 			else if(prodchoice=="omega_decay_baryonic"){
-				ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(momega,PartDist));
+				PartDist->set_mass(momega);
 				DMGen = std::shared_ptr<DMGenerator>(new omega_decay_gen_baryonic(mv, mdm, kappa, alD));
 			}
 			else if(prodchoice=="phi_decay_baryonic"){
-				ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mphi,PartDist));
+				PartDist->set_mass(mphi);
 				DMGen = std::shared_ptr<DMGenerator>(new phi_decay_gen_baryonic(mv, mdm, kappa, alD));
 			}
 			Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
 		}
 		else if(prodchoice=="parton_production_baryonic"||prodchoice=="parton_production"){
-			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv, PartDist));		
+			PartDist->set_mass(mphi);
 			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
 		}
 		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||prodchoice=="V_decay_baryonic"){
-			ParGen = std::shared_ptr<Particle_Generator>(new Particle_Generator(mv,PartDist));
+			PartDist->set_mass(mphi);
 			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
 			Vnum *= DMGen->BranchingRatio();
 
@@ -365,7 +363,6 @@ int main(int argc, char* argv[]){
 		}
 		proddist_vec.push_back(proddist);
 		DMGen_list.push_back(DMGen);
-		ParGen_list.push_back(ParGen);
 		PartDist_list.push_back(PartDist);
 		Vnum_list.push_back(Vnum);
 		Vnumtot+=Vnum;
@@ -446,7 +443,20 @@ int main(int argc, char* argv[]){
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
 	cout << "Minimum Scattering Energy = " << min_scatter_energy << " GeV" <<  endl;
 	cout << "Timing Cut = " << timing_cut << " s\n";
-	
+
+	std::unique_ptr<std::ofstream> summary_out;	
+	summary_out = std::unique_ptr<std::ofstream>(new std::ofstream(summary_filename,std::ios::app));
+		
+	if(!summary_out->is_open()){
+        cerr << "Unable to open output file: " << summary_filename << endl;
+        parstream.close();
+        return 1;
+    }
+
+	////////////////////
+	//START OF BURN-IN//
+	////////////////////
+
 	double BURN_MAX = par->Burn_In();
 	double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0; i<chan_count; i++){
@@ -460,14 +470,16 @@ int main(int argc, char* argv[]){
 		}
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
 			list<Particle> vecburn;
-			if(DMGen_list[i]->GenDM(vecburn, det_int, ParGen_list[i])){
+			Particle dist_part (0);
+			//dist_part.report(std::cout);
+			PartDist_list[i]->Sample_Particle(dist_part);
+			//dist_part.report(cout);
+			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
+			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
 					if(burniter->name.compare("DM")==0){
-						//burniter->report(cout);
-						//nburn++;
 						SigGen->probscatter(det, *burniter);
 						nburn++;
-						
 					}
 				}
 			}
@@ -478,8 +490,10 @@ int main(int argc, char* argv[]){
 
 		cout << "pMax at end of Burn-In = " << SigGen->get_pMax() << endl;
 	}
-    //actual run
- 
+
+	//////////////////
+    //SIMULATION RUN//
+ 	//////////////////
     cout << "Run " << par->Run_Name()  << " Start" << endl;
 
     if(outmode=="comprehensive")
@@ -510,7 +524,10 @@ int main(int argc, char* argv[]){
 		}
 		trials_list[i]++; 
 		list<Particle> vec;
-		if(DMGen_list[i]->GenDM(vec, det_int, ParGen_list[i])){
+		Particle dist_part (0);
+		PartDist_list[i]->Sample_Particle(dist_part);
+
+		if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
 			//Yes, this list is named vec.  
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
@@ -524,14 +541,10 @@ int main(int argc, char* argv[]){
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
-                      	//This is a temporary solution. Every scatter object needs to implement its
-						//own version, but most will be identical. Should be an efficient way
-						//to handle that.
-						timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
-						//cout << "t_delay_frac=" << t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed()) << endl;
-						//iter->report(cout);
-						//cout << "Speed = " << iter->Speed() << endl;
-						//cout << "Time = " << iter->end_coords[3] << endl;
+						if(timing_cut>0)
+							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
+						else
+							timing_efficiency[i]+=1;
 						scatter_switch = true;	
                     }
                 }    
@@ -549,14 +562,6 @@ int main(int argc, char* argv[]){
 	cout << "Run complete\n";
 
 
-	std::unique_ptr<std::ofstream> summary_out;	
-	summary_out = std::unique_ptr<std::ofstream>(new std::ofstream(summary_filename,std::ios::app));
-		
-	if(!summary_out->is_open()){
-        cerr << "Unable to open output file: " << summary_filename << endl;
-        parstream.close();
-        return 1;
-    }
 
 
 	if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")

@@ -4,7 +4,6 @@
 #include "constants.h"
 
 //using std::cout; using std::endl;
-
 //Should update to use Set_Origin and Set_Time
 Particle::Particle(double mass){
     Set_Mass(mass);
@@ -12,8 +11,31 @@ Particle::Particle(double mass){
     for(int i=0; i<4; i++){
         origin_coords[i]=0.0;
 		end_coords[i]=0.0;
-	}	
+	}
     EVENT_SET = false;
+}
+
+Particle::Particle(const Particle &part){
+	Set_Mass(part.m);
+	ThreeMomentum(part.px,part.py,part.pz);
+	for(int i=0; i<4; i++){
+        origin_coords[i]=part.origin_coords[i];
+		end_coords[i]=part.end_coords[i];
+	}
+	EVENT_SET = part.EVENT_SET;
+	name = part.name;
+}
+
+Particle& Particle::operator=(const Particle& part){
+	Set_Mass(part.m);
+	ThreeMomentum(part.px,part.py,part.pz);
+	for(int i=0; i<4; i++){
+        origin_coords[i]=part.origin_coords[i];
+		end_coords[i]=part.end_coords[i];
+	}
+	EVENT_SET = part.EVENT_SET;
+	name = part.name;
+	return *this;
 }
 
 double Particle::Theta(){

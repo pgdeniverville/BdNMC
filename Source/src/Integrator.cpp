@@ -5,7 +5,6 @@
 #include "constants.h"
 
 using std::cout; using std::endl;
-using std::isnan;
 
 const int DDMAX = 20;
 
@@ -27,11 +26,11 @@ double func_check(std::function<double(double)> f, double abscissa, double min, 
 	double fp,fm;
 	fp=f(res_int(abscissa,min,max));
 	//cout << "fp=" << fp << endl;
-	if(isnan(fp))
+	if(std::isnan(fp))
 		fp=0;
 	fm=f(res_int(-abscissa,min,max));
 	//cout << "fm = " << fm<< endl;
-	if(isnan(fm))
+	if(std::isnan(fm))
 		fm=0;
 	return fm+fp;
 }

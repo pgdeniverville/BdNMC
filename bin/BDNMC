@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+RUN_DIRECTORY=${PWD##*/}
+
+if [ $RUN_DIRECTORY = "bin" ]
+then
+	cd ..
+fi
+
+
 START=$(date +%s)
 if [ ! -d "Events" ]
 then
@@ -13,16 +21,17 @@ then
 	make main
 fi
 cd ..
-#if (($# != 0))
-#then
-#    for arg in "$@"
-#    do
-#        ./Source/main $arg
-#    done
-#else
-#    ./Source/main
-#fi
-#
+
+if (($# != 0))
+then
+    for arg in "$@"
+    do
+        ./Source/main $arg
+    done
+else
+    ./Source/main
+fi
+
 #END=$(date +%s)
 #DIFF=$(( $END - $START ))
 #echo "Execution time = $DIFF s"

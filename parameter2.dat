@@ -2,6 +2,8 @@
 #All masses should be provided in GeV, all lengths in meters.
 #Lines preceded by a # are ignored by the parser.
 
+#This is a second sample parameter card implements a more complicated run
+
 #Uncomment this to set the seed for the Random Number Generator
 #seed 114234
 
@@ -10,14 +12,14 @@
 
 #Model Parameters
 epsilon 1e-3
-dark_matter_mass 0.01
-dark_photon_mass 0.2
+dark_matter_mass 0.005
+dark_photon_mass 0.1
 alpha_D 0.1
 
 #Run parameters
 POT 2e20
 pi0_per_POT 0.9
-samplesize 20000
+samplesize 1000
 
 #Optionally, you may specify a number of pi0s per meson
 #meson_per_pi0 0.0333
@@ -31,13 +33,14 @@ burn_timeout 20000
 
 beam_energy 8.9
 
+
 ######EXAMPLE####################
 #Production Parameters
 #Currently pi0_decay, eta_decay, rho_decay, omega_decay and phi_decay are supported.
 production_channel pi0_decay
 
 #Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
-#production_distribution pi0_sanfordwang
+production_distribution pi0_sanfordwang
 
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.
@@ -62,22 +65,20 @@ production_channel pi0_decay
 production_channel eta_decay
 production_distribution k0_sanfordwang
 
-
-#This invokes the bremsstrahlung production channel. This works, but is still in development, so the results may not be reliable!
+#This invokes the bremsstrahlung production channel. This works, but may be 
+#unreliable around the rho resonance. The zmin/zmax values seem reasonable for MiniBooNE energies.
+#ptmax could be as large as the proton mass, but probably would not change signal much. 
 production_channel V_decay
 production_distribution proton_brem
 ptmax 0.2
 zmin 0.3
 zmax 0.7
 
-#Scattering Parameters
-#Choose either NCE_nucleon or NCE_electron
-signal_channel NCE_nucleon
-efficiency 0.35
-#signal_channel NCE_nucleon
+#Scattering Parameters 
+signal_channel Pion_Inelastic
 
 #Where to write events. 
-output_file Events/events_pion_inelastic.dat
+output_file Events/events.dat
 #Where to write a summary of the run with number of events and paramaters in the format: channel_name V_mass DM_mass num_events epsilon alpha_prime scattering_channel 
 summary_file Events/summary.dat
 
@@ -91,9 +92,9 @@ output_mode comprehensive
 #output_mode particle_list
 
 #Cuts on the kinetic energy of outgoing nucleon or electron. These default to min=0 and max=1e9 GeV
-max_scatter_energy 0.9
-min_scatter_energy 0.035
-#Decreasing the resolution increases setup time but improves accuracy of scattering cross section
+#max_scatter_energy 0.9
+#min_scatter_energy 0.035
+#Decreasing the resolution increases setup time but improves accuracy of scattering cross sections
 #dm_energy_resolution 0.01
 
 #Detector Parameters

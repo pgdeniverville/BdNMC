@@ -171,7 +171,8 @@ def ship_detector(f,xpos=0.0,ypos=0,zpos=100.0,radius=0.52,length=2.1,theta=0,ph
     f.write('\n')
     f.write(Argon_string)
 
-def test_detector(f,xpos=0.0,ypos=0.0,zpos=0.0,radius=1):
+#This is shifted by a tiny amount to prevent weird underflow errors
+def test_detector(f,xpos=0.0,ypos=0.0,zpos=0.01,radius=1):
     f.write("\ndetector sphere\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
     f.write('\n')

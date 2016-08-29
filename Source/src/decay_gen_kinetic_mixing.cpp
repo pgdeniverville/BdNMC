@@ -67,11 +67,10 @@ void pion_decay_gen::sample_dist(double& s, double& theta){
     }
 }
 
-bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod ){
+bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
-    Particle meson(mpi0);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "pion";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -82,7 +81,6 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
     darkmatter2.name = "DM";
 
     if(OFF_SHELL&&!((mx*2<=mv)&&(mv<meson.m)&&(2*mx>=0.97*mv))){
-        //cout << "Triggering this shit\n";
 		double s, theta;//theta is the angle relative to the gamma in the V* rest frame
         sample_dist(s, theta);
         darkphoton.Set_Mass(sqrt(s));
@@ -97,7 +95,11 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
     meson.report(cout);
 */
     vec.push_back(meson);
-    if((intersect1=det_int(darkmatter1))>0 || (intersect2=det_int(darkmatter2))>0){
+ 	intersect1=det_int(darkmatter1);
+    intersect2=det_int(darkmatter2);
+
+    vec.push_back(meson);
+    if((intersect1)>0 || (intersect2)>0){
         vec.push_back(darkphoton);
         if(intersect1>0){
             vec.push_back(darkmatter1);
@@ -105,10 +107,8 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
         if(intersect2>0){
             vec.push_back(darkmatter2);
         }
-        //datalog << "Event_Start" << endl;
-        
         return true;
-    }
+    }  
     else
         return false;
 }
@@ -170,12 +170,11 @@ void eta_decay_gen::sample_dist(double& s, double& theta){
     }
 }
 
-bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod){
+bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(meta);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "eta";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -194,19 +193,22 @@ bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particl
     else
         DecayDM(darkmatter1, darkmatter2, darkphoton, meson);
 
+
+	intersect1=det_int(darkmatter1);
+    intersect2=det_int(darkmatter2);
+
+
     vec.push_back(meson);
-    if((intersect1=det_int(darkmatter1))>0 || (intersect2=det_int(darkmatter2))>0){
-        vec.push_back(darkphoton);
+    if((intersect1)>0 || (intersect2)>0){
+		vec.push_back(darkphoton);
         if(intersect1>0){
             vec.push_back(darkmatter1);
         }
         if(intersect2>0){
             vec.push_back(darkmatter2);
         }
-        //datalog << "Event_Start" << endl;
-        
         return true;
-    }
+    }	
     else
         return false;
 }
@@ -231,12 +233,11 @@ void rho_decay_gen::Evaluate_Branching_Ratio(){
     branchingratio = brrho_to_V(mv, mx, kappa,alphaD)*brV_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool rho_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod ){
+bool rho_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part ){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(mrho);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "rho";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -285,12 +286,11 @@ void omega_decay_gen::Evaluate_Branching_Ratio(){
     branchingratio = bromega_to_V(mv, mx, kappa,alphaD)*brV_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool omega_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod ){
+bool omega_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part ){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(momega);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "omega";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)
@@ -339,12 +339,11 @@ void phi_decay_gen::Evaluate_Branching_Ratio(){
     branchingratio = brphi_to_V(mv, mx, kappa,alphaD)*brV_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool phi_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, std::shared_ptr<Particle_Generator>  meson_prod){
+bool phi_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
-    Particle meson(mphi);
-    meson_prod->Generate_Particle(meson);
+    Particle meson = part;
     meson.name = "phi";
 
     Particle darkphoton(mv);//In off-shell case this is changed to sqrt(s)

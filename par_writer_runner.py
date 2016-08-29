@@ -137,11 +137,12 @@ def ship_eval(mass_arr,signal_channel="NCE_electron"):
 
     #write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=2000,sumlog="Events/ship.dat")    
     if signal_channel =="NCE_electron":
-        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=2000,sumlog="Events/ship_y_andrei2.dat",output_mode="summary",alpha_D=alD)
+        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1000,sumlog="Events/ship_test.dat",output_mode="comprehensive",alpha_D=alD)
+        #write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1e6,sumlog="Events/ship_test.dat",output_mode="comprehensive",outlog="Events/walter_events.dat",alpha_D=alD,det=test_detector,min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,max_scatter_energy=400)
     elif signal_channel =="Inelastic_Nucleon_Scattering_Baryonic":
         write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="Inelastic_Nucleon_Scattering_Baryonic",samplesize=2000,sumlog="Events/ship_y2.dat",output_mode="summary",alpha_D=1e-4,eps=0.0)
     elif signal_channel=="test":
-        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1000000,sumlog="Events/ship_test.dat",outlog="dm_dist_{}_{}.dat".format(MV,MX),output_mode="dm_detector_distribution",alpha_D=alD,det=test_detector)
+        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1000000,sumlog="Events/ship_test.dat",outlog="dm_dist_{}_{}.dat".format(MV,MX),output_mode="dm_detector_distribution",alpha_D=alD,det=test_detector,min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,max_scatter_energy=400)
     subp.call(["./Source/main", parfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0)) 
@@ -491,7 +492,11 @@ def execute_ship_parallel(genlist=True):
     #vmassarr=[30,210,420,600,810,1020,1200,1500,1710]
     #massarr=[[MV,MV/3.0] for MV in vmassarr]
     #massarr=[[1,1.0/3.0]]
+<<<<<<< HEAD
     massarr=[[1000,200]]
+=======
+    massarr=[[600,200]]
+>>>>>>> makerevision
     for marr in massarr:
         ship_eval(marr,signal_channel="NCE_electron")
         #ship_eval(marr,signal_channel="test")
