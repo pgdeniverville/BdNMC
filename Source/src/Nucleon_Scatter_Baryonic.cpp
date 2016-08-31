@@ -33,8 +33,8 @@ void Nucleon_Scatter_Baryonic::generate_cross_sections(){
 	double a,b,c,xmin,sigmatot;
     for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
 		//cout << "Energy=" << iter << endl;
-		std::function<double(double)> fp = bind(DMNscattering_Baryonic::dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
-		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
+		std::function<double(double)> fp = std::bind(DMNscattering_Baryonic::dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
+		std::function<double(double)> fplim = std::bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
 		//for(double ii=scatmin(iter,mdm,mp);ii<scatmax(iter);ii+=0.01){
 	    //	cout << ii << " " << fp(ii) << " " << endl;
 		//}	  
@@ -52,8 +52,8 @@ void Nucleon_Scatter_Baryonic::generate_cross_sections(){
 			xmin=0;
 			vec_proton_maxima.push_back(-1.0*golden(a,b,c,fplim,tol_frac,tol_abs,xmin));
 		}	
-		std::function<double(double)> fn = bind(DMNscattering_Baryonic::dsigmadEdmN,iter,_1,mdm,MDP,alD,kap);
-        std::function<double(double)> fnlim = bind(lim_func_wrapper,_1,0.0,fn,scatmin(iter,mdm,mn),scatmax(iter));	
+		std::function<double(double)> fn = std::bind(DMNscattering_Baryonic::dsigmadEdmN,iter,_1,mdm,MDP,alD,kap);
+        std::function<double(double)> fnlim = std::bind(lim_func_wrapper,_1,0.0,fn,scatmin(iter,mdm,mn),scatmax(iter));	
 		sigmatot=DoubleExponential_adapt(fn,scatmin(iter,mdm,mn),scatmax(iter),100,0.1,1e-3);
 		vec_neutron.push_back(sigmatot);
         if(sigmatot==0){
