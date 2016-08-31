@@ -1,4 +1,3 @@
-
 #include "Scatter.h"
 #include "minimization.h"
 #include "DMNscattering.h"
@@ -40,8 +39,8 @@ void Nucleon_Scatter::generate_cross_sections(){
 //	double emax; double emin;
 	double a,b,c,xmin;
     for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
-		std::function<double(double)> fp = bind(dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
-		std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
+		std::function<double(double)> fp = std::bind(dsigmadEdmP,iter,_1,mdm,MDP,alD,kap);
+		std::function<double(double)> fplim = std::bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
 		vec_proton.push_back(DoubleExponential_adapt(fp,scatmin(iter,mdm,mp),scatmax(iter),50,0.1,1e-2));
 		a=scatmin(iter,mdm,mp);
 		b=scatmax(iter);
@@ -50,8 +49,8 @@ void Nucleon_Scatter::generate_cross_sections(){
 		vec_proton_maxima.push_back(-1.0*golden(a,b,c,fplim,tol_frac,tol_abs,xmin));
 		//cout << vec_proton.back()*convGeV2cm2 << endl;
 
-		std::function<double(double)> fn = bind(dsigmadEdmN,iter,_1,mdm,MDP,alD,kap);
-        std::function<double(double)> fnlim = bind(lim_func_wrapper,_1,0.0,fn,scatmin(iter,mdm,mn),scatmax(iter));	
+		std::function<double(double)> fn = std::bind(dsigmadEdmN,iter,_1,mdm,MDP,alD,kap);
+        std::function<double(double)> fnlim = std::bind(lim_func_wrapper,_1,0.0,fn,scatmin(iter,mdm,mn),scatmax(iter));	
 		vec_neutron.push_back(DoubleExponential_adapt(fn,scatmin(iter,mdm,mn),scatmax(iter),50,0.1,1e-2));
 		a=scatmin(iter,mdm,mn);
 		b=scatmax(iter);

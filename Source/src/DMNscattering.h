@@ -1,4 +1,4 @@
-#ifndef GUARD_DMNscaterring_h
+#ifndef GUARD_DMNscattering_h
 #define GUARD_DMNscattering_h
 
 #include <cmath>
