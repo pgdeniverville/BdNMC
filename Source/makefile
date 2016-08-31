@@ -51,3 +51,4 @@ $(DEPDIR)/%.d: ;
 .PHONY: clean
 clean:
 	rm *.o
+	rm -r .d
