@@ -1,0 +1,103 @@
+#Parameter Card
+#All masses should be provided in GeV, all lengths in meters.
+#Lines preceded by a # are ignored by the parser.
+
+#Uncomment this to set the seed for the Random Number Generator
+#seed 114234
+
+#run 2500
+
+#Model Parameters
+epsilon 1e-3
+dark_matter_mass 0.02
+dark_photon_mass 0.08
+alpha_D 0.1
+
+#Run parameters
+POT 2e20
+pi0_per_POT 0.9
+samplesize 4000000
+
+#meson_per_pi0 30
+
+#The simulation generates dark matter trajectories intersecting the detector, scatters them, and 
+#throws away the results until burn_max is reached. If the number of attempts exceeds 
+#burn_max*burn_timeout, the burn_in process aborts early and an alert is written to the terminal
+#before the simulation resumes.
+burn_max 1000
+burn_timeout 20000 
+
+#Production Parameters
+#Currently pi0_decay and eta_decay are supported
+#production_channel pi0_decay
+#production_distribution particle_list
+
+production_channel particle_list
+production_distribution burmansmith
+particle_list_file Source/particle_list_burmansmith.dat
+
+#production_channel eta_decay
+#production_distribution k0_sanfordwang
+#production_distribution particle_list
+#particle_list_file Source/particle_list.dat
+
+#parton_V_neutron_file parton_V_n.dat
+#parton_V_proton_file parton_V_p.dat
+#proton_target_cross_section 1.1e-30
+n_num_target 52
+p_num_target 42
+beam_energy 8.9
+#Choosing a production distribution is optional. 
+#production_distribution pi0_sanfordwang
+#production_distribution k0_sanfordwang
+
+#Choose your own fit for the sanfordwang distribution. An example set is provided.
+#If this is not set, the default values will be used.
+#sanfordwang_file ../sanfordwang_parameters.dat
+
+
+#Scattering Parameters
+#Choose either NCE_nucleon or NCE_electron
+signal_channel NCE_nucleon
+
+#Where to write events
+output_file Events/events.dat
+summary_file Events/summary.dat
+#In summary mode, the code appends to the output_file with the production and signal channels, as well as the model parameters.
+#output_mode summary
+
+#In comprehensive mode, all particles that make up an event are written to the output file. This overwrites the output file.
+#output_mode comprehensive
+
+
+#Generate a particle_list file of length samplesize.
+output_mode particle_list
+
+max_scatter_energy 1
+min_scatter_energy 0.035
+dm_energy_resolution 0.01
+
+#Detector Parameters
+detector sphere
+x-position 0.0
+y-position -1.9
+z-position 491.0
+radius 5.0
+
+#Material parameters
+#Mass is set in GeV.
+#mass is only important for coherent scattering, can be set to anything.
+#anything not defined will be set to zero.
+material Carbon
+number_density 3.63471e22
+proton_number 6
+neutron_number 6
+electron_number 6
+mass 11.2593
+
+material Hydrogen
+number_density 7.26942e22
+proton_number 1
+neutron_number 0
+electron_number 1
+mass 0.945778

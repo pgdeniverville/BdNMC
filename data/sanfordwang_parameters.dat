@@ -1,0 +1,40 @@
+#Note that any parameter can be commented 
+#out in order to use the default value.
+Beam_Energy 8.9
+maximum_pi_momentum 7.890000000
+
+#Pi plus distribution
+c1 220.7000
+c2 1.080000
+c3 1.000000
+c4 1.978000
+c5 1.320000
+c6 5.572000
+c7 0.086800
+c8 9.686000
+c9 1.000000
+
+#pi minus distribution
+d1 213.7000
+d2 0.937900
+d3 5.454000
+d4 1.210000 
+d5 1.284000 
+d6 4.781000
+d7 0.073380
+d8 8.329000
+d9 1.000000
+
+#K0 distribution, used for eta.
+e1 15.130
+e2 1.975
+e3 4.084
+e4 0.928
+e5 0.731
+e6 4.362
+e7 0.048
+e8 13.300
+e9 1.278
+
+
+
