@@ -23,7 +23,7 @@ class BurmanSmith : public Distribution {
    private:
         double Tp, Ep, NormZ, TA, TAZ730, TAZ585, sigmaAZ585, sigmaAZ730;
         double sigmaA;
-        double sigmamax, Tpimax;
+        double Tpimax;
         int Z;
         double TF(double);
         double Amp(double);

@@ -154,11 +154,11 @@ void Pion_Inelastic::generate_cross_sections(){
             vec_proton_maxima.push_back(0);
         }
         else{
-            std::function<double(double)> fp = bind(&Pion_Inelastic::dsigma_dER_N,this,iter,_1,mdm,MDP,alD,kap,mp);
+            std::function<double(double)> fp = std::bind(&Pion_Inelastic::dsigma_dER_N,this,iter,_1,mdm,MDP,alD,kap,mp);
             //lim_func_wrapper comes from minimization.h. It evaluates to zero outside
             //specified boundaries, and flips the sign of its function for use by
             //minimization.
-			std::function<double(double)> fplim = bind(lim_func_wrapper,_1,0.0,fp,Ermin(iter,mdm,mp),Ermax(iter,mdm,mp));
+			std::function<double(double)> fplim = std::bind(lim_func_wrapper,_1,0.0,fp,Ermin(iter,mdm,mp),Ermax(iter,mdm,mp));
     		vec_proton.push_back(DoubleExponential_adapt(fp,Ermin(iter,mdm,mp),Ermax(iter,mdm,mp),100,0.1,1e-4));
             prep_ab(a,b,iter,mdm,mp);
     		//cout << "a=" << a << "b=" << b << "Ermax=" << Ermax(iter,mdm,mp) << endl; 
@@ -173,8 +173,8 @@ void Pion_Inelastic::generate_cross_sections(){
             vec_neutron_maxima.push_back(0);
         }
         else{
-    		std::function<double(double)> fn = bind(&Pion_Inelastic::dsigma_dER_N,this,iter,_1,mdm,MDP,alD,kap,mn);
-            std::function<double(double)> fnlim = bind(lim_func_wrapper,_1,0.0,fn,Ermin(iter,mdm,mn),Ermax(iter,mdm,mn));   
+    		std::function<double(double)> fn = std::bind(&Pion_Inelastic::dsigma_dER_N,this,iter,_1,mdm,MDP,alD,kap,mn);
+            std::function<double(double)> fnlim = std::bind(lim_func_wrapper,_1,0.0,fn,Ermin(iter,mdm,mn),Ermax(iter,mdm,mn));   
             vec_neutron.push_back(DoubleExponential_adapt(fn,Ermin(iter,mdm,mn),Ermax(iter,mdm,mn),100,0.1,1e-4));
             prep_ab(a,b,iter,mdm,mn);
             //cout << "a=" << a << "b=" << b << "Ermax=" << Ermax(iter,mdm,mn) << endl; 

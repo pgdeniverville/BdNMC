@@ -16,7 +16,7 @@ class BMPT : public Distribution{
         double Invariant_Cross_Section_pi_minus(double p, double theta);//E \times d^3\sigma/dp^3
     private:
         double Beam_Energy, Mass_Number, Meson_Mass;
-        double sBMPT, Beta_CM, BMPTmax;
+        double sBMPT, Beta_CM;
         double theta_max, p_max;
         double xR(double p, double theta);
         double xF(double p, double theta);
