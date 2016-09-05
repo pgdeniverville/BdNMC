@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
 
-RUN_DIRECTORY=${PWD##*/}
+RUN_DIRECTORY=$PWD
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ $RUN_DIRECTORY = "bin" ]
-then
-	cd ..
-fi
-
+cd $DIR
+cd ..
 
 START=$(date +%s)
 if [ ! -d "Events" ]
@@ -26,7 +24,7 @@ if (($# != 0))
 then
     for arg in "$@"
     do
-        ./Source/main $arg
+        ./Source/main $RUN_DIRECTORY/$arg
     done
 else
     ./Source/main

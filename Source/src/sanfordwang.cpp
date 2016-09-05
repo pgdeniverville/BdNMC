@@ -7,8 +7,8 @@
 using std::cout;
 using std::endl;
 
-const double MPI = mpi0;
-const double META = meta;
+//const double MPI = mpi0;
+//const double META = meta;
 const double thetamin=0, thetamax=pi/2.0;
 //const double sigswpip=158.93469618126042;
 //const double sigswpim=144.63;

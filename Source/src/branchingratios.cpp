@@ -11,7 +11,7 @@
 using std::cout; using std::endl;
 
 const double mp = MASS_PROTON;
-const double mpim = MASS_PION_CHARGED;
+//const double mpim = MASS_PION_CHARGED;
 const double metap = 0.95778;
 const double Br_etap_to_gamma_gamma=0.022;
 const double Br_etap_to_gamma_rho=0.291;

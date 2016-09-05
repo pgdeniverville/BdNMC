@@ -10,7 +10,7 @@ const double mp = MASS_PROTON;
 const double mn = MASS_NEUTRON;
 
 //unit conversions
-const double convmcm = 100.0;
+//const double convmcm = 100.0;
 
 //Form factor fit parameters from hep-ex/0308005.
 const double aEN = 0.942; const double bEN = 4.61; const double mup = 2.793;
@@ -181,73 +181,3 @@ double Ef_to_N_Theta(double En, double Ef, double mdm, double m){
     return acos((En*(En+m-Ef)-m*Ef)/sqrt(En*En-mdm*mdm)/sqrt(pow(En+m-Ef,2)-m*m));
 }
 
-/*
-bool probscatter (double &pMax, double mv, double kap, double alD, detector det, Particle DM, Particle Nucleon, Linear_Interpolation LIN, Linear_Interpolation LIP){
-    
-    using namespace std::placeholders;
-
-    double LXDet = convmcm*det.Ldet(DM);
-    double XDMp = LIP.Interpolate(DM.E)*npCH2;
-    double XDMn = LIN.Interpolate(DM.E)*nnCH2;
-    double prob;
-    if((prob = LXDet*convGeV2cm2*(XDMp+XDMn)) > pMax)
-        pMax = prob;
-    if(prob > pMax*Random::Flat(0,1)){
-        if(XDMp/(XDMn+XDMp) <= Random::Flat(0,1)){
-            auto fn = std::bind(dsigmadEdmP,DM.E,_1,DM.m,mv,alD,kap);//this might not work.
-            std::function<double(double)> Xsec = fn;
-            Nucleon.m = mp;
-            Nucleon.name = "proton";
-            scatterevent(DM, Nucleon, Xsec);
-        }
-        else{
-            auto fn = std::bind(dsigmadEdmN,DM.E,_1,DM.m,mv,alD,kap);
-            std::function <double(double)> Xsec = fn;
-            Nucleon.m = mn;
-            Nucleon.name = "neutron";
-            scatterevent(DM, Nucleon, Xsec);
-        }
-        Event coordinates(0);
-        coordinates.FourPosition(DM, det);
-        Nucleon.coords = & coordinates;
-        cout << Nucleon.name << " " << Nucleon.px << " " << Nucleon.coords->x << endl;;
-        Nucleon.EVENT_SET = true;
-        return true;
-    }
-    else
-        return false;
-}*/
-/*
-bool probscatter_coherent (double &pMax, const double mv, const double kap, const double alD, const std::shared_ptr<detector>& det, const int mat_index, Particle &DM, Linear_Interpolation &LIP){
-
-    using namespace std::placeholders;
-
-    double LXDet = convmcm*det->Ldet(DM);
-    double XDMc = LIP.Interpolate(DM.E)*(det->get_nDensity(mat_index));
-    double prob;
-    if((prob = LXDet*convGeV2cm2*(XDMc)) > pMax*Random::Flat(0,1)){
-        if(prob>pMax)
-            pMax = prob;
-        return true;
-    }
-    else
-        return false;
-}
-
-bool probscatter_coherent (double &pMax, const double mv, const double kap, const double alD,  const std::shared_ptr<detector>& det, const int mat_index, Particle &DM, Particle *Nucleus, Linear_Interpolation &LIP){
-
-    using namespace std::placeholders;
-    double LXDet = convmcm*det->Ldet(DM);
-    double XDMc = LIP.Interpolate(DM.E)*(det->get_nDensity(mat_index));
-    double prob = LXDet*convGeV2cm2*(XDMc);
-    if(prob > pMax*Random::Flat(0,1)){
-        if(prob>pMax)
-            pMax = prob;
-        auto fn = std::bind(dsigmadEdmP,DM.E,_1,DM.m,mv,alD,kap);//this might not work.
-        std::function<double(double)> Xsec = fn;
-        scatterevent(DM, *Nucleus, Xsec);
-        return true;
-    }
-    else
-        return false;
-}*/

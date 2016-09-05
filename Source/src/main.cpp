@@ -43,12 +43,12 @@ using std::list;    using std::vector;
 using std::exception;
 using std::cerr;
 
-const double mp = MASS_PROTON;
-const double mn = MASS_NEUTRON;
-const double me = MASS_ELECTRON;
-const double EDMres = 0.1;
+//const double mp = MASS_PROTON;
+//const double mn = MASS_NEUTRON;
+//const double me = MASS_ELECTRON;
+//const double EDMres = 0.1;
 //cm per meter
-const double cmpm = 100.0;
+//const double cmpm = 100.0;
 
 double t_delay_fraction(double tcut, double pos, double speed){
 	double tdelay=pos/speed/speed_of_light-pos/speed_of_light;
