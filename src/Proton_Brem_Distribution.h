@@ -25,7 +25,7 @@ class Proton_Brem_Distribution : public Distribution{
 			
 		//Proton Form Factor parameters
 		double rD = 0.8/0.197; 
-		double mD2 = 12.0/rD/rD;
+		//double mD2 = 12.0/rD/rD;
 		//Proton Cross Section fit parameters
 		double Hpp = 0.2704; 
 		double Mpp=2.2127; 
