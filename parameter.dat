@@ -43,7 +43,7 @@ production_distribution pi0_sanfordwang
 
 #Choose your own fit for the sanfordwang distribution. An example set is provided.
 #If this is not set, the default values will be used.
-#sanfordwang_file ../sanfordwang_parameters.dat
+sanfordwang_file data/sanfordwang_parameters.dat
 
 #A list of 4-momenta (of pions, for example) may be provided in the format (px py pz E).
 #production_distribution particle_list
