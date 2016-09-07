@@ -491,9 +491,9 @@ int main(int argc, char* argv[]){
 		cout << "pMax at end of Burn-In = " << SigGen->get_pMax() << endl;
 	}
 
-	//////////////////
-    //SIMULATION RUN//
- 	//////////////////
+	///////////////////
+    //SIMULATION LOOP//
+ 	///////////////////
     cout << "Run " << par->Run_Name()  << " Start" << endl;
 
     if(outmode=="comprehensive")

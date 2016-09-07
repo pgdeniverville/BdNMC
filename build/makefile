@@ -1,6 +1,6 @@
 CXXFLAGS = -std=c++11 -Wall 
 
-VPATH = src:header
+VPATH = ../src:header
 
 CXX = g++
 

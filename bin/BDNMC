@@ -13,7 +13,8 @@ then
 	mkdir Events
 fi
 
-cd Source
+cd build
+
 #if [ ! -e "main" ]
 #then
 make main
@@ -24,10 +25,10 @@ if (($# != 0))
 then
     for arg in "$@"
     do
-        ./Source/main $RUN_DIRECTORY/$arg
+        ./build/main $RUN_DIRECTORY/$arg
     done
 else
-    ./Source/main
+    ./build/main
 fi
 
 #END=$(date +%s)
