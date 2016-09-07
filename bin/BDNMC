@@ -14,10 +14,10 @@ then
 fi
 
 cd Source
-if [ ! -e "main" ]
-then
-	make main
-fi
+#if [ ! -e "main" ]
+#then
+make main
+#fi
 cd ..
 
 if (($# != 0))

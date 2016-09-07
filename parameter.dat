@@ -5,7 +5,7 @@
 #Uncomment this to set the seed for the Random Number Generator
 #seed 114234
 
-#Give you run a name. If no name is supplied, one will be generated from the current time.
+#Give your run a name. If no name is supplied, one will be generated from the current time.
 #run 14506
 
 #Model Parameters
@@ -32,8 +32,6 @@ burn_timeout 20000
 beam_energy 8.9
 
 
-
-######EXAMPLE####################
 #Production Parameters
 #Currently pi0_decay, eta_decay, rho_decay, omega_decay and phi_decay are supported.
 production_channel pi0_decay
@@ -57,7 +55,6 @@ production_distribution pi0_sanfordwang
 #y-offset 50
 #z-offset -100
 #t-offset 0.0
-######END EXAMPLE################
 
 
 #Here we also call a second production mode.
@@ -65,8 +62,9 @@ production_distribution pi0_sanfordwang
 #production_distribution k0_sanfordwang
 
 #This invokes the bremsstrahlung production channel. This works, but may be 
-#unreliable around the rho resonance. The zmin/zmax values seem reasonable for MiniBooNE energies.
-#ptmax could be as large as the proton mass, but probably would not change signal much. 
+#unreliable around the rho resonance. The zmin/zmax values seem reasonable 
+#for MiniBooNE energies. ptmax could be as large as the proton mass, but 
+#probably would not change signal much. 
 #production_channel V_decay
 #production_distribution proton_brem
 #ptmax 0.2
@@ -74,11 +72,10 @@ production_distribution pi0_sanfordwang
 #zmax 0.7
 
 #Scattering Parameters
-#Choose either NCE_nucleon or NCE_electron
+#Choose from NCE_nucleon, NCE_electron, Pion_Inelastic, 
 signal_channel NCE_nucleon
 #scatter_dist_filename Source/data/DIS.dat
 
-#New channel available: Pion_Inelastic. Still in testing.
 
 #Where to write events. 
 output_file Events/events.dat
