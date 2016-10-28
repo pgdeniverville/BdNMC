@@ -32,6 +32,12 @@ bool parton_V_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle
     darkmatter2.name = "DM";
 
 	//darkphoton.report(std::cout);
+	//std::cout << darkphoton.m << std::endl;
+	//darkmatter1.report(std::cout);
+	//darkmatter2.report(std::cout);
+
+
+	//darkphoton.report(std::cout);
     double thetad;
 
     while(true){
@@ -39,7 +45,7 @@ bool parton_V_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle
         if((1-pow(cos(thetad),2))>Random::Flat(0,1))
             break;
     }
-
+	//std::cout << thetad << std::endl;
     TwoBodyDecay(darkphoton, darkmatter1, darkmatter2, thetad);
   	//darkmatter1.report(std::cout);
 	//darkmatter2.report(std::cout);

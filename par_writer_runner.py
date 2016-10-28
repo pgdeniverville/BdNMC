@@ -396,7 +396,8 @@ def lsnd_eval(mass_arr,signal_channel="NCE_electron"):
     else:
         return
     if signal_channel=="NCE_electron":
-        write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_interp.dat",p_num_target=8,samplesize=1000,alpha_D=alD)
+        #write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_interp.dat",p_num_target=8,samplesize=1000,alpha_D=alD)
+        write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_Y.dat",p_num_target=8,samplesize=1000,alpha_D=alD)
     elif signal_channel=="NCE_nucleon":
         write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,min_scatter_energy=0.018, max_scatter_energy=1000,sumlog="Events/lsnd_thesis3.dat",p_num_target=8,samplesize=1000,signal_chan="NCE_nucleon")
     subp.call(["./build/main", parfile])
@@ -545,7 +546,7 @@ def execute_lsnd_parallel(genlist=True):
         np.savetxt("data/particle_list_lsnd.dat",arr3)
     #massarr=[]
     chimassarr=[1,2,3,4,5,6,7,8,9,10,11,12,62]+[i for i in range(13,65,3)]
-    vmassarr=[i for i in range(10,30,1)]+[i for i in range(30,130,5)]+[131,132,133,134,135,136,137,138]+[i for i in range(140,700,20)]
+    #vmassarr=[i for i in range(10,30,1)]+[i for i in range(30,130,5)]+[131,132,133,134,135,136,137,138]+[i for i in range(140,700,20)]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     #vmassarr=[i for i in range(5,400,5)]
     #massarr=[[MV,MV/5] for MV in vmassarr]
@@ -555,14 +556,14 @@ def execute_lsnd_parallel(genlist=True):
     #chimassarr=[i for i in range(15,100,10)]+[11,12,13,14,16,18,23,27]
     #chimassarr=[5,7,9,49,51,24,26]
     #massarr=massarr+[[MV,MX] for MV in vmassarr for MX in chimassarr]
-    massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr if MX<MV/2.0]+[[MV,MV/2.0] for MV in range(10,134,1)]
-    massarr2 = [] 
-    for i in massarr:
-        if i not in massarr2:
-            massarr2.append(i)
-    massarr=massarr2
-    print(len(massarr))
-    print(massarr)
+    #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr if MX<MV/2.0]+[[MV,MV/2.0] for MV in range(10,134,1)]
+    massarr = [[3*MX,MX] for MX in chimassarr] 
+    #for i in massarr:
+    #    if i not in massarr2:
+    #        massarr2.append(i)
+    #massarr=massarr2
+    #print(len(massarr))
+    #print(massarr)
     for marr in massarr:
         lsnd_eval(marr,signal_channel="NCE_electron")
     #pool=Pool(processes=4)
@@ -605,5 +606,5 @@ def execute_t2k_parallel(genlist=True):
 
 #execute_t2k_parallel(genlist=True)
 #execute_miniboone_parallel(genlist=False)
-execute_ship_parallel(genlist=True)
-#execute_lsnd_parallel(genlist=False)
+#execute_ship_parallel(genlist=True)
+execute_lsnd_parallel(genlist=True)

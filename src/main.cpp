@@ -166,7 +166,8 @@ int main(int argc, char* argv[]){
     double alD = par->alD();
     double mv = par->MassDP();
     double mdm = par->MassDM();
-    
+   
+   		
 	
 	//Detector setup
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
@@ -227,7 +228,7 @@ int main(int argc, char* argv[]){
 			std::string proton_file = proditer->Parton_V_Proton_File();
 			std::string neutron_file = proditer->Parton_V_Neutron_File();
 			std::shared_ptr<parton_sample> parsam(new parton_sample(proton_file,neutron_file,\
-						target_p,target_n));	
+						target_p,target_n));
 			Vnum = POT*parsam->production_proton_cross_section()*microbarn/target_p_cross*(target_p+\
 					target_n);
 			if(proddist=="parton_V"){
@@ -323,11 +324,11 @@ int main(int argc, char* argv[]){
 			Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
 		}
 		else if(prodchoice=="parton_production_baryonic"||prodchoice=="parton_production"){
-			PartDist->set_mass(mphi);
+			PartDist->set_mass(mv);
 			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
 		}
 		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||prodchoice=="V_decay_baryonic"){
-			PartDist->set_mass(mphi);
+			PartDist->set_mass(mv);
 			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
 			Vnum *= DMGen->BranchingRatio();
 
