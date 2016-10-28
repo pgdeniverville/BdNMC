@@ -34,9 +34,12 @@ class Scatter{
 		void set_angle_limits(double min, double max){min_angle=min;max_angle=max;}
 		//void set_scattering_energy(double emin, double emax){Escatmin=emin; Escatemax=emax;}
 		//double get_MDP(){return kap;}
+		//This tells the code to rotate the end state particle with 
+		//bool set_end_state(bool t){_End_state_with_DM_parallel_to_z=t;}
 	protected:	
 		double pMax, MDP, mdm, alD, kap;
 		double Escatmax, Escatmin,min_angle,max_angle;
+		//bool _End_state_with_DM_parallel_to_z=false;
 };
 
 /*
