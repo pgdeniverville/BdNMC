@@ -192,7 +192,7 @@ def lsnd_detector(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3
     f.write('\n')
     f.write(Hydrogen_string)
 
-def write_lsnd(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_electron", outfile="parameter_run.dat", proddist=["burmansmith"], partlistfile=["data/particle_list_lsnd.dat"],sumlog="Events/lsnd.dat",outlog="Events/lsnd_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.018, max_scatter_energy=0.05, dm_energy_resolution=0.01, efficiency=0.19*0.793,beam_energy=0.8, n_num_target=0,p_num_target=1,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,POT=1.8e23): 
+def write_lsnd(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_electron", outfile="parameter_run.dat", proddist=["burmansmith"], partlistfile=["data/particle_list_lsnd.dat"],sumlog="Events/lsnd.dat",outlog="Events/lsnd_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.018, max_scatter_energy=0.05, dm_energy_resolution=0.01, efficiency=0.19*0.793,beam_energy=0.8, n_num_target=0,p_num_target=1,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,POT=1.8e23):
     pi0_per_POT=0.06
     #Just a random value. I should code the actual function in at some point.
     p_cross=30*mb

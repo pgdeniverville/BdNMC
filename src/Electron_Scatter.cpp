@@ -78,16 +78,16 @@ void Electron_Scatter::scatterevent (Particle &DM, Particle &electron) {
     while(true){
         xe = Random::Flat(0,1)*(EeMax-EeMin)+EeMin;
         if(dsigmadEe(xe,DM.E,DM.m,MDP,kap,alD)>dsigmax*Random::Flat(0,1)){
-			electron.Set_Mass(Me);
-			electron.name = "electron";
-            thetae = ThetaEe(xe,DM.E,DM.m);
-            phie = Random::Flat(0,1)*2*Pi;
-            pe = sqrt(xe*xe-pow(electron.m,2));
-			electron.ThreeMomentum(pe*sin(thetae)*cos(phie),pe*sin(thetae)*sin(phie),pe*cos(thetae));
-			electron.Rotate_y(DM.Theta()); 
-			electron.Rotate_z(DM.Phi());
+		electron.Set_Mass(Me);
+		electron.name = "electron";
+            	thetae = ThetaEe(xe,DM.E,DM.m);
+            	phie = Random::Flat(0,1)*2*Pi;
+            	pe = sqrt(xe*xe-pow(electron.m,2));
+		electron.ThreeMomentum(pe*sin(thetae)*cos(phie),pe*sin(thetae)*sin(phie),pe*cos(thetae));
+		electron.Rotate_y(DM.Theta()); 
+		electron.Rotate_z(DM.Phi());
             
-			break;
+		break;
         }
     }    
 }
