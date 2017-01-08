@@ -128,9 +128,12 @@ class Electron_Scatter: public Scatter{
 		double scatmin(double, double);
 };
 
+
+//final_state=0 -> Inelastic pi0 production
+//final_state=1 -> Inelastic photon production
 class Pion_Inelastic: public Scatter{
 	public:
-		Pion_Inelastic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
+		Pion_Inelastic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax,int final_state=0);
 		~Pion_Inelastic(){}
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
@@ -144,7 +147,8 @@ class Pion_Inelastic: public Scatter{
 		double Ermin(double DM_Energy, double DM_Mass, double Nucleon_Mass);
 		void prep_ab(double &, double &, double, double, double);
 		double Er_to_theta(double DM_Energy, double Delta_Energy, double DM_Mass, double Nucleon_Mass);
-		
+        double final_mass,final_branch;
+        std::string final_name;		
 		double dsigma_dER_N(double En, double ER, double mx, double mA, double alphaprime, double kappa, double mN);
 		double GM(double q2);
 		double Edmmin, Edmmax, Edmres;

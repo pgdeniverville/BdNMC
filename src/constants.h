@@ -35,6 +35,9 @@ const double momega=0.78265;
 const double mrho = 0.77527;
 const double mphi = 1.019461;
 
+//Vectors
+const double MASS_PHOTON=0.0;
+
 //Branching Ratios
 const double br_eta_to_gamma_gamma=0.3941;
 

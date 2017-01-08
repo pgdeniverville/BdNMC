@@ -19,6 +19,7 @@ const double convmcm = 100.0;
 const double tol_abs=1e-20;
 const double tol_frac=1e-10;
 const double Delta_to_pi0 = 2.0/3.0;
+const double Delta_to_gamma=0.006;
 
 using std::cout;
 using std::endl;
@@ -65,7 +66,7 @@ return -(alphaEM*alphaprime*pow(Mdelta + mN,2)*
        *pi*pow(kappa,2)*pow(GM(-pow(Mdelta,2) + 2*ER*mN - pow(mN,2)),2))/
    (2.*mN*pow(pow(mA,2) - pow(Mdelta,2) + 2*ER*mN - pow(mN,2),2)*
      (-pow(Mdelta,2) + 2*ER*mN - pow(mN,2) + pow(Mdelta + mN,2))*
-     TriangleFunc2(sqrt(2*En*mN + pow(mN,2) + pow(mx,2)),mx,mN))*Delta_to_pi0;
+     TriangleFunc2(sqrt(2*En*mN + pow(mN,2) + pow(mx,2)),mx,mN))*final_branch;
 }
 
 double Pion_Inelastic::GM(double q2){
@@ -89,8 +90,21 @@ NEmin, NEmax are cuts on the energy of the recoiling nucleon.
 Emini, Emaxi, Eresi are the min and max energy of the incoming dm 
 particle, and the energy resolution that should be used to build
 the scattering interpolation function.
+final_state=0 is default and implies a pi0 final state
+final_state=1 means a photon final state.
 */
-Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double MDM, double MV, double alphaprime, double kappa, double NEmax, double NEmin){
+Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double MDM, double MV, double alphaprime, double kappa, double NEmax, double NEmin, int final_state){
+    cout << "final_state=" << final_state << endl; 
+    if(final_state==1){
+        final_mass=MASS_PHOTON;
+        final_branch=Delta_to_gamma;
+        final_name="photon";
+    }
+    else{
+        final_mass=mpi0;
+        final_branch=Delta_to_pi0;
+        final_name="pi0";
+    }
     MAX_Q2_WARNING = false;
     Edmmin=std::max(Emini,std::max(Edm_kinetic_min(MDM, mn),Edm_kinetic_min(MDM, mp))); Edmmax=Emaxi; Edmres=Eresi;
 	Escatmin=NEmin;
@@ -99,6 +113,8 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
     form_factor = shared_ptr<Linear_Interpolation>();
     load_form_factor(form_factor_filename, form_factor);
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
+    cout << "Preparation finished\n";
+    
 /*    for(double i = Ermin(1,0.01,mp); i < Ermax(1,0.01,mp); i+=0.001){
         cout << i; 
         double mxvals[]={0.01,0.1,0.2};
@@ -199,10 +215,12 @@ void Pion_Inelastic::generate_cross_sections(){
 This function takes a list of particles involved in the scattering and the dark matter from the main code, runs 
 probscatter with the final state scattered particle (pion) and the dark matter. It then checks that the pion satisfies
 any angular cuts, and inserts it into the particle list for later recording.
+
+This might not be a pion anymore if final_state==1, but it probably will be.
 */
 bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
-    Particle pion(mpi0);
-        pion.name = "pi0";
+    Particle pion(final_mass);
+    pion.name = final_name;
     if(probscatter(det, *DMit, pion)&&(min_angle<=0||pion.Theta()>min_angle)&&(max_angle>2*pi||pion.Theta()<max_angle)&&(pion.Kinetic_Energy()>Escatmin)&&(pion.Kinetic_Energy()<Escatmax)){
         Generate_Position(det, *DMit, pion);
         partlist.insert(std::next(DMit),pion);

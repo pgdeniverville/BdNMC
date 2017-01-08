@@ -396,9 +396,17 @@ int main(int argc, char* argv[]){
 	else if(sigchoice=="NCE_nucleon_baryonic"){
 		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter_Baryonic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
 	}
-	else if(sigchoice=="Pion_Inelastic"){
-		//I might need some checking for allowed energies.i
-		SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
+	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Inelastic_Delta_to_Gamma"){
+		//I might need some checking for allowed energies.
+        cout << "Delta channels working\n";
+        if(sigchoice=="Pion_Inelastic"){
+            cout << "Creating Pion_Inelastic\n";
+		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
+        }
+        else if(sigchoice=="Inelastic_Delta_to_Gamma"){
+		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,1));
+        }
+        cout << "End of creation of Pion_Inelastic.\n";
 	}
 	else if(sigchoice=="Inelastic_Nucleon_Scattering_Baryonic" || sigchoice=="Inelastic_Nucleon_Scattering"){
 		if(par->Scatter_Dist_Filename()==""){
