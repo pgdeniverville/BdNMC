@@ -12,11 +12,13 @@ V_decay_gen::V_decay_gen(double MV, double MX, double kap, double alp, const std
 }
 
 void V_decay_gen::Evaluate_Branching_Ratio(){
-	if(chan_name=="V_decay_baryonic")
+	if(chan_name=="V_decay_baryonic"){
         branchingratio= brVB_to_dm_dm(mv,mx,kappa,alphaD);
-    else
+    }
+    else{
         branchingratio = brV_to_dm_dm(mv, mx, kappa, alphaD);
-	OFF_SHELL = false;
+    }
+    OFF_SHELL = false;
 }
 
 bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
