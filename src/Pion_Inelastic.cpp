@@ -94,7 +94,6 @@ final_state=0 is default and implies a pi0 final state
 final_state=1 means a photon final state.
 */
 Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double MDM, double MV, double alphaprime, double kappa, double NEmax, double NEmin, int final_state){
-    cout << "final_state=" << final_state << endl; 
     if(final_state==1){
         final_mass=MASS_PHOTON;
         final_branch=Delta_to_gamma;
@@ -113,7 +112,6 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
     form_factor = shared_ptr<Linear_Interpolation>();
     load_form_factor(form_factor_filename, form_factor);
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
-    cout << "Preparation finished\n";
     
 /*    for(double i = Ermin(1,0.01,mp); i < Ermax(1,0.01,mp); i+=0.001){
         cout << i; 
