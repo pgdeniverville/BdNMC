@@ -86,7 +86,7 @@ production_distribution pi0_sanfordwang
 ################
 
 #Scattering Parameters
-#Choose from NCE_nucleon, NCE_electron, Pion_Inelastic, or NCE_nucleon_baryonic.
+#Choose from NCE_nucleon, NCE_electron, Pion_Inelastic, Inelastic_Delta_to_Gamma or NCE_nucleon_baryonic.
 signal_channel NCE_nucleon
 #scatter_dist_filename Source/data/DIS.dat
 
