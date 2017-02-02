@@ -111,7 +111,7 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
 	//std::cout << Edmmax << " " << Edmmin << endl;
     form_factor = shared_ptr<Linear_Interpolation>();
     load_form_factor(form_factor_filename, form_factor);
-	set_Model_Parameters(MDM, MV, alphaprime, kappa);
+    set_Model_Parameters(MDM, MV, alphaprime, kappa);
     
 /*    for(double i = Ermin(1,0.01,mp); i < Ermax(1,0.01,mp); i+=0.001){
         cout << i; 
@@ -191,12 +191,12 @@ void Pion_Inelastic::generate_cross_sections(){
             std::function<double(double)> fnlim = std::bind(lim_func_wrapper,_1,0.0,fn,Ermin(iter,mdm,mn),Ermax(iter,mdm,mn));   
             vec_neutron.push_back(DoubleExponential_adapt(fn,Ermin(iter,mdm,mn),Ermax(iter,mdm,mn),100,0.1,1e-4));
             prep_ab(a,b,iter,mdm,mn);
-            //cout << "a=" << a << "b=" << b << "Ermax=" << Ermax(iter,mdm,mn) << endl; 
             c=mnbrak(a,b,fnlim);
     		xmin=0;
     		vec_neutron_maxima.push_back(-1.0*golden(a,b,c,fnlim,tol_frac,tol_abs,xmin));
         }
     }
+
     //cout << "End of loop\n";
 	proton_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_proton,Edmmin,Edmmax));
     neutron_cross = std::unique_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_neutron,Edmmin,Edmmax));

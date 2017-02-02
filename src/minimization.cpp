@@ -22,8 +22,8 @@ const double TINY = 1e-20;
 
 double mnbrak(double& ax, double& bx, std::function<double(double)> func){
 	double r,q,u,ulim,fu;
-	double fa = func(ax);
-	double fb = func(bx);
+	double fa = func(ax)+0.0;
+	double fb = func(bx)+0.0;
 	if(fb>fa){
 		double dum = ax;
 		ax = bx;
@@ -33,7 +33,9 @@ double mnbrak(double& ax, double& bx, std::function<double(double)> func){
 		fa = dum;
 	}
 	double cx = bx+GOLD*(bx-ax);
-	double fc=func(cx);
+	double fc=func(cx)+0.0;
+    if(fb==0&&fc==0)
+        return cx;
 	while(fb>=fc){
 		r = (bx - ax)*(fb - fc);
 		q = (bx - cx)*(fb - fa);

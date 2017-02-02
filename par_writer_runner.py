@@ -246,6 +246,77 @@ def miniboone_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay},sign
     #    print "\ntime={}\n".format(t1-t0)
     subp.call(["rm", parfile])
 
+def miniboone_numi_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay},signal_channel = "NCE_nucleon",det_switch="miniboone_numi",alpha_D=0.5,sumlog="Events/miniboone_numi_500mev_15gev_y.dat"):
+
+    MV=mass_arr[0]
+    MX=mass_arr[1]
+    t0 = time.time()
+    parfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
+    #if MX/1000.0<mpi0/2.0:
+
+    BEAM_ENERGY=120
+    alD=alpha_D
+    zmin=max(3*MV/1000.0/BEAM_ENERGY,0.1)
+    zmax=1-zmin
+
+    proddist = []
+    prodchan = []
+    partlistfile = [    ]
+    executing=False
+    if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
+        proddist.append("particle_list")
+        prodchan.append("pi0_decay")
+        partlistfile.append("data/particle_list.dat")
+        executing=True
+    if MX/1000.0<meta/2.0 and MV<900.0 and _eta_decay in channels:
+        proddist.append("particle_list")
+        prodchan.append("eta_decay")
+        partlistfile.append("data/particle_list_k0.dat")
+        executing=True
+    if MV/1000.0>=mrho and _parton in channels:
+	proddist.append("parton_V")
+	prodchan.append("parton_production")
+	partlistfile.append("")
+        executing=True
+    if MV/2.0>MX and zmin<zmax and _brem in channels:
+        proddist.append("proton_brem")
+        prodchan.append("V_decay")
+        partlistfile.append("")
+        executing=True
+    if ((MV<1200) and (MV>=350)) and _rho_decay in channels:
+        proddist.append("particle_list")
+        prodchan.append("rho_decay")
+        partlistfile.append("data/particle_list.dat")
+        proddist.append("particle_list")
+        prodchan.append("omega_decay")
+        partlistfile.append("data/particle_list.dat")
+        executing=True
+   # if MV/1000.0>=mrho and MV<=1250:
+   #     proddist.append("particle_list")
+   #     prodchan.append("phi_decay")
+   #     partlistfile.append("data/particle_list.dat")
+    if not executing:
+        return
+    if signal_channel=="NCE_nucleon":
+        write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0.5,max_scatter_energy=15,alpha_D=alpha_D,eps=1e-3,efficiency=0.35,det=miniboone_detector,output_mode="summary",outlog="Events/miniboone_events.dat")
+    if signal_channel=="Pion_Inelastic":
+        write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,samplesize=2000,min_scatter_energy=0,max_scatter_energy=10.0,partlistfile=partlistfile,outfile=parfile,signal_chan="Pion_Inelastic",sumlog="Events/miniboone_pion_numi.dat",alpha_D=alpha_D)
+    if signal_channel=="NCE_electron":
+        write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0.5,max_scatter_energy=3,max_scatter_angle=0.14,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",sumlog="Events/miniboone_electron_numi_500mev_3gev.dat",zmin=zmin,zmax=zmax,alpha_D=alpha_D,output_mode="summary")
+    if signal_channel=="Inelastic_Nucleon_Scattering":
+        write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="Inelastic_Nucleon_Scattering",samplesize=2000,sumlog="Events/miniboone_dis.dat",output_mode="summary",alpha_D=alpha_D)
+            #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,samplesize=40000,signal_chan="NCE_nucleon",sumlog="Events3/summary.dat",efficiency=1.0,output_mode="comprehensive",outlog="Events3/mini_{}_{}.dat".format(MV,MX),det=miniboone_detector_full)
+    subp.call(["./build/main", parfile])
+    t1 = time.time()
+    print("\ntime={}\n".format(t1-t0))
+    t0 = time.time()
+    #if MX/1000.0<meta/2.0:
+    #    write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist="particle_list",prod_chan="eta_decay",outfile=parfile)
+    #    subp.call(["./build/main", parfile])
+    #    t1 = time.time()
+    #    print "\ntime={}\n".format(t1-t0)
+    subp.call(["rm", parfile])
+
 def t2k_FD_baryonic_eval(mass_arr,signal_channel="NCE_nucleon_baryonic"):
     MV=mass_arr[0]
     MX=mass_arr[1]
@@ -497,6 +568,18 @@ def execute_miniboone_parallel(genlist=True):
     #ool.map(miniboone_eval,massarr)
 
 
+def execute_miniboone_numi_p(genlist=True):
+    if genlist:
+        write_miniboone_numi(prod_chan=["pi0_decay"],proddist=["bmpt"],samplesize=1e6,output_mode="particle_list",partlistfile=["data/particle_list_numi.dat"])
+        subp.call(["./build/main", "parameter_run.dat"])
+    vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
+    massarr=[[MV,MV/3.0] for MV in vmassarr]
+    for marr in massarr:
+        miniboone_numi_eval(marr,signal_channel="NCE_nucleon")
+        miniboone_numi_eval(marr,signal_channel="NCE_electron")
+        #iminiboone_numi_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
+        #miniboone_numi_eval(marr,signal_channel="Pion_Inelastic")
+
 def execute_ship_parallel(genlist=True):
     if genlist:
         write_ship(prod_chan=["pi0_decay"],proddist=["bmpt"],samplesize=1e6,output_mode="particle_list",partlistfile=["data/particle_list_ship.dat"])
@@ -595,6 +678,7 @@ def execute_t2k_parallel(genlist=True):
     #pool.map(ship_eval,massarr)
 
 #execute_t2k_parallel(genlist=True)
-execute_miniboone_parallel(genlist=False)
+#execute_miniboone_parallel(genlist=False)
+execute_miniboone_numi_p(genlist=False)
 #execute_ship_parallel(genlist=True)
 #execute_lsnd_parallel(genlist=True)
