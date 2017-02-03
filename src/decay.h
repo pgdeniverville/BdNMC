@@ -1,10 +1,13 @@
 #ifndef GUARD_decay_h
 #define GUARD_decay_h
 
-// class decay
-
 #include "Particle.h"
 #include "Random.h"
+
+/*
+ * decay.h and decay.cpp supplies a number of useful functions for calculating
+ * decay kinematics.
+ */
 
 void DecayDP (Particle &, Particle &);
 void DecayDM (Particle &, Particle &, Particle &, Particle &);
