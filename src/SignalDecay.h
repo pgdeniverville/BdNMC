@@ -54,14 +54,15 @@ class SignalDecay: public Scatter{
         bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
         bool probscatter(std::shared_ptr<detector>& det, Particle &Parent);
 
-        void set_Model_Parameters(double lifetime, std::vector<double> Branching_Ratios, std::vector<std::vect<Particle> >);
+        void set_Model_Parameters(double lifetime, std::vector<double> Branching_Ratios, std::vector<std::vector<Particle> >);
 
        void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, std::vector<Particle> &scat); 
 
     private:
+        std::vector<std::vector<Particle> > Final_States; 
         std::vector<double> Branching_Ratios;
-        double lifetime;
-
+        double Lifetime;
+        
 };
 
 #endif
