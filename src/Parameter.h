@@ -50,13 +50,20 @@ class Parameter{
     public:
         Parameter(std::ifstream&);
         ~Parameter(){}
+       
+        //Allows the user to query the map directly.
+        //This will be used by future model implementations.
+        bool Query_Map(const std::string, double&);
+
         int Integrity(){return integrity;}
         double MassDM(){return mass_dm;}
         double MassDP(){return mass_V;}
         double kap(){return epsilon;}
         double Epsilon(){return epsilon;}
         double alD(){return alpha_D;}
-       		
+        double Model_Name(){return model_name;}
+
+
 		double Beam_Energy(){return beam_energy;}
 		double Max_DM_Energy(){return max_dm_energy;}
 		double EDM_RES(){return edmres;}
@@ -94,7 +101,9 @@ class Parameter{
 		std::shared_ptr<std::list<production_channel> > Get_Production_List(){return prodlist;}
 		std::string Run_Name(){return run_name;}
     private:
-		std::shared_ptr<detector> det;
+        std::map<std::string, std::string> keymap;
+            
+        std::shared_ptr<detector> det;
         //std::string prod_channel;
 		//std::string prod_dist;
 		std::string sig_channel;
@@ -133,7 +142,9 @@ class Parameter{
 		double target_p_num;
 
 		double p_cross;	
-		
+	
+        std::string model_name = "Hidden_Sector_DM";
+
 		double efficiency;
 		double mass_dm;
         double mass_V;

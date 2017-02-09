@@ -11,6 +11,7 @@ const double pi = M_PI;
 
 //Physical Constants
 const double alphaEM = 1.0/137.035999074;
+const double G_ELEC = sqrt(4*M_PI*alphaEM);
 const double speed_of_light = 299792458;
 
 //Units
@@ -23,7 +24,8 @@ const double GeVtofm=0.197;
 //Particle Masses in GeV
 const double MASS_PROTON = 0.938272;
 const double MASS_NEUTRON = 0.939565;
-const double MASS_ELECTRON = 0.000511;
+const double MASS_ELECTRON = 0.0005109989461;
+const double MASS_MUON = 0.10576583745;
 const double MASS_DEUTERON = 1.875612859;
 const double MASS_DELTA = 1.232;
 

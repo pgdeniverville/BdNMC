@@ -48,7 +48,7 @@ class DecayChannel{
 class SignalDecay: public Scatter{
     public:
         //Creating a local copy
-        SignalDecay(double lifetime, std::vector<double> Branching_Ratios, std::vector<std::vector<Particle> >);
+        SignalDecay(double lifetime, std::vector<double> branching_ratios, std::vector<std::vector<Particle> > final_states);
         ~SignalDecay(){};
 
         bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
@@ -62,7 +62,7 @@ class SignalDecay: public Scatter{
         std::vector<std::vector<Particle> > Final_States; 
         std::vector<double> Branching_Ratios;
         double Lifetime;
-        
+        std::vector<std::string> Channel_Name; 
 };
 
 #endif

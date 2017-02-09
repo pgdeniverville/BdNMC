@@ -21,9 +21,7 @@ const double Br_rho_to_e_e = 4.72e-5;
 const double brpi0to2gamma = 0.98823;
 const double bretato2gamma = 0.3941;
 const double Br_omega_to_e_e = 7.28e-5;
-const double melec = 0.000511;
 const double mmuon = 0.1057;
-const double alphaem = 1/137.036;
 const double etafactor = 0.61;
 
 
@@ -52,7 +50,7 @@ double rhofunc(double x){
 }
 
 double brrho_to_V_1(double mv, double mx, double kappa, double alphaD){
-    return 3.0*pow(kappa,2.0)/alphaem*Br_rho_to_e_e*pow(mrho,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
+    return 3.0*pow(kappa,2.0)/alphaEM*Br_rho_to_e_e*pow(mrho,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
         (pow(pow(mrho,2)-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2));
 }
 
@@ -65,7 +63,7 @@ double brrho_to_V(double mv, double mx, double kappa, double alphaD){
 double bromega_to_V(double mv, double mx, double kappa, double alphaD){
     if(mv-momega>0.1||momega-mv>0.1)
         return 0.0;
-    return 3.0*pow(kappa,2)/alphaem*Br_omega_to_e_e*pow(momega,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
+    return 3.0*pow(kappa,2)/alphaEM*Br_omega_to_e_e*pow(momega,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
         (pow(pow(momega,2)-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2));
 }
 
@@ -84,7 +82,7 @@ double br_eta_prime_to_V(double mv, double mx, double kappa, double alphaD){
 double brphi_to_V(double mv, double mx, double kappa, double alphaD){
     if(mv-mphi>0.15||mphi-mv>0.15)
         return 0.0;
-    return 3.0*pow(kappa,2)/alphaem*Br_phi_to_e_e*pow(mphi,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
+    return 3.0*pow(kappa,2)/alphaEM*Br_phi_to_e_e*pow(mphi,3)*GammaV_to_dm_dm(mv,mx,kappa,alphaD)/
         (pow(pow(mphi,2)-mv*mv,2)+pow(mv*GammaV(mv,mx,kappa,alphaD),2));
 }
 
@@ -99,11 +97,11 @@ double GammaV(double mv, double mx, double kappa, double alphaD){
     if(mv>2*mx){
         term = alphaD*(mv*mv-4*mx*mx)*sqrt(mv*mv/4-mx*mx);
     }
-    if(mv>2*melec){
-        term += 4*pow(kappa,2)*alphaem*(2*pow(melec,2)+mv*mv)*sqrt(mv*mv/4-pow(melec,2));
+    if(mv>2*MASS_ELECTRON){
+        term += 4*pow(kappa,2)*alphaEM*(2*pow(MASS_ELECTRON,2)+mv*mv)*sqrt(mv*mv/4-pow(MASS_ELECTRON,2));
     }
     if(mv>2*mmuon){
-        term += 4*pow(kappa,2)*alphaem*(2*pow(mmuon,2)+mv*mv)*sqrt(mv*mv/4-pow(mmuon,2));//I need to multiply this by the RRatio, but it's a minor overall effect when V->DM+DM is available;
+        term += 4*pow(kappa,2)*alphaEM*(2*pow(mmuon,2)+mv*mv)*sqrt(mv*mv/4-pow(mmuon,2));//I need to multiply this by the RRatio, but it's a minor overall effect when V->DM+DM is available;
     }
     return 1.0/(6.0*mv*mv)*(term);
 }
@@ -178,7 +176,7 @@ double wpp(double z, double pt2, double mA){
 
 double wpp_scalar(double z, double pt2, double mA, double epsilon){
 	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
-	return pow(epsilon,2)*alphaem/(8*pi)*(8*pow(mp,4)*(z-1)*pow(z,3)/pow(H,3)+4*pow(mp*mA,2)*(z-1)*pow(z,3)/pow(H,3)-8*pow(mp,2)*(z-1)*z/pow(H,2)+z/H);
+	return pow(epsilon,2)*alphaEM/(8*pi)*(8*pow(mp,4)*(z-1)*pow(z,3)/pow(H,3)+4*pow(mp*mA,2)*(z-1)*pow(z,3)/pow(H,3)-8*pow(mp,2)*(z-1)*z/pow(H,2)+z/H);
 }
 
 /********************
@@ -208,15 +206,15 @@ double brVB_to_dm_dm(double mv, double mx, double kappa, double alphaD){
 double brpi0toVBgamma(double mv, double mx, double kappa, double alphaD){
     if(mv>mpi0)
         return 0;
-    return 2*pow(sqrt(alphaD/alphaem)-kappa,2)*pow(1-mv*mv/pow(mpi0,2),3)*brpi0to2gamma;
+    return 2*pow(sqrt(alphaD/alphaEM)-kappa,2)*pow(1-mv*mv/pow(mpi0,2),3)*brpi0to2gamma;
 }
 
 double d2brpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD, double s, double theta){
-    return sqrt(1-4*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaem)-kappa,2)*pow(sin(theta),3)/(8*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
+    return sqrt(1-4*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaEM)-kappa,2)*pow(sin(theta),3)/(8*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
 }
 
 double dbrpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD, double s){
-    return sqrt(1.0-4.0*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4.0*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaem)-kappa,2)/(6.0*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
+    return sqrt(1.0-4.0*mx*mx/s)*pow(pow(mpi0,2)-s,3)*(s-4.0*mx*mx)*pow(alphaD,1)*pow(sqrt(alphaD/alphaEM)-kappa,2)/(6.0*pow(mpi0,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
 }
 
 double brpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD){
@@ -244,15 +242,15 @@ double brpi0_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double 
 double bretatoVBgamma(double mv, double mx, double kappa, double alphaD){
     if(mv>meta)
         return 0;
-    return 2*pow(etafactor*sqrt(alphaD/alphaem)-kappa,2)*pow(1-mv*mv/pow(meta,2),3)*bretato2gamma;
+    return 2*pow(etafactor*sqrt(alphaD/alphaEM)-kappa,2)*pow(1-mv*mv/pow(meta,2),3)*bretato2gamma;
 }
 
 double d2breta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD, double s, double theta){
-    return bretato2gamma*sqrt(1-4*mx*mx/s)*pow(pow(meta,2)-s,3)*(s-4*mx*mx)*pow(alphaD,1)*pow(etafactor*sqrt(alphaD/alphaem)-kappa,2)*pow(sin(theta),3)/(8*pow(meta,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
+    return bretato2gamma*sqrt(1-4*mx*mx/s)*pow(pow(meta,2)-s,3)*(s-4*mx*mx)*pow(alphaD,1)*pow(etafactor*sqrt(alphaD/alphaEM)-kappa,2)*pow(sin(theta),3)/(8*pow(meta,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
 }
 
 double dbreta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD, double s){
-    return bretato2gamma*sqrt(1.0-4.0*mx*mx/s)*pow(pow(meta,2)-s,3)*(s-4.0*mx*mx)*pow(alphaD,1)*pow(etafactor*sqrt(alphaD/alphaem)-kappa,2)/(6.0*pow(meta,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
+    return bretato2gamma*sqrt(1.0-4.0*mx*mx/s)*pow(pow(meta,2)-s,3)*(s-4.0*mx*mx)*pow(alphaD,1)*pow(etafactor*sqrt(alphaD/alphaEM)-kappa,2)/(6.0*pow(meta,6)*pi*(pow(s-mv*mv,2)+pow(mv*GammaVB(mv,mx,kappa,alphaD),2)));
 }
 
 double breta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double alphaD){
@@ -279,13 +277,63 @@ double breta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double 
 
 double bromega_to_Vb(double mv, double mx, double kappa, double alphaD){
 
-    return 0.25*pow(2*sqrt(alphaD/alphaem)-kappa,2)*alphaD/alphaem*Br_omega_to_e_e*pow(momega,4)/ \
+    return 0.25*pow(2*sqrt(alphaD/alphaEM)-kappa,2)*alphaD/alphaEM*Br_omega_to_e_e*pow(momega,4)/ \
         (pow(pow(momega,2)-pow(mv,2),2)+1e-4*pow(momega,4))*pow(1-4*pow(mx/mv,2),1.5);//Where does that 1e-4 come from? Must be the width of Omega.
 }
 
 double brphi_to_Vb(double mv, double mx, double kappa, double alphaD){
 	if(mv-mphi>0.25||mphi-mv>0.25)
         return 0.0;
-    return 0.25*pow(-sqrt(alphaD/alphaem)-kappa,2)*alphaD/alphaem*Br_phi_to_e_e*pow(momega,4)/ \
+    return 0.25*pow(-sqrt(alphaD/alphaEM)-kappa,2)*alphaD/alphaEM*Br_phi_to_e_e*pow(momega,4)/ \
         (pow(pow(mphi,2)-pow(mv,2),2)+1e-4*pow(mphi,4))*pow(1-4*pow(mx/mv,2),1.5);
 }
+
+/*
+ * DARK AXION WITH DARK PHOTON
+ */
+
+namespace Ax_DP{
+
+    //From https://arxiv.org/abs/1611.01466
+    double Gamma_dp_to_a_gamma(double mA, double ma, double Gaggp){
+        if(ma>=mA){
+            return 0;
+        }
+
+        return pow(Gagg,2)/(96*pi)*pow(mA,3)*pow(1-pow(ma/mA,3),3);     
+    }
+    
+    //From https://arxiv.org/abs/1611.01466
+    double Gamma_dp_to_lepton(double mA, double ml, double eps){
+        if(2*ml>mA)
+            return 0;
+
+        return pow(eps*G_ELEC,2)*sqrt(pow(mA,2)-4*ml*ml)*(mA*mA+2*ml*ml)/(12*pi*mA*mA); 
+    }
+    
+    //From https://arxiv.org/abs/0807.3279
+    double Gamma_dp_to_3gamma(double mA, double eps, double ep){
+        if(3*mA>melec){
+            return 0;
+        }
+        return 17.0/288000.0/pow(pi,3)*pow(alphaEM,3)*ep*pow(mA,9)/pow(MASS_ELECTRON,8);
+    }
+
+
+    //This does not currently contain the R-Ratio. I will need to figure out a good way of including it at some point.
+    double Gamma_dp(double mA, double ma, double Gagpg, double eps, double ep){
+        return Gamma_dp_to_a_gamma( mA, ma, Gagpg) + Gamma_dp_to_lepton(mA, MASS_ELECTRON, eps) + Gamma_dp_to_lepton(mA, MASS_MUON, eps) + Gamma_dp_to_3gamma( mA, eps, ep); 
+    }
+
+    double Br_dp_to_a_gamma(double mA, double ma, double Gagpg, double eps, double ep){
+        return Gamma_dp_to_a_gamma(mA, ma, Gagpg)/Gamma_dp(mA, ma, Gagpg, eps, ep);
+    }
+
+    double Br_dp_to_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep){
+        return Gamma_dp_to_lepton(mA, ml, eps)/Gamma_dp(mA, ma, Gagpg, eps, ep);
+    }
+
+    double Br_dp_to_3gamma(double mA, double ma, double Gagpg, double eps, double ep){
+        return Gamma_dp_to_3gamma(mA, eps, ep)/Gamma_dp(mA, ma, Gagpg, eps, ep);
+    }
+}//End of namespace Ax_DP

@@ -7,6 +7,8 @@
 using std::list;
 using std::vector;
 using std::cout; using std::endl;
+using std::string;
+
 
 double decay_probability(double t1, double t2, double lifetime){
     return exp(-t1/lifetime) - exp(-t2/lifetime);
@@ -22,6 +24,19 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
     Final_States = final_states; 
     Lifetime = lifetime;
     pMax=0;
+    for(unsigned i = 0; i<= Final_States.size();i++){
+        if(Final_States[i].size()==0){
+            Channel_Name.push_back("Undetermined Products");
+            continue;
+        }
+
+        string tmp = Final_States[i][0].name;
+        tmp += " ";
+        for(unsigned j = 1; j <= Final_States[i].size(); j++){
+            tmp += Final_States[i][j].name;
+        }
+        Channel_Name.push_back(tmp);
+    }
 }
 
 bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
@@ -54,7 +69,11 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
             partlist.insert(std::next(Parentit),daughter2);
         }
         else{
-            std::cerr << "This code does not currently support >2 body final states for decays." << endl;
+            Particle product(*Parentit);
+
+            product.name = Channel_Name[i];
+            
+            partlist.insert(std::next(Parentit),product);
         }
 
         return true;

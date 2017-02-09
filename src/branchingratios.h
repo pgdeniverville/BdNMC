@@ -50,4 +50,24 @@ double breta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double 
 double bromega_to_Vb(double mv, double mx, double kappa, double alphaD);
 double brphi_to_Vb(double mv, double mx, double kappa, double alphaD);
 
+
+/*
+ * This namespace is for dark photon coupled to axion. It has a lot of
+ * parameters I haven't figured out how I would like to set yet.
+ * See: https://arxiv.org/abs/1611.01466
+ */
+namespace Ax_DP {
+    double Gamma_dp_to_a_gamma(double mA, double ma, double Gagpg);
+    double Gamma_dp_to_lepton( double mA, double ml, double eps);
+    double Gamma_dp_to_3gamma(double mA, double eps, double ep);
+    double Gamma_dp(double mA, double ma, double ml, double Gagpg, double eps, double ep);
+
+    double Br_dp_to_a_gamma(double mA, double ma, double Gagpg, double eps, double ep);
+    double Br_dp_to_lepton_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep);
+    double Br_dp_to_3gamma(double mA, double ma, double Gagpg, double eps, double ep);
+    double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep);
+
+}
+
+
 #endif

@@ -42,6 +42,9 @@ const string dist_mod_key = "dist_mod";
 const string pos_offset_key = "position_offset";
 
 const string detkey = "detector";
+
+const string modelkey = "model";
+
 const string dmkey = "dark_matter_mass";
 const string Vkey = "dark_photon_mass";
 const string epskey = "epsilon";
@@ -342,7 +345,6 @@ Parameter::Parameter(std::ifstream &instream){
 	prodlist = std::shared_ptr<list<production_channel> > (new list<production_channel>); 
 	if(instream.is_open()){
         string hold, key, val;
-        map<string, string> keymap;
         vector<_material> mat_vec;
         int line_num=0;
         int error_state = 0;
@@ -385,7 +387,7 @@ Parameter::Parameter(std::ifstream &instream){
         for(vector<_material>::iterator it = mat_vec.begin(); it != mat_vec.end(); ++it){
             det->add_material(it->n_density, it->p_num, it->n_num, it->e_num,it->mass,it->name);
         }
-        
+        Set_String(modelkey,model_name,keymap,"Hidden_Sector_DM");
         Set_Model_Parameters(keymap);    
         Set_Double(POTkey, POT, keymap);
 		Set_Double(pi0_ratio_key,pi0ratio,keymap,0.9);
@@ -613,4 +615,15 @@ void Parameter::Set_Model_Parameters(map<string, string> &keymap){
     Set_Double(Vkey, mass_V, keymap);
     Set_Double(epskey, epsilon, keymap);
     Set_Double(alkey, alpha_D, keymap);
+}
+
+bool Query_Map(const string key, double& val){
+    if(keymap.count(key)!=1){
+        val = 0.0;
+        return false;
+    }
+    else{
+        val = keymap[key];
+        return true;
+    }
 }

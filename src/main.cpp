@@ -165,10 +165,11 @@ int main(int argc, char* argv[]){
     double kappa = par->Epsilon();
     double alD = par->alD();
     double mv = par->MassDP();
-    double mdm = par->MassDM();
-   
-   		
-	
+    double mdm = par->MassDM();	
+
+    //This will turn into a Model class later on.
+    Axion_Dark_Photon adp(par);
+
 	//Detector setup
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
     function<double(Particle)> det_int = bind(&detector::Ldet,det,_1);//should get rid of this eventually, just pass detector object references.
@@ -252,9 +253,20 @@ int main(int argc, char* argv[]){
 			cerr << "Invalid or missing distribution " << proddist << " declared for particle_list outmode\n Terminating run.\n";
 			return -1;
 		}
-		
-
-		if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){ 
+	    
+        if(par->Model_Name()=="Axion_Dark_Photon"){
+            if(prodchoice=="Brem_V"){
+                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen());
+            }
+            /*
+            else if(prodchoice=="pi0_decay"){
+                
+            }
+            else if(prodchoice=="eta_decay"){
+                
+            }*/
+        }
+        else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){ 
 			
 			if(proddist=="default"){
 				std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
@@ -294,7 +306,8 @@ int main(int argc, char* argv[]){
 			else
 				Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
 		}
-		else if(prodchoice=="omega_decay"||prodchoice=="rho_decay"||prodchoice=="phi_decay"||prodchoice=="omega_decay_baryonic"||prodchoice=="phi_decay_baryonic"){
+		else if(prodchoice=="omega_decay"||prodchoice=="rho_decay"||
+                prodchoice=="phi_decay"||prodchoice=="omega_decay_baryonic"||prodchoice=="phi_decay_baryonic"){
 			if(proddist=="default"){
 				std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
 				sw->set_fit_parameters(*proditer);
@@ -331,7 +344,6 @@ int main(int argc, char* argv[]){
 			PartDist->set_mass(mv);
 			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
 			Vnum *= DMGen->BranchingRatio();
-
 		}
 		else{
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
@@ -378,6 +390,9 @@ int main(int argc, char* argv[]){
 
 	//Signal Channel
 	string sigchoice = par->Signal_Channel();
+    //Particles with this name will be checked for intersection with the
+    //detector and passed to Scatter.probscatter.
+    string sig_part_name == "DM";
 	std::unique_ptr<Scatter> SigGen;
 //Update this so it scales energy to Beam energy.
 	double max_dm_energy = par->Max_DM_Energy();
@@ -418,10 +433,33 @@ int main(int argc, char* argv[]){
 		min_scatter_energy=0;
 		max_scatter_energy=1e9;
 	}
-	else{
+    //I'm going to have to rewrite this at some point.
+    //Going to shift more of the setup into the model class.
+    //Probably also going to make a model class superclass. Pass names of particles/channels to it,
+    //and it supplies details about those particles/channels.
+    else if(sigchoice=="Signal_Decay"){
+        double lifetime;
+        vector<double> Branching_Ratios;
+        vector<vector<Particle> > Final_States;
+        if(par->model_Name()=="Axion_Dark_Photon"){
+            lifetime=adp.Lifetime();
+            adp.Branching_Ratios(Branching_Ratios);
+            adp.Final_States(Final_States);
+            sig_part_choice == "Dark_Photon";
+            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
+        }
+        else{
+            cerr << "No model declared for Signal_Decay.\n";
+            return -1;
+        }
+
+    }
+    else{
 		cerr << "Invalid Channel Selection: " << sigchoice << endl;
 		return -1;
 	}
+    
+
 	SigGen->set_angle_limits(min_angle, max_angle);
 
 	//Begin Run
@@ -483,7 +521,7 @@ int main(int argc, char* argv[]){
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
-					if(burniter->name.compare("DM")==0){
+					if(burniter->name.compare(sig_part_scatter)==0){
 						SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
@@ -537,7 +575,7 @@ int main(int argc, char* argv[]){
 			//Yes, this list is named vec.  
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
-                if(iter->name.compare("DM")==0){
+                if(iter->name.compare(sig_part_scatter)==0){
 					NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
 						iter->report(*comprehensive_out);
@@ -547,10 +585,12 @@ int main(int argc, char* argv[]){
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
-						if(timing_cut>0)
+						if(timing_cut>0){
 							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
-						else
+                        }
+                        else{
 							timing_efficiency[i]+=1;
+                        }
 						scatter_switch = true;	
                     }
                 }    
@@ -567,17 +607,18 @@ int main(int argc, char* argv[]){
     } 
 	cout << "Run complete\n";
 
+    //This will be moved later.
 
+    if(outmode=="summary"||outmode=="dm_detector_distribution"||
+            outmode=="comprehensive"){
+	    *summary_out << "Run " << par->Run_Name() << endl;
+    }
 
-
-	if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-		*summary_out << "Run " << par->Run_Name() << endl;
-
-	vector<double> signal_list(chan_count,0.0);	
+	vector<double> signal_list(chan_count,0.0);
  	double signal = 0.0;
 	int scattot = 0;
-	int NDM = 0;
-	cout << "Some debug information:\n"; 
+	int NDM = 0;    
+
 	for(int i=0; i<chan_count; i++){
 		if(scat_list[i]==0)
 			signal_list[i]=0;
@@ -586,14 +627,24 @@ int main(int argc, char* argv[]){
 		scattot+=scat_list[i];
   		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
 		cout << " Timing_Efficiency: " << timing_efficiency[i]/scat_list[i] << " ";
-		cout << "Scatterings: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
-		if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
-		NDM+=NDM_list[i]; 
+		cout << "Events: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
+		if(outmode=="summary"||outmode=="dm_detector_distribution"||
+                outmode=="comprehensive"){
+            *summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
+        }
+        NDM+=NDM_list[i]; 
 		signal+=signal_list[i];
  	}
-	if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
+	if(outmode=="summary"||outmode=="dm_detector_distribution"||
+            outmode=="comprehensive"){
 		*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+        if(par->Model_Name()=="Axion_Dark_Photon"){
+            string rep;
+            adp.Report(rep);
+            cout << rep;
+            *summary_out << rep;
+        }
+    }
 
 
 	//cout << scattot/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency() << endl;
@@ -603,14 +654,14 @@ int main(int argc, char* argv[]){
 		comprehensive_out->close();
 
     cout << "Number of trials = " << trials << endl;	
-	cout << "Number of DM intersecting detector = " << NDM << endl;	
+	cout << "Number of candidates intersecting detector = " << NDM << endl;	
 	cout << "Number of " << sigchoice <<  " = " << scattot << endl;
 	for(int i=0; i<chan_count;i++)
 		cout << "Number of scatterings from channel " << i+1 << " " << DMGen_list[i]->Channel_Name() << " = " << scat_list[i] << " in " << trials_list[i] << " trials." << endl;  
 	cout << "Number of sample events generated = " << nevent << endl;
 	cout << "Acceptance = " << (double)NDM/(2*trials) << endl;	
-	cout << "Maximum scattering probability = "  << SigGen->get_pMax() << endl;
-	cout << "Average scattering probability = "  << (double)scattot/NDM*SigGen->get_pMax() << endl;
+	cout << "Maximum event probability = "  << SigGen->get_pMax() << endl;
+	cout << "Average event probability = "  << (double)scattot/NDM*SigGen->get_pMax() << endl;
 	cout << "Predicted number of signal events = "  << signal << endl;
 	for(int i=0; i<chan_count;i++)
 		cout << "Predicted number of signal events from channel " << i+1 << " " << DMGen_list[i]->Channel_Name()  <<  " = "  << signal_list[i] << endl;

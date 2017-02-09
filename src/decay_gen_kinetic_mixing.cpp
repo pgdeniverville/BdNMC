@@ -190,13 +190,12 @@ bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particl
         darkphoton.Set_Mass(sqrt(s));
         DecayDM_Off_Shell(darkmatter1, darkmatter2, darkphoton, meson, theta);
     }
-    else
+    else{
         DecayDM(darkmatter1, darkmatter2, darkphoton, meson);
+    }
 
-
-	intersect1=det_int(darkmatter1);
+    intersect1=det_int(darkmatter1);
     intersect2=det_int(darkmatter2);
-
 
     vec.push_back(meson);
     if((intersect1)>0 || (intersect2)>0){
