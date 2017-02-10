@@ -61,7 +61,7 @@ class Parameter{
         double kap(){return epsilon;}
         double Epsilon(){return epsilon;}
         double alD(){return alpha_D;}
-        double Model_Name(){return model_name;}
+        std::string Model_Name(){return model_name;}
 
 
 		double Beam_Energy(){return beam_energy;}

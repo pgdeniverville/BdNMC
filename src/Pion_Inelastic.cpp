@@ -241,12 +241,15 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM){
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
 	//std::cout << DM.E << " " << XDMp << " " << XDMn << " " << prob << " " << endl;
     if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
 		return true;
     }
-    else
+
+    else{
         return false;
+    }
 }
 
 /*
@@ -263,14 +266,16 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
     Particle Delta(Mdelta);
     Delta.name = "Delta";
     if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
 
 		if(XDMp/(XDMn+XDMp) >= Random::Flat(0,1)){
 			std::function<double(double)> Xsec = std::bind(&Pion_Inelastic::dsigma_dER_N,this,DM.E,_1,DM.m,MDP,alD,kap,mp);
 			//Not sure if this check is still necessary.
-            if(Ermin(DM.E,DM.m,mp) >= Ermax(DM.E, DM.m, mp))
+            if(Ermin(DM.E,DM.m,mp) >= Ermax(DM.E, DM.m, mp)){
 				return false;
+            }
             scatterevent(DM, Delta, Xsec, *proton_cross_maxima,mp);
             Particle Proton(mp);
             Proton.name="Proton";

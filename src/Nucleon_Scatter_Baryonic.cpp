@@ -94,13 +94,15 @@ bool Nucleon_Scatter_Baryonic::probscatter(std::shared_ptr<detector>& det, Parti
     double XDMn = neutron_cross->Interpolate(DM.E)*(det->NNtot());
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
     if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
  
 		return true;
     }
-    else
+    else{
         return false;
+    }
 }
 
 bool Nucleon_Scatter_Baryonic::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &Nucleon){ 
@@ -113,8 +115,9 @@ bool Nucleon_Scatter_Baryonic::probscatter(std::shared_ptr<detector>& det, Parti
     //DM.report(cout);
     //cout << "prob = " << prob << " pMax = " << pMax << endl;
 	if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
  
 		if(XDMp/(XDMn+XDMp) >= Random::Flat(0,1)){
             std::function<double(double)> Xsec = std::bind(DMNscattering_Baryonic::dsigmadEdmP,DM.E,_1,DM.m,MDP,alD,kap);

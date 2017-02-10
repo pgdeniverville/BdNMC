@@ -13,6 +13,7 @@ const double pi = M_PI;
 const double alphaEM = 1.0/137.035999074;
 const double G_ELEC = sqrt(4*M_PI*alphaEM);
 const double speed_of_light = 299792458;
+const double hbar = 6.5875*pow(10,-25);
 
 //Units
 const double microbarn = 1e-34;//In m^2

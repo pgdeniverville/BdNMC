@@ -141,7 +141,7 @@ class Do_Nothing_Gen: public DMGenerator{
         Do_Nothing_Gen(const std::string chan="");
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part);
     private:
-        void Evaluate_Branching_Ration(){return 1.0;}
-}
+        void Evaluate_Branching_Ration();
+};
 
 #endif

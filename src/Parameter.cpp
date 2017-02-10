@@ -617,13 +617,13 @@ void Parameter::Set_Model_Parameters(map<string, string> &keymap){
     Set_Double(alkey, alpha_D, keymap);
 }
 
-bool Query_Map(const string key, double& val){
+bool Parameter::Query_Map(const string key, double& val){
     if(keymap.count(key)!=1){
         val = 0.0;
         return false;
     }
     else{
-        val = keymap[key];
+        val = stod(keymap[key]);
         return true;
     }
 }

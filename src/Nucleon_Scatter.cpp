@@ -76,8 +76,9 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM){
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
 	//std::cout << DM.E << " " << XDMp << " " << XDMn << " " << prob << " " << endl;
 	if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
  
 		return true;
     }
@@ -103,22 +104,25 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, 
     double XDMn = neutron_cross->Interpolate(DM.E)*(det->NNtot());
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
 	if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
 		if(XDMp/(XDMn+XDMp) >= Random::Flat(0,1)){
 			std::function<double(double)> Xsec = std::bind(dsigmadEdmP,DM.E,_1,DM.m,MDP,alD,kap);
             Nucleon.Set_Mass(mp);
             Nucleon.name = "proton";
-			if(scatmax(DM.E) < scatmin(DM.E, DM.m, Nucleon.m))
+			if(scatmax(DM.E) < scatmin(DM.E, DM.m, Nucleon.m)){
 				return false;
+            }
 			scatterevent(DM, Nucleon, Xsec, *proton_cross_maxima);
         }
         else{
 			std::function<double(double)> Xsec = std::bind(dsigmadEdmN,DM.E,_1,DM.m,MDP,alD,kap);
 			Nucleon.Set_Mass(mn);
             Nucleon.name = "neutron";
-            if(scatmax(DM.E) < scatmin(DM.E, DM.m, Nucleon.m))
+            if(scatmax(DM.E) < scatmin(DM.E, DM.m, Nucleon.m)){
 				return false;
+            }
 			scatterevent(DM, Nucleon, Xsec, *neutron_cross_maxima);
         }
         return true;

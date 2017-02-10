@@ -30,7 +30,8 @@
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
 #include "Position_Distributions.h"
-
+#include "Axion_Dark_Photon.h"
+#include "SignalDecay.h"
 
 //Plotting stuff
 //#include "DMNscattering.h"
@@ -392,7 +393,7 @@ int main(int argc, char* argv[]){
 	string sigchoice = par->Signal_Channel();
     //Particles with this name will be checked for intersection with the
     //detector and passed to Scatter.probscatter.
-    string sig_part_name == "DM";
+    string sig_part_name = "DM";
 	std::unique_ptr<Scatter> SigGen;
 //Update this so it scales energy to Beam energy.
 	double max_dm_energy = par->Max_DM_Energy();
@@ -441,11 +442,11 @@ int main(int argc, char* argv[]){
         double lifetime;
         vector<double> Branching_Ratios;
         vector<vector<Particle> > Final_States;
-        if(par->model_Name()=="Axion_Dark_Photon"){
+        if(par->Model_Name()=="Axion_Dark_Photon"){
             lifetime=adp.Lifetime();
             adp.Branching_Ratios(Branching_Ratios);
             adp.Final_States(Final_States);
-            sig_part_choice == "Dark_Photon";
+            sig_part_name = "Dark_Photon";
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
         }
         else{
@@ -521,7 +522,7 @@ int main(int argc, char* argv[]){
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
-					if(burniter->name.compare(sig_part_scatter)==0){
+					if(burniter->name.compare(sig_part_name)==0){
 						SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
@@ -575,7 +576,7 @@ int main(int argc, char* argv[]){
 			//Yes, this list is named vec.  
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
-                if(iter->name.compare(sig_part_scatter)==0){
+                if(iter->name.compare(sig_part_name)==0){
 					NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
 						iter->report(*comprehensive_out);

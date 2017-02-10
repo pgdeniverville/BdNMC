@@ -300,7 +300,7 @@ namespace Ax_DP{
             return 0;
         }
 
-        return pow(Gagg,2)/(96*pi)*pow(mA,3)*pow(1-pow(ma/mA,3),3);     
+        return pow(Gaggp,2)/(96*pi)*pow(mA,3)*pow(1-pow(ma/mA,3),3);     
     }
     
     //From https://arxiv.org/abs/1611.01466
@@ -313,7 +313,7 @@ namespace Ax_DP{
     
     //From https://arxiv.org/abs/0807.3279
     double Gamma_dp_to_3gamma(double mA, double eps, double ep){
-        if(3*mA>melec){
+        if(3*mA>MASS_ELECTRON){
             return 0;
         }
         return 17.0/288000.0/pow(pi,3)*pow(alphaEM,3)*ep*pow(mA,9)/pow(MASS_ELECTRON,8);

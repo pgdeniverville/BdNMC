@@ -60,10 +60,10 @@ namespace Ax_DP {
     double Gamma_dp_to_a_gamma(double mA, double ma, double Gagpg);
     double Gamma_dp_to_lepton( double mA, double ml, double eps);
     double Gamma_dp_to_3gamma(double mA, double eps, double ep);
-    double Gamma_dp(double mA, double ma, double ml, double Gagpg, double eps, double ep);
+    double Gamma_dp(double mA, double ma, double Gagpg, double eps, double ep);
 
     double Br_dp_to_a_gamma(double mA, double ma, double Gagpg, double eps, double ep);
-    double Br_dp_to_lepton_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep);
+    double Br_dp_to_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep);
     double Br_dp_to_3gamma(double mA, double ma, double Gagpg, double eps, double ep);
     double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep);
 
