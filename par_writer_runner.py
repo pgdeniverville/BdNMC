@@ -679,6 +679,6 @@ def execute_t2k_parallel(genlist=True):
 
 #execute_t2k_parallel(genlist=True)
 #execute_miniboone_parallel(genlist=False)
-execute_miniboone_numi_p(genlist=False)
-#execute_ship_parallel(genlist=True)
+#execute_miniboone_numi_p(genlist=False)
+execute_ship_parallel(genlist=True)
 #execute_lsnd_parallel(genlist=True)

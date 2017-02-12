@@ -44,6 +44,9 @@ using std::list;    using std::vector;
 using std::exception;
 using std::cerr;
 
+//Temporary! I will clean this up in the big revision
+const string dark_axion_signal_string = "Dark_Photon";
+
 //const double mp = MASS_PROTON;
 //const double mn = MASS_NEUTRON;
 //const double me = MASS_ELECTRON;
@@ -256,8 +259,13 @@ int main(int argc, char* argv[]){
 		}
 	    
         if(par->Model_Name()=="Axion_Dark_Photon"){
-            if(prodchoice=="Brem_V"){
-                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen());
+            if(proddist=="proton_brem"){
+                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark Photon Bremsstrahlung", dark_axion_signal_string));
+                cout << DMGen->Channel_Name() << endl;
+            }
+            else{
+                cerr << "Invalid distribution selected\n Try production_distribution proton_brem?\n";
+                return -1;
             }
             /*
             else if(prodchoice=="pi0_decay"){
@@ -446,8 +454,10 @@ int main(int argc, char* argv[]){
             lifetime=adp.Lifetime();
             adp.Branching_Ratios(Branching_Ratios);
             adp.Final_States(Final_States);
-            sig_part_name = "Dark_Photon";
+            sig_part_name = dark_axion_signal_string;
+            cout << "SigGen Fail\n";
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
+            cout << "SigGen\n";
         }
         else{
             cerr << "No model declared for Signal_Decay.\n";
@@ -473,7 +483,8 @@ int main(int argc, char* argv[]){
     cout << "alphaD = " << alD << endl;	
     cout << "kappa = " << kappa << endl;
 	for(int i = 0; i<chan_count; i++){
-		cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();
+		cout << "DMGen_list size=" << DMGen_list.size() << endl;
+        cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();
 		if(DMGen_list[i]->query_off_shell()){
 			cout << " in Off-Shell mode.\n";
 		} 
@@ -501,6 +512,7 @@ int main(int argc, char* argv[]){
 	////////////////////
 	//START OF BURN-IN//
 	////////////////////
+        
 
 	double BURN_MAX = par->Burn_In();
 	double BURN_OVERRIDE = par->Burn_Timeout();
@@ -514,16 +526,15 @@ int main(int argc, char* argv[]){
 			cout << "Begin Channel " << i+1 << " Burn-In" << endl;
 		}
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
-			list<Particle> vecburn;
+			cout << "attempt1=" << burnattempt << endl;
+            list<Particle> vecburn;
 			Particle dist_part (0);
-			//dist_part.report(std::cout);
 			PartDist_list[i]->Sample_Particle(dist_part);
-			//dist_part.report(cout);
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
 					if(burniter->name.compare(sig_part_name)==0){
-						SigGen->probscatter(det, *burniter);
+                        SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
 				}
@@ -571,13 +582,15 @@ int main(int argc, char* argv[]){
 		list<Particle> vec;
 		Particle dist_part (0);
 		PartDist_list[i]->Sample_Particle(dist_part);
-
-		if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
+		cout << "Trial=" << trials << endl; 
+        dist_part.report(cout);
+        if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
 			//Yes, this list is named vec.  
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
                 if(iter->name.compare(sig_part_name)==0){
-					NDM_list[i]++;
+					cout << "Found a " << sig_part_name << " and pmax=" << SigGen->get_pMax() << endl;
+                    NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
 						iter->report(*comprehensive_out);
 						scatter_switch=true;
@@ -585,7 +598,8 @@ int main(int argc, char* argv[]){
 					}
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
-						scat_list[i]++;
+						cout << "Successful signal\n";
+                        scat_list[i]++;
 						if(timing_cut>0){
 							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
                         }

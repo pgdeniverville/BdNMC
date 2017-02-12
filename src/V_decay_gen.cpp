@@ -57,7 +57,8 @@ bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)
 //Do_Nothing_Gen does not decay the received particle! This whole 
 //file should be renamed something more general.
 
-Do_Nothing_Gen::Do_Nothing_Gen(const std::string chan){
+Do_Nothing_Gen::Do_Nothing_Gen(const std::string chan, const std::string part_name){
+    Part_Name = std::string(part_name);
     chan_name = std::string(chan);
     branchingratio=1;
 }
@@ -69,8 +70,9 @@ void Do_Nothing_Gen::Evaluate_Branching_Ratio(){
 */
 
 bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+    part.name = Part_Name;
     vec.push_back(part);
-
+    
     if(det_int(part)>0)
         return true;
 

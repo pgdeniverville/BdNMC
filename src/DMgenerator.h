@@ -20,7 +20,7 @@ class DMGenerator{
     protected:
         virtual void Evaluate_Branching_Ratio() {};
         double mv, mx, kappa, alphaD;
-        bool OFF_SHELL;
+        bool OFF_SHELL = false;
         std::string chan_name;
         double branchingratio;
         double pmax;
@@ -138,10 +138,12 @@ class V_decay_gen: public DMGenerator{
 
 class Do_Nothing_Gen: public DMGenerator{
     public:
-        Do_Nothing_Gen(const std::string chan="");
+        Do_Nothing_Gen(const std::string chan="", const std::string part_name="");
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part);
+        void Set_Part_Name(const std::string part_name){Part_Name = std::string(part_name);}
     private:
         void Evaluate_Branching_Ration();
+        std::string Part_Name="";
 };
 
 #endif
