@@ -142,8 +142,18 @@ class Do_Nothing_Gen: public DMGenerator{
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part);
         void Set_Part_Name(const std::string part_name){Part_Name = std::string(part_name);}
     private:
-        void Evaluate_Branching_Ration();
+        void Evaluate_Branching_Ratio();
         std::string Part_Name="";
+};
+
+class Two_Body_Decay_Gen: public DMGenerator{
+    public:
+        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string parent_name ,Particle daughter1, Particle daughter2); 
+        bool GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part);
+    private:
+        void Evaluate_Branching(){return;}
+        Particle daughter1, daughter2;
+        std::string Part_Name;
 };
 
 #endif

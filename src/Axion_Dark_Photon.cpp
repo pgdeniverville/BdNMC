@@ -54,35 +54,34 @@ void Axion_Dark_Photon::Set_Model_Parameters(Parameter* par){
     Particle muon(MASS_MUON);
     muon.name = "Muon";
 
+    Particle hadronic(0);
+    hadronic.name="Hadronic Stuff";
+
     branching_ratios.clear();
     final_states.clear();
-
-    if(double Br=Br_dp_to_a_gamma(mass_dp, mass_axion, Gagpg, epsilon, eprime)!=0){
-        cout << "gamma axion\n";
+    double Br;
+    if((Br=Br_dp_to_a_gamma(mass_dp, mass_axion, Gagpg, epsilon, eprime))!=0){
         branching_ratios.push_back(Br);
         vector<Particle> vec;
         vec.push_back(gamma);
         vec.push_back(axion);
         final_states.push_back(vec);
     }
-    if(double Br=Br_dp_to_lepton(mass_dp, mass_axion, MASS_ELECTRON, Gagpg, epsilon, eprime)!=0){
-        cout << "2electron\n";
+    if((Br=Br_dp_to_lepton(mass_dp, mass_axion, MASS_ELECTRON, Gagpg, epsilon, eprime))!=0){
         branching_ratios.push_back(Br);
         vector<Particle> vec;
         vec.push_back(electron);
         vec.push_back(electron);
         final_states.push_back(vec);
     }
-    if(double Br=Br_dp_to_lepton(mass_dp, mass_axion, MASS_MUON, Gagpg, epsilon, eprime)!=0){
-        cout << "2muon\n";
+    if((Br=Br_dp_to_lepton(mass_dp, mass_axion, MASS_MUON, Gagpg, epsilon, eprime))!=0){
         branching_ratios.push_back(Br);
         vector<Particle> vec;
         vec.push_back(muon);
         vec.push_back(muon);
         final_states.push_back(vec);
     }
-    if(double Br=Br_dp_to_3gamma(mass_dp, mass_axion, Gagpg, epsilon, eprime)!=0){
-        cout << "3gamma" << endl;
+    if((Br=Br_dp_to_3gamma(mass_dp, mass_axion, Gagpg, epsilon, eprime))!=0){
         branching_ratios.push_back(Br);
         vector<Particle> vec;
         vec.push_back(gamma);
@@ -90,7 +89,12 @@ void Axion_Dark_Photon::Set_Model_Parameters(Parameter* par){
         vec.push_back(gamma);
         final_states.push_back(vec);
     }
-    //Hadronic Channel still needs to be added!
+    if((Br=Br_dp_to_hadrons(mass_dp, mass_axion, Gagpg, epsilon, eprime))!=0){
+        branching_ratios.push_back(Br);
+        vector<Particle> vec;
+        vec.push_back(hadronic);
+        final_states.push_back(vec);
+    }
 }
 
 

@@ -11,7 +11,7 @@ using std::string;
 
 
 double decay_probability(double t1, double t2, double lifetime){
-    cout << "dec_prob_report\n" << "exp(-t1/tau)=" << exp(-t1/lifetime) << " exp(-t2/tau)=" << exp(-t2/lifetime) << " prob=" << exp(-t1/lifetime) - exp(-t2/lifetime) <<  endl;
+    //cout << "dec_prob_report\n" << "exp(-t1/tau)=" << exp(-t1/lifetime) << " exp(-t2/tau)=" << exp(-t2/lifetime) << " prob=" << exp(-t1/lifetime) - exp(-t2/lifetime) <<  endl;
     return abs(exp(-t2/lifetime) - exp(-t1/lifetime));
 }
 
@@ -34,7 +34,7 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
         string tmp = Final_States[i][0].name;
         tmp += " ";
         for(unsigned j = 1; j < Final_States[i].size(); j++){
-            cout << Final_States[i][j].name << endl;
+            //cout << Final_States[i][j].name << endl;
             tmp += Final_States[i][j].name;
         }
         Channel_Name.push_back(tmp);
@@ -49,12 +49,12 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         time1 = time2;
         time2 = ttmp;
     }
-    cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << endl;
+    //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << endl;
 
     double prob = decay_probability(time1, time2, Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)));
     double u = Random::Flat(0,1);
     if(prob>u*pMax){
-        cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
+        //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
         if(prob>pMax){
             pMax=prob;
         }

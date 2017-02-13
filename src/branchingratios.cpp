@@ -8,6 +8,10 @@
 #include <iostream>
 #include <iomanip>
 
+#include <fstream>
+#include <vector>
+#include <memory>
+
 using std::cout; using std::endl;
 
 const double mp = MASS_PROTON;
@@ -23,6 +27,33 @@ const double bretato2gamma = 0.3941;
 const double Br_omega_to_e_e = 7.28e-5;
 const double mmuon = 0.1057;
 const double etafactor = 0.61;
+
+const std::string rratio_filename = "data/rratio.dat";
+static std::shared_ptr<Linear_Interpolation> rratio;
+bool rratio_loaded=false;
+
+/********************
+ * R-RATIO
+ ********************/
+//Should just write a general function for reading in data files.
+void Load_2D_Interpolation(const std::string& filename, std::shared_ptr<Linear_Interpolation>& ff){
+    std::ifstream instream(filename);
+    if(!instream.is_open()){
+        std::cerr << "Cannot open " << filename << std::endl;
+        throw -1;
+    }
+    std::vector<double> dist;
+    double in, x_min, x_max;
+    instream >> x_min;
+    instream >> in;
+    dist.push_back(in);
+    while(instream >> x_max){
+        instream >> in;
+        dist.push_back(in);
+    }
+
+    ff = std::shared_ptr<Linear_Interpolation>(new Linear_Interpolation(dist, x_min,x_max));
+}
 
 
 /********************
@@ -291,7 +322,8 @@ double brphi_to_Vb(double mv, double mx, double kappa, double alphaD){
 /*
  * DARK AXION WITH DARK PHOTON
  */
-
+//This is currently incomplete, there are a bunch of processes I have
+//yet to consider. Maybe I should go to Madgraph instead of doing it by hand?
 namespace Ax_DP{
 
     //From https://arxiv.org/abs/1611.01466
@@ -300,7 +332,7 @@ namespace Ax_DP{
             return 0;
         }
 
-        return pow(Gaggp,2)/(96*pi)*pow(mA,3)*pow(1-pow(ma/mA,3),3);     
+        return pow(Gaggp,2)/(96*pi)*pow(mA,3)*pow(1-pow(ma/mA,2),3);     
     }
     
     //From https://arxiv.org/abs/1611.01466
@@ -310,7 +342,15 @@ namespace Ax_DP{
 
         return pow(eps*G_ELEC,2)*sqrt(pow(mA,2)-4*ml*ml)*(mA*mA+2*ml*ml)/(12*pi*mA*mA); 
     }
-    
+
+    double Gamma_dp_to_hadrons(double mA, double eps){
+        if(!rratio_loaded){
+            Load_2D_Interpolation(rratio_filename,rratio);
+            rratio_loaded=true;
+        }
+        return Gamma_dp_to_lepton(mA, MASS_MUON, eps)*rratio->Interpolate(mA*mA); 
+    }
+
     //From https://arxiv.org/abs/0807.3279
     double Gamma_dp_to_3gamma(double mA, double eps, double ep){
         if(3*mA>MASS_ELECTRON){
@@ -321,16 +361,31 @@ namespace Ax_DP{
 
 
     //This does not currently contain the R-Ratio. I will need to figure out a good way of including it at some point.
-    double Gamma_dp(double mA, double ma, double Gagpg, double eps, double ep){
-        return Gamma_dp_to_a_gamma( mA, ma, Gagpg) + Gamma_dp_to_lepton(mA, MASS_ELECTRON, eps) + Gamma_dp_to_lepton(mA, MASS_MUON, eps) + Gamma_dp_to_3gamma( mA, eps, ep); 
+    double Gamma_dp(double mA, double ma, double Gagpg, double eps, double ep){ 
+        return Gamma_dp_to_a_gamma( mA, ma, Gagpg) + Gamma_dp_to_lepton(mA, MASS_ELECTRON, eps) + Gamma_dp_to_lepton(mA, MASS_MUON, eps) + Gamma_dp_to_hadrons(mA, eps)+ Gamma_dp_to_3gamma( mA, eps, ep); 
     }
 
     double Br_dp_to_a_gamma(double mA, double ma, double Gagpg, double eps, double ep){
+        /*cout << "Testing Br_dp_to_a_gamma\n";
+        cout << Gamma_dp_to_a_gamma(mA, ma, Gagpg) << endl;
+        cout << Gamma_dp_to_lepton(mA, MASS_MUON, eps) << endl;
+        cout << rratio->Interpolate(mA*mA) << endl;
+        cout << Gamma_dp(mA, ma, Gagpg, eps, ep) << endl;
+        cout << Gamma_dp_to_a_gamma(mA, ma, Gagpg)/Gamma_dp(mA, ma, Gagpg, eps, ep) << endl;*/
         return Gamma_dp_to_a_gamma(mA, ma, Gagpg)/Gamma_dp(mA, ma, Gagpg, eps, ep);
     }
 
     double Br_dp_to_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep){
         return Gamma_dp_to_lepton(mA, ml, eps)/Gamma_dp(mA, ma, Gagpg, eps, ep);
+    }
+
+    //Uses rratio, might not be valid at higher s?
+    double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep){
+        if(!rratio_loaded){
+            Load_2D_Interpolation(rratio_filename,rratio);
+            rratio_loaded=true;
+        }
+        return Gamma_dp_to_hadrons(mA,eps)/Gamma_dp(mA, ma, Gagpg, eps, ep);
     }
 
     double Br_dp_to_3gamma(double mA, double ma, double Gagpg, double eps, double ep){

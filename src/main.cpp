@@ -267,13 +267,21 @@ int main(int argc, char* argv[]){
                 cerr << "Invalid distribution selected\n Try production_distribution proton_brem?\n";
                 return -1;
             }
-            /*
             else if(prodchoice=="pi0_decay"){
-                
+                Particle gamma(0);
+                gamma.name = "Photon";
+                Particle dp(mv)
+                dp.name = "Dark_Photon";
+                DMGen = std::shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),mv,dp,gamma));
             }
             else if(prodchoice=="eta_decay"){
-                
-            }*/
+                Particle gamma(0);
+                gamma.name = "Photon";
+                Particle dp(mv)
+                dp.name = "Dark_Photon";
+                DMGen = std::shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(
+                            bretatoVgamma(mv,mdm,kappa,alD) ,mv,dp,gamma));
+            }
         }
         else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){ 
 			
@@ -526,7 +534,6 @@ int main(int argc, char* argv[]){
 			cout << "Begin Channel " << i+1 << " Burn-In" << endl;
 		}
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
-			cout << "attempt1=" << burnattempt << endl;
             list<Particle> vecburn;
 			Particle dist_part (0);
 			PartDist_list[i]->Sample_Particle(dist_part);
@@ -582,14 +589,11 @@ int main(int argc, char* argv[]){
 		list<Particle> vec;
 		Particle dist_part (0);
 		PartDist_list[i]->Sample_Particle(dist_part);
-		cout << "Trial=" << trials << endl; 
-        dist_part.report(cout);
         if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
 			//Yes, this list is named vec.  
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
                 if(iter->name.compare(sig_part_name)==0){
-					cout << "Found a " << sig_part_name << " and pmax=" << SigGen->get_pMax() << endl;
                     NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
 						iter->report(*comprehensive_out);
@@ -598,7 +602,6 @@ int main(int argc, char* argv[]){
 					}
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
-						cout << "Successful signal\n";
                         scat_list[i]++;
 						if(timing_cut>0){
 							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());

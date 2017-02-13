@@ -1,6 +1,8 @@
 #ifndef GUARD_branchingratios_h
 #define GUARD_branchingratios_h
 
+
+
 //KINETIC MIXING
 double bretatoVgamma(double mv, double mx, double kappa, double alphaD);
 double d2breta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s, double theta);
@@ -60,13 +62,13 @@ namespace Ax_DP {
     double Gamma_dp_to_a_gamma(double mA, double ma, double Gagpg);
     double Gamma_dp_to_lepton( double mA, double ml, double eps);
     double Gamma_dp_to_3gamma(double mA, double eps, double ep);
+    double Gamma_dp_to_hadrons(double mA, double eps);
     double Gamma_dp(double mA, double ma, double Gagpg, double eps, double ep);
 
     double Br_dp_to_a_gamma(double mA, double ma, double Gagpg, double eps, double ep);
     double Br_dp_to_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep);
     double Br_dp_to_3gamma(double mA, double ma, double Gagpg, double eps, double ep);
     double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep);
-
 }
 
 

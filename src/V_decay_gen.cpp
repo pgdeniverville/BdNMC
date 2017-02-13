@@ -62,12 +62,11 @@ Do_Nothing_Gen::Do_Nothing_Gen(const std::string chan, const std::string part_na
     chan_name = std::string(chan);
     branchingratio=1;
 }
-/*
+
 void Do_Nothing_Gen::Evaluate_Branching_Ratio(){
     branchingratio=1;
-    return;
 }
-*/
+
 
 bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     part.name = Part_Name;
@@ -77,4 +76,35 @@ bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
         return true;
 
     return false;
+}
+
+//A general isotropic two body decay. Only cares about the kinematics!
+
+Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string part_name, Particle Daughter1, Particle Daughter2){
+    if(parent_mass < Daughter1.m+Daughter2.m){
+        std::cerr << "Parent_Mass is smaller than daughter masses, invalid decay!\n";
+        throw -30;
+    }
+    Part_Name = std::string(part_name);
+    daughter1 = Particle(Daughter1);
+    daughter2 = Particle(Daughter2);
+    branchingratio=branching_ratio;
+}
+
+bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+    Particle parent = Particle(part);
+    parent.name = Part_Name;
+    vec.push_back(part);
+
+    TwoBodyDecay(parent, daughter1, daughter2);
+    bool intersect=false;
+    if(det_int(daughter1)>0){
+        intersect=true;
+        vec.push_back(daughter1);
+    }
+    if(det_int(daughter2)>0){
+        intersect=true;
+        vec.push_back(daughter2);
+    }
+    return intersect;
 }
