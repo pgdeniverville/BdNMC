@@ -20,7 +20,7 @@ class Linear_Interpolation{
         double Interpolate(double Xval);
     private:
         std::vector<double> yvals;
-        double xmin, xres;
+        double xmin, xres, xmax;
 };
 
 #endif

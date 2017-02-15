@@ -6,6 +6,8 @@
 #include <fstream>
 #include "constants.h"
 
+using std::cout; using std::endl;
+
 V_decay_gen::V_decay_gen(double MV, double MX, double kap, double alp, const std::string chan){
     set_model_params(MV, MX, kap, alp);
 	chan_name=std::string(chan);
@@ -94,7 +96,7 @@ Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mas
 bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
     Particle parent = Particle(part);
     parent.name = Part_Name;
-    vec.push_back(part);
+    vec.push_back(parent);
 
     TwoBodyDecay(parent, daughter1, daughter2);
     bool intersect=false;

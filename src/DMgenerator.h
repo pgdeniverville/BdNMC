@@ -13,6 +13,7 @@ class DMGenerator{
         DMGenerator(){}
         virtual bool GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part) {return false;}
         double BranchingRatio(){return branchingratio;}
+        void Set_Channel_Name(std::string ch_na){chan_name=ch_na;}
         std::string Channel_Name(){return chan_name;}
         void set_model_params(double MV, double MX, double kap, double alp){mv=MV; mx=MX; kappa=kap; alphaD=alp; Evaluate_Branching_Ratio();}
         bool query_off_shell(){return OFF_SHELL;}

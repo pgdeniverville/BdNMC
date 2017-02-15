@@ -156,6 +156,7 @@ int main(int argc, char* argv[]){
     	}
 	}
     
+
 	parstream.close();
     
 	//Run Parameters
@@ -263,24 +264,36 @@ int main(int argc, char* argv[]){
                 DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark Photon Bremsstrahlung", dark_axion_signal_string));
                 cout << DMGen->Channel_Name() << endl;
             }
+            else if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){
+                Particle gamma(0);
+                gamma.name = "Photon";
+                Particle dp(mv);
+                dp.name = "Dark_Photon";
+                if(prodchoice=="pi0_decay"){
+                    DMGen = std::shared_ptr<DMGenerator>(new 
+                            Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),
+                            MASS_PION_NEUTRAL,"Pion",dp,gamma));
+                    PartDist->set_mass(MASS_PION_NEUTRAL);
+                }
+                else if (prodchoice=="eta_decay"){
+                    DMGen = std::shared_ptr<DMGenerator>(new 
+                            Two_Body_Decay_Gen(bretatoVgamma(mv,mdm,kappa,alD),
+                            MASS_ETA,"Eta",dp,gamma));
+                    PartDist->set_mass(MASS_ETA);
+				
+                }
+                if(proditer->Meson_Per_Pi0()<=0){
+				    Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
+                }
+			    else{
+				    Vnum = DMGen->BranchingRatio()*num_pi0*
+                        (proditer->Meson_Per_Pi0());
+                }
+                DMGen->Set_Channel_Name(prodchoice);
+            }
             else{
-                cerr << "Invalid distribution selected\n Try production_distribution proton_brem?\n";
+                cerr << "Invalid production or distribution selected\n Axion_Dark_Photon is still in dev, so may react oddly.\n";
                 return -1;
-            }
-            else if(prodchoice=="pi0_decay"){
-                Particle gamma(0);
-                gamma.name = "Photon";
-                Particle dp(mv)
-                dp.name = "Dark_Photon";
-                DMGen = std::shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),mv,dp,gamma));
-            }
-            else if(prodchoice=="eta_decay"){
-                Particle gamma(0);
-                gamma.name = "Photon";
-                Particle dp(mv)
-                dp.name = "Dark_Photon";
-                DMGen = std::shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(
-                            bretatoVgamma(mv,mdm,kappa,alD) ,mv,dp,gamma));
             }
         }
         else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){ 
@@ -357,7 +370,8 @@ int main(int argc, char* argv[]){
 			PartDist->set_mass(mv);
 			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
 		}
-		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||prodchoice=="V_decay_baryonic"){
+		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||
+                prodchoice=="V_decay_baryonic"){
 			PartDist->set_mass(mv);
 			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
 			Vnum *= DMGen->BranchingRatio();
@@ -463,9 +477,7 @@ int main(int argc, char* argv[]){
             adp.Branching_Ratios(Branching_Ratios);
             adp.Final_States(Final_States);
             sig_part_name = dark_axion_signal_string;
-            cout << "SigGen Fail\n";
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
-            cout << "SigGen\n";
         }
         else{
             cerr << "No model declared for Signal_Decay.\n";
@@ -491,7 +503,6 @@ int main(int argc, char* argv[]){
     cout << "alphaD = " << alD << endl;	
     cout << "kappa = " << kappa << endl;
 	for(int i = 0; i<chan_count; i++){
-		cout << "DMGen_list size=" << DMGen_list.size() << endl;
         cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();
 		if(DMGen_list[i]->query_off_shell()){
 			cout << " in Off-Shell mode.\n";
@@ -657,10 +668,7 @@ int main(int argc, char* argv[]){
             outmode=="comprehensive"){
 		*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
         if(par->Model_Name()=="Axion_Dark_Photon"){
-            string rep;
-            adp.Report(rep);
-            cout << rep;
-            *summary_out << rep;
+            adp.Report(*summary_out, signal);
         }
     }
 

@@ -25,7 +25,7 @@ class Axion_Dark_Photon {
         double GAGPGP(){return Gagpgp;}
         //This will be expanded later to accept string arguments and
         //provide specific reports based on channel.
-        void Report(std::string&);
+        void Report(std::ostream&, double tot=0);
     private:
         double mass_axion;
         double mass_dp;

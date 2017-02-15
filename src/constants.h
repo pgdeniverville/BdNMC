@@ -28,9 +28,11 @@ const double MASS_DEUTERON = 1.875612859;
 const double MASS_DELTA = 1.232;
 
 //Mesons
-const double mpi0= 0.1349766;
+const double MASS_PION_NEUTRAL=0.1349766;
+const double mpi0= MASS_PION_NEUTRAL;
 const double MASS_PION_CHARGED=0.13957018;
-const double meta=0.547862;
+const double MASS_ETA = 0.547862;
+const double meta= MASS_ETA;
 const double momega=0.78265;
 const double mrho = 0.77527;
 const double mphi = 1.019461;

@@ -195,6 +195,7 @@ Linear_Interpolation::Linear_Interpolation(vector<double> Yvals, double Xmin, do
     yvals.resize(Yvals.size());
     std::copy(Yvals.begin(),Yvals.end(),yvals.begin());
     xmin = Xmin;
+    xmax = Xmax;
     xres = (Xmax-Xmin)/(Yvals.size()-1);
     yvals.push_back(0);
 }
@@ -203,8 +204,15 @@ Linear_Interpolation::Linear_Interpolation(vector<double> Yvals, double Xmin, do
  * Interpolate returns the value of f(xval) for xmin<=xval<=xmax. Values outside this range will
  * likely lead to a segmenation fault. Should perhaps add error handling, not certain of the 
  * cost at run time to check the domain at every evaluation.
+ *
+ * It has to be done somewhere, added error checking. Returns 0.0 rather
+ * than trying to extrapolate.
  */
 double Linear_Interpolation::Interpolate(double xval){
+    if(xval<xmin)
+        return 0.0;
+    else if(xval>xmax)
+        return 0.0;
     double index = (xval-xmin)/xres;
     int lowindex = (int)floor(index);
     return (lowindex+1-index)*yvals[lowindex]+(index-lowindex)*yvals[lowindex+1];
