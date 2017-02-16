@@ -391,7 +391,7 @@ int main(int argc, char* argv[]){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
 	}
 	else if(sigchoice=="NCE_nucleon"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));	
+        SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,par->Coherent(),det));	
 	}
 	else if(sigchoice=="NCE_nucleon_baryonic"){
 		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter_Baryonic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));

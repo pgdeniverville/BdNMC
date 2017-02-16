@@ -51,7 +51,7 @@ class Scatter{
 
 class Nucleon_Scatter: public Scatter{
 	public:
-		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
+		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax, const bool cohere=false, std::shared_ptr<detector> det = nullptr);
 		~Nucleon_Scatter(){}
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
@@ -60,17 +60,31 @@ class Nucleon_Scatter: public Scatter{
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
 			generate_cross_sections();
 		}
+		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa, std::shared_ptr<detector>& det){
+			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
+            generate_coherent_cross_sections(det);
+        }
 	private:
+        bool coherent;
 		double scatmax(double);
 		double scatmin(double DM_Energy, double DM_Mass, double Nucleon_Mass);
 		double Edmmin, Edmmax, Edmres;
-		std::unique_ptr<Linear_Interpolation> proton_cross_maxima;
-		std::unique_ptr<Linear_Interpolation> neutron_cross_maxima;
-		std::unique_ptr<Linear_Interpolation> proton_cross;
-		std::unique_ptr<Linear_Interpolation> neutron_cross;
-		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
+		Linear_Interpolation proton_cross_maxima;
+		Linear_Interpolation neutron_cross_maxima;
+		Linear_Interpolation proton_cross;
+		Linear_Interpolation neutron_cross;
+       
+
+        //Coherent Variables
+        std::vector<Linear_Interpolation> atom_maxima;
+        std::vector<Linear_Interpolation> atom_cross;
+        
+        void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void generate_cross_sections();
+		void generate_coherent_cross_sections(std::shared_ptr<detector>& det);
+        
 };
+
 
 //This is good for inelastic
 class Inelastic_Nucleon_Scatter: public Scatter{

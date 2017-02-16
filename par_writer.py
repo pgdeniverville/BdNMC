@@ -29,6 +29,8 @@ meson_per_pi0_miniboone = {'pi0_decay' : '1.0', 'eta_decay' : str(1.0/30.0), 'rh
 
 meson_per_pi0_lsnd = {'pi0_decay' : '1.0'}
 
+meson_per_pi0_coherent = {'piminus_capture' : '0.63'}
+
 meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
@@ -41,7 +43,10 @@ Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutro
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 
-def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9, n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1,inelastic_dist="data/DIS.dat"):
+Sodium_Iodide_String = "material Sodium\nnumber_density 1.58e23\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e23\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
+
+def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9,
+        n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1,inelastic_dist="data/DIS.dat",coherent='false'):
     with open(outfile,'w') as f:
         if run>=0:
             f.write('run {}\n'.format(run))
@@ -96,6 +101,7 @@ def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.
         f.write('summary_file {}\n'.format(sumlog))
         f.write('output_mode {}\n'.format(output_mode))
         f.write('samplesize {}\n'.format(str(samplesize)))
+        f.write('coherent {}\n'.format(coherent))
         f.write('pi0_per_POT {}\n\n'.format(str(pi0_per_POT)))
         write_detector(f)
         f.close()
@@ -192,6 +198,8 @@ def test_detector(f,xpos=0.0,ypos=0.0,zpos=0.01,radius=1):
     f.write('\n')
     f.write(Hydrogen_string)
 
+
+
 def write_ship(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_electron", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["data/particle_list_ship.dat"],outlog="Events/ship_events.dat", output_mode="summary",samplesize=1000,beam_energy=400,n_num_target=54,p_num_target=42,min_scatter_energy=2,max_scatter_energy=20,min_scatter_angle=0.01,max_scatter_angle=0.02,efficiency=0.5,sumlog="Events/ship_run.dat",max_trials=80e6,ptmax=1,zmin=0.1,zmax=0.9,run=-1,dm_energy_resolution=0.01,det=ship_detector):
     POT=2e20
     pi0_per_POT=1.8
@@ -211,6 +219,47 @@ def write_lsnd(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_
     #Just a random value. I should code the actual function in at some point.
     p_cross=30*mb
     write_experiment(write_detector=lsnd_detector,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross, min_scatter_angle=min_scatter_angle,max_scatter_angle=max_scatter_angle)
+
+def coherent_detector_LAr(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.48,length=0.96,theta=pi/2.0,phi=pi/2.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+def coherent_detector_NaI(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.601,length=2*0.601,theta=pi/2.0,phi=pi/2.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Sodium_Iodide_string)
+
+def write_coherent(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1,\
+        prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon",\
+        coherent="true", outfile="parameter_run.dat",\
+        proddist=["burmansmith"], partlistfile=["data/particle_list_lsnd.dat"],\
+        sumlog="Events/coherent.dat",outlog="Events/coherent_events.dat",\
+        output_mode="summary",samplesize=5000, min_scatter_energy=0.018,\
+        max_scatter_energy=0.05, dm_energy_resolution=0.001,\
+        efficiency=0.5,beam_energy=1.0, n_num_target=0,p_num_target=80,\
+        max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,\
+        min_scatter_angle=0.0,max_scatter_angle=2.1*pi,POT=1e23):
+    pi0_per_POT=0.1
+    #Just a random value. I should code the actual function in at some point.
+    p_cross=30*mb
+    write_experiment(write_detector=coherent_detector_LAr,eps=eps,mdm=mdm,\
+            mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,\
+            signal_chan = signal_chan, outfile=outfile, proddist=proddist,\
+            partlistfile=partlistfile,sumlog=sumlog,outlog=outlog,\
+            output_mode=output_mode,samplesize=samplesize,\
+            min_scatter_energy=min_scatter_energy,\
+            max_scatter_energy=max_scatter_energy,\
+            dm_energy_resolution=dm_energy_resolution,\
+            efficiency=efficiency,beam_energy=beam_energy,\
+            meson_per_pi0=meson_per_pi0_coherent,\
+            n_num_target=n_num_target,p_num_target=p_num_target,\
+            max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,\
+            POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross, \
+            min_scatter_angle=min_scatter_angle,\
+            max_scatter_angle=max_scatter_angle,coherent=coherent)
 
 v_parton_kinetic = "~/Code/DMcode/"
 v_parton_baryonic = "~/Code/DMcodeBaryon/"

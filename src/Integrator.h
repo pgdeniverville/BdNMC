@@ -16,11 +16,14 @@ double SimpsonCubature(std::function<double(double, double)> f, double a, double
 class Linear_Interpolation{
     public:
         Linear_Interpolation(std::vector<double>, double Xmin, double Xmax);
-		~Linear_Interpolation(){};
+		Linear_Interpolation(){xmin=0; xmax=0;}
+        Linear_Interpolation(const Linear_Interpolation &);
+        Linear_Interpolation& operator=(const Linear_Interpolation&);
+        ~Linear_Interpolation(){};
         double Interpolate(double Xval);
     private:
         std::vector<double> yvals;
-        double xmin, xres;
+        double xmin,xmax,xres;
 };
 
 #endif

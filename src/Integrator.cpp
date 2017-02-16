@@ -209,3 +209,16 @@ double Linear_Interpolation::Interpolate(double xval){
     int lowindex = (int)floor(index);
     return (lowindex+1-index)*yvals[lowindex]+(index-lowindex)*yvals[lowindex+1];
 }
+
+Linear_Interpolation::Linear_Interpolation(const Linear_Interpolation &LI){
+    yvals = LI.yvals;
+    xmin = LI.xmin;
+    xmax = LI.xmax;
+}
+
+Linear_Interpolation& Linear_Interpolation::operator=(const Linear_Interpolation& LI){
+    yvals = LI.yvals;
+    xmin = LI.xmin;
+    xmax = LI.xmax;
+    return *this;
+}
