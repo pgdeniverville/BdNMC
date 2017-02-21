@@ -261,7 +261,7 @@ int main(int argc, char* argv[]){
 	    
         if(par->Model_Name()=="Axion_Dark_Photon"){
             if(proddist=="proton_brem"){
-                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark Photon Bremsstrahlung", dark_axion_signal_string));
+                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
                 cout << DMGen->Channel_Name() << endl;
             }
             else if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){

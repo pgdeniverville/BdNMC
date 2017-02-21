@@ -19,10 +19,11 @@ void Axion_Dark_Photon::Report(std::ostream& out, double tot){
     std::cout << "Lifetime of Dark Photon: " << lifetime << std::endl;
     out << "Lifetime " << lifetime << "\n";
     for(unsigned i=0; i<branching_ratios.size(); i++){
-        for(unsigned j=0; j<final_states[i].size(); j++){
-            out << final_states[i][j].name << "_";
+        out << final_states[i][0].name;
+        for(unsigned j=1; j<final_states[i].size(); j++){
+            out << "_" << final_states[i][j].name;
         }
-        out << branching_ratios[i]<< " " << mass_dp << " " << mass_axion << " " << epsilon << " " << eprime << " " << Gagg << " " << Gagpg << " " << Gagpgp;
+        out << " " << branching_ratios[i]<< " " << mass_dp << " " << mass_axion << " " << epsilon << " " << eprime << " " << Gagg << " " << Gagpg << " " << Gagpgp;
         if(tot>=0){
             out << " " << tot*branching_ratios[i];
         }

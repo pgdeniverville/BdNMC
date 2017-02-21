@@ -1,6 +1,7 @@
 from par_writer import *
 import numpy as np
 import sys
+import math
 
 import time
 
@@ -70,7 +71,7 @@ def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True
     #    print "\ntime={}\n".format(t1-t0)
     subp.call(["rm", parfile])
 
-def ship_eval(mass_arr,signal_channel="NCE_electron",model="Dark_Photon_DM"):
+def ship_eval(mass_arr,signal_channel="NCE_electron",model="Dark_Photon_DM",sumlog="Events/ship.dat",channels={_parton,_brem,_pion_decay,_eta_decay}):
     MV=mass_arr[0]
     MX=mass_arr[1]
 
@@ -92,21 +93,27 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",model="Dark_Photon_DM"):
     partlistfile = []
 
     if model=="Axion_Dark_Photon":
-        if MX/1000.0<mpi0/2.0 and MV<600.0:
+        executing=False
+        if MV/1000.0<mpi0 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             partlistfile.append("data/particle_list_ship.dat")
-        if MX/1000.0<meta/2.0 and MV<900.0:
+            executing=True
+        if MV/1000.0<meta and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay")
             partlistfile.append("data/particle_list_ship.dat")
-        if MV/2.0>MX and proton_brem_switch:
-    	   proddist.append("proton_brem")
-    	   prodchan.append("Brem_V")
-     	   partlistfile.append("")
+            executing=True
+        if MV/2.0>MX and _brem in channels:
+    	    proddist.append("proton_brem")
+    	    prodchan.append("Brem_V")
+     	    partlistfile.append("")
+            executing=True
         epsilon=mass_arr[2]
         alD=mass_arr[3]
         gagpg=mass_arr[4]
+        if not executing:
+            return
     elif signal_channel=="Inelastic_Nucleon_Scattering_Baryonic":
         if MX/1000.0<mpi0/2.0 and MV<600:
             proddist.append("particle_list")
@@ -163,7 +170,10 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",model="Dark_Photon_DM"):
 
     #write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=2000,sumlog="Events/ship.dat")
     if model == "Axion_Dark_Photon":
-        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="Signal_Decay",samplesize=1000,sumlog="Events/ship_axion.dat",output_mode="summary",alpha_D=alD,zmin=zmin,zmax=zmax,eps=epsilon,gagpg=gagpg,model=model)
+        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,\
+                signal_chan="Signal_Decay",samplesize=100,sumlog=sumlog,output_mode="comprehensive",alpha_D=alD,zmin=zmin,\
+                zmax=zmax,eps=epsilon,gagpg=gagpg,model=model,min_scatter_angle=-1,max_scatter_angle=3*pi,min_scatter_energy=0,\
+                max_scatter_energy=400,max_trials=10e6)
     elif signal_channel =="NCE_electron":
         write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1000,sumlog="Events/ship_y.dat",output_mode="summary",alpha_D=alD)
         #write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1e6,sumlog="Events/ship_test.dat",output_mode="comprehensive",outlog="Events/walter_events.dat",alpha_D=alD,det=test_detector,min_scatter_angle=0,max_scatter_angle=10,min_scatter_energy=0,max_scatter_energy=400)
@@ -599,6 +609,12 @@ def execute_miniboone_numi_p(genlist=True):
         #iminiboone_numi_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
         #miniboone_numi_eval(marr,signal_channel="Pion_Inelastic")
 
+def Gaggp_func(epsilon,mA,mult):
+    return mult*math.sqrt(8*(0.3*epsilon/mA)**2)
+
+def logscan(A,B,X):
+    return A*math.exp(X*math.log(B/A))
+
 def execute_ship_parallel(genlist=True):
     if genlist:
         write_ship(prod_chan=["pi0_decay"],proddist=["bmpt"],samplesize=1e6,output_mode="particle_list",partlistfile=["data/particle_list_ship.dat"])
@@ -618,9 +634,15 @@ def execute_ship_parallel(genlist=True):
     #massarr=[[MV,MV/3.0] for MV in vmassarr]
     #massarr=[[100,10,]]
     #massarr=[[MV,200] for MV in vmassarr]
-    massarr=[[100,10,1e-8,0.1,1e-7]]
-    for marr in massarr:
-        ship_eval(marr,signal_channel="Signal_Decay",model="Axion_Dark_Photon")
+    epsarr=[logscan(1e-9,1e-6,X/15.0) for X in range(0,15)]
+    #mAarr =[round(logscan(2,1000,X/15.0)) for X in range(0,15)]
+    mAarr = [770,134,540]+[X for X in range(1050,2000,50)]
+    axarr = [[y,y/4.0,x,0.1,Gaggp_func(x,y/1000.0,5)] for x in epsarr for y in mAarr]
+    #axarr=[[100,10,1e-8,0.1,1e-7]]
+    for arr in axarr:
+        ship_eval(arr,signal_channel="Signal_Decay",model="Axion_Dark_Photon",sumlog="Events/ship_5.dat",channels={_brem,_pion_decay,_eta_decay})
+        #ship_eval(arr,signal_channel="Signal_Decay",model="Axion_Dark_Photon",sumlog="Events/ship_2_meson.dat",channels={_pion_decay,_eta_decay})
+    #for marr in massarr:
         #ship_eval(marr,signal_channel="NCE_electron")
         #ship_eval(marr,signal_channel="test")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")

@@ -204,7 +204,7 @@ def write_ship(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_
     pi0_per_POT=1.8
     p_cross=11*mb
     write_experiment(write_detector=det,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy,
-            n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross,meson_per_pi0=meson_per_pi0_ship,min_scatter_angle=min_scatter_angle,max_scatter_angle=max_scatter_angle,model=model,gagg=gagg,gagpg=1e-7,gagpgp=0)
+            n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross,meson_per_pi0=meson_per_pi0_ship,min_scatter_angle=min_scatter_angle,max_scatter_angle=max_scatter_angle,model=model,gagg=gagg,gagpg=gagpg,gagpgp=gagpgp)
 
 def lsnd_detector(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3,theta=0,phi=0):
     f.write("\ndetector cylinder\n");

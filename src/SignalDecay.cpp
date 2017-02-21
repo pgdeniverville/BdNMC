@@ -54,6 +54,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
     double prob = decay_probability(time1, time2, Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)));
     double u = Random::Flat(0,1);
     if(prob>u*pMax){
+        Parentit->EVENT_SET=true;
         //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
         if(prob>pMax){
             pMax=prob;
@@ -64,7 +65,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         
         double br_chan = Random::Flat(0,1);
         unsigned i;
-        
+
         for(i = 0; i<Branching_Ratios.size();i++){
             if(br_chan<Branching_Ratios[i])
                 break;
@@ -74,8 +75,8 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         if(Final_States[i].size() == 2){
             Particle daughter1(Final_States[i][0]);
             Particle daughter2(Final_States[i][1]);
-            
-
+            daughter1.EVENT_SET=true;            
+            daughter2.EVENT_SET=true;
             TwoBodyDecay(*Parentit, daughter1, daughter2);
 
             partlist.insert(std::next(Parentit),daughter1);
@@ -83,7 +84,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         }
         else{
             Particle product(*Parentit);
-
+            product.EVENT_SET=true;
             product.name = Channel_Name[i];
             
             partlist.insert(std::next(Parentit),product);
