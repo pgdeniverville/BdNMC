@@ -333,6 +333,14 @@ int main(int argc, char* argv[]){
 			Vnum *= DMGen->BranchingRatio();
 
 		}
+        else if(prodchoice=="piminus_capture"){
+            PartDist = std::shared_ptr<Distribution>(new DoNothingDist());
+            if(proddist!=""){
+                cerr << "No production distribution supported for piminus_capture";
+            }
+			DMGen = std::shared_ptr<DMGenerator>(new piminus_capture_gen(mv,mdm,kappa,alD));
+            Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+        }
 		else{
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
 			return -1;

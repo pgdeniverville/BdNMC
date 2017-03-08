@@ -150,7 +150,7 @@ class Pion_Inelastic: public Scatter{
 		Pion_Inelastic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax,int final_state=0);
 		~Pion_Inelastic(){}
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
-		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM,Particle &pion, Particle &Delta,Particle &nucleon);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);

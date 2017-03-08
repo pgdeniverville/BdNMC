@@ -554,8 +554,8 @@ def execute_miniboone_parallel(genlist=True):
         #miniboone_baryonic_eval(marr,det_switch="miniboone")
         #for chan in channs:
         #    miniboone_eval(marr,signal_channel="NCE_nucleon",det_switch="miniboone",channels=[chan],sumlog="Events/miniboone_split.dat")
-        #miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
-        miniboone_eval(marr,signal_channel="Inelastic_Delta_to_Gamma",det_switch="miniboone")
+        miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
+        #miniboone_eval(marr,signal_channel="Inelastic_Delta_to_Gamma",det_switch="miniboone")
         #miniboone_eval(marr,signal_channel="NCE_electron",det_switch="miniboone")
         #miniboone_eval(marr,signal_channel="NCE_nucleon",det_switch="sbnd")
         #miniboone_baryonic_eval(marr,det_switch="miniboone")

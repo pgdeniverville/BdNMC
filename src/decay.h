@@ -9,6 +9,9 @@
  * decay kinematics.
  */
 
+void Link_Particles(Particle &, Particle &);
+void Link_Particles_Immediate(Particle &, Particle &);
+
 void DecayDP (Particle &, Particle &);
 void DecayDM (Particle &, Particle &, Particle &, Particle &);
 void DecayDM_Off_Shell(Particle &daughter1, Particle &daughter2, Particle &mediato, Particle &parent, double theta);
