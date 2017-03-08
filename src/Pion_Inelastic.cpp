@@ -228,6 +228,9 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, list<Particle>&
         Link_Particles_Immediate(Delta, Nucleon);
         Particle DMout(DMit->m);
         DMout.name = "Recoil_DM";
+        DMout.ThreeMomentum(DMit->px-Delta.px,DMit->pz-Delta.pz,DMit->pz-Delta.pz);
+        
+        //Insert in reverse display order.
         partlist.insert(std::next(DMit),pion);
         partlist.insert(std::next(DMit),Nucleon);
         partlist.insert(std::next(DMit),Delta);

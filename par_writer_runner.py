@@ -226,7 +226,7 @@ def miniboone_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay},sign
             print("SBND RUN IN PROGRESS")
             write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0,max_scatter_energy=1000.0,partlistfile=partlistfile,outfile=parfile,signal_chan="Pion_Inelastic",sumlog="Events/pion_inelastic_sbnd.dat")
         else:
-            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,samplesize=10000,min_scatter_energy=0,max_scatter_energy=10.0,partlistfile=partlistfile,outfile=parfile,signal_chan="Pion_Inelastic",sumlog="Events/miniboone_pion_test.dat",alpha_D=alpha_D)
+            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,output_mode="comprehensive",outlog="Events/miniboone_testing.dat",proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0,max_scatter_energy=10.0,partlistfile=partlistfile,outfile=parfile,signal_chan="Pion_Inelastic",sumlog="Events/miniboone_pion_test.dat",alpha_D=alpha_D)
     elif signal_channel=="Inelastic_Delta_to_Gamma":
         if det_switch == "sbnd":
             print("SBND RUN")
@@ -545,7 +545,7 @@ def execute_miniboone_parallel(genlist=True):
     #    if i not in massarr2:
     #        massarr2.append(i)
     #massarr=massarr2
-    massarr=[[10,80]]
+    massarr=[[80,10]]
     print(massarr)
     #channs={_parton,_brem,_pion_decay,_eta_decay}
     #pool=Pool(processes=3)
@@ -678,7 +678,7 @@ def execute_t2k_parallel(genlist=True):
     #pool.map(ship_eval,massarr)
 
 #execute_t2k_parallel(genlist=True)
-#execute_miniboone_parallel(genlist=False)
-execute_miniboone_numi_p(genlist=False)
+execute_miniboone_parallel(genlist=False)
+#execute_miniboone_numi_p(genlist=False)
 #execute_ship_parallel(genlist=True)
 #execute_lsnd_parallel(genlist=True)
