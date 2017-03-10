@@ -37,7 +37,7 @@ beam_energy 8.9
 
 #Production Parameters
 #Currently pi0_decay,  eta_decay, V_decay and phi_decay, are supported. 
-#For baryonic, we support pi0_decay_baryonic, eta_decay_baryonic, V_decay_baryonic, phi_decay_baryonic,
+#For baryonic, we support pi0_decay_baryonic, eta_decay_baryonic, V_decay_baryonic, phi_decay_baryonic, piminus_capture
 production_channel pi0_decay
 
 #Choosing a production distribution is optional, but it must be grouped with the relevant production_channel entry 
@@ -89,6 +89,10 @@ production_distribution pi0_sanfordwang
 #Choose from NCE_nucleon, NCE_electron, Pion_Inelastic, Inelastic_Delta_to_Gamma or NCE_nucleon_baryonic.
 signal_channel NCE_nucleon
 #scatter_dist_filename Source/data/DIS.dat
+
+#Add this line to use coherent scattering rather than incoherent scattering.
+#coherent true
+
 
 ########
 #OUPTUT#
