@@ -56,6 +56,27 @@ Nucleon_Scatter::Nucleon_Scatter(double Emini, double Emaxi, double Eresi, doubl
     }
 }
 
+void Nucleon_Scatter::cross_gen_handler(std::function<double(double)> fp, std::function<double(double)> fplim, std::vector<double> &cross_vec, std::vector<double> &cross_vec_maxima, double iter, double m1, const double m2){ 
+    
+    double sigmatot=DoubleExponential_adapt(fp,scatmin(iter,m1,m2),scatmax(iter),100,0.1,1e-3);
+	
+    //Build an array of integrated scattering cross sections.
+	cross_vec.push_back(sigmatot);
+	
+    if(sigmatot==0){
+        //If sigma is zero it is unlikely to have a maximum.
+	    cross_vec_maxima.push_back(0);
+	}
+	else{
+        double a=scatmin(iter,m1,m2);
+        double b=scatmax(iter);
+        double c=mnbrak(a,b,fplim);
+        double xmin=0;
+        cross_vec_maxima.push_back(-1.0*golden(a,b,c,fplim,tol_frac,tol_abs,xmin));
+    }
+}
+
+
 void Nucleon_Scatter::generate_cross_sections(){
 	std::vector<double> vec_proton_maxima;
 	std::vector<double> vec_neutron_maxima;
@@ -63,26 +84,16 @@ void Nucleon_Scatter::generate_cross_sections(){
 	std::vector<double> vec_neutron;
 
 //	double emax; double emin;
-	double a,b,c,xmin;
     for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
-		std::function<double(double)> fp = std::bind(dsig_prot,iter,_1,mdm,MDP,alD,kap);
+		
+        //Proton
+        std::function<double(double)> fp = std::bind(dsig_prot,iter,_1,mdm,MDP,alD,kap);
 		std::function<double(double)> fplim = std::bind(lim_func_wrapper,_1,0.0,fp,scatmin(iter,mdm,mp),scatmax(iter));	
-		vec_proton.push_back(DoubleExponential_adapt(fp,scatmin(iter,mdm,mp),scatmax(iter),50,0.1,1e-2));
-		a=scatmin(iter,mdm,mp);
-		b=scatmax(iter);
-		c=mnbrak(a,b,fplim);
-		xmin=0;
-		vec_proton_maxima.push_back(-1.0*golden(a,b,c,fplim,tol_frac,tol_abs,xmin));
-		//cout << vec_proton.back()*convGeV2cm2 << endl;
-
+	    cross_gen_handler(fp, fplim, vec_proton, vec_proton_maxima,iter,mdm,mp);
+        //Neutron
 		std::function<double(double)> fn = std::bind(dsig_neut,iter,_1,mdm,MDP,alD,kap);
         std::function<double(double)> fnlim = std::bind(lim_func_wrapper,_1,0.0,fn,scatmin(iter,mdm,mn),scatmax(iter));	
-		vec_neutron.push_back(DoubleExponential_adapt(fn,scatmin(iter,mdm,mn),scatmax(iter),50,0.1,1e-2));
-		a=scatmin(iter,mdm,mn);
-		b=scatmax(iter);
-		c=mnbrak(a,b,fnlim);
-		xmin=0;
-		vec_neutron_maxima.push_back(-1.0*golden(a,b,c,fnlim,tol_frac,tol_abs,xmin));
+	    cross_gen_handler(fn, fnlim, vec_neutron, vec_neutron_maxima,iter,mdm,mn);
 		//cout << iter << " " << vec_proton.back() << endl; 
 		//cout << "scatmin and max = " << scatmin(iter,mdm,mp) << " " << scatmax(iter) << endl;
     }
@@ -95,22 +106,14 @@ void Nucleon_Scatter::generate_cross_sections(){
 
 void Nucleon_Scatter::generate_coherent_cross_sections(std::shared_ptr<detector>& det){
     cout << "Generating Coherent Cross Sections\n";
-    for(int i =0; i!=det->mat_num(); i++){
+    for(unsigned i =0; i!=det->mat_num(); i++){
         std::vector<double> vec_atom_maxima;
         std::vector<double> vec_atom;
         double mass=det->M(i);
-        double a,b,c,xmin;
         for(double iter=Edmmin; iter<=Edmmax; iter+=Edmres){
 		    std::function<double(double)> fa = std::bind(dsig_cohp,iter,_1,mdm,MDP,alD,kap,det->PN(i)+det->NN(i),det->PN(i));
 		    std::function<double(double)> falim = std::bind(lim_func_wrapper,_1,0.0,fa,scatmin(iter,mdm,mass),scatmax(iter));	
-		    double sig = DoubleExponential_adapt(fa,scatmin(iter,mdm,mass),scatmax(iter),50,0.1,1e-2);
-            vec_atom.push_back(sig);
-            //cout << "iter= " << iter << " scatmin= " << scatmin(iter,mdm,mass) << " scatmax= " << scatmax(iter)  << " sig= " << sig << endl;
-		    a=scatmin(iter,mdm,mass);
-		    b=scatmax(iter);
-		    c=mnbrak(a,b,falim);
-		    xmin=0;
-		    vec_atom_maxima.push_back(-1.0*golden(a,b,c,falim,tol_frac,tol_abs,xmin));
+	        cross_gen_handler(fa, falim, vec_atom, vec_atom_maxima,iter,mdm,mass);
         }
         atom_maxima.push_back(Linear_Interpolation(vec_atom_maxima,Edmmin,Edmmax));
         atom_cross.push_back(Linear_Interpolation(vec_atom,Edmmin,Edmmax));
@@ -125,7 +128,7 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM){
     
     if(coherent){
        //cout << "Coherent\n";
-        for(int i=0; i<det->mat_num(); i++){
+        for(unsigned i=0; i<det->mat_num(); i++){
            //cout << "Iterating\n";
             XDM +=atom_cross[i].Interpolate(DM.E)
                 *(det->get_nDensity(i));

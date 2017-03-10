@@ -88,6 +88,9 @@ class Nucleon_Scatter: public Scatter{
 		void generate_cross_sections();
 		void generate_coherent_cross_sections(std::shared_ptr<detector>& det);
          
+        void cross_gen_handler(std::function<double(double)> fp, std::function<double(double)> fplim,
+                std::vector<double> &cross_vec, std::vector<double> &cross_vec_maxima,
+                double iter, double m1, const double m2); 
 };
 
 
