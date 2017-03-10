@@ -9,6 +9,7 @@ _eta_decay=2
 _rho_decay=3
 _parton=4
 _brem=5
+_piminus_cap=6
 
 #write_miniboone(mdm=0.005,mv=0.4,proddist=["","","proton_brem"],prod_chan=["pi0_decay","eta_decay","V_decay"],partlistfile=["","",""])
 rho_decay_switch=False
@@ -678,7 +679,7 @@ def execute_t2k_parallel(genlist=True):
     #pool.map(ship_eval,massarr)
 
 #execute_t2k_parallel(genlist=True)
-execute_miniboone_parallel(genlist=False)
+#execute_miniboone_parallel(genlist=False)
 #execute_miniboone_numi_p(genlist=False)
 #execute_ship_parallel(genlist=True)
 #execute_lsnd_parallel(genlist=True)

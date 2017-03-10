@@ -19,6 +19,7 @@ class Linear_Interpolation{
 		Linear_Interpolation(){xmin=0; xmax=0;}
         Linear_Interpolation(const Linear_Interpolation &);
         Linear_Interpolation& operator=(const Linear_Interpolation&);
+        double operator()(double x){return Interpolate(x);}
         ~Linear_Interpolation(){};
         double Interpolate(double Xval);
     private:

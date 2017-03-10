@@ -51,7 +51,8 @@ class Scatter{
 
 class Nucleon_Scatter: public Scatter{
 	public:
-		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax, const bool cohere=false, std::shared_ptr<detector> det = nullptr);
+		//Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax, std::string model);
+		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax, std::string model, const bool cohere, std::shared_ptr<detector> det);
 		~Nucleon_Scatter(){}
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
@@ -74,6 +75,10 @@ class Nucleon_Scatter: public Scatter{
 		Linear_Interpolation proton_cross;
 		Linear_Interpolation neutron_cross;
        
+        //Function pointers to cross section functions!
+        double (*dsig_prot)(double, double, double, double, double, double);
+        double (*dsig_neut)(double, double, double, double, double, double);
+        double (*dsig_cohp)(double, double, double, double, double, double, double, double);
 
         //Coherent Variables
         std::vector<Linear_Interpolation> atom_maxima;
@@ -82,7 +87,7 @@ class Nucleon_Scatter: public Scatter{
         void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void generate_cross_sections();
 		void generate_coherent_cross_sections(std::shared_ptr<detector>& det);
-        
+         
 };
 
 
@@ -104,7 +109,7 @@ class Inelastic_Nucleon_Scatter: public Scatter{
 		std::string channel_name;
 		double E_min, E_max;
 };
-
+/*Deprecated!
 class Nucleon_Scatter_Baryonic: public Scatter{
 	public:
 		Nucleon_Scatter_Baryonic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
@@ -127,7 +132,7 @@ class Nucleon_Scatter_Baryonic: public Scatter{
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void generate_cross_sections();
 };
-
+*/
 class Electron_Scatter: public Scatter{
 	public:
 		Electron_Scatter(double MDM, double MV, double alphaprime, double kappa, double eEmin, double eEmax);
