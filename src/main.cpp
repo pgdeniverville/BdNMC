@@ -333,6 +333,14 @@ int main(int argc, char* argv[]){
 			Vnum *= DMGen->BranchingRatio();
 
 		}
+        else if(prodchoice=="piminus_capture"){
+            PartDist = std::shared_ptr<Distribution>(new DoNothingDist());
+            if(proddist!="default"){
+                cerr << "No production distribution supported for piminus_capture";
+            }
+			DMGen = std::shared_ptr<DMGenerator>(new piminus_capture_gen(mv,mdm,kappa,alD));
+            Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+        }
 		else{
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
 			return -1;
@@ -391,10 +399,11 @@ int main(int argc, char* argv[]){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
 	}
 	else if(sigchoice=="NCE_nucleon"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));	
+        SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Kinetic_V",par->Coherent(),det));	
 	}
+    //Eventually these won't have to be separate channels, they'll just check the model!
 	else if(sigchoice=="NCE_nucleon_baryonic"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter_Baryonic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
+		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Baryonic_V",par->Coherent(),det));
 	}
 	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Inelastic_Delta_to_Gamma"){
 		//I might need some checking for allowed energies.
@@ -466,7 +475,7 @@ int main(int argc, char* argv[]){
 	double BURN_MAX = par->Burn_In();
 	double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0; i<chan_count; i++){
-   		int nburn = 0;
+        int nburn = 0;
 		if(Vnum_list[i]==0){
 			cout << "Skipping Channel " << i+1 << ", no events expected.\n";
 			continue;
@@ -475,7 +484,7 @@ int main(int argc, char* argv[]){
 			cout << "Begin Channel " << i+1 << " Burn-In" << endl;
 		}
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
-			list<Particle> vecburn;
+            list<Particle> vecburn;
 			Particle dist_part (0);
 			//dist_part.report(std::cout);
 			PartDist_list[i]->Sample_Particle(dist_part);

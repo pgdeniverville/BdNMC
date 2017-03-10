@@ -7,6 +7,8 @@
 #include <locale>
 #include "constants.h"
 
+#include "parameter_keys.h"
+
 using std::exception;
 using std::string;
 using std::map;
@@ -14,54 +16,6 @@ using std::cout; using std::cerr;
 using std::endl;
 using std::vector;
 using std::list;
-
-const string beam_energy_key = "beam_energy";
-const string max_dm_energy_key = "max_dm_energy";
-const string dm_energy_res_key = "dm_energy_resolution";
-const string min_scatter_energy_key = "min_scatter_energy";
-const string max_scatter_energy_key = "max_scatter_energy";
-const string angle_lower_limit_key = "min_scatter_angle";
-const string angle_upper_limit_key = "max_scatter_angle";
-const string timing_key = "timing_cut";
-const string scatter_dist_filename_key = "scatter_dist_filename";
-
-const string production_distribution_key = "production_distribution";
-const string particle_list_file_key = "particle_list_file";
-const string prodkey = "production_channel";
-const string meson_per_pi0_key = "meson_per_pi0";
-const string parton_V_neutron_file_key = "parton_V_neutron_file";
-const string parton_V_proton_file_key = "parton_V_proton_file";
-const string sanford_wang_key = "sanfordwang_file";
-const string distribution_parameter_key = "distribution_parameter_file";
-const string ptmax_key = "ptmax";
-const string zmin_key = "zmin";
-const string zmax_key = "zmax";
-const string part_list_pos_key = "particle_list_position";
-
-const string dist_mod_key = "dist_mod";
-const string pos_offset_key = "position_offset";
-
-const string detkey = "detector";
-const string dmkey = "dark_matter_mass";
-const string Vkey = "dark_photon_mass";
-const string epskey = "epsilon";
-const string alkey = "alpha_D";
-const string signalkey = "signal_channel";
-const string outkey = "output_file";
-const string sumkey = "summary_file";
-const string output_mode_key = "output_mode"; const string out_mode_def = "comprehensive";
-const string efficiency_key = "efficiency";
-const string POTkey = "POT";
-const string pi0_ratio_key = "pi0_per_POT";
-const string burn_in_key = "burn_max";
-const string burn_timeout_key = "burn_timeout";
-const string repeat_key = "repeat_count";
-const string max_trials_key = "max_trials";
-const string seed_key = "seed";
-const string p_cross_key = "proton_target_cross_section";
-vector<string> spherearr = {"radius","x-position","y-position","z-position"};
-vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};
-const string run_key = "run";
 
 //All defaults should be stored here at some point.
 
@@ -403,6 +357,7 @@ Parameter::Parameter(std::ifstream &instream){
             cerr << "No signal channel selected\n";
             integrity=-1;
         }
+        Set_Bool(coherent_key, coherent, keymap, false); 
 		Set_String(output_mode_key, output_mode, keymap, out_mode_def);	
 		Set_String(run_key, run_name, keymap, std::to_string(time(NULL)));	
 		for(list<production_channel>::iterator iter = prodlist->begin(); iter!=prodlist->end(); iter++)
@@ -521,6 +476,23 @@ void Parameter::Build_Detector(map<string, string> &keymap){
         }
     
 }//end of Parameter::Build_Detector
+
+void Parameter::Set_Bool(const string &key, bool &var, map<string, string> &keymap, const bool &def){
+    try{
+        if(keymap.count(key)==1){
+            if(keymap[key]=="true"){
+               var = true; 
+            }
+        }
+        else{
+            var = def;
+        }
+    }
+    catch(exception& e){
+            cerr << "Invalid model parameter: " << key << endl;
+            integrity = -1;
+    }
+}
 
 //These should be replaced with a single overloaded function.
 void Parameter::Set_Double(const string &key, double &var, map<string, string> &keymap){

@@ -219,9 +219,22 @@ This might not be a pion anymore if final_state==1, but it probably will be.
 bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
     Particle pion(final_mass);
     pion.name = final_name;
-    if(probscatter(det, *DMit, pion)&&(min_angle<=0||pion.Theta()>min_angle)&&(max_angle>2*pi||pion.Theta()<max_angle)&&(pion.Kinetic_Energy()>Escatmin)&&(pion.Kinetic_Energy()<Escatmax)){
-        Generate_Position(det, *DMit, pion);
+    Particle Delta(Mdelta);
+    Delta.name = "Delta";
+    Particle Nucleon(0);
+    if(probscatter(det, *DMit, pion, Delta, Nucleon)&&(min_angle<=0||pion.Theta()>min_angle)&&(max_angle>2*pi||pion.Theta()<max_angle)&&(pion.Kinetic_Energy()>Escatmin)&&(pion.Kinetic_Energy()<Escatmax)){
+        Generate_Position(det, *DMit, Delta);
+        Link_Particles_Immediate(Delta, pion);
+        Link_Particles_Immediate(Delta, Nucleon);
+        Particle DMout(DMit->m);
+        DMout.name = "Recoil_DM";
+        DMout.ThreeMomentum(DMit->px-Delta.px,DMit->pz-Delta.pz,DMit->pz-Delta.pz);
+        
+        //Insert in reverse display order.
         partlist.insert(std::next(DMit),pion);
+        partlist.insert(std::next(DMit),Nucleon);
+        partlist.insert(std::next(DMit),Delta);
+        partlist.insert(std::next(DMit),DMout);
         return true;
     }
     return false;
@@ -253,15 +266,14 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM){
 Scatters a DM particle off a detector nucleon. Stores the outgoing pion in &pion.
 */
 
-bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &pion){ 
+bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &pion, Particle &Delta, Particle &Nucleon){ 
 	if(DM.E<Edmmin)
         return false;
     double LXDet = convmcm*(det->Ldet(DM));
     double XDMp = proton_cross->Interpolate(DM.E)*(det->PNtot());
     double XDMn = neutron_cross->Interpolate(DM.E)*(det->NNtot());
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
-    Particle Delta(Mdelta);
-    Delta.name = "Delta";
+
     if(prob > pMax*Random::Flat(0,1)){
         if(prob > pMax)
         	pMax = prob;
@@ -275,6 +287,7 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
             Particle Proton(mp);
             Proton.name="Proton";
             TwoBodyDecay(Delta, Proton, pion);
+            Nucleon = Proton;
             //Delta.report(cout);
             //Proton.report(cout);
             //pion.report(cout);
@@ -287,6 +300,7 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
             Particle Neutron(mn);
             Neutron.name = "Neutron";
             TwoBodyDecay(Delta, Neutron, pion);
+            Nucleon = Neutron;
             //Delta.report(cout);
             //Neutron.report(cout);
             //pion.report(cout);
