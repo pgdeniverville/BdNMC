@@ -28,9 +28,6 @@ void IsotropicParticleGen(Particle &part, double Energy){
 //Off-shell equations for this code are dodgy. I need some theory input on these branching ratios.
 
 piminus_capture_gen::piminus_capture_gen(double MV, double MX, double kap, double alp){
-    for(double massv = 0.01; massv<0.16; massv+=0.01){
-        std::cout << massv << " " << brmass_to_dm_dm(0.129, massv, 0.005, kap, alp) << " " << brmasstoVgamma(0.129,massv,0.005,kap,alp)*brV_to_dm_dm(massv, 0.005, kap, alp) << std::endl; 
-    }
     set_model_params(MV, MX, kap, alp);
     chan_name="Piminus_capture";
 }
