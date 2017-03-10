@@ -57,7 +57,8 @@ def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True
         write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-4,dm_energy_resolution=0.01,sumlog="Events/sbnd_y4.dat",output_mode="summary",zmin=zmin,zmax=zmax)
     else:
         #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,samplesize=1000,eps=0,alpha_D=1e-5,signal_chan="NCE_nucleon_baryonic",sumlog="Events/summary_baryonic_test.dat",output_mode="summary",outlog="Events/mini_baryonic_{}_{}.dat".format(MV,MX),det=miniboone_detector_full,efficiency=1)
-        #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-5,dm_energy_resolution=0.01,sumlog="Events/miniboone_baryonic_y.dat",output_mode="summary",zmin=zmin,zmax=zmax)
+        write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-5,dm_energy_resolution=0.01,sumlog="Events/miniboone_baryonic_y.dat",output_mode="summary",zmin=zmin,zmax=zmax)
+        '''
         write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,\
         prod_chan=prodchan,partlistfile=partlistfile,\
         min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,\
@@ -65,6 +66,7 @@ def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True
         sumlog="Events_fit/summary_baryonic.dat",output_mode="comprehensive",\
         outlog="Events_fit/mini_baryonic_{}_{}.dat".format(MV,MX),\
         det=miniboone_detector_full,efficiency=1,zmin=zmin,zmax=zmax)
+    '''
     subp.call(["./build/main", parfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -225,7 +227,7 @@ def miniboone_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay},sign
             print("SBND RUN IN PROGRESS")
             write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog="Events/sbnd_y.dat",zmin=zmin,zmax=zmax,alpha_D=alpha_D)
         else:
-            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0,max_scatter_energy=8,alpha_D=alpha_D,eps=1e-3,efficiency=1,det=miniboone_detector,output_mode="summary",outlog="Events/miniboone_events.dat")
+            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0.035,max_scatter_energy=2,alpha_D=alpha_D,eps=1e-3,efficiency=1,det=miniboone_detector,output_mode="summary",outlog="Events/miniboone_events.dat")
             #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0.035,max_scatter_energy=2,alpha_D=alpha_D,eps=1e-3,efficiency=0.35,det=miniboone_detector,output_mode="summary",outlog="Events/miniboone_events.dat")
             #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,samplesize=40000,signal_chan="NCE_nucleon",sumlog="Events3/summary.dat",efficiency=1.0,output_mode="comprehensive",outlog="Events3/mini_{}_{}.dat".format(MV,MX),det=miniboone_detector_full)
     elif signal_channel=="Pion_Inelastic":
@@ -537,9 +539,9 @@ def execute_miniboone_parallel(genlist=True):
     #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000]+[3,5,7,9]
     #chimassarr=[i for i in range(10,270,10)]+[i for i in range(270,560,20)]+[132,134,136]+[1,5]
     #This is for the 2016 paper.
-    chimassarr=[i for i in range(10,270,5)]+[i for i in range(270,501,10)]+[1,2,3,4,5,6,7,8,9,11,12,13,14]+[770/3.0,772/3.0,768/3.0,762/3.0,778/3.0]
+    #chimassarr=[i for i in range(10,270,5)]+[i for i in range(270,501,10)]+[1,2,3,4,5,6,7,8,9,11,12,13,14]+[770/3.0,772/3.0,768/3.0,762/3.0,778/3.0]
     #chimassarr=[i for i in range(525,700,25)]
-    massarr=[[3*MX,MX] for MX in chimassarr]
+    #massarr=[[3*MX,MX] for MX in chimassarr]
     #chimassarr=[5*i for i in range(13)]+[10*i+65 for i in range(20)]
     #vmassarr=[10*i for i in range(13)]+[20*i+130 for i in range(21)]+[540,135]
     #massarr=np.array([[MV,MX] for MV in vmassarr for MX in chimassarr])
@@ -557,6 +559,7 @@ def execute_miniboone_parallel(genlist=True):
     #        massarr2.append(i)
     #massarr=massarr2
     #massarr=[[80,10],[150,10],[300,40]]
+    massarr=[[80,10]]
     print(massarr)
     #channs={_parton,_brem,_pion_decay,_eta_decay}
     #pool=Pool(processes=3)
@@ -565,11 +568,11 @@ def execute_miniboone_parallel(genlist=True):
         #miniboone_baryonic_eval(marr,det_switch="miniboone")
         #for chan in channs:
         #    miniboone_eval(marr,signal_channel="NCE_nucleon",det_switch="miniboone",channels=[chan],sumlog="Events/miniboone_split.dat")
-        miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="sbnd")
+        #miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="sbnd")
         #miniboone_eval(marr,signal_channel="Inelastic_Delta_to_Gamma",det_switch="miniboone")
-        miniboone_eval(marr,signal_channel="NCE_electron",det_switch="sbnd")
-        miniboone_eval(marr,signal_channel="NCE_nucleon",det_switch="sbnd")
-        #miniboone_baryonic_eval(marr,det_switch="miniboone")
+        #miniboone_eval(marr,signal_channel="NCE_electron",det_switch="sbnd")
+        miniboone_eval(marr,signal_channel="NCE_nucleon",det_switch="miniboone")
+        miniboone_baryonic_eval(marr,det_switch="miniboone")
         #if len(sys.argv)>1 and sys.argv[1]=="b":
 
         #else:
