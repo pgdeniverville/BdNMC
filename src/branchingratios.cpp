@@ -91,7 +91,7 @@ double brphi_to_V(double mv, double mx, double kappa, double alphaD){
 double brmasstoVgamma(double mass, double mv, double mx, double kappa, double alphaD){
     if(mv>mass)
         return 0;
-    return 2*pow(kappa,2)*pow(1-mv*mv/pow(mass,2),0.5);//scaling less dubious
+    return 2*pow(kappa,2)*pow(1-mv*mv/pow(mass,2),3);//scaling less dubious
 }
 
 double GammaV(double mv, double mx, double kappa, double alphaD){
