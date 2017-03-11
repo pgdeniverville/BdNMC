@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-//std::ofstream datalog("piminuslog.dat", std::ios::out);
+std::ofstream datalog("piminuslog.dat", std::ios::out);
 
 const double mass = 0.129;//From MacDonald et al. 1976. Need to implement a six percent spread.
 //const double pi = 3.14159;
@@ -16,7 +16,8 @@ void IsotropicParticleGen(Particle &part, double Energy){
     double theta = acos(Random::Flat(-1,1));
     double phi = Random::Flat(0,1)*2*pi;
     double mom;
-                    
+    //datalog << "Isotropic Report\n";
+    //part.report(datalog);
     if(Energy < part.m)
         mom=0;
     else
@@ -76,8 +77,7 @@ bool piminus_capture_gen::GenDM(std::list<Particle>& vec, std::function<double(P
     darkmatter1.name = "DM";
     Particle darkmatter2(mx);
     darkmatter2.name = "DM";
-
-
+    
     if(OFF_SHELL){
         double s, theta;//theta is the angle relative to the gamma in the V* rest frame
         sample_dist(s, theta);
@@ -89,13 +89,17 @@ bool piminus_capture_gen::GenDM(std::list<Particle>& vec, std::function<double(P
         IsotropicParticleGen(darkphoton,mass);
         TwoBodyDecay(darkphoton, darkmatter1, darkmatter2);
     }
-   
+    //darkphoton.report(datalog);
+    //darkmatter1.report(datalog);
+    //darkmatter2.report(datalog);
     vec.push_back(darkphoton);
     if((intersect1=det_int(darkmatter1))>0 || (intersect2=det_int(darkmatter2))>0){
         if(intersect1>0){
+            //datalog << "DM1 hit\n";
             vec.push_back(darkmatter1);
         }
         if(intersect2>0){
+            //datalog << "DM2 hit\n";
             vec.push_back(darkmatter2);
         }
         //darkphoton.report(datalog);

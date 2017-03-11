@@ -43,7 +43,7 @@ Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutro
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 
-Sodium_Iodide_String = "material Sodium\nnumber_density 1.58e23\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e23\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
+Sodium_Iodide_string = "material Sodium\nnumber_density 1.58e22\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
 
 def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9,
         n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1,inelastic_dist="data/DIS.dat",coherent='false'):
