@@ -76,6 +76,7 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 */
+
 	using namespace std::placeholders;
     string parameter_file;
 
@@ -453,7 +454,8 @@ int main(int argc, char* argv[]){
 		cout << "Branching Ratio "  << i+1 << " = " << DMGen_list[i]->BranchingRatio() << endl;
 	   	cout <<	"V's produced in channel " << i+1 << " = " << Vnum_list[i] << endl;
 	}
-	cout << "Signal Chanel = " << sigchoice << endl;
+	
+    cout << "Signal Chanel = " << sigchoice << endl;
  	cout << "Beam Energy = " << beam_energy << " GeV" << endl;
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
 	cout << "Minimum Scattering Energy = " << min_scatter_energy << " GeV" <<  endl;
@@ -473,7 +475,13 @@ int main(int argc, char* argv[]){
 	////////////////////
 
 	double BURN_MAX = par->Burn_In();
-	double BURN_OVERRIDE = par->Burn_Timeout();
+	
+    if(outmode=="dm_detector_mode"){
+        BURN_MAX = 0;
+        cout << "Detector_Mode selected.\nSkipping Burn-In.";
+    }
+    
+    double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0; i<chan_count; i++){
         int nburn = 0;
 		if(Vnum_list[i]==0){
@@ -511,9 +519,10 @@ int main(int argc, char* argv[]){
  	///////////////////
     cout << "Run " << par->Run_Name()  << " Start" << endl;
 
-    if(outmode=="comprehensive")
+    if(outmode=="comprehensive"){
 		*comprehensive_out << "Run " << par->Run_Name() << endl;
-			
+    }	
+
     int trials = 0;
     vector<long> trials_list(chan_count,0);
 	vector<int> scat_list(chan_count,0);
@@ -549,7 +558,8 @@ int main(int argc, char* argv[]){
                 if(iter->name.compare("DM")==0){
 					NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
-						iter->report(*comprehensive_out);
+                        *comprehensive_out << DMGen_list[i]->Channel_Name() << " ";
+                        iter->report(*comprehensive_out);
 						scatter_switch=true;
 						continue;
 					}
@@ -574,13 +584,14 @@ int main(int argc, char* argv[]){
 		else if(scatter_switch)
 			++nevent;
     } 
-	cout << "Run complete\n";
+	
+    cout << "Run complete\n";
 
 
-
-
-	if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
+	if(outmode=="summary"||outmode=="dm_detector_distribution"
+            ||outmode=="comprehensive"){
 		*summary_out << "Run " << par->Run_Name() << endl;
+    }
 
 	vector<double> signal_list(chan_count,0.0);	
  	double signal = 0.0;
@@ -595,15 +606,24 @@ int main(int argc, char* argv[]){
 		scattot+=scat_list[i];
   		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
 		cout << " Timing_Efficiency: " << timing_efficiency[i]/scat_list[i] << " ";
-		cout << "Scatterings: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
-		if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-			*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
-		NDM+=NDM_list[i]; 
-		signal+=signal_list[i];
- 	}
-	if(outmode=="summary"||outmode=="dm_detector_distribution"||outmode=="comprehensive")
-		*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+		cout << "Scatterings: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;
+		
+        
+        if(outmode=="summary"||outmode=="dm_detector_distribution"||
+                    outmode=="comprehensive"){
+            *summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
+            NDM+=NDM_list[i]; 
+            signal+=signal_list[i];
+        }
+    }
 
+
+    if(outmode=="summary"||outmode=="comprehensive"){
+        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+    }
+    else if(outmode=="dm_detector_distribution"){
+        *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << endl;
+    }
 
 	//cout << scattot/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency() << endl;
     summary_out->close();
@@ -624,7 +644,7 @@ int main(int argc, char* argv[]){
 	for(int i=0; i<chan_count;i++)
 		cout << "Predicted number of signal events from channel " << i+1 << " " << DMGen_list[i]->Channel_Name()  <<  " = "  << signal_list[i] << endl;
 	
-	if(outmode=="comprehensive"||outmode=="dm_detector_dist"){
+	if(outmode=="comprehensive"||outmode=="dm_detector_distribution"){
 		cout << "--------------------" << endl;	
 		cout << "Events stored in file " << output_filename << endl;	
 		cout << "--------------------" << endl;

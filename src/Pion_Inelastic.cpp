@@ -44,7 +44,8 @@ double Pion_Inelastic::Ermin(double E, double mx, double MN){
 }
 
 double Pion_Inelastic::Er_to_theta(double Ex, double EDelta, double mx, double MN){
-    return acos((-pow(Mdelta,2) + 2*Ex*(EDelta - MN) + 2*EDelta*MN - pow(MN,2))/(2.*sqrt((EDelta - Mdelta)*(EDelta + Mdelta))*sqrt((Ex - mx)*(Ex + mx))));
+    //cout << "Ex=" << Ex << " EDelta=" << EDelta << " MN=" << MN << " Bot=" << (2*sqrt(EDelta*EDelta-Mdelta*Mdelta)*sqrt(Ex*Ex-mx*mx)) << " theta=" << acos((2*EDelta*MN+2*EDelta*Ex-2*Ex*mn-Mdelta*Mdelta-mn*mn)/(2*sqrt(EDelta*EDelta-Mdelta*Mdelta)*sqrt(Ex*Ex-mx*mx))) << endl; 
+    return acos((2*EDelta*MN+2*EDelta*Ex-2*Ex*mn-Mdelta*Mdelta-mn*mn)/(2*sqrt(EDelta*EDelta-Mdelta*Mdelta)*sqrt(Ex*Ex-mx*mx)));
 }
 /*
 En: Incident DM energy
@@ -81,6 +82,7 @@ double Pion_Inelastic::GM(double q2){
     return form_factor->Interpolate(q2);
 }
 
+//Minimum total energy for a DM particle to produce a Delta
 double Edm_kinetic_min(double mx, double mN){
     return (pow(Mdelta,2)+2*Mdelta*mx-mN*mN)/(2*mN);
 }
@@ -106,7 +108,7 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
     }
     MAX_Q2_WARNING = false;
     Edmmin=std::max(Emini,std::max(Edm_kinetic_min(MDM, mn),Edm_kinetic_min(MDM, mp))); Edmmax=Emaxi; Edmres=Eresi;
-	Escatmin=NEmin;
+    Escatmin=NEmin;
 	Escatmax=NEmax;
 	//std::cout << Edmmax << " " << Edmmin << endl;
     form_factor = shared_ptr<Linear_Interpolation>();
@@ -254,8 +256,9 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM){
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
 	//std::cout << DM.E << " " << XDMp << " " << XDMn << " " << prob << " " << endl;
     if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
-        	pMax = prob;
+        if(prob > pMax){
+            pMax = prob;
+        }
 		return true;
     }
     else
@@ -275,14 +278,15 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
 
     if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
-
+        }
 		if(XDMp/(XDMn+XDMp) >= Random::Flat(0,1)){
 			std::function<double(double)> Xsec = std::bind(&Pion_Inelastic::dsigma_dER_N,this,DM.E,_1,DM.m,MDP,alD,kap,mp);
 			//Not sure if this check is still necessary.
             if(Ermin(DM.E,DM.m,mp) >= Ermax(DM.E, DM.m, mp))
 				return false;
+            
             scatterevent(DM, Delta, Xsec, *proton_cross_maxima,mp);
             Particle Proton(mp);
             Proton.name="Proton";
@@ -313,14 +317,14 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
 
 void Pion_Inelastic::scatterevent (Particle &DM, Particle &Delta, std::function<double(double)> Xsec, Linear_Interpolation& Xmax, double mN){
     double Delta_E_max = Ermax(DM.E, DM.m, mN);
-    double Delta_E_min = Ermin(DM.E, DM.m, mN); 
+    double Delta_E_min = Ermin(DM.E, DM.m, mN);
 	double dsigmax = std::max(Xsec(Delta_E_min),Xmax.Interpolate(DM.E));
     double xe,thetaN,phiN,pN;
     while(true){
         xe = Random::Flat(Delta_E_min,Delta_E_max);
         //cout << "xe=" << xe << " Ermin" << Ermin(DM.E, DM.m, mN) << " Ermax " << Ermax(DM.E, DM.m, mN) << endl;
         if(Xsec(xe)/dsigmax > Random::Flat(0,1)){
-            thetaN = Er_to_theta(DM.E,xe,DM.m,Delta.m);
+            thetaN = Er_to_theta(DM.E,xe,DM.m,mN);
             //cout << "theta=" << thetaN << endl;
             phiN = Random::Flat(0,1)*2*pi;
             //pN = sqrt(pow(DM.E+mN-xe,2)-pow(Delta.m,2));

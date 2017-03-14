@@ -1,6 +1,7 @@
 from par_writer import *
 import numpy as np
 import sys
+import math
 
 import time
 
@@ -13,6 +14,16 @@ _piminus_cap=6
 
 #write_miniboone(mdm=0.005,mv=0.4,proddist=["","","proton_brem"],prod_chan=["pi0_decay","eta_decay","V_decay"],partlistfile=["","",""])
 rho_decay_switch=False
+
+_DET_XPOS = 0.0
+_DET_YPOS = 0.0
+_DET_ZPOS = 100
+def ship_detector_modular(f,xpos=_DET_XPOS,ypos=_DET_YPOS,zpos=_DET_ZPOS,radius=0.8268,length=3.34,theta=0,phi=0):
+    #def ship_detector(f,xpos=0.0,ypos=0,zpos=30.0,radius=0.655,length=2.645,theta=0,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
 
 def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_switch=True,det_switch="miniboone"):
     MV=mass_arr[0]
@@ -86,6 +97,14 @@ def ship_eval(mass_arr,signal_channel="NCE_electron"):
     parfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
     #if MX/1000.0<mpi0/2.0:
 
+    _DIST = mass_arr[2]
+    _ANGLE = mass_arr[3]
+
+    global _DET_XPOS, _DET_YPOS, _DET_ZPOS
+
+    _DET_XPOS = _DIST*math.sin(math.radians(_ANGLE))
+    _DET_YPOS = 0
+    _DET_ZPOS = _DIST*math.cos(math.radians(_ANGLE))
 
     rho_decay_switch=False
     proton_brem_switch=True
@@ -161,7 +180,14 @@ def ship_eval(mass_arr,signal_channel="NCE_electron"):
     elif signal_channel == "Inelastic_Nucleon_Scattering":
         write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="Inelastic_Nucleon_Scattering",samplesize=2000,sumlog="Events/ship_y.dat",output_mode="summary",alpha_D=alD)
     elif signal_channel=="test":
-        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",samplesize=1000000,sumlog="Events/ship_test.dat",outlog="dm_dist_{}_{}.dat".format(MV,MX),output_mode="dm_detector_distribution",alpha_D=alD,det=test_detector,min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,max_scatter_energy=400)
+        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=1000,sumlog="Claudia_Events/ship_claudia_test.dat",\
+                outlog="Claudia_Events/dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=alD,det=ship_detector_modular,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=400,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=10)
     subp.call(["./build/main", parfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -228,7 +254,7 @@ def miniboone_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay},sign
             print("SBND RUN IN PROGRESS")
             write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog="Events/sbnd_y.dat",zmin=zmin,zmax=zmax,alpha_D=alpha_D)
         else:
-            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0.035,max_scatter_energy=2,alpha_D=alpha_D,eps=1e-3,efficiency=1,det=miniboone_detector,output_mode="summary",outlog="Events/miniboone_events.dat")
+            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0.035,max_scatter_energy=2,alpha_D=alpha_D,eps=1e-3,efficiency=1,det=miniboone_detector,output_mode="comprehensive",outlog="Events/miniboone_events.dat")
             #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,samplesize=2000,signal_chan="NCE_nucleon",sumlog=sumlog,zmin=zmin,zmax=zmax,min_scatter_energy=0.035,max_scatter_energy=2,alpha_D=alpha_D,eps=1e-3,efficiency=0.35,det=miniboone_detector,output_mode="summary",outlog="Events/miniboone_events.dat")
             #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,samplesize=40000,signal_chan="NCE_nucleon",sumlog="Events3/summary.dat",efficiency=1.0,output_mode="comprehensive",outlog="Events3/mini_{}_{}.dat".format(MV,MX),det=miniboone_detector_full)
     elif signal_channel=="Pion_Inelastic":
@@ -536,20 +562,12 @@ def execute_miniboone_parallel(genlist=True):
         #write_miniboone(prod_chan=["V_decay"],proddist=["proton_brem"],samplesize=4e6,output_mode="particle_list",partlistfile=["data/particle_list_miniboone_brem.dat"])
     #chimassarr=[10]
     #vmassarr=[1,5]+[10*i for i in range(1,14)]+[10*i for i in range(15,100,2)]+[775,774,776,777,778,779,781,782,783,785,787]+[1005,1010,1015,1.02,1025,1030,1035,1050,1100,1150,1200,1300]+[i for i in range(1000,2100,250)]
-    #vmassarr=[19,21,17,15,23]
     #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000]+[3,5,7,9]
     #chimassarr=[i for i in range(10,270,10)]+[i for i in range(270,560,20)]+[132,134,136]+[1,5]
     #This is for the 2016 paper.
     #chimassarr=[i for i in range(10,270,5)]+[i for i in range(270,501,10)]+[1,2,3,4,5,6,7,8,9,11,12,13,14]+[770/3.0,772/3.0,768/3.0,762/3.0,778/3.0]
     #chimassarr=[i for i in range(525,700,25)]
     #massarr=[[3*MX,MX] for MX in chimassarr]
-    #chimassarr=[5*i for i in range(13)]+[10*i+65 for i in range(20)]
-    #vmassarr=[10*i for i in range(13)]+[20*i+130 for i in range(21)]+[540,135]
-    #massarr=np.array([[MV,MX] for MV in vmassarr for MX in chimassarr])
-    #massarr=massarr[massarr[:,0]>2*massarr[:,1]]
-    #chimassarr=[i for i in range(10,270,10)]+[132,134,136]+[1,5]
-    #massarr=[[MV,MV/6.0] for MV in vmassarr]
-    #massarr=[[100,11]]
     #for marr in massarr:
     #chimassarr=[7,8,9,10,11,12,13]
     #    miniboone_baryonic_eval(marr,det_switch="miniboone")
@@ -571,8 +589,8 @@ def execute_miniboone_parallel(genlist=True):
         #miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
         #miniboone_eval(marr,signal_channel="Inelastic_Delta_to_Gamma",det_switch="miniboone")
         #miniboone_eval(marr,signal_channel="NCE_electron",det_switch="miniboone")
-        miniboone_eval(marr,signal_channel="NCE_nucleon",det_switch="miniboone")
-        miniboone_baryonic_eval(marr,det_switch="miniboone")
+        miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
+        #miniboone_baryonic_eval(marr,det_switch="miniboone")
         #if len(sys.argv)>1 and sys.argv[1]=="b":
 
         #else:
@@ -602,21 +620,24 @@ def execute_ship_parallel(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmassarr=[i for i in range(100,1000,50)]+[775,774,776,777,778,779,781,782,783,785,787]+[1005,1010,1015,1.02,1025,1030,1035,1050,1100,1150,1200,1300]+[i for i in range(1000,4100,250)]+[390,395,405,410]
     #chimassarr=[1,5]+[10*i for i in range(1,27)]
-    #vmassarr=[600,700,800,900]
     #vmassarr=[401,405,425,450,475,772,768,762,778]
     #vmassarr=vmassarr+[771,769,773,767]
     #vmassarr=vmassarr+[400,500,600,700,760,765,770,775,780,800,900,1000,1010,1015,1020,1025,1030,1250,1500,1750,2000,2250,2500,2750,3000,3250,3500,3750,4000]
     #vmassarr=[850,750,825,875,725]
     #vmassarr=[i for i in range(2000,3200,200)]
-    vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
-    #massarr=[[MV,MV/5.0] for MV in vmassarr]
-    massarr=[[MV,MV/3.0] for MV in vmassarr]
-    #massarr=[[MV,200] for MV in vmassarr]
-    for marr in massarr:
-        ship_eval(marr,signal_channel="NCE_electron")
+    #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
+    #massarr=[[MV,MV/3.0] for MV in vmassarr]
+    #for marr in massarr:
+        #ship_eval(marr,signal_channel="NCE_electron")
         #ship_eval(marr,signal_channel="test")
-        ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
-        ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering_Baryonic")
+        #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
+        #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering_Baryonic")
+    anglearr=[0,1,2,4,6,8,10]
+    distance=[100,250,550,700]
+    vmassarr=[5,10,20,30,40,50,75,100,125,134,150,175,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,1750,2000,2250,2500,3000,3500,4000,4500,5000]
+    totarr = [[MV,MV/3.0,dist,angle] for MV in vmassarr for dist in distance for angle in anglearr]
+    for arr in totarr:
+        ship_eval(arr,signal_channel="test")
     #pool=Pool(processes=4)
     #pool.map(ship_eval,massarr)
 
@@ -694,5 +715,5 @@ def execute_t2k_parallel(genlist=True):
 #execute_t2k_parallel(genlist=True)
 execute_miniboone_parallel(genlist=False)
 #execute_miniboone_numi_p(genlist=False)
-#execute_ship_parallel(genlist=True)
+#execute_ship_parallel(genlist=False)
 #execute_lsnd_parallel(genlist=True)
