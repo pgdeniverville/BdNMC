@@ -11,6 +11,7 @@ _rho_decay=3
 _parton=4
 _brem=5
 _piminus_cap=6
+_phi_decay=7
 
 #write_miniboone(mdm=0.005,mv=0.4,proddist=["","","proton_brem"],prod_chan=["pi0_decay","eta_decay","V_decay"],partlistfile=["","",""])
 rho_decay_switch=False
@@ -66,7 +67,7 @@ def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True
     #    partlistfile.append("data/particle_list.dat")
     if det_switch == "sbnd":
         print("SBND run in progress")
-        write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-4,dm_energy_resolution=0.01,sumlog="Events/sbnd_y4.dat",output_mode="summary",zmin=zmin,zmax=zmax)
+        write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-4,dm_energy_resolution=0.01,sumlog="Events/sbnd_nucleon_baryonic.dat",output_mode="summary",zmin=zmin,zmax=zmax)
     else:
         #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,samplesize=1000,eps=0,alpha_D=1e-5,signal_chan="NCE_nucleon_baryonic",sumlog="Events/summary_baryonic_test.dat",output_mode="summary",outlog="Events/mini_baryonic_{}_{}.dat".format(MV,MX),det=miniboone_detector_full,efficiency=1)
         write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,samplesize=1000,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_nucleon_baryonic",eps=0,alpha_D=1e-5,dm_energy_resolution=0.01,sumlog="Events/miniboone_baryonic_y.dat",output_mode="summary",zmin=zmin,zmax=zmax)
@@ -90,7 +91,7 @@ def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True
     #    print "\ntime={}\n".format(t1-t0)
     subp.call(["rm", parfile])
 
-def ship_eval(mass_arr,signal_channel="NCE_electron"):
+def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pion_decay,_eta_decay}):
     MV=mass_arr[0]
     MX=mass_arr[1]
     t0 = time.time()
@@ -117,12 +118,12 @@ def ship_eval(mass_arr,signal_channel="NCE_electron"):
     proddist = []
     prodchan = []
     partlistfile = []
-    if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic":
-        if MX/1000.0<mpi0/2.0 and MV<600:
+    if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" || signal_channel=="Baryonic_Test":
+        if MX/1000.0<mpi0/2.0 and MV<600 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay_baryonic")
             partlistfile.append("data/particle_list_ship.dat")
-        if MX/1000.0<meta/2.0 and MV<900:
+        if MX/1000.0<meta/2.0 and MV<900 and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay_baryonic")
             partlistfile.append("data/particle_list_ship.dat")
@@ -130,43 +131,36 @@ def ship_eval(mass_arr,signal_channel="NCE_electron"):
         #    proddist.append("particle_list")
         #    prodchan.append("omega_decay_baryonic")
         #    partlistfile.append("data/particle_list.dat")
-        if MV/1000.0>0.9 and MV<1250:
+        if MV/1000.0>0.9 and MV<1250 and _phi_decay in channels:
             proddist.append("particle_list")
             prodchan.append("phi_decay_baryonic")
             partlistfile.append("data/particle_list_ship.dat")
-        if MV/1000.0<=4:
+        if MV/1000.0<=4 and _brem in channels:
             proddist.append("proton_brem_baryonic")
             prodchan.append("V_decay_baryonic")
             partlistfile.append("")
-        if MV/1000.0>=mrho:
+        if MV/1000.0>=mrho and _parton in channels:
            proddist.append("parton_V_baryonic")
            prodchan.append("parton_production_baryonic")
            partlistfile.append("")
     else:
-        if MX/1000.0<mpi0/2.0 and MV<600.0:
+        if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             partlistfile.append("data/particle_list_ship.dat")
-        if MX/1000.0<meta/2.0 and MV<900.0:
+        if MX/1000.0<meta/2.0 and MV<900.0 and eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay")
             partlistfile.append("data/particle_list_ship.dat")
-        if MV/1000.0>=mrho and parton_switch:
+        if MV/1000.0>=mrho and _parton in channels:
     	   proddist.append("parton_V")
     	   prodchan.append("parton_production")
     	   partlistfile.append("")
-        if MV/2.0>MX and proton_brem_switch:
+        if MV/2.0>MX and proton_brem_switch and _brem in channels:
     	   proddist.append("proton_brem")
     	   prodchan.append("V_decay")
      	   partlistfile.append("")
-        if ((MV<1200) and (MV>=350)) and rho_decay_switch:
-           proddist.append("particle_list")
-           prodchan.append("rho_decay")
-           partlistfile.append("data/particle_list_ship.dat")
-           proddist.append("particle_list")
-           prodchan.append("omega_decay")
-           partlistfile.append("data/particle_list_ship.dat")
-        if MV/1000.0>=mrho and MV<=1250:
+        if MV/1000.0>=mrho and MV<=1250 and and _phi_decay in channels:
             proddist.append("particle_list")
             prodchan.append("phi_decay")
             partlistfile.append("data/particle_list_ship.dat")
@@ -560,14 +554,13 @@ def execute_miniboone_parallel(genlist=True):
         write_miniboone(prod_chan=["eta_decay"],proddist=["k0_sanfordwang"],samplesize=2e6,output_mode="particle_list",partlistfile=["data/particle_list_k0.dat"])
         subp.call(["./build/main", "parameter_run.dat"])
         #write_miniboone(prod_chan=["V_decay"],proddist=["proton_brem"],samplesize=4e6,output_mode="particle_list",partlistfile=["data/particle_list_miniboone_brem.dat"])
-    #chimassarr=[10]
     #vmassarr=[1,5]+[10*i for i in range(1,14)]+[10*i for i in range(15,100,2)]+[775,774,776,777,778,779,781,782,783,785,787]+[1005,1010,1015,1.02,1025,1030,1035,1050,1100,1150,1200,1300]+[i for i in range(1000,2100,250)]
     #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000]+[3,5,7,9]
     #chimassarr=[i for i in range(10,270,10)]+[i for i in range(270,560,20)]+[132,134,136]+[1,5]
     #This is for the 2016 paper.
-    #chimassarr=[i for i in range(10,270,5)]+[i for i in range(270,501,10)]+[1,2,3,4,5,6,7,8,9,11,12,13,14]+[770/3.0,772/3.0,768/3.0,762/3.0,778/3.0]
-    #chimassarr=[i for i in range(525,700,25)]
-    #massarr=[[3*MX,MX] for MX in chimassarr]
+    chimassarr=[i for i in range(10,270,5)]+[i for i in range(270,501,10)]+[1,2,3,4,5,6,7,8,9,11,12,13,14]+[770/3.0,772/3.0,768/3.0,762/3.0,778/3.0]
+    chimassarr=chimassarr+[i for i in range(525,700,25)]
+    massarr=[[3*MX,MX] for MX in chimassarr]
     #for marr in massarr:
     #chimassarr=[7,8,9,10,11,12,13]
     #    miniboone_baryonic_eval(marr,det_switch="miniboone")
@@ -577,7 +570,7 @@ def execute_miniboone_parallel(genlist=True):
     #    if i not in massarr2:
     #        massarr2.append(i)
     #massarr=massarr2
-    massarr=[[80,10]]
+    #massarr=[[80,10]]
     print(massarr)
     #channs={_parton,_brem,_pion_decay,_eta_decay}
     #pool=Pool(processes=3)
@@ -589,8 +582,8 @@ def execute_miniboone_parallel(genlist=True):
         #miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
         #miniboone_eval(marr,signal_channel="Inelastic_Delta_to_Gamma",det_switch="miniboone")
         #miniboone_eval(marr,signal_channel="NCE_electron",det_switch="miniboone")
-        miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
-        #miniboone_baryonic_eval(marr,det_switch="miniboone")
+        #miniboone_eval(marr,signal_channel="Pion_Inelastic",det_switch="miniboone")
+        miniboone_baryonic_eval(marr,det_switch="sbnd")
         #if len(sys.argv)>1 and sys.argv[1]=="b":
 
         #else:
