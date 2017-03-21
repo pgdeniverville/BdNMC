@@ -476,13 +476,13 @@ int main(int argc, char* argv[]){
 
 	double BURN_MAX = par->Burn_In();
 	
-    if(outmode=="dm_detector_mode"){
+    if(outmode=="dm_detector_distribution"){
         BURN_MAX = 0;
         cout << "Detector_Mode selected.\nSkipping Burn-In.";
     }
     
     double BURN_OVERRIDE = par->Burn_Timeout();
-	for(int i=0; i<chan_count; i++){
+	for(int i=0;BURN_MAX!=0&&i<chan_count; i++){
         int nburn = 0;
 		if(Vnum_list[i]==0){
 			cout << "Skipping Channel " << i+1 << ", no events expected.\n";
@@ -622,7 +622,7 @@ int main(int argc, char* argv[]){
         *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
     }
     else if(outmode=="dm_detector_distribution"){
-        *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << endl;
+        *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
     }
 
 	//cout << scattot/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency() << endl;
