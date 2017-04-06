@@ -406,13 +406,17 @@ int main(int argc, char* argv[]){
 	else if(sigchoice=="NCE_nucleon_baryonic"){
 		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Baryonic_V",par->Coherent(),det));
 	}
-	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Inelastic_Delta_to_Gamma"){
+	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Pion_Inelastic_Charged"||sigchoice=="Inelastic_Delta_to_Gamma"){
 		//I might need some checking for allowed energies.
         if(sigchoice=="Pion_Inelastic"){
 		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
         }
         else if(sigchoice=="Inelastic_Delta_to_Gamma"){
 		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,1));
+        }
+        //This covers both charged and neutral pion production
+        else if(sigchoice=="Pion_Inelastic_Charged"){
+		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,2));
         }
 	}
 	else if(sigchoice=="Inelastic_Nucleon_Scattering_Baryonic" || sigchoice=="Inelastic_Nucleon_Scattering"){

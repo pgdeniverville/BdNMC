@@ -19,6 +19,7 @@ const double convmcm = 100.0;
 const double tol_abs=1e-20;
 const double tol_frac=1e-10;
 const double Delta_to_pi0 = 2.0/3.0;
+const double Delta_to_pion_charged = 1.0/3.0;
 const double Delta_to_gamma=0.006;
 
 using std::cout;
@@ -100,6 +101,13 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
         final_mass=MASS_PHOTON;
         final_branch=Delta_to_gamma;
         final_name="photon";
+    }
+    //Inelegant, but straightforward.
+    //This allows for the possibility of charged pion decays.
+    if(final_state==2){
+        final_branch=Delta_to_pi0+Delta_to_pion_charged;
+        final_mass=0;
+        final_name="pion";//The code will look for this final_name to trigger charged pion handling
     }
     else{
         final_mass=mpi0;
@@ -288,13 +296,24 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
 				return false;
             
             scatterevent(DM, Delta, Xsec, *proton_cross_maxima,mp);
+            //Temporary, may not be a proton!
             Particle Proton(mp);
             Proton.name="Proton";
+            //This could be generalized, not sure the best way to do it yet.
+            if(final_name=="pion"){
+                if(Random::Flat()>1.0/3.0){
+                    pion.name="pi0";
+                    pion.m=mpi0;
+                }
+                else{
+                    pion.name="pi+";
+                    pion.m=MASS_PION_CHARGED;
+                    Proton.name="Neutron";
+                    Proton.m = mn;
+                }
+            }
             TwoBodyDecay(Delta, Proton, pion);
             Nucleon = Proton;
-            //Delta.report(cout);
-            //Proton.report(cout);
-            //pion.report(cout);
         }
         else{
 			std::function<double(double)> Xsec = std::bind(&Pion_Inelastic::dsigma_dER_N,this,DM.E,_1,DM.m,MDP,alD,kap,mn);
@@ -303,11 +322,21 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
 			scatterevent(DM, Delta, Xsec, *neutron_cross_maxima,mn);
             Particle Neutron(mn);
             Neutron.name = "Neutron";
+            //This could be generalized, not sure the best way to do it yet.
+            if(final_name=="pion"){
+                if(Random::Flat()>1.0/3.0){
+                    pion.name="pi0";
+                    pion.m=mpi0;
+                }
+                else{
+                    pion.name="pi-";
+                    pion.m=MASS_PION_CHARGED;
+                    Neutron.name="Proton";
+                    Neutron.m = mp;
+                }
+            }
             TwoBodyDecay(Delta, Neutron, pion);
             Nucleon = Neutron;
-            //Delta.report(cout);
-            //Neutron.report(cout);
-            //pion.report(cout);
         }
         return true;
     }
