@@ -149,7 +149,8 @@ production_channel::production_channel(){
 	parton_V_p_file=""; 
 	meson_per_pi0=-1; 
 	PTMAX=-1; 
-	ZMIN=-1;
+	PTMIN=0;
+    ZMIN=-1;
    	ZMAX=-1;
 	particle_list_position=false;
 	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
@@ -202,6 +203,8 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.ZMIN=stod(val);
 			else if(key==ptmax_key)
 				tmpprod.PTMAX=stod(val);
+            else if(key==ptmin_key)
+                tmpprod.PTMIN=stod(val);
 			else if(key==part_list_pos_key){
 				if(lowercase(val)=="true")
 					tmpprod.particle_list_position=true;

@@ -27,13 +27,14 @@ class production_channel{
 		std::string parton_V_n_file, parton_V_p_file;
 		//This map holds sanfordwang parameters.
 		std::map<std::string, std::string> dist_param_map;
-		double meson_per_pi0, PTMAX, ZMIN, ZMAX;
+		double meson_per_pi0, PTMAX, PTMIN, ZMIN, ZMAX;
 		bool particle_list_position;
 		production_channel();
 		bool query_dist_param(){return (dist_param_map.size()!=0);}
 		bool query_dist_param(const std::string &, double&);
 		bool par_list_pos(){return particle_list_position;} 
 		double Meson_Per_Pi0(){return meson_per_pi0;}
+        double ptmin(){return PTMIN;}
 		double ptmax(){return PTMAX;}
 		double zmin(){return ZMIN;}
 		double zmax(){return ZMAX;}

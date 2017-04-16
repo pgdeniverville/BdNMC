@@ -118,7 +118,7 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
     parton_switch = True;
     alD=0.1
 
-    zmin=max(3*MV/1000.0/8.9,0.3)
+    zmin=max(3*MV/1000.0/400,0.1)
     zmax=1-zmin
 
     proddist = []
@@ -126,12 +126,12 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
     partlistfile = []
     executing=False
     if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" or signal_channel=="Baryonic_Test":
-        if MX/1000.0<mpi0/2.0 and MV<600 and _pion_decay in channels:
+        if MX/1000.0<mpi0/2.0 and MV<1000 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay_baryonic")
             partlistfile.append("data/particle_list_ship.dat")
             executing=True
-        if MX/1000.0<meta/2.0 and MV<900 and _eta_decay in channels:
+        if MX/1000.0<meta/2.0 and MV<1000 and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay_baryonic")
             partlistfile.append("data/particle_list_ship.dat")
@@ -157,7 +157,6 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
             executing=True
     else:
         if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
-            print( "Pion Decay!")
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             partlistfile.append("data/particle_list_ship.dat")
@@ -211,7 +210,7 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
                 output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,det=ship_detector_modular,\
                 min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
                 max_scatter_energy=400,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
-                zmin=zmin,zmax=zmax,ptmax=10)
+                zmin=zmin,zmax=zmax,ptmax=20)
     subp.call(["./build/main", parfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -286,7 +285,8 @@ def miniboone_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay},sign
             print("SBND RUN IN PROGRESS")
             write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0,max_scatter_energy=1000.0,partlistfile=partlistfile,outfile=parfile,signal_chan=signal_channel,sumlog="Events/sbnd60_pion_inelastic.dat",alpha_D=alpha_D)
         else:
-            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,output_mode="comprehensive",outlog="Events/miniboone_testing.dat",proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0,max_scatter_energy=10.0,partlistfile=partlistfile,outfile=parfile,signal_chan=signal_channel,sumlog="Events/miniboone_pion_test.dat",alpha_D=alpha_D)
+            #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,output_mode="comprehensive",outlog="Events/miniboone_testing.dat",proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0,max_scatter_energy=10.0,partlistfile=partlistfile,outfile=parfile,signal_chan=signal_channel,sumlog="Events/miniboone_pion_test.dat",alpha_D=alpha_D)
+            write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,output_mode="comprehensive",outlog="Events/miniboone_pion_{}_{}.dat".format(MV,MX),proddist=proddist,prod_chan=prodchan,samplesize=40000,min_scatter_energy=0,max_scatter_energy=10.0,partlistfile=partlistfile,outfile=parfile,signal_chan=signal_channel,sumlog="Events/miniboone_pion_testing.dat",alpha_D=alpha_D)
     elif signal_channel=="NCE_electron":
         if det_switch == "sbnd":
             write_sbnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,samplesize=1000,min_scatter_energy=0,max_scatter_energy=1.0,max_scatter_angle=0.14,partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",sumlog="Events/sbnd_elec_y.dat",zmin=zmin,zmax=zmax,alpha_D=alpha_D,output_mode="summary")
@@ -586,7 +586,7 @@ def execute_miniboone_parallel(genlist=True):
     #chimassarr=chimassarr+[i for i in range(525,700,25)]
     #massarr=[[3*MX,MX] for MX in chimassarr]
     #massarr=[[30,10],[300,100]]
-    massarr=[[30,10]]
+    massarr=[[30,10],[3,1],[300,100],[2000,750]]
     print(massarr)
     det_switch="miniboone"
     for marr in massarr:
@@ -636,7 +636,8 @@ def execute_ship_parallel(genlist=True):
         #ship_eval(marr,signal_channel="test")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering_Baryonic")
-    anglearr=[0,1,2,4,6,8,10]
+    #anglearr=[0,1,2,4,6,8,10]
+    anglearr=[7]
     distance=[100,250,550,700]
     vmassarr=[5,10,20,30,40,50,75,100,125,134,150,175,200,250,300,350,400,450,500,600,700,750,760,770,775,777,779,790,800,900,1000,1250,1500,1750,2000,2250,2500,3000,3500,4000,4500,5000]
     totarr = [[MV,MV/3.0,dist,angle] for MV in vmassarr for dist in distance for angle in anglearr]
@@ -720,7 +721,7 @@ def execute_t2k_parallel(genlist=True):
     #pool.map(ship_eval,massarr)
 
 #execute_t2k_parallel(genlist=True)
-execute_miniboone_parallel(genlist=False)
+#execute_miniboone_parallel(genlist=False)
 #execute_miniboone_numi_p(genlist=False)
-#execute_ship_parallel(genlist=False)
+execute_ship_parallel(genlist=False)
 #execute_lsnd_parallel(genlist=True)

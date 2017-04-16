@@ -240,11 +240,11 @@ int main(int argc, char* argv[]){
 			PartDist = parsam;
 		}
 		else if(proddist=="proton_brem"||proddist=="proton_brem_baryonic"){
-			if(proditer->ptmax()<0 || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
+			if(proditer->ptmax()<proditer->ptmin() || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
 				cerr << "Invalid properties for production_distribution proton_brem." << endl;
 				return -1;
 			}
-			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist));
+			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist,proditer->ptmin()));
 			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
 			Vnum = pbd->V_prod_rate()*POT;
 			PartDist = pbd;
@@ -482,7 +482,7 @@ int main(int argc, char* argv[]){
 	
     if(outmode=="dm_detector_distribution"){
         BURN_MAX = 0;
-        cout << "Detector_Mode selected.\nSkipping Burn-In.";
+        cout << "Detector_Mode selected.\nSkipping Burn-In.\n";
     }
     
     double BURN_OVERRIDE = par->Burn_Timeout();

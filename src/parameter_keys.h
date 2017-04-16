@@ -23,6 +23,7 @@ const string parton_V_proton_file_key = "parton_V_proton_file";
 const string sanford_wang_key = "sanfordwang_file";
 const string distribution_parameter_key = "distribution_parameter_file";
 const string ptmax_key = "ptmax";
+const string ptmin_key = "ptmin";
 const string zmin_key = "zmin";
 const string zmax_key = "zmax";
 const string part_list_pos_key = "particle_list_position";
