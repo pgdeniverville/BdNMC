@@ -6,6 +6,7 @@ import numpy as np
 from multiprocessing import Pool
 
 import Parsing_inelastic
+import math
 
 @contextmanager
 def cd(newdir):
@@ -44,6 +45,9 @@ Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutro
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 
 Sodium_Iodide_string = "material Sodium\nnumber_density 1.58e22\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
+
+#Don't know what the atomic makeup of the MINOS detector is. Not using this for event generation, so it should be okay.
+MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0\n"
 
 def write_experiment(write_detector,eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=[""], partlistfile=["Source/particle_list.dat"],sumlog="Events/miniboone.dat",outlog="Events/miniboone_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.035, max_scatter_energy=1.0, dm_energy_resolution=0.01, efficiency=0.35,beam_energy=8.9,
         n_num_target=4,p_num_target=4,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,POT=2e20,pi0_per_POT=0.9,p_cross=25*mb,meson_per_pi0=meson_per_pi0_miniboone,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,repeat=1,timing=0.0,burn_max=-1,inelastic_dist="data/DIS.dat",coherent='false'):
@@ -130,6 +134,27 @@ def miniboone_detector_full(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=6.106):
     f.write('\n')
     f.write(Carbon_string)
 
+MINOS_absorber_z=270
+MINOS_target_z=950
+#Don't use this for actual event generation!
+def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=MINOS_target_z,radius=2.2,length=1.7,theta=0,phi=0):
+    print("This detector should not be used for event generation!")
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(MINOS_string)
+
+NOvA_absorber_d=240
+NOvA_target_d=920
+NOvA_angle=0.0575959#3.3 degree
+
+def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_angle),zpos=NOvA_target_d*math.cos(NOvA_angle),radius=2,length=14,theta=-0.0575959,phi=0):
+    print("This detector should not be used for event generation!")
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(MINOS_string)
+
 def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,radius=2.38,length=4.76,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
@@ -171,7 +196,7 @@ def write_miniboone(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = [
     p_cross=25*mb
     write_experiment(write_detector=det,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross)
 
-def write_miniboone_numi(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["data/particle_list_numi.dat"],sumlog="Events/miniboone_numi.dat",outlog="Events/miniboone_events_numi.dat", output_mode="summary",samplesize=5000,min_scatter_energy=0.05,max_scatter_energy=3.0,dm_energy_resolution=0.01,efficiency=0.35,beam_energy=120,n_num_target=8,p_num_target=8,max_trials=80e6,ptmax=2,zmin=0.1,zmax=0.9,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,det=miniboone_detector_numi,POT=2e20):
+def write_miniboone_numi(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_nucleon", outfile="parameter_run.dat", proddist=["bmpt"], partlistfile=["data/particle_list_numi.dat"],sumlog="Events/miniboone_numi.dat",outlog="Events/miniboone_events_numi.dat",output_mode="summary",samplesize=5000,min_scatter_energy=0.05,max_scatter_energy=3.0,dm_energy_resolution=0.01,efficiency=0.35,beam_energy=120,n_num_target=8,p_num_target=8,max_trials=80e6,ptmax=2,zmin=0.1,zmax=0.9,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,det=miniboone_detector_numi,POT=1e21):
     pi0_per_POT=1.0
     #Need a better estimate for this. Not 40mb? Suppressed by something?
     p_cross=15*mb
@@ -221,7 +246,7 @@ def lsnd_detector(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3
 
 def write_lsnd(eps=1e-3, mdm = 0.03, mv = 0.1, alpha_D = 0.1, prod_chan = ["pi0_decay"], signal_chan = "NCE_electron", outfile="parameter_run.dat", proddist=["burmansmith"], partlistfile=["data/particle_list_lsnd.dat"],sumlog="Events/lsnd.dat",outlog="Events/lsnd_events.dat", output_mode="summary",samplesize=5000, min_scatter_energy=0.018, max_scatter_energy=0.05, dm_energy_resolution=0.01, efficiency=0.19*0.793,beam_energy=0.8, n_num_target=0,p_num_target=1,max_trials=80e6,ptmax=0.2,zmin=0.3,zmax=0.7,run=-1,min_scatter_angle=0.0,max_scatter_angle=2.1*pi,POT=1.8e23):
     pi0_per_POT=0.06
-    #Just a random value. I should code the actual function in at some point.
+    #Just a placeholder value. I should code the actual function in at some point.
     p_cross=30*mb
     write_experiment(write_detector=lsnd_detector,eps=eps,mdm=mdm,mv=mv,alpha_D=alpha_D,prod_chan=prod_chan,signal_chan = signal_chan, outfile=outfile, proddist=proddist, partlistfile=partlistfile,sumlog=sumlog,outlog=outlog, output_mode=output_mode,samplesize=samplesize, min_scatter_energy=min_scatter_energy, max_scatter_energy=max_scatter_energy, dm_energy_resolution=dm_energy_resolution, efficiency=efficiency,beam_energy=beam_energy, n_num_target=n_num_target,p_num_target=p_num_target,max_trials=max_trials,ptmax=ptmax,zmin=zmin,zmax=zmax,run=run,POT=POT,pi0_per_POT=pi0_per_POT,p_cross=p_cross, min_scatter_angle=min_scatter_angle,max_scatter_angle=max_scatter_angle)
 

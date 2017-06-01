@@ -76,10 +76,11 @@ def execute_coherent(genlist=True):
     if genlist:
         write_coherent(prod_chan=["pi0_decay"],proddist=["burmansmith"],samplesize=1e6,output_mode="particle_list",partlistfile=["data/particle_list_coherent.dat"],p_num_target=80)
         subp.call(["./build/main","parameter_run.dat"])
-    vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138]+[i for i in range(140,700,10)]
-    chimassarr=[5]
-    massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
-    #massarr=[[MV,MV/3.0] for MV in vmassarr]
+    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138]+[i for i in range(140,700,10)]
+    #chimassarr=[5]
+    #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
+    vmassarr=[3,6,9]
+    massarr=[[MV,MV/3.0] for MV in vmassarr]
     #massarr=massarr+massarr2
     for marr in massarr:
         coherent_eval(marr,signal_channel="NCE_nucleon",sumlog="Events/coherent_LAr2.dat",coherent="true",det_switch="LAr")

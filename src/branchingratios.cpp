@@ -170,6 +170,7 @@ double brmass_to_dm_dm(double mmeson, double mv, double mx, double kappa, double
     auto dbr = std::bind(dbrmass_to_dm_dm,mmeson, mv,mx,kappa,alphaD,_1);
     return DoubleExponential_adapt(dbr,4*mx*mx,pow(mmeson,2),100,0.1,1e-4);
 }
+
 //divide by 4?
 double wpp(double z, double pt2, double mA){
 	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);

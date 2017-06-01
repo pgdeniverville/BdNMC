@@ -29,6 +29,26 @@ def ship_detector_modular(f,radius=0.8268,length=3.34,theta=0,phi=0):
     f.write('\n')
     f.write(Argon_string)
 
+def MINOS_detector_modular(f,xpos=0.0,radius=2,length=1.7,theta=0,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(MINOS_string)
+
+def NOvA_detector_modular(f,xpos=0.0,radius=2,length=14,theta=-NOvA_angle,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(MINOS_string)
+
+def miniboone_detector_modular(f,radius=5.0):
+    f.write("\ndetector sphere\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius)))
+    f.write('\n')
+    f.write(Hydrogen_string)
+    f.write('\n')
+    f.write(Carbon_string)
+
 def miniboone_baryonic_eval(mass_arr,rho_decay_switch=False,partonic_switch=True,brem_switch=True,det_switch="miniboone"):
     MV=mass_arr[0]
     MX=mass_arr[1]
@@ -103,20 +123,17 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
     t0 = time.time()
     parfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
     #if MX/1000.0<mpi0/2.0:
+    if len(mass_arr)>2:
+        _DIST = mass_arr[2]
+        _ANGLE = mass_arr[3]
 
-    _DIST = mass_arr[2]
-    _ANGLE = mass_arr[3]
+        global _DET_XPOS, _DET_YPOS, _DET_ZPOS
 
-    global _DET_XPOS, _DET_YPOS, _DET_ZPOS
+        _DET_XPOS = _DIST*math.sin(math.radians(_ANGLE))
+        _DET_YPOS = 0
+        _DET_ZPOS = _DIST*math.cos(math.radians(_ANGLE))
 
-    _DET_XPOS = _DIST*math.sin(math.radians(_ANGLE))
-    _DET_YPOS = 0
-    _DET_ZPOS = _DIST*math.cos(math.radians(_ANGLE))
-
-    rho_decay_switch=False
-    proton_brem_switch=True
-    parton_switch = True;
-    alD=0.1
+    alD=0.5
 
     zmin=max(3*MV/1000.0/400,0.1)
     zmax=1-zmin
@@ -171,7 +188,7 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
     	    prodchan.append("parton_production")
     	    partlistfile.append("")
             executing=True
-        if MV/2.0>MX and proton_brem_switch and _brem in channels:
+        if MV/2.0>MX and _brem in channels:
     	    proddist.append("proton_brem")
     	    prodchan.append("V_decay")
      	    partlistfile.append("")
@@ -196,8 +213,8 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
     elif signal_channel=="test":
         write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
                 partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
-                samplesize=40000,sumlog="Claudia_Events2/ship_claudia_test.dat",\
-                outlog="Claudia_Events2/dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                samplesize=40000,sumlog="Claudia_Events/ship_claudia_test.dat",\
+                outlog="Claudia_Events/dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
                 output_mode="dm_detector_distribution",alpha_D=alD,det=ship_detector_modular,\
                 min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
                 max_scatter_energy=400,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
@@ -205,8 +222,8 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
     elif signal_channel=="Baryonic_Test":
         write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
                 partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
-                samplesize=1000,sumlog="Claudia_Events2/ship_claudia_test.dat",\
-                outlog="Claudia_Events2/dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                samplesize=40000,sumlog="Claudia_Events4/ship_claudia_test.dat",\
+                outlog="Claudia_Events4/dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
                 output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,det=ship_detector_modular,\
                 min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
                 max_scatter_energy=400,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
@@ -310,6 +327,20 @@ def miniboone_numi_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay}
     t0 = time.time()
     parfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
     #if MX/1000.0<mpi0/2.0:
+    if len(mass_arr)>2:
+        _DIST = mass_arr[2]
+        _ANGLE = mass_arr[3]
+
+        global _DET_XPOS, _DET_YPOS, _DET_ZPOS
+        if det_switch == "nova" or det_switch == "nova_abs":
+            _DET_XPOS = 0
+            _DET_YPOS = -_DIST*math.sin(math.radians(_ANGLE))
+            _DET_ZPOS = _DIST*math.cos(math.radians(_ANGLE))
+        else:
+            _DET_XPOS = _DIST*math.sin(math.radians(_ANGLE))
+            _DET_YPOS = 0
+            _DET_ZPOS = _DIST*math.cos(math.radians(_ANGLE))
+
 
     BEAM_ENERGY=120
     alD=alpha_D
@@ -320,35 +351,62 @@ def miniboone_numi_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay}
     prodchan = []
     partlistfile = [    ]
     executing=False
-    if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
-
-        proddist.append("particle_list")
-        prodchan.append("pi0_decay")
-        partlistfile.append("data/particle_list.dat")
-        executing=True
-    if MX/1000.0<meta/2.0 and MV<900.0 and _eta_decay in channels:
-        proddist.append("particle_list")
-        prodchan.append("eta_decay")
-        partlistfile.append("data/particle_list_k0.dat")
-        executing=True
-    if MV/1000.0>=mrho and _parton in channels:
-	proddist.append("parton_V")
-	prodchan.append("parton_production")
-	partlistfile.append("")
-        executing=True
-    if MV/2.0>MX and zmin<zmax and _brem in channels:
-        proddist.append("proton_brem")
-        prodchan.append("V_decay")
-        partlistfile.append("")
-        executing=True
-    if ((MV<1200) and (MV>=350)) and _rho_decay in channels:
-        proddist.append("particle_list")
-        prodchan.append("rho_decay")
-        partlistfile.append("data/particle_list.dat")
-        proddist.append("particle_list")
-        prodchan.append("omega_decay")
-        partlistfile.append("data/particle_list.dat")
-        executing=True
+    if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" or signal_channel=="Baryonic_Test":
+        if MX/1000.0<mpi0/2.0 and MV<1000 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay_baryonic")
+            partlistfile.append("data/particle_list_numi.dat")
+            executing=True
+        if MX/1000.0<meta/2.0 and MV<1000 and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay_baryonic")
+            partlistfile.append("data/particle_list_numi.dat")
+            executing=True
+        #if ((MV<1200) and (MV>=350)) and rho_decay_switch:
+        #    proddist.append("particle_list")
+        #    prodchan.append("omega_decay_baryonic")
+        #    partlistfile.append("data/particle_list.dat")
+        if MV/1000.0>0.9 and MV<1250 and _phi_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("phi_decay_baryonic")
+            partlistfile.append("data/particle_list_numi.dat")
+            executing=True
+        if MV>2.0*MX and _brem in channels:
+            proddist.append("proton_brem_baryonic")
+            prodchan.append("V_decay_baryonic")
+            partlistfile.append("")
+            executing=True
+        if MV/1000.0>=mrho and _parton in channels:
+            proddist.append("parton_V_baryonic")
+            prodchan.append("parton_production_baryonic")
+            partlistfile.append("")
+            executing=True
+    else:
+        if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/particle_list_numi.dat")
+            executing=True
+        if MX/1000.0<meta/2.0 and MV<900.0 and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay")
+            partlistfile.append("data/particle_list_numi.dat")
+            executing=True
+        if MV/1000.0>=mrho and _parton in channels:
+            proddist.append("parton_V")
+    	    prodchan.append("parton_production")
+    	    partlistfile.append("")
+            executing=True
+        if MV/2.0>MX and proton_brem_switch and _brem in channels:
+    	    proddist.append("proton_brem")
+    	    prodchan.append("V_decay")
+     	    partlistfile.append("")
+            executing=True
+        if MV/1000.0>=mrho and MV<=1250 and _phi_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("phi_decay")
+            partlistfile.append("data/particle_list_ship.dat")
+            executing=True
    # if MV/1000.0>=mrho and MV<=1250:
    #     proddist.append("particle_list")
    #     prodchan.append("phi_decay")
@@ -364,6 +422,53 @@ def miniboone_numi_eval(mass_arr,channels={_parton,_brem,_pion_decay,_eta_decay}
     if signal_channel=="Inelastic_Nucleon_Scattering":
         write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,signal_chan="Inelastic_Nucleon_Scattering",samplesize=2000,sumlog="Events/miniboone_dis.dat",output_mode="summary",alpha_D=alpha_D)
             #write_miniboone(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,min_scatter_energy=0.05,max_scatter_energy=2,outfile=parfile,samplesize=40000,signal_chan="NCE_nucleon",sumlog="Events3/summary.dat",efficiency=1.0,output_mode="comprehensive",outlog="Events3/mini_{}_{}.dat".format(MV,MX),det=miniboone_detector_full)
+    if signal_channel=="Baryonic_Test":
+        if det_switch=="miniboone_numi":
+            write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=40000,sumlog="Claudia_Events5/mini_numi_claudia_test.dat",\
+                outlog="Claudia_Events5/dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,det=miniboone_detector_modular,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=120,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=8)
+        elif det_switch=="minos":
+            write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,det=MINOS_detector_modular,proddist=proddist,prod_chan=prodchan,\
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=40000,sumlog="Claudia_Events5/minos_claudia_test.dat",\
+                outlog="Claudia_Events5/minos_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=120,run="minos_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=8)
+        elif det_switch=="minos_abs":
+            write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
+                det=MINOS_detector_modular,
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=40000,sumlog="Claudia_Events5/minos_abs_claudia_test.dat",\
+                outlog="Claudia_Events5/minos_abs_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=120,run="minos_abs_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=8)
+        elif det_switch=="nova":
+            write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,det=NOvA_detector_modular,proddist=proddist,prod_chan=prodchan,\
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=10000,sumlog="Claudia_Events5/nova_claudia_test.dat",\
+                outlog="Claudia_Events5/nova_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=120,run="nova_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=8)
+        elif det_switch=="nova_abs":
+            write_miniboone_numi(mdm=MX/1000.0,mv=MV/1000.0,det=NOvA_detector_modular,proddist=proddist,prod_chan=prodchan,\
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=40000,sumlog="Claudia_Events5/nova_abs_claudia_test.dat",\
+                outlog="Claudia_Events5/nova_abs_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=120,run="nova_abs_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=8)
     subp.call(["./build/main", parfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -608,13 +713,37 @@ def execute_miniboone_numi_p(genlist=True):
     if genlist:
         write_miniboone_numi(prod_chan=["pi0_decay"],proddist=["bmpt"],samplesize=1e6,output_mode="particle_list",partlistfile=["data/particle_list_numi.dat"])
         subp.call(["./build/main", "parameter_run.dat"])
-    vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
-    massarr=[[MV,MV/3.0] for MV in vmassarr]
-    for marr in massarr:
-        miniboone_numi_eval(marr,signal_channel="NCE_nucleon")
-        miniboone_numi_eval(marr,signal_channel="NCE_electron")
+    #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
+    #massarr=[[MV,MV/3.0] for MV in vmassarr]
+    vmassarr=[100,500,770,1000]
+    dist = 745
+    angle = 6
+    massarr=[[MV, MV/3.0, dist, angle] for MV in vmassarr]
+    #for marr in massarr:
+        #miniboone_numi_eval(marr,det_switch="miniboone_numi",signal_channel="Baryonic_Test",channels={_brem,_pion_decay,_eta_decay})
+        #miniboone_numi_eval(marr,signal_channel="NCE_nucleon")
+        #miniboone_numi_eval(marr,signal_channel="NCE_electron")
         #iminiboone_numi_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
         #miniboone_numi_eval(marr,signal_channel="Pion_Inelastic")
+    vmassarr=[100,500,770,1000]
+    dist = MINOS_target_z
+    angle = 0
+    massarr=[[MV, MV/3.0, dist, angle] for MV in vmassarr]
+    for marr in massarr:
+        miniboone_numi_eval(marr,det_switch="minos",signal_channel="Baryonic_Test",channels={_brem,_pion_decay,_eta_decay})
+    dist = MINOS_absorber_z
+    massarr=[[MV, MV/3.0, dist, angle] for MV in vmassarr]
+    for marr in massarr:
+        miniboone_numi_eval(marr,det_switch="minos_abs",signal_channel="Baryonic_Test",channels={_brem,_pion_decay,_eta_decay})
+    angle = 3.3
+    dist = NOvA_target_d
+    massarr=[[MV, MV/3.0, dist, angle] for MV in vmassarr]
+    for marr in massarr:
+        miniboone_numi_eval(marr,det_switch="nova",signal_channel="Baryonic_Test",channels={_brem,_pion_decay,_eta_decay})
+    dist = NOvA_absorber_d
+    massarr=[[MV, MV/3.0, dist, angle] for MV in vmassarr]
+    for marr in massarr:
+        miniboone_numi_eval(marr,det_switch="nova_abs",signal_channel="Baryonic_Test",channels={_brem,_pion_decay,_eta_decay})
 
 def execute_ship_parallel(genlist=True):
     if genlist:
@@ -631,23 +760,28 @@ def execute_ship_parallel(genlist=True):
     #vmassarr=[i for i in range(2000,3200,200)]
     #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
     #massarr=[[MV,MV/3.0] for MV in vmassarr]
-    #for marr in massarr:
-        #ship_eval(marr,signal_channel="NCE_electron")
+    marr=[[3,1]]
+    for marr in marr:
+        ship_eval(marr,signal_channel="NCE_electron")
         #ship_eval(marr,signal_channel="test")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering_Baryonic")
     #anglearr=[0,1,2,4,6,8,10]
-    anglearr=[7]
-    distance=[100,250,550,700]
-    vmassarr=[5,10,20,30,40,50,75,100,125,134,150,175,200,250,300,350,400,450,500,600,700,750,760,770,775,777,779,790,800,900,1000,1250,1500,1750,2000,2250,2500,3000,3500,4000,4500,5000]
-    totarr = [[MV,MV/3.0,dist,angle] for MV in vmassarr for dist in distance for angle in anglearr]
+    #anglearr=[0,1,2,3,5]
+    #anglearr=[0]
+    #distance=[100,250,550,700]
+    #distance=[40]
+    #vmassarr=[3000]
+    #vmassarr=[5,10,20,40,75,100,125,134,150,175,200,250,300,350,400,500,600,700,750,760,770,777,790,800,900,1000,1250,1500,2000,2500,3000,3500,4000,4500,5000]
+    #vmassarr=[10,100,500,700]
+    #totarr = [[MV,MV/3.0,dist,angle] for MV in vmassarr for dist in distance for angle in anglearr]
     #i=0
     #for arr in totarr:
     #    print i
     #    i+=1
-    #    ship_eval(arr,channels={_pion_decay,_eta_decay,_brem},signal_channel="Baryonic_Test")
-    pool=Pool(processes=4)
-    pool.map(ship_eval_par,totarr)
+    #    ship_eval_par(arr)
+    #pool=Pool(processes=3)
+    #pool.map(ship_eval_par,totarr)
 
 def execute_lsnd_parallel(genlist=True):
     if genlist:
@@ -722,6 +856,6 @@ def execute_t2k_parallel(genlist=True):
 
 #execute_t2k_parallel(genlist=True)
 #execute_miniboone_parallel(genlist=False)
-#execute_miniboone_numi_p(genlist=False)
+#execute_miniboone_numi_p(genlist=True)
 execute_ship_parallel(genlist=False)
 #execute_lsnd_parallel(genlist=True)
