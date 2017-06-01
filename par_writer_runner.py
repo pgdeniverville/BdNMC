@@ -29,6 +29,14 @@ def ship_detector_modular(f,radius=0.8268,length=3.34,theta=0,phi=0):
     f.write('\n')
     f.write(Argon_string)
 
+def OPERA_detector(f,xpos=0.0,ypos=0.0,zpos=7.3e6,radius=56.4,length=1,theta=0,phi=0):
+    print("Don't use this for event generation!")
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+
 def MINOS_detector_modular(f,xpos=0.0,radius=2,length=1.7,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
@@ -220,6 +228,7 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
                 max_scatter_energy=400,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
                 zmin=zmin,zmax=zmax,ptmax=20)
     elif signal_channel=="Baryonic_Test":
+        '''
         write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
                 partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
                 samplesize=40000,sumlog="Claudia_Events4/ship_claudia_test.dat",\
@@ -228,6 +237,15 @@ def ship_eval(mass_arr,signal_channel="NCE_electron",channels={_parton,_brem,_pi
                 min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
                 max_scatter_energy=400,run="dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
                 zmin=zmin,zmax=zmax,ptmax=20)
+        '''
+        write_ship(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,\
+                partlistfile=partlistfile,outfile=parfile,signal_chan="NCE_electron",\
+                samplesize=1000,sumlog="Claudia_Events/OPERA_claudia_test.dat",\
+                outlog="Claudia_Events/OPERA_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                output_mode="dm_detector_distribution",alpha_D=1e-5,eps=0,det=OPERA_detector,\
+                min_scatter_angle=0,max_scatter_angle=6,min_scatter_energy=0,\
+                max_scatter_energy=400,run="OPERA_dm_dist_{}_{}_{}_{}.dat".format(MV,MX,_DIST,_ANGLE),\
+                zmin=zmin,zmax=zmax,ptmax=1)
     subp.call(["./build/main", parfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -505,8 +523,7 @@ def t2k_FD_baryonic_eval(mass_arr,signal_channel="NCE_nucleon_baryonic"):
         proddist.append("particle_list")
         prodchan.append("eta_decay_baryonic")
         partlistfile.append("data/particle_list_t2k.dat")
-    #if ((MV<1200) and (MV>=350)) and rho_decay_switch:
-    #    proddist.append("particle_list")
+    #if ((MV<1200) and (MV>=350)) and rho_decay_switc100#    proddist.append("particle_list")
     #    prodchan.append("omega_decay_baryonic")
     #    partlistfile.append("data/particle_list.dat")
     if MV/1000.0>0.9 and MV<1250:
@@ -760,26 +777,26 @@ def execute_ship_parallel(genlist=True):
     #vmassarr=[i for i in range(2000,3200,200)]
     #vmassarr=[i for i in range(10,140,10)]+[i for i in range(150,1000,50)]+[770,772,768,762,778]+[1000,1100,1150,1200,1300]+[i for i in range(1000,5100,250)]+[1005,1010,1020,1015,1025,1030]+[3,5,7,9]+[30,210,420,600,810,1020,1200,1500,1710]
     #massarr=[[MV,MV/3.0] for MV in vmassarr]
-    marr=[[3,1]]
-    for marr in marr:
-        ship_eval(marr,signal_channel="NCE_electron")
+    #marr=[[3,1]]
+    #for marr in marr:
+        #ship_eval(marr,signal_channel="NCE_electron")
         #ship_eval(marr,signal_channel="test")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering")
         #ship_eval(marr,signal_channel="Inelastic_Nucleon_Scattering_Baryonic")
     #anglearr=[0,1,2,4,6,8,10]
     #anglearr=[0,1,2,3,5]
-    #anglearr=[0]
+    anglearr=[0]
     #distance=[100,250,550,700]
-    #distance=[40]
-    #vmassarr=[3000]
+    distance=[750000]
+    vmassarr=[10,100,250,500,770,1000]
     #vmassarr=[5,10,20,40,75,100,125,134,150,175,200,250,300,350,400,500,600,700,750,760,770,777,790,800,900,1000,1250,1500,2000,2500,3000,3500,4000,4500,5000]
     #vmassarr=[10,100,500,700]
-    #totarr = [[MV,MV/3.0,dist,angle] for MV in vmassarr for dist in distance for angle in anglearr]
-    #i=0
-    #for arr in totarr:
-    #    print i
-    #    i+=1
-    #    ship_eval_par(arr)
+    totarr = [[MV,MV/3.0,dist,angle] for MV in vmassarr for dist in distance for angle in anglearr]
+    i=0
+    for arr in totarr:
+        print i
+        i+=1
+        ship_eval_par(arr)
     #pool=Pool(processes=3)
     #pool.map(ship_eval_par,totarr)
 

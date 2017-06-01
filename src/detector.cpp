@@ -267,3 +267,14 @@ double detector_cylinder::Ldet (const Particle &DM){
     else
         throw crossings.size();
 }
+
+/*******************
+ *detector_cuboid*
+ *******************/
+
+detector_cuboid::detector_cuboid(double x, double y, double z, double detlength, double, detwidth, double detheight, double detPhi, double detTheta, double detPsi){
+    r[0]=x; r[1]=y; r[2]=z;
+    //Length oriented along z-axis
+     
+}
+

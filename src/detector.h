@@ -64,10 +64,23 @@ class detector_cylinder: public detector{
                 double detTheta, double detPhi);
         ~detector_cylinder(){}
         double Ldet (const Particle &);
-        double Ldeto (const Particle &, const double offset[3]);
+        //double Ldeto (const Particle &, const double offset[3]);
     private:
         double Rdet, Ldetector;
         double l[3];
+};
+
+class detector_cuboid: public detector{
+    public:
+        detector_cuboid(double xdet, double ydet, double zdet, double detlength, double detwidth, double detheight, double detPhi, double detTheta ,double detPsi);
+        ~detector_cuboid(){}
+        double Ldet (const Particle &);
+    private:
+        //double Hdetector, Wdetector, Ldetector;
+        //These each point to the center of one of the cuboid's faces.
+        double l[3];
+        double w[3];
+        double h[3];
 };
 
 #endif
