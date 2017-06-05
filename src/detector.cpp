@@ -8,7 +8,7 @@ using std::cout;
 using std::endl;
 
 //inner product for 3-vectors
-double ip(double vec1[],double vec2[]){
+double ip(const double vec1[], const double vec2[]){
     return vec1[0]*vec2[0]+vec1[1]*vec2[1]+vec1[2]*vec2[2];
 }
 
@@ -48,14 +48,8 @@ double detector_sphere::Ldet (const Particle &DM) {
 	cout << endl;	
 	*/
     A = ip(b,b);
-   // B = -2*(ip(r,b)-ip(o,b));
-   // C = (ip(r,r)-2*ip(o,r)+ip(o,o))-pow(Rdet,2);
     B = -2*ip(o,b);
     C = ip(o,o)-pow(Rdet,2);
-
-	/*
-	cout << "A = " << A << " B = " << B << " C = " << C << endl;
-    */
 	
 	if((pow(B,2)-4*A*C)<0||A==0){
         return 0.0;
@@ -102,91 +96,10 @@ detector_cylinder::detector_cylinder (double x, double y, double z, double detle
     l[2] = detlength*cos(detTheta)/2;
     
 }
-//This is a temporary setup.
-/*
-double detector_cylinder::Ldeto (const Particle &DM, const double offset[3]){
-    b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
-    double ro[3];
-    for(int i=0; i<3; i++){
-        ro[i] = r[i] - offset[i];
-    } 
-    vector<double> crossings;
-    double B1,B2;
-    
-
-    //Checking crossing point of circular faces.
-    if(ip(b,l)!=0){//if b.l==0, beam is parallel to the circular faces.
-        
-
-        B1 = (ip(ro,l)+ip(l,l))/ip(b,l);
-        double Rhold[3];//Need to hold this value for use in calculation.
-        if(B1>0){
-            for(int iter=0; iter <3; iter++){
-                Rhold[iter] = B1*b[iter]-l[iter]-ro[iter];
-            }
-            if(sqrt(ip(Rhold,Rhold))<=Rdet){
-                crossings.push_back(B1);
-            }
-        }
-            
-
-        B2 = (ip(ro,l)-ip(l,l))/ip(b,l);//For B2 l->-l.
-        if(B2>0){ 
-            
-            for(int iter=0; iter <3; iter++){
-                Rhold[iter] = B2*b[iter]+l[iter]-ro[iter];
-            }
-            
-            if(sqrt(ip(Rhold,Rhold))<=Rdet){
-                crossings.push_back(B2);
-            }
-        }
-    }
-    
-
-    double B3, B4, A3, A4;
-
-    if(crossings.size()<2){
-        double X = -pow(ip(b,l),2) + ip(b,b)*ip(l,l);
-        double Y = -2*ip(ro,b)*ip(l,l)+2*ip(b,l)*ip(ro,l);
-        double Z = -pow(ip(ro,l),2)-pow(Rdet,2)*ip(l,l)+ip(ro,ro)*ip(l,l);
-        double sqr_arg=Y*Y-4*X*Z; //argument in the quadratic equation square root.
-        if(sqr_arg > 0){
-            B3 = (-Y+sqrt(sqr_arg))/(2*X);
-            B4 = (-Y-sqrt(sqr_arg))/(2*X);
-
-            
-            if(B3 > 0 && (A3 = (B3*ip(b,l)-ip(ro,l))/ip(l,l) ) > -1 && A3<1){
-                crossings.push_back(B3);
-            }
-             
-            if(B4 > 0 && (A4 = (B4*ip(b,l)-ip(ro,l))/ip(l,l) )>-1 && A4<1){
-                crossings.push_back(B4);
-            }
-        }
-    }
-
-    
-    if(crossings.size()==0)
-        return 0.0;
-    else if(crossings.size()==2){
-        cross_point[0]=crossings[0];
-        cross_point[1]=crossings[1];
-        return (crossings[1]>crossings[0] ? (crossings[1]-crossings[0])*sqrt(ip(b,b)) :\
-                (crossings[0]-crossings[1])*sqrt(ip(b,b)));
-    }
-    else if(crossings.size()==1)
-        //return crossings[0]*sqrt(ip(b,b));
-        //needs to be written better for inside of detector case.
-        return 0.0;
-    else
-        throw crossings.size();
-}
-*/
 
 //I should write a 3 vector class, and overload multiplication and addition.
-//This can also be improved by allowing the intersection points to be negative, but
-//setting them to zero is so. That means the intersection happened in the past, and we either
+//This can also be improved by allowing the intersection points to be negative. 
+//That means the intersection happened in the past, and we are either
 //originating in the detector, or going in the opposite direction. Both cases are handled
 //properly by the Ldet calculation.
 double detector_cylinder::Ldet (const Particle &DM){
@@ -272,9 +185,69 @@ double detector_cylinder::Ldet (const Particle &DM){
  *detector_cuboid*
  *******************/
 
-detector_cuboid::detector_cuboid(double x, double y, double z, double detlength, double, detwidth, double detheight, double detPhi, double detTheta, double detPsi){
+//In place rotation of 3-vector arr.
+void XYX_rotate(const double t1, const double t2, const double t3, double *arr){
+    double x=arr[0];
+    double y=arr[1];
+    double z=arr[2];
+    arr[0] = x*cos(t2)+z*cos(t3)*sin(t2)+y*sin(t2)*sin(t3);
+    arr[1] = x*sin(t1)*sin(t2)+z*(-cos(t2)*cos(t3)*sin(t1)-cos(t1)*sin(t3))+y*(cos(t1)*cos(t3)-cos(t2)*sin(t1)*sin(t3));
+    arr[2] = -x*cos(t1)*sin(t2)+y*(cos(t3)*sin(t1)+cos(t1)*cos(t2)*sin(t3))+z*(cos(t1)*cos(t2)*cos(t3)-sin(t1)*sin(t3));
+}
+
+detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, double detheight, double detlength, double detPhi, double detTheta, double detPsi){
     r[0]=x; r[1]=y; r[2]=z;
     //Length oriented along z-axis
-     
+    face[0][0]=detwidth/2.0;
+    face[1][1]=detheight/2.0;
+    face[2][2]=detlength/2.0;
+    dim[0]=pow(detwidth/2.0,2);
+    dim[1]=pow(detheight/2.0,2);
+    dim[2]=pow(detheight/2.0,2);
+    for(int i = 0; i<3; i++){
+        XYX_rotate(detPhi,detTheta,detPsi,face[i]);
+        for(int j=0; j<3; j++)
+            face[i+3][j]=-face[i][j];
+    }
+
 }
+
+double detector_cuboid::Ldet (const Particle &DM){
+    b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
+    
+    double o[3];
+	for(int i=0; i<3; i++){
+        o[i] = r[i] - DM.origin_coords[i];
+    }
+    double entry=0;
+    double exit=0;
+
+    bool consistency=false;
+    for(int i=0; i<6; i++){
+        double ft = ip(o,face[i])+ip(face[i],face[i]);
+        if(ft==0){
+            if(consistency)//Two faces are parallel to R=r+n.
+            {
+                std::cerr << "Only one face of cuboid detector can be parallel to o.";
+                throw -1;
+            }
+            else
+                consistency=true;
+            continue;
+        }
+        double detcross=(ip(o,face[i])+ip(b,face[i]))/ip(b,face[i]);
+        if(ft<0&&detcross>entry){
+            entry=detcross;
+        }
+        else if(detcross>0){
+            if(exit>0||detcross<exit)
+            exit=detcross;
+        }
+    }
+    if(entry>exit)
+        return 0.0;
+    else
+        return (exit-entry)*sqrt(ip(b,b));
+}
+
 

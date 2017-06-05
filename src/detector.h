@@ -69,18 +69,22 @@ class detector_cylinder: public detector{
         double Rdet, Ldetector;
         double l[3];
 };
-
+/*
+* We use the XYX Proper Euler rotation angles as shown in https://en.wikipedia.org/wiki/Euler_angles.
+* Use detPhi to rotate about the x-axis (rotate y into z axis), detTheta to
+* rotate about the y-axis (z into x axis).
+*/
 class detector_cuboid: public detector{
     public:
+       
         detector_cuboid(double xdet, double ydet, double zdet, double detlength, double detwidth, double detheight, double detPhi, double detTheta ,double detPsi);
         ~detector_cuboid(){}
         double Ldet (const Particle &);
     private:
         //double Hdetector, Wdetector, Ldetector;
         //These each point to the center of one of the cuboid's faces.
-        double l[3];
-        double w[3];
-        double h[3];
+        double face[6][3];
+        double dim[6];
 };
 
 #endif
