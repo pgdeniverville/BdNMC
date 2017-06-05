@@ -53,4 +53,5 @@ const string p_cross_key = "proton_target_cross_section";
 
 vector<string> spherearr = {"radius","x-position","y-position","z-position"};
 vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};
+vector<string> cuboidarr = {"length","width","height","x-position","y-position","z-position","det-phi","det-theta","det-psi"};
 const string run_key = "run";

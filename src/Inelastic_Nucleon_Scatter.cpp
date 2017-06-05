@@ -88,8 +88,9 @@ bool Inelastic_Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Part
     //cout << prob << " " << LXDet << " " << DM.E << " " << scatter_dist->Interpolate(DM.E) << " " << (det->PNtot()+det->NNtot()) << endl;
 	//std::cout << DM.E << " " << XDMp << " " << XDMn << " " << prob << " " << endl;
 	if(prob > pMax*Random::Flat(0,1)){
-        if(prob > pMax)
+        if(prob > pMax){
         	pMax = prob;
+        }
 		return true;
     }
     else

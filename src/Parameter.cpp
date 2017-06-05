@@ -467,6 +467,24 @@ void Parameter::Build_Detector(map<string, string> &keymap){
                     }
                 }
             }
+            else if(keymap[detkey]=="cuboid"){
+                for(vector<string>::iterator it = cuboidarr.begin(); it!=cuboidarr.end(); ++it){
+                    if(keymap.count(*it)!=1){
+                        cerr << "Missing detector_cuboid parameter: " << *it << endl;
+                        integrity = -1;
+                    } 
+                }
+                if(integrity==0){
+                    try{
+                    det = std::make_shared<detector_cuboid>(stod(keymap["x-position"]),stod(keymap["y-position"]),
+                            stod(keymap["z-position"]),stod(keymap["length"]),stod(keymap["width"]),stod(keymap["height"]),
+                            stod(keymap["det-phi"]),stod(keymap["det-theta"]),stod(keymap["det-psi"]));
+                    }
+                    catch(exception& e){
+                        cerr << "Exception: " << e.what() << " encountered constructing detector object\n";
+                    }
+                }
+            }
             else{
                 cerr << "Invalid detector shape declared: " << keymap[detkey] << endl;
                 integrity = -1;
