@@ -67,7 +67,7 @@ double detector_sphere::Ldet (const Particle &DM) {
 	if(Ldetexit<0)
 		Ldetexit=0;
 
-    if(Ldetenter<Ldetexit){
+    if(Ldetexit>Ldetenter){
         cross_point[0] = Ldetenter;
         cross_point[1] = Ldetexit;
         return (Ldetexit-Ldetenter)*sqrt(A);
@@ -190,9 +190,11 @@ void XYX_rotate(const double t1, const double t2, const double t3, double *arr){
     double x=arr[0];
     double y=arr[1];
     double z=arr[2];
+    //cout << arr[0] << " " << arr[1] << " " << arr[2] << endl;
     arr[0] = x*cos(t2)+z*cos(t3)*sin(t2)+y*sin(t2)*sin(t3);
     arr[1] = x*sin(t1)*sin(t2)+z*(-cos(t2)*cos(t3)*sin(t1)-cos(t1)*sin(t3))+y*(cos(t1)*cos(t3)-cos(t2)*sin(t1)*sin(t3));
     arr[2] = -x*cos(t1)*sin(t2)+y*(cos(t3)*sin(t1)+cos(t1)*cos(t2)*sin(t3))+z*(cos(t1)*cos(t2)*cos(t3)-sin(t1)*sin(t3));
+    //cout << arr[0] << " " << arr[1] << " " << arr[2] << endl;
 }
 
 detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, double detheight, double detlength, double detPhi, double detTheta, double detPsi){
@@ -201,30 +203,43 @@ detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, 
     face[0][0]=detwidth/2.0;
     face[1][1]=detheight/2.0;
     face[2][2]=detlength/2.0;
-    dim[0]=pow(detwidth/2.0,2);
-    dim[1]=pow(detheight/2.0,2);
-    dim[2]=pow(detheight/2.0,2);
+    //dim[0]=pow(detwidth/2.0,2);
+    //dim[1]=pow(detheight/2.0,2);
+    //dim[2]=pow(detlength/2.0,2);
     for(int i = 0; i<3; i++){
         XYX_rotate(detPhi,detTheta,detPsi,face[i]);
         for(int j=0; j<3; j++)
             face[i+3][j]=-face[i][j];
+    }
+    for(int i=0; i<6; i++){
+        //cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
     }
 
 }
 
 double detector_cuboid::Ldet (const Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
-    
+     
     double o[3];
 	for(int i=0; i<3; i++){
         o[i] = r[i] - DM.origin_coords[i];
     }
     double entry=0;
     double exit=0;
-
+    //cout << "DETECTOR_START\n";
+    //DM.report(cout);
     bool consistency=false;
     for(int i=0; i<6; i++){
+        double bot = ip(b,face[i]);
+        //cout << "bot=" << bot << endl;
+        if(bot==0){
+            continue;
+        }
         double ft = ip(o,face[i])+ip(face[i],face[i]);
+        //cout << "ft" << i << "= " << ft << endl;
+        //cout << face[i][0] << " " << face[i][1] << " " << face[i][2] << endl;
+        //cout << ip(o,face[i]) << endl;
+        //cout << ip(face[i],face[i]) << endl;
         if(ft==0){
             if(consistency)//Two faces are parallel to R=r+n.
             {
@@ -235,19 +250,29 @@ double detector_cuboid::Ldet (const Particle &DM){
                 consistency=true;
             continue;
         }
-        double detcross=(ip(o,face[i])+ip(b,face[i]))/ip(b,face[i]);
-        if(ft<0&&detcross>entry){
+        double detcross=ft/bot;
+        //cout << "detcross=" << detcross << endl;
+        if(ft<0&&(detcross>entry||entry==0.0)){
             entry=detcross;
+            //cout << "entry" << endl;
         }
         else if(detcross>0){
-            if(exit>0||detcross<exit)
-            exit=detcross;
+            if(exit==0||detcross<exit){
+                exit=detcross;
+                //cout << "exit" << endl;
+            }
         }
+        
     }
-    if(entry>exit)
+    if(entry>=exit||entry<0)
         return 0.0;
-    else
+    else{
+        //DM.report(cout);
+        //cout << "CrossReport " << entry << " " << exit << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
+        cross_point[0]=entry;
+        cross_point[1]=exit;
         return (exit-entry)*sqrt(ip(b,b));
+    }
 }
 
 

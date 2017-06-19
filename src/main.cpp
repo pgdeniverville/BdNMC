@@ -174,7 +174,7 @@ int main(int argc, char* argv[]){
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
     function<double(Particle)> det_int = bind(&detector::Ldet,det,_1);//should get rid of this eventually, just pass detector object references.
 	//function<double(Particle)> det_int = [](Particle x){return 1.0;};
-	
+
 	//Production Mode
 	vector<std::shared_ptr<DMGenerator> > DMGen_list;//Should be a unique_ptr
 	vector<std::shared_ptr<Distribution> > PartDist_list;//This is an abstract class from which all distributions inherit.
@@ -505,7 +505,7 @@ int main(int argc, char* argv[]){
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
 					if(burniter->name.compare("DM")==0){
-						SigGen->probscatter(det, *burniter);
+                        SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
 				}
@@ -570,11 +570,13 @@ int main(int argc, char* argv[]){
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
 						scat_list[i]++;
-						if(timing_cut>0)
+						if(timing_cut>0){
 							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
-						else
+                        }
+						else{
 							timing_efficiency[i]+=1;
-						scatter_switch = true;	
+                        }
+                        scatter_switch = true;	
                     }
                 }    
             }

@@ -476,8 +476,8 @@ void Parameter::Build_Detector(map<string, string> &keymap){
                 }
                 if(integrity==0){
                     try{
-                    det = std::make_shared<detector_cuboid>(stod(keymap["x-position"]),stod(keymap["y-position"]),
-                            stod(keymap["z-position"]),stod(keymap["length"]),stod(keymap["width"]),stod(keymap["height"]),
+                        det = std::make_shared<detector_cuboid>(stod(keymap["x-position"]),stod(keymap["y-position"]),
+                            stod(keymap["z-position"]),stod(keymap["width"]),stod(keymap["height"]),stod(keymap["length"]),
                             stod(keymap["det-phi"]),stod(keymap["det-theta"]),stod(keymap["det-psi"]));
                     }
                     catch(exception& e){

@@ -187,6 +187,6 @@ void Particle::Generate_Position(double rngpoint){
     }
 }
 
-void Particle::report(std::ostream& ostr){
+void Particle::report(std::ostream& ostr) const{
     ostr << name << " " << E << " " << px << " " << py << " " << pz << " " << m << " " << origin_coords[0] << " " << origin_coords[1] << " " << origin_coords[2] << " " << origin_coords[3] << " " << end_coords[0] << " " << end_coords[1] << " " << end_coords[2] << " " << end_coords[3] << std::endl;
 } 
