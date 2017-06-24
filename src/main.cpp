@@ -562,7 +562,7 @@ int main(int argc, char* argv[]){
                 if(iter->name.compare("DM")==0){
 					NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
-                        *comprehensive_out << DMGen_list[i]->Channel_Name() << " ";
+                        *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
                         iter->report(*comprehensive_out);
 						scatter_switch=true;
 						continue;
@@ -577,6 +577,10 @@ int main(int argc, char* argv[]){
 							timing_efficiency[i]+=1;
                         }
                         scatter_switch = true;	
+                    }
+                    else{
+                        iter = vec.erase(iter);
+                        iter--;
                     }
                 }    
             }

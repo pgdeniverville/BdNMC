@@ -684,7 +684,11 @@ def lsnd_eval(mass_arr,signal_channel="NCE_electron"):
         return
     if signal_channel=="NCE_electron":
         #write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_interp.dat",p_num_target=8,samplesize=1000,alpha_D=alD)
-        write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_10mev.dat",p_num_target=8,samplesize=1000,alpha_D=alD)
+        #write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_10mev.dat",p_num_target=8,samplesize=1000,alpha_D=alD)
+        #write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_check.dat",p_num_target=8,samplesize=10000,alpha_D=0.5,outlog="Events/lsnd_check_events.dat",output_mode="comprehensive")
+        write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_check.dat",p_num_target=8,samplesize=10000,alpha_D=0.5,outlog="Events/lsnd_check_events.dat",output_mode="comprehensive")
+    elif signal_channel=="test":
+        write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,sumlog="Events/lsnd_check_test.dat",p_num_target=8,samplesize=40000,alpha_D=0.5,outlog="Events/lsnd_check_test_events.dat",output_mode="dm_detector_distribution")
     elif signal_channel=="NCE_nucleon":
         write_lsnd(mdm=MX/1000.0,mv=MV/1000.0,proddist=proddist,prod_chan=prodchan,partlistfile=partlistfile,outfile=parfile,min_scatter_energy=0.018, max_scatter_energy=1000,sumlog="Events/lsnd_thesis3.dat",p_num_target=8,samplesize=1000,signal_chan="NCE_nucleon")
     subp.call(["./build/main", parfile])
@@ -813,9 +817,10 @@ def execute_lsnd_parallel(genlist=True):
         np.savetxt("data/particle_list_lsnd.dat",arr3)
     #massarr=[]
     #chimassarr=[1,2,3,4,5,6,7,8,9,10,11,12,62]+[i for i in range(13,65,3)]
-    chimassarr=[10]
-    vmassarr=[i for i in range(10,30,1)]+[i for i in range(30,130,5)]+[131,132,133,134,135,136,137,138]+[i for i in range(140,700,20)]
-    massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
+    #chimassarr=[10]
+    #vmassarr=[i for i in range(10,30,1)]+[i for i in range(30,130,5)]+[131,132,133,134,135,136,137,138]+[i for i in range(140,700,20)]
+    #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
+    massarr=[[3,1]]
     #vmassarr=[i for i in range(5,400,5)]
     #massarr=[[MV,MV/5] for MV in vmassarr]
     #vmassarr=[i for i in range(600,910,50)]
@@ -834,6 +839,7 @@ def execute_lsnd_parallel(genlist=True):
     #print(massarr)
     for marr in massarr:
         lsnd_eval(marr,signal_channel="NCE_electron")
+        lsnd_eval(marr,signal_channel="test")
     #pool=Pool(processes=4)
     #pool.map(lsnd_eval,massarr)
 
@@ -874,5 +880,5 @@ def execute_t2k_parallel(genlist=True):
 #execute_t2k_parallel(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_miniboone_numi_p(genlist=True)
-execute_ship_parallel(genlist=False)
-#execute_lsnd_parallel(genlist=True)
+#execute_ship_parallel(genlist=False)
+execute_lsnd_parallel(genlist=False)
