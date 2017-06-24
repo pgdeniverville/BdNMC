@@ -159,6 +159,10 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, list<Particle>
 	if(probscatter(det, *DMit, nucleon)&&(min_angle<=0||nucleon.Theta()>min_angle)&&(max_angle>2*pi||nucleon.Theta()<max_angle)){
 		Generate_Position(det, *DMit, nucleon);
 		partlist.insert(std::next(DMit),nucleon);
+        Particle DMout(DMit->m);
+        DMout.name = "Recoil_DM";
+        DMout.ThreeMomentum(DMit->px-nucleon.px,DMit->py-nucleon.py,DMit->pz-nucleon.pz);
+        partlist.insert(std::next(DMit),DMout);
 		return true;
 	}
 	return false;
