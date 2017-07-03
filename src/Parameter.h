@@ -27,13 +27,14 @@ class production_channel{
 		std::string parton_V_n_file, parton_V_p_file;
 		//This map holds sanfordwang parameters.
 		std::map<std::string, std::string> dist_param_map;
-		double meson_per_pi0, PTMAX, ZMIN, ZMAX;
+		double meson_per_pi0, PTMAX, PTMIN, ZMIN, ZMAX;
 		bool particle_list_position;
 		production_channel();
 		bool query_dist_param(){return (dist_param_map.size()!=0);}
 		bool query_dist_param(const std::string &, double&);
 		bool par_list_pos(){return particle_list_position;} 
 		double Meson_Per_Pi0(){return meson_per_pi0;}
+        double ptmin(){return PTMIN;}
 		double ptmax(){return PTMAX;}
 		double zmin(){return ZMIN;}
 		double zmax(){return ZMAX;}
@@ -94,7 +95,8 @@ class Parameter{
 		double Pi0_per_POT(){return pi0ratio;}
 		//Indicates if any custom sanfordwang parameters have been declared.
 		std::string Signal_Channel(){return sig_channel;}
-		std::string Output_File(){return output_file;}
+        bool Coherent(){return coherent;}
+        std::string Output_File(){return output_file;}
 		std::string Output_Mode(){return output_mode;}
 		std::string Summary_File(){return summary_file;}
         std::shared_ptr<detector> Get_Detector(){return det;}
@@ -112,7 +114,8 @@ class Parameter{
 		//std::string parton_V_proton_file;
 		std::string run_name;	
 		std::shared_ptr<std::list<production_channel> >  prodlist; 
-		
+	
+
 		double angle_upper_limit;
 		double angle_lower_limit;
 		double edmres;
@@ -126,7 +129,8 @@ class Parameter{
         std::string output_file;
         std::string summary_file;
 		std::string output_mode;
-	
+        bool coherent;
+
 		double beam_energy;
 		double max_scatter_energy;
 		double min_scatter_energy;
@@ -157,6 +161,7 @@ class Parameter{
 		//void parse_parameter_file(const std::string &, std::map<std::string, std::string> &parammap);
         void Set_Double(const std::string &, double &, std::map<std::string, std::string> &keymap);
         void Set_Integer(const std::string &, int &, std::map<std::string, std::string> &keymap);
+        void Set_Bool(const std::string &, bool &, std::map<std::string, std::string> &keymap, const bool &def);
         void Set_Double(const std::string &, double &, std::map<std::string, std::string> &keymap, const double &def);
         void Set_Integer(const std::string &, int &, std::map<std::string, std::string> &keymap, const int &def);
 		void Set_String(const std::string &, std::string &, std::map<std::string, std::string> &keymap, const std::string &def);

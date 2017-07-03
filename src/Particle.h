@@ -29,7 +29,7 @@ public:
     void     Rotate_x(double);
     void     Rotate_y(double);
     void     Rotate_z(double);
-    void     report(std::ostream&);
+    void     report(std::ostream&) const;
     //void    Generate_4Vector(double s);
 	void 	Set_Origin(double x, double y, double z);
 //    void    Set_Position(double x, double y, double z);

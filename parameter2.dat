@@ -19,7 +19,7 @@ alpha_D 0.1
 #Run parameters
 POT 2e20
 pi0_per_POT 0.9
-samplesize 1000
+samplesize 100
 
 #Optionally, you may specify a number of pi0s per meson
 #meson_per_pi0 0.0333
@@ -28,7 +28,7 @@ samplesize 1000
 #throws away the results until burn_max is reached. If the number of attempts exceeds 
 #burn_max*burn_timeout, the burn_in process aborts early and an alert is written to cerr
 #before the simulation resumes.
-burn_max 1000
+burn_max 10
 burn_timeout 20000 
 
 beam_energy 8.9
@@ -98,11 +98,18 @@ output_mode comprehensive
 #dm_energy_resolution 0.01
 
 #Detector Parameters
-detector sphere
+detector cuboid
+#detector cuboid
 x-position 0.0
-y-position -1.9
-z-position 491.0
-radius 5.0
+y-position 0.0
+z-position 100.0
+#radius 10.0
+width 20.0
+height 20.0
+length 2.0
+det-phi 0.0
+det-theta 0.0
+det-psi 1.57
 
 #Material parameters
 #Mass is set in GeV.

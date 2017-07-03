@@ -19,6 +19,7 @@ const double convmcm = 100.0;
 const double tol_abs=1e-20;
 const double tol_frac=1e-10;
 const double Delta_to_pi0 = 2.0/3.0;
+const double Delta_to_pion_charged = 1.0/3.0;
 const double Delta_to_gamma=0.006;
 
 using std::cout;
@@ -44,7 +45,8 @@ double Pion_Inelastic::Ermin(double E, double mx, double MN){
 }
 
 double Pion_Inelastic::Er_to_theta(double Ex, double EDelta, double mx, double MN){
-    return acos((-pow(Mdelta,2) + 2*Ex*(EDelta - MN) + 2*EDelta*MN - pow(MN,2))/(2.*sqrt((EDelta - Mdelta)*(EDelta + Mdelta))*sqrt((Ex - mx)*(Ex + mx))));
+    //cout << "Ex=" << Ex << " EDelta=" << EDelta << " MN=" << MN << " Bot=" << (2*sqrt(EDelta*EDelta-Mdelta*Mdelta)*sqrt(Ex*Ex-mx*mx)) << " theta=" << acos((2*EDelta*MN+2*EDelta*Ex-2*Ex*mn-Mdelta*Mdelta-mn*mn)/(2*sqrt(EDelta*EDelta-Mdelta*Mdelta)*sqrt(Ex*Ex-mx*mx))) << endl; 
+    return acos((2*EDelta*MN+2*EDelta*Ex-2*Ex*mn-Mdelta*Mdelta-mn*mn)/(2*sqrt(EDelta*EDelta-Mdelta*Mdelta)*sqrt(Ex*Ex-mx*mx)));
 }
 /*
 En: Incident DM energy
@@ -81,6 +83,7 @@ double Pion_Inelastic::GM(double q2){
     return form_factor->Interpolate(q2);
 }
 
+//Minimum total energy for a DM particle to produce a Delta
 double Edm_kinetic_min(double mx, double mN){
     return (pow(Mdelta,2)+2*Mdelta*mx-mN*mN)/(2*mN);
 }
@@ -99,6 +102,13 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
         final_branch=Delta_to_gamma;
         final_name="photon";
     }
+    //Inelegant, but straightforward.
+    //This allows for the possibility of charged pion decays.
+    if(final_state==2){
+        final_branch=Delta_to_pi0+Delta_to_pion_charged;
+        final_mass=0;
+        final_name="pion";//The code will look for this final_name to trigger charged pion handling
+    }
     else{
         final_mass=mpi0;
         final_branch=Delta_to_pi0;
@@ -106,7 +116,7 @@ Pion_Inelastic::Pion_Inelastic(double Emini, double Emaxi, double Eresi, double 
     }
     MAX_Q2_WARNING = false;
     Edmmin=std::max(Emini,std::max(Edm_kinetic_min(MDM, mn),Edm_kinetic_min(MDM, mp))); Edmmax=Emaxi; Edmres=Eresi;
-	Escatmin=NEmin;
+    Escatmin=NEmin;
 	Escatmax=NEmax;
 	//std::cout << Edmmax << " " << Edmmin << endl;
     form_factor = shared_ptr<Linear_Interpolation>();
@@ -219,9 +229,22 @@ This might not be a pion anymore if final_state==1, but it probably will be.
 bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
     Particle pion(final_mass);
     pion.name = final_name;
-    if(probscatter(det, *DMit, pion)&&(min_angle<=0||pion.Theta()>min_angle)&&(max_angle>2*pi||pion.Theta()<max_angle)&&(pion.Kinetic_Energy()>Escatmin)&&(pion.Kinetic_Energy()<Escatmax)){
-        Generate_Position(det, *DMit, pion);
+    Particle Delta(Mdelta);
+    Delta.name = "Delta";
+    Particle Nucleon(0);
+    if(probscatter(det, *DMit, pion, Delta, Nucleon)&&(min_angle<=0||pion.Theta()>min_angle)&&(max_angle>2*pi||pion.Theta()<max_angle)&&(pion.Kinetic_Energy()>Escatmin)&&(pion.Kinetic_Energy()<Escatmax)){
+        Generate_Position(det, *DMit, Delta);
+        Link_Particles_Immediate(Delta, pion);
+        Link_Particles_Immediate(Delta, Nucleon);
+        Particle DMout(DMit->m);
+        DMout.name = "Recoil_DM";
+        DMout.ThreeMomentum(DMit->px-Delta.px,DMit->py-Delta.py,DMit->pz-Delta.pz);
+        
+        //Insert in reverse display order.
         partlist.insert(std::next(DMit),pion);
+        partlist.insert(std::next(DMit),Nucleon);
+        partlist.insert(std::next(DMit),Delta);
+        partlist.insert(std::next(DMit),DMout);
         return true;
     }
     return false;
@@ -256,33 +279,44 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM){
 Scatters a DM particle off a detector nucleon. Stores the outgoing pion in &pion.
 */
 
-bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &pion){ 
+bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &pion, Particle &Delta, Particle &Nucleon){ 
 	if(DM.E<Edmmin)
         return false;
     double LXDet = convmcm*(det->Ldet(DM));
     double XDMp = proton_cross->Interpolate(DM.E)*(det->PNtot());
     double XDMn = neutron_cross->Interpolate(DM.E)*(det->NNtot());
     double prob=LXDet*convGeV2cm2*(XDMp+XDMn);
-    Particle Delta(Mdelta);
-    Delta.name = "Delta";
+
     if(prob > pMax*Random::Flat(0,1)){
         if(prob > pMax){
         	pMax = prob;
         }
-
 		if(XDMp/(XDMn+XDMp) >= Random::Flat(0,1)){
 			std::function<double(double)> Xsec = std::bind(&Pion_Inelastic::dsigma_dER_N,this,DM.E,_1,DM.m,MDP,alD,kap,mp);
 			//Not sure if this check is still necessary.
             if(Ermin(DM.E,DM.m,mp) >= Ermax(DM.E, DM.m, mp)){
 				return false;
             }
+            
             scatterevent(DM, Delta, Xsec, *proton_cross_maxima,mp);
+            //Temporary, may not be a proton!
             Particle Proton(mp);
             Proton.name="Proton";
+            //This could be generalized, not sure the best way to do it yet.
+            if(final_name=="pion"){
+                if(Random::Flat()>1.0/3.0){
+                    pion.name="pi0";
+                    pion.m=mpi0;
+                }
+                else{
+                    pion.name="pi+";
+                    pion.m=MASS_PION_CHARGED;
+                    Proton.name="Neutron";
+                    Proton.m = mn;
+                }
+            }
             TwoBodyDecay(Delta, Proton, pion);
-            //Delta.report(cout);
-            //Proton.report(cout);
-            //pion.report(cout);
+            Nucleon = Proton;
         }
         else{
 			std::function<double(double)> Xsec = std::bind(&Pion_Inelastic::dsigma_dER_N,this,DM.E,_1,DM.m,MDP,alD,kap,mn);
@@ -291,10 +325,21 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
 			scatterevent(DM, Delta, Xsec, *neutron_cross_maxima,mn);
             Particle Neutron(mn);
             Neutron.name = "Neutron";
+            //This could be generalized, not sure the best way to do it yet.
+            if(final_name=="pion"){
+                if(Random::Flat()>1.0/3.0){
+                    pion.name="pi0";
+                    pion.m=mpi0;
+                }
+                else{
+                    pion.name="pi-";
+                    pion.m=MASS_PION_CHARGED;
+                    Neutron.name="Proton";
+                    Neutron.m = mp;
+                }
+            }
             TwoBodyDecay(Delta, Neutron, pion);
-            //Delta.report(cout);
-            //Neutron.report(cout);
-            //pion.report(cout);
+            Nucleon = Neutron;
         }
         return true;
     }
@@ -304,14 +349,14 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, Particle &DM, P
 
 void Pion_Inelastic::scatterevent (Particle &DM, Particle &Delta, std::function<double(double)> Xsec, Linear_Interpolation& Xmax, double mN){
     double Delta_E_max = Ermax(DM.E, DM.m, mN);
-    double Delta_E_min = Ermin(DM.E, DM.m, mN); 
+    double Delta_E_min = Ermin(DM.E, DM.m, mN);
 	double dsigmax = std::max(Xsec(Delta_E_min),Xmax.Interpolate(DM.E));
     double xe,thetaN,phiN,pN;
     while(true){
         xe = Random::Flat(Delta_E_min,Delta_E_max);
         //cout << "xe=" << xe << " Ermin" << Ermin(DM.E, DM.m, mN) << " Ermax " << Ermax(DM.E, DM.m, mN) << endl;
         if(Xsec(xe)/dsigmax > Random::Flat(0,1)){
-            thetaN = Er_to_theta(DM.E,xe,DM.m,Delta.m);
+            thetaN = Er_to_theta(DM.E,xe,DM.m,mN);
             //cout << "theta=" << thetaN << endl;
             phiN = Random::Flat(0,1)*2*pi;
             //pN = sqrt(pow(DM.E+mN-xe,2)-pow(Delta.m,2));

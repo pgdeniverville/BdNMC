@@ -51,7 +51,8 @@ class Scatter{
 
 class Nucleon_Scatter: public Scatter{
 	public:
-		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
+		//Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax, std::string model);
+		Nucleon_Scatter(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax, std::string model, const bool cohere, std::shared_ptr<detector> det);
 		~Nucleon_Scatter(){}
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
@@ -60,17 +61,38 @@ class Nucleon_Scatter: public Scatter{
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
 			generate_cross_sections();
 		}
+		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa, std::shared_ptr<detector>& det){
+			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
+            generate_coherent_cross_sections(det);
+        }
 	private:
+        bool coherent;
 		double scatmax(double);
 		double scatmin(double DM_Energy, double DM_Mass, double Nucleon_Mass);
 		double Edmmin, Edmmax, Edmres;
-		std::unique_ptr<Linear_Interpolation> proton_cross_maxima;
-		std::unique_ptr<Linear_Interpolation> neutron_cross_maxima;
-		std::unique_ptr<Linear_Interpolation> proton_cross;
-		std::unique_ptr<Linear_Interpolation> neutron_cross;
-		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
+		Linear_Interpolation proton_cross_maxima;
+		Linear_Interpolation neutron_cross_maxima;
+		Linear_Interpolation proton_cross;
+		Linear_Interpolation neutron_cross;
+       
+        //Function pointers to cross section functions!
+        double (*dsig_prot)(double, double, double, double, double, double);
+        double (*dsig_neut)(double, double, double, double, double, double);
+        double (*dsig_cohp)(double, double, double, double, double, double, double, double);
+
+        //Coherent Variables
+        std::vector<Linear_Interpolation> atom_maxima;
+        std::vector<Linear_Interpolation> atom_cross;
+        
+        void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void generate_cross_sections();
+		void generate_coherent_cross_sections(std::shared_ptr<detector>& det);
+         
+        void cross_gen_handler(std::function<double(double)> fp, std::function<double(double)> fplim,
+                std::vector<double> &cross_vec, std::vector<double> &cross_vec_maxima,
+                double iter, double m1, const double m2); 
 };
+
 
 //This is good for inelastic
 class Inelastic_Nucleon_Scatter: public Scatter{
@@ -90,7 +112,7 @@ class Inelastic_Nucleon_Scatter: public Scatter{
 		std::string channel_name;
 		double E_min, E_max;
 };
-
+/*Deprecated!
 class Nucleon_Scatter_Baryonic: public Scatter{
 	public:
 		Nucleon_Scatter_Baryonic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax);
@@ -113,7 +135,7 @@ class Nucleon_Scatter_Baryonic: public Scatter{
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void generate_cross_sections();
 };
-
+*/
 class Electron_Scatter: public Scatter{
 	public:
 		Electron_Scatter(double MDM, double MV, double alphaprime, double kappa, double eEmin, double eEmax);
@@ -136,7 +158,7 @@ class Pion_Inelastic: public Scatter{
 		Pion_Inelastic(double Emin, double Emax, double Eres, double MDM, double MV, double alphaprime, double kappa, double NEmin, double NEmax,int final_state=0);
 		~Pion_Inelastic(){}
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
-		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
+		bool probscatter(std::shared_ptr<detector>& det, Particle &DM,Particle &pion, Particle &Delta,Particle &nucleon);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);

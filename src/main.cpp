@@ -80,6 +80,7 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 */
+
 	using namespace std::placeholders;
     string parameter_file;
 
@@ -179,7 +180,7 @@ int main(int argc, char* argv[]){
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
     function<double(Particle)> det_int = bind(&detector::Ldet,det,_1);//should get rid of this eventually, just pass detector object references.
 	//function<double(Particle)> det_int = [](Particle x){return 1.0;};
-	
+
 	//Production Mode
 	vector<std::shared_ptr<DMGenerator> > DMGen_list;//Should be a unique_ptr
 	vector<std::shared_ptr<Distribution> > PartDist_list;//This is an abstract class from which all distributions inherit.
@@ -245,11 +246,11 @@ int main(int argc, char* argv[]){
 			PartDist = parsam;
 		}
 		else if(proddist=="proton_brem"||proddist=="proton_brem_baryonic"){
-			if(proditer->ptmax()<0 || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
+			if(proditer->ptmax()<proditer->ptmin() || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
 				cerr << "Invalid properties for production_distribution proton_brem." << endl;
 				return -1;
 			}
-			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist));
+			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist,proditer->ptmin()));
 			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
 			Vnum = pbd->V_prod_rate()*POT;
 			PartDist = pbd;
@@ -376,6 +377,14 @@ int main(int argc, char* argv[]){
 			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
 			Vnum *= DMGen->BranchingRatio();
 		}
+        else if(prodchoice=="piminus_capture"){
+            PartDist = std::shared_ptr<Distribution>(new DoNothingDist());
+            if(proddist!="default"){
+                cerr << "No production distribution supported for piminus_capture";
+            }
+			DMGen = std::shared_ptr<DMGenerator>(new piminus_capture_gen(mv,mdm,kappa,alD));
+            Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+        }
 		else{
 			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
 			return -1;
@@ -437,18 +446,23 @@ int main(int argc, char* argv[]){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
 	}
 	else if(sigchoice=="NCE_nucleon"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));	
+        SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Kinetic_V",par->Coherent(),det));	
 	}
+    //Eventually these won't have to be separate channels, they'll just check the model!
 	else if(sigchoice=="NCE_nucleon_baryonic"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter_Baryonic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
+		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Baryonic_V",par->Coherent(),det));
 	}
-	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Inelastic_Delta_to_Gamma"){
+	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Pion_Inelastic_Charged"||sigchoice=="Inelastic_Delta_to_Gamma"){
 		//I might need some checking for allowed energies.
         if(sigchoice=="Pion_Inelastic"){
 		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
         }
         else if(sigchoice=="Inelastic_Delta_to_Gamma"){
 		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,1));
+        }
+        //This covers both charged and neutral pion production
+        else if(sigchoice=="Pion_Inelastic_Charged"){
+		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,2));
         }
 	}
 	else if(sigchoice=="Inelastic_Nucleon_Scattering_Baryonic" || sigchoice=="Inelastic_Nucleon_Scattering"){
@@ -513,7 +527,8 @@ int main(int argc, char* argv[]){
 		cout << "Branching Ratio "  << i+1 << " = " << DMGen_list[i]->BranchingRatio() << endl;
 	   	cout <<	"V's produced in channel " << i+1 << " = " << Vnum_list[i] << endl;
 	}
-	cout << "Signal Chanel = " << sigchoice << endl;
+	
+    cout << "Signal Chanel = " << sigchoice << endl;
  	cout << "Beam Energy = " << beam_energy << " GeV" << endl;
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
 	cout << "Minimum Scattering Energy = " << min_scatter_energy << " GeV" <<  endl;
@@ -534,9 +549,15 @@ int main(int argc, char* argv[]){
         
 
 	double BURN_MAX = par->Burn_In();
-	double BURN_OVERRIDE = par->Burn_Timeout();
-	for(int i=0; i<chan_count; i++){
-   		int nburn = 0;
+	
+    if(outmode=="dm_detector_distribution"){
+        BURN_MAX = 0;
+        cout << "Detector_Mode selected.\nSkipping Burn-In.\n";
+    }
+    
+    double BURN_OVERRIDE = par->Burn_Timeout();
+	for(int i=0;BURN_MAX!=0&&i<chan_count; i++){
+        int nburn = 0;
 		if(Vnum_list[i]==0){
 			cout << "Skipping Channel " << i+1 << ", no events expected.\n";
 			continue;
@@ -551,7 +572,7 @@ int main(int argc, char* argv[]){
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
-					if(burniter->name.compare(sig_part_name)==0){
+				    if(burniter->name.compare(sig_part_name)==0){
                         SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
@@ -570,9 +591,10 @@ int main(int argc, char* argv[]){
  	///////////////////
     cout << "Run " << par->Run_Name()  << " Start" << endl;
 
-    if(outmode=="comprehensive")
+    if(outmode=="comprehensive"){
 		*comprehensive_out << "Run " << par->Run_Name() << endl;
-			
+    }	
+
     int trials = 0;
     vector<long> trials_list(chan_count,0);
 	vector<int> scat_list(chan_count,0);
@@ -607,20 +629,25 @@ int main(int argc, char* argv[]){
                 if(iter->name.compare(sig_part_name)==0){
                     NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
-						iter->report(*comprehensive_out);
+                        *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
+                        iter->report(*comprehensive_out);
 						scatter_switch=true;
 						continue;
 					}
 					//may need to replace this with a list<Particle> later
 					if(SigGen->probscatter(det, vec, iter)){
-                        scat_list[i]++;
+						scat_list[i]++;
 						if(timing_cut>0){
 							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
                         }
-                        else{
+						else{
 							timing_efficiency[i]+=1;
                         }
-						scatter_switch = true;	
+                        scatter_switch = true;	
+                    }
+                    else{
+                        iter = vec.erase(iter);
+                        iter--;
                     }
                 }    
             }
@@ -673,6 +700,13 @@ int main(int argc, char* argv[]){
     }
 
 
+    if(outmode=="summary"||outmode=="comprehensive"){
+        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+    }
+    else if(outmode=="dm_detector_distribution"){
+        *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
+    }
+
 	//cout << scattot/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency() << endl;
     summary_out->close();
 	
@@ -692,7 +726,7 @@ int main(int argc, char* argv[]){
 	for(int i=0; i<chan_count;i++)
 		cout << "Predicted number of signal events from channel " << i+1 << " " << DMGen_list[i]->Channel_Name()  <<  " = "  << signal_list[i] << endl;
 	
-	if(outmode=="comprehensive"||outmode=="dm_detector_dist"){
+	if(outmode=="comprehensive"||outmode=="dm_detector_distribution"){
 		cout << "--------------------" << endl;	
 		cout << "Events stored in file " << output_filename << endl;	
 		cout << "--------------------" << endl;

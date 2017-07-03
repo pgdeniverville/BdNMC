@@ -7,6 +7,8 @@
 #include <locale>
 #include "constants.h"
 
+#include "parameter_keys.h"
+
 using std::exception;
 using std::string;
 using std::map;
@@ -15,56 +17,6 @@ using std::endl;
 using std::vector;
 using std::list;
 
-const string beam_energy_key = "beam_energy";
-const string max_dm_energy_key = "max_dm_energy";
-const string dm_energy_res_key = "dm_energy_resolution";
-const string min_scatter_energy_key = "min_scatter_energy";
-const string max_scatter_energy_key = "max_scatter_energy";
-const string angle_lower_limit_key = "min_scatter_angle";
-const string angle_upper_limit_key = "max_scatter_angle";
-const string timing_key = "timing_cut";
-const string scatter_dist_filename_key = "scatter_dist_filename";
-
-const string production_distribution_key = "production_distribution";
-const string particle_list_file_key = "particle_list_file";
-const string prodkey = "production_channel";
-const string meson_per_pi0_key = "meson_per_pi0";
-const string parton_V_neutron_file_key = "parton_V_neutron_file";
-const string parton_V_proton_file_key = "parton_V_proton_file";
-const string sanford_wang_key = "sanfordwang_file";
-const string distribution_parameter_key = "distribution_parameter_file";
-const string ptmax_key = "ptmax";
-const string zmin_key = "zmin";
-const string zmax_key = "zmax";
-const string part_list_pos_key = "particle_list_position";
-
-const string dist_mod_key = "dist_mod";
-const string pos_offset_key = "position_offset";
-
-const string detkey = "detector";
-
-const string modelkey = "model";
-
-const string dmkey = "dark_matter_mass";
-const string Vkey = "dark_photon_mass";
-const string epskey = "epsilon";
-const string alkey = "alpha_D";
-const string signalkey = "signal_channel";
-const string outkey = "output_file";
-const string sumkey = "summary_file";
-const string output_mode_key = "output_mode"; const string out_mode_def = "comprehensive";
-const string efficiency_key = "efficiency";
-const string POTkey = "POT";
-const string pi0_ratio_key = "pi0_per_POT";
-const string burn_in_key = "burn_max";
-const string burn_timeout_key = "burn_timeout";
-const string repeat_key = "repeat_count";
-const string max_trials_key = "max_trials";
-const string seed_key = "seed";
-const string p_cross_key = "proton_target_cross_section";
-vector<string> spherearr = {"radius","x-position","y-position","z-position"};
-vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};
-const string run_key = "run";
 
 //All defaults should be stored here at some point.
 
@@ -198,7 +150,8 @@ production_channel::production_channel(){
 	parton_V_p_file=""; 
 	meson_per_pi0=-1; 
 	PTMAX=-1; 
-	ZMIN=-1;
+	PTMIN=0;
+    ZMIN=-1;
    	ZMAX=-1;
 	particle_list_position=false;
 	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
@@ -251,6 +204,8 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.ZMIN=stod(val);
 			else if(key==ptmax_key)
 				tmpprod.PTMAX=stod(val);
+            else if(key==ptmin_key)
+                tmpprod.PTMIN=stod(val);
 			else if(key==part_list_pos_key){
 				if(lowercase(val)=="true")
 					tmpprod.particle_list_position=true;
@@ -405,6 +360,7 @@ Parameter::Parameter(std::ifstream &instream){
             cerr << "No signal channel selected\n";
             integrity=-1;
         }
+        Set_Bool(coherent_key, coherent, keymap, false); 
 		Set_String(output_mode_key, output_mode, keymap, out_mode_def);	
 		Set_String(run_key, run_name, keymap, std::to_string(time(NULL)));	
 		for(list<production_channel>::iterator iter = prodlist->begin(); iter!=prodlist->end(); iter++)
@@ -511,6 +467,24 @@ void Parameter::Build_Detector(map<string, string> &keymap){
                     }
                 }
             }
+            else if(keymap[detkey]=="cuboid"){
+                for(vector<string>::iterator it = cuboidarr.begin(); it!=cuboidarr.end(); ++it){
+                    if(keymap.count(*it)!=1){
+                        cerr << "Missing detector_cuboid parameter: " << *it << endl;
+                        integrity = -1;
+                    } 
+                }
+                if(integrity==0){
+                    try{
+                        det = std::make_shared<detector_cuboid>(stod(keymap["x-position"]),stod(keymap["y-position"]),
+                            stod(keymap["z-position"]),stod(keymap["width"]),stod(keymap["height"]),stod(keymap["length"]),
+                            stod(keymap["det-phi"]),stod(keymap["det-theta"]),stod(keymap["det-psi"]));
+                    }
+                    catch(exception& e){
+                        cerr << "Exception: " << e.what() << " encountered constructing detector object\n";
+                    }
+                }
+            }
             else{
                 cerr << "Invalid detector shape declared: " << keymap[detkey] << endl;
                 integrity = -1;
@@ -523,6 +497,23 @@ void Parameter::Build_Detector(map<string, string> &keymap){
         }
     
 }//end of Parameter::Build_Detector
+
+void Parameter::Set_Bool(const string &key, bool &var, map<string, string> &keymap, const bool &def){
+    try{
+        if(keymap.count(key)==1){
+            if(keymap[key]=="true"){
+               var = true; 
+            }
+        }
+        else{
+            var = def;
+        }
+    }
+    catch(exception& e){
+            cerr << "Invalid model parameter: " << key << endl;
+            integrity = -1;
+    }
+}
 
 //These should be replaced with a single overloaded function.
 void Parameter::Set_Double(const string &key, double &var, map<string, string> &keymap){

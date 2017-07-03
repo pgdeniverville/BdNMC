@@ -83,7 +83,7 @@ double Proton_Brem_Distribution::d2N_proton_brem_to_V(double z, double pt2){
 		return pow(std::abs(F_1_proton_baryonic(MA*MA,kappa,alpha_D)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*wpp(z,pt2, MA)/4.0/pi;
 	}
 	else 
-		return pow(std::abs(F_1_proton(MA*MA)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*pow(kappa,2)*alphaEM*wpp(z,pt2, MA);
+		return pow(std::abs(F_1_proton(MA*MA)),2)*sigmapp(2*mp*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-mp*mp))))/sigmapp(2*mp*Beam_Energy)*pow(kappa,2)*alphaEM*wpp(z,pt2,MA);
 }
 
 void Proton_Brem_Distribution::set_fit_parameters(production_channel &par){
