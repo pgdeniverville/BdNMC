@@ -9,6 +9,7 @@ double d2breta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD,
 double dbreta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD, double s);
 double breta_to_gamma_dm_dm(double mv, double mx, double kappa, double alphaD);
 
+double Gamma_V(double mv, double mx, double kappa, double alphaD);
 double Gamma_V_to_leptons(double mv, double kappa, double ml);
 double Gamma_V_to_hadrons(double mv, double kappa);
 double Gamma_V_to_visible(double mv, double kappa);

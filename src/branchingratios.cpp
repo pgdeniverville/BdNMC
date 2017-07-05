@@ -143,6 +143,10 @@ double Gamma_V_to_visible(double mv, double kappa){
     return Gamma_V_to_leptons(mv, kappa, MASS_ELECTRON)+Gamma_V_to_leptons(mv, kappa, MASS_MUON)+Gamma_V_to_hadrons(mv, kappa);
 }
 
+double Gamma_V(double mv, double mx, double kappa, double alphaD){
+    return Gamma_V_to_visible(mv, kappa)+GammaV_to_dm_dm(mv, mx, kappa, alphaD);
+}
+
 double GammaV(double mv, double mx, double kappa, double alphaD){
     double term = 0;
     if(mv>2*mx){

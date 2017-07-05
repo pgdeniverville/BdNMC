@@ -494,20 +494,24 @@ int main(int argc, char* argv[]){
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
         }
         //More temporary stuff ugh
-        else if(par->Model_Name()=="Visible_Dark_Photon"){
+        else if(par->Model_Name()=="Dark_Photon_DM"){
             Particle electron(MASS_ELECTRON);
             electron.name = "Electron";
             
+            Particle DM(mdm);
+            DM.name="DM";
+
             Particle muon(MASS_MUON);
             muon.name = "Muon";
 
             Particle hadronic(0);
             hadronic.name = "Hadronic Stuff";
             
+            double GV = Gamma_V(mv,mdm,kappa,alD);
             sig_part_name = "V";
-            lifetime=hbar/Gamma_V_to_visible(mv,kappa);
+            lifetime=hbar/GV;
             double br = 0;
-            if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON))>0){
+            if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON)/GV)>0){
                 Branching_Ratios.push_back(br);
                 cout << "BR(V->e e) = " << br << endl;
                 vector<Particle> vec;
@@ -516,7 +520,7 @@ int main(int argc, char* argv[]){
                 Final_States.push_back(vec);
             }
             
-            if((br=Gamma_V_to_leptons(mv,kappa,MASS_MUON))>0){
+            if((br=Gamma_V_to_leptons(mv,kappa,MASS_MUON)/GV)>0){
                 Branching_Ratios.push_back(br);
                 cout << "BR(V->mu mu) = " << br << endl;
                 vector<Particle> vec;
@@ -525,13 +529,23 @@ int main(int argc, char* argv[]){
                 Final_States.push_back(vec);
             }
 
-            if((br=Gamma_V_to_hadrons(mv,kappa))>0){
+            if((br=Gamma_V_to_hadrons(mv,kappa)/GV)>0){
                 Branching_Ratios.push_back(br);
                 cout << "BR(V->hadronic) = " << br << endl;
                 vector<Particle> vec;
                 vec.push_back(hadronic);
                 Final_States.push_back(vec);
             }
+            
+            if((br=GammaV_to_dm_dm(mv,mdm,kappa,alD)/GV)>0){
+                Branching_Ratios.push_back(br);
+                cout << "BR(V->DM DM) = " << br << endl;
+                vector<Particle> vec;
+                vec.push_back(DM);
+                vec.push_back(DM);
+                Final_States.push_back(vec);
+            }
+
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
         }
         else{
