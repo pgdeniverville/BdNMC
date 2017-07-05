@@ -493,6 +493,47 @@ int main(int argc, char* argv[]){
             sig_part_name = dark_axion_signal_string;
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
         }
+        //More temporary stuff ugh
+        else if(par->Model_Name()=="Visible_Dark_Photon"){
+            Particle electron(MASS_ELECTRON);
+            electron.name = "Electron";
+            
+            Particle muon(MASS_MUON);
+            muon.name = "Muon";
+
+            Particle hadronic(0);
+            hadronic.name = "Hadronic Stuff";
+            
+            sig_part_name = "V";
+            lifetime=hbar/Gamma_V_to_visible(mv,kappa);
+            double br = 0;
+            if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON))>0){
+                Branching_Ratios.push_back(br);
+                cout << "BR(V->e e) = " << br << endl;
+                vector<Particle> vec;
+                vec.push_back(electron);
+                vec.push_back(electron);
+                Final_States.push_back(vec);
+            }
+            
+            if((br=Gamma_V_to_leptons(mv,kappa,MASS_MUON))>0){
+                Branching_Ratios.push_back(br);
+                cout << "BR(V->mu mu) = " << br << endl;
+                vector<Particle> vec;
+                vec.push_back(muon);
+                vec.push_back(muon);
+                Final_States.push_back(vec);
+            }
+
+            if((br=Gamma_V_to_hadrons(mv,kappa))>0){
+                Branching_Ratios.push_back(br);
+                cout << "BR(V->hadronic) = " << br << endl;
+                vector<Particle> vec;
+                vec.push_back(hadronic);
+                Final_States.push_back(vec);
+            }
+            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
+        }
         else{
             cerr << "No model declared for Signal_Decay.\n";
             return -1;

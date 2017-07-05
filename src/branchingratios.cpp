@@ -25,7 +25,7 @@ const double Br_rho_to_e_e = 4.72e-5;
 const double brpi0to2gamma = 0.98823;
 const double bretato2gamma = 0.3941;
 const double Br_omega_to_e_e = 7.28e-5;
-const double mmuon = 0.1057;
+const double mmuon = MASS_MUON;
 const double etafactor = 0.61;
 
 const std::string rratio_filename = "data/rratio.dat";
@@ -121,6 +121,26 @@ double brmasstoVgamma(double mass, double mv, double mx, double kappa, double al
     if(mv>mass)
         return 0;
     return 2*pow(kappa,2)*pow(1-mv*mv/pow(mass,2),3);//scaling less dubious
+}
+
+//V to l+l-
+double Gamma_V_to_leptons(double mv, double kappa, double ml){
+    if(mv<2*ml){
+        return 0;
+    }
+    return 4*pow(kappa,2)*alphaEM*(2*pow(mmuon,2)+mv*mv)*sqrt(mv*mv/4-pow(mmuon,2))/(6.0*mv*mv);
+}
+
+double Gamma_V_to_hadrons(double mv, double kappa){
+    if(!rratio_loaded){
+        Load_2D_Interpolation(rratio_filename,rratio);
+        rratio_loaded=true;
+    }
+    return Gamma_V_to_leptons(mv,kappa,MASS_MUON)*rratio->Interpolate(mv*mv);   
+}
+
+double Gamma_V_to_visible(double mv, double kappa){
+    return Gamma_V_to_leptons(mv, kappa, MASS_ELECTRON)+Gamma_V_to_leptons(mv, kappa, MASS_MUON)+Gamma_V_to_hadrons(mv, kappa);
 }
 
 double GammaV(double mv, double mx, double kappa, double alphaD){
