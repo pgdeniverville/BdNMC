@@ -56,7 +56,7 @@ class SignalDecay: public Scatter{
 
         void set_Model_Parameters(double lifetime, std::vector<double> Branching_Ratios, std::vector<std::vector<Particle> >);
 
-       void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, std::vector<Particle> &scat); 
+       //void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, std::vector<Particle> &scat); 
 
     private:
         std::vector<std::vector<Particle> > Final_States; 

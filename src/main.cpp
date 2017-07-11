@@ -260,7 +260,7 @@ int main(int argc, char* argv[]){
 			return -1;
 		}
 	    
-        if(par->Model_Name()=="Axion_Dark_Photon"){
+        if(par->Model_Name()=="Axion_Dark_Photon"||par->Model_Name()=="Dark_Photon"){
             if(proddist=="proton_brem"){
                 DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
                 cout << DMGen->Channel_Name() << endl;
@@ -494,7 +494,7 @@ int main(int argc, char* argv[]){
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
         }
         //More temporary stuff ugh
-        else if(par->Model_Name()=="Dark_Photon_DM"){
+        else if(par->Model_Name()=="Dark_Photon"){
             Particle electron(MASS_ELECTRON);
             electron.name = "Electron";
             
@@ -507,8 +507,10 @@ int main(int argc, char* argv[]){
             Particle hadronic(0);
             hadronic.name = "Hadronic Stuff";
             
+            //PLaceholder
+            sig_part_name = dark_axion_signal_string;
+            
             double GV = Gamma_V(mv,mdm,kappa,alD);
-            sig_part_name = "V";
             lifetime=hbar/GV;
             double br = 0;
             if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON)/GV)>0){
@@ -687,11 +689,13 @@ int main(int argc, char* argv[]){
                         *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
                         iter->report(*comprehensive_out);
 						scatter_switch=true;
-						continue;
+						continue;;
 					}
 					//may need to replace this with a list<Particle> later
+                    //cout << SigGen->get_pMax() << endl;
 					if(SigGen->probscatter(det, vec, iter)){
-						scat_list[i]++;
+						//cout << "Scatter?\n"; 
+                        scat_list[i]++;
 						if(timing_cut>0){
 							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
                         }

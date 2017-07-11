@@ -124,11 +124,11 @@ double brmasstoVgamma(double mass, double mv, double mx, double kappa, double al
 }
 
 //V to l+l-
-double Gamma_V_to_leptons(double mv, double kappa, double ml){
-    if(mv<2*ml){
+double Gamma_V_to_leptons(double mA, double eps, double ml){
+    if(mA<2*ml){
         return 0;
     }
-    return 4*pow(kappa,2)*alphaEM*(2*pow(mmuon,2)+mv*mv)*sqrt(mv*mv/4-pow(mmuon,2))/(6.0*mv*mv);
+    return  pow(eps*G_ELEC,2)*sqrt(pow(mA,2)-4*ml*ml)*(mA*mA+2*ml*ml)/(12*pi*mA*mA);
 }
 
 double Gamma_V_to_hadrons(double mv, double kappa){
@@ -136,7 +136,9 @@ double Gamma_V_to_hadrons(double mv, double kappa){
         Load_2D_Interpolation(rratio_filename,rratio);
         rratio_loaded=true;
     }
-    return Gamma_V_to_leptons(mv,kappa,MASS_MUON)*rratio->Interpolate(mv*mv);   
+    if(mv>MASS_MUON)
+        return Gamma_V_to_leptons(mv,kappa,MASS_MUON)*rratio->Interpolate(mv*mv);   
+    return 0;
 }
 
 double Gamma_V_to_visible(double mv, double kappa){

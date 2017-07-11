@@ -42,6 +42,7 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
 }
 
 bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
+    //Parentit->report(cout);
     double time1 = (*Parentit).Momentum()*det->cross_point[0]/(*Parentit).Speed()/speed_of_light;
     double time2 = (*Parentit).Momentum()*det->cross_point[1]/(*Parentit).Speed()/speed_of_light;
     if(time1>time2){
@@ -53,6 +54,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
 
     double prob = decay_probability(time1, time2, Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)));
     double u = Random::Flat(0,1);
+    //cout << prob << " " << pMax << " " << u*pMax << endl;
     if(prob>u*pMax){
         Parentit->EVENT_SET=true;
         //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
@@ -78,7 +80,8 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
             daughter1.EVENT_SET=true;            
             daughter2.EVENT_SET=true;
             TwoBodyDecay(*Parentit, daughter1, daughter2);
-
+            double u = Generate_Position(det, *Parentit, daughter1);
+            Generate_Position(*Parentit, daughter2, u);
             partlist.insert(std::next(Parentit),daughter1);
             partlist.insert(std::next(Parentit),daughter2);
         }
