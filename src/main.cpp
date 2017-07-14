@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 */
-
+    //std::ofstream logging("log2.dat", std::ofstream::out);
 	using namespace std::placeholders;
     string parameter_file;
 
@@ -684,6 +684,7 @@ int main(int argc, char* argv[]){
             for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
            	//The way this is structured means I can't do my usual repeat thing to boost stats. 
                 if(iter->name.compare(sig_part_name)==0){
+                    //iter->report(logging);
                     NDM_list[i]++;
 					if(outmode=="dm_detector_distribution"){
                         *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";

@@ -8,6 +8,8 @@
 
 using std::cout; using std::endl;
 
+//std::ofstream logging("log.dat", std::ofstream::out);
+
 V_decay_gen::V_decay_gen(double MV, double MX, double kap, double alp, const std::string chan){
     set_model_params(MV, MX, kap, alp);
 	chan_name=std::string(chan);
@@ -36,11 +38,13 @@ bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)
 
 
 
-	//darkphoton.report(std::cout);
+	//darkphoton.report(logging);
 
     TwoBodyDecay(darkphoton, darkmatter1, darkmatter2);
-  	//darkmatter1.report(std::cout);
-	//darkmatter2.report(std::cout);
+  	//darkmatter1.report(logging);
+	//darkmatter2.report(logging);
+    
+
 
     vec.push_back(darkphoton);
     if((intersect1=det_int(darkmatter1))>0 || (intersect2=det_int(darkmatter2))>0){
