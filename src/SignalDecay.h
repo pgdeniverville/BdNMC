@@ -62,7 +62,8 @@ class SignalDecay: public Scatter{
         std::vector<std::vector<Particle> > Final_States; 
         std::vector<double> Branching_Ratios;
         double Lifetime;
-        std::vector<std::string> Channel_Name; 
+        std::vector<std::string> Channel_Name;
+        //std::vector<int> decay_counts;
 };
 
 #endif

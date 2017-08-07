@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-std::ofstream datalog("piminuslog.dat", std::ios::out);
+//std::ofstream datalog("piminuslog.dat", std::ios::out);
 
 const double mass = 0.129;//From MacDonald et al. 1976. Need to implement a six percent spread.
 //const double pi = 3.14159;

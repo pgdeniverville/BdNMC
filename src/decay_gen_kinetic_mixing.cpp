@@ -134,7 +134,7 @@ void eta_decay_gen::Evaluate_Branching_Ratio(){
         branchingratio = 0;
         cerr << chan_name << " forbidden by energy conservation.";
         return;
-            
+           
     }
     
     branchingratio = breta_to_gamma_dm_dm(mv, mx, kappa, alphaD);
@@ -195,6 +195,12 @@ bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particl
 
     intersect1=det_int(darkmatter1);
     intersect2=det_int(darkmatter2);
+/*
+    meson.report(std::cout);
+    darkphoton.report(std::cout);
+    darkmatter1.report(std::cout);
+    darkmatter2.report(std::cout);
+*/
 
     vec.push_back(meson);
     if((intersect1)>0 || (intersect2)>0){

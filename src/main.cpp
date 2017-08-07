@@ -143,7 +143,13 @@ int main(int argc, char* argv[]){
         summary_filename = "../Events/summary.dat";
     }
 
-
+    //Signal Channel
+	string sigchoice = par->Signal_Channel();
+    //Particles with this name will be checked for intersection with the
+    //detector and passed to Scatter.probscatter.
+    
+    string sig_part_name = "DM";
+	
 	string outmode; 
 	std::unique_ptr<std::ofstream> comprehensive_out; 
 
@@ -260,7 +266,7 @@ int main(int argc, char* argv[]){
 			return -1;
 		}
 	    
-        if(par->Model_Name()=="Axion_Dark_Photon"||par->Model_Name()=="Dark_Photon"){
+        if(par->Model_Name()=="Axion_Dark_Photon"||(par->Model_Name()=="Dark_Photon"&&mv<2*mdm&&sigchoice=="Signal_Decay")){
             if(proddist=="proton_brem"){
                 DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
                 cout << DMGen->Channel_Name() << endl;
@@ -281,7 +287,6 @@ int main(int argc, char* argv[]){
                             Two_Body_Decay_Gen(bretatoVgamma(mv,mdm,kappa,alD),
                             MASS_ETA,"Eta",dp,gamma));
                     PartDist->set_mass(MASS_ETA);
-				
                 }
                 if(proditer->Meson_Per_Pi0()<=0){
 				    Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
@@ -318,7 +323,7 @@ int main(int argc, char* argv[]){
 				Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
 		}
 		else if(prodchoice=="eta_decay"||prodchoice=="eta_decay_baryonic"){
-			if(proddist=="default"){
+            if(proddist=="default"){
 				std::shared_ptr<sanfordwang> sw(new sanfordwang("k0_sanfordwang"));
 				sw->set_fit_parameters(*proditer);
 				PartDist = sw;
@@ -428,11 +433,6 @@ int main(int argc, char* argv[]){
 
 	double EDMRES = par->EDM_RES();
 
-	//Signal Channel
-	string sigchoice = par->Signal_Channel();
-    //Particles with this name will be checked for intersection with the
-    //detector and passed to Scatter.probscatter.
-    string sig_part_name = "DM";
 	std::unique_ptr<Scatter> SigGen;
 //Update this so it scales energy to Beam energy.
 	double max_dm_energy = par->Max_DM_Energy();
@@ -585,7 +585,7 @@ int main(int argc, char* argv[]){
 	   	cout <<	"V's produced in channel " << i+1 << " = " << Vnum_list[i] << endl;
 	}
 	
-    cout << "Signal Chanel = " << sigchoice << endl;
+    cout << "Signal Channel = " << sigchoice << endl;
  	cout << "Beam Energy = " << beam_energy << " GeV" << endl;
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
 	cout << "Minimum Scattering Energy = " << min_scatter_energy << " GeV" <<  endl;
@@ -629,7 +629,7 @@ int main(int argc, char* argv[]){
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
-				    if(burniter->name.compare(sig_part_name)==0){
+                    if(burniter->name.compare(sig_part_name)==0){
                         SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
@@ -639,10 +639,9 @@ int main(int argc, char* argv[]){
 		if(nburn < BURN_MAX){
 			cout << "Burn-In timed out, scattering number=" << nburn << " scattering goal=" << BURN_MAX << endl;
 		}
-
 		cout << "pMax at end of Burn-In = " << SigGen->get_pMax() << endl;
 	}
-
+    
 	///////////////////
     //SIMULATION LOOP//
  	///////////////////
@@ -662,7 +661,11 @@ int main(int argc, char* argv[]){
 	//int escat=0;
     bool scatter_switch;
     int trials_max = par->Max_Trials();
-	for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
+	if(SigGen->get_pMax()==0){
+        cout << "pMax = 0, setting trials = trials_max\n";
+        trials = trials_max;
+    }
+    for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
         int i;
 		scatter_switch = false;
 		double vrnd = Random::Flat(0.0,1)*Vnumtot;
@@ -759,15 +762,13 @@ int main(int argc, char* argv[]){
         }
     }
 
-
-    if(outmode=="summary"||outmode=="comprehensive"){
-        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
-    }
+//    if(outmode=="summary"||outmode=="comprehensive"){
+//        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+//    }
     else if(outmode=="dm_detector_distribution"){
         *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
     }
 
-	//cout << scattot/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency() << endl;
     summary_out->close();
 	
   	if(outmode=="dm_detector_distribution"||outmode=="comprehensive")
