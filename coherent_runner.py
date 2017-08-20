@@ -1,4 +1,4 @@
-from par_writer import *
+from par_writerbak import *
 import numpy as np
 import sys
 
@@ -83,11 +83,11 @@ def execute_coherent(genlist=True):
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     #massarr=massarr+massarr2
     for marr in massarr:
-        coherent_eval(marr,signal_channel="NCE_nucleon",sumlog="Events/coherent_LAr2.dat",coherent="true",det_switch="LAr")
-        coherent_eval(marr,signal_channel="NCE_nucleon",sumlog="Events/coherent_NaI2.dat",coherent="true",det_switch="NaI")
-        coherent_eval(marr,signal_channel="NCE_nucleon_baryonic",sumlog="Events/coherent_LAr2.dat",coherent="true",det_switch="LAr")
-        coherent_eval(marr,signal_channel="NCE_nucleon_baryonic",sumlog="Events/coherent_NaI2.dat",coherent="true",det_switch="NaI")
+        coherent_eval(marr,signal_channel="NCE_nucleon",sumlog="Events/coherent_LAr_test1.dat",coherent="true",det_switch="LAr")
+        #coherent_eval(marr,signal_channel="NCE_nucleon",sumlog="Events/coherent_NaI2.dat",coherent="true",det_switch="NaI")
+        coherent_eval(marr,signal_channel="NCE_nucleon_baryonic",sumlog="Events/coherent_LAr_test1.dat",coherent="true",det_switch="LAr")
+        #coherent_eval(marr,signal_channel="NCE_nucleon_baryonic",sumlog="Events/coherent_NaI2.dat",coherent="true",det_switch="NaI")
 
 
-execute_coherent(genlist=True)
+execute_coherent(genlist=False)
 

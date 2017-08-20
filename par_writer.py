@@ -46,6 +46,8 @@ ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneu
 
 Sodium_Iodide_string = "material Sodium\nnumber_density 1.58e22\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
 
+Cesium_Iodide_string = "material Cesium\nnumber_density 1.04e22\nproton_number 55\n neutron_number 78\nelectron_number 55\nmass 132.9\nmaterial Iodine\nnumber_density 1.04e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
+
 #Don't know what the atomic makeup of the MINOS detector is. Not using this for event generation, so it should be okay.
 MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0\n"
 
@@ -215,7 +217,7 @@ def t2k_superK1000(f):
     xpos=12867.7;ypos=0;zpos=294719;detphi=0;radius=190.5;dettheta=1.5708;length=410;
     f.write("\ndetector cylinder\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\ndet-theta {4}\ndet-phi {5}\nlength {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(dettheta),str(detphi),str(length),str(length)))
-    print("WARNING: This detector is enlarge 1000 fold. Its efficiency must be suppressed in a corresponding manner.")
+    print("WARNING: This detector is enlarged 1000 fold. Its efficiency must be suppressed in a corresponding manner.")
     f.write('\n')
     f.write(Water_string)
 
@@ -238,6 +240,12 @@ def coherent_detector_NaI(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.601,length=2*0.
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
     f.write(Sodium_Iodide_string)
+0.08
+def coherent_detector_CsI(f,xpos=19.6,ypos=0.0,zpos=0.0,radius=0.08,length=2*0.08,theta=pi/2.0,phi=pi/2.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Cesium_Iodide_string)
 
 #############
 #EXPERIMENTS#
@@ -250,7 +258,7 @@ def write_miniboone(d={},det=miniboone_detector):
     context.update(d)
     write_experiment(det,context)
 
-t2k_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_t2k.dat"], "sumlog" : "Events/t2k.dat", "outlog" : "Events/t2k_events.dat", "beam_energy" : 30, "n_num_target" : 6, "p_num_target" : 6, "ptmax" : 1, "zmin" : 0.2, "zmax" : 0.8, "pi0_per_POT" : 1.0, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_energy" : 0.035, "max_scatter_energy" : 2, "p_cross" : 15*mb}
+t2k_default = {"POT" : 8e21, "proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_t2k.dat"], "sumlog" : "Events/t2k.dat", "outlog" : "Events/t2k_events.dat", "beam_energy" : 30, "n_num_target" : 6, "p_num_target" : 6, "ptmax" : 1, "zmin" : 0.2, "zmax" : 0.8, "pi0_per_POT" : 1.0, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_energy" : 0.035, "max_scatter_energy" : 2, "p_cross" : 15*mb}
 
 def write_t2k(d={}, det=t2k_ND280):
     context = t2k_default.copy()
@@ -274,7 +282,8 @@ def write_lsnd(d={}, det=lsnd_detector):
     context.update(d)
     write_experiment(det,context)
 
-coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 0.018, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.5, "beam_energy" : 1.0, "p_num_target" : 80, "n_num_target" : 0, "POT" : 1e23, "pi0_per_POT" : 0.1, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" : meson_per_pi0_coherent}
+coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 0.018, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.5, "beam_energy" : 1.0, "p_num_target" : 80, "n_num_target" : 0, "POT" : 1e23, "pi0_per_POT" : 0.1, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" :
+        meson_per_pi0_coherent, "outlog" : "Events/coherent_events.dat"}
 
 def write_coherent(d={}, det=coherent_detector_LAr):
     context = coherent_default.copy()

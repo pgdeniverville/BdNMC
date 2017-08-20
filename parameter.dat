@@ -146,12 +146,6 @@ neutron_number 0
 electron_number 1
 mass 0.945778
 
-
-
-
-
-
-
 #When run, this file should write a final signal estimate to terminal that looks like:
 
 #Predicted number of signal events = 284.31

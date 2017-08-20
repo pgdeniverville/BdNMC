@@ -18,7 +18,7 @@ _pion_inelastic_channels={"Pion_Inelastic","Pion_Inelastic_Charged","Inelastic_D
 #write_miniboone(mdm=0.005,mv=0.4,proddist=["","","proton_brem"],prod_chan=["pi0_decay","eta_decay","V_decay"],partlistfile=["","",""])
 rho_decay_switch=False
 
-_DET_XPOS = 0.0
+DET_XPOS = 0.0
 _DET_YPOS = 0.0
 _DET_ZPOS = 100
 
@@ -222,13 +222,13 @@ def t2k_eval(d_user):
         return
 
     if signal_channel=="NCE_nucleon":
-        if detswitch == "superk":
-            user2 = {"samplesize" : 500, "min_scatter_energy" : 0.0014, "max_scatter_energy" : 1000.0, "efficiency" : 0.66/1000.0, "sumlog" : "Events/superk_y,dat"}
-        elif detswitch == "P0D":
+        if det_switch == "superk":
+            user2 = {"samplesize" : 500, "min_scatter_energy" : 0.0014, "max_scatter_energy" : 1000.0, "efficiency" : 0.66/1000.0, "sumlog" : "Events/superk_y,dat","timing" : 5e-8}
+        elif det_switch == "P0D":
             pass
     elif signal_channel in _pion_inelastic_channels:
         if det_switch == "superk":
-            user2 = {"efficiency" : 0.66/1000.0, "samplesize" : 1000, "min_scatter_energy" : 0.0, "max_scatter_energy" : 1000.0}
+            user2 = {"efficiency" : 0.66/1000.0, "samplesize" : 1000, "min_scatter_energy" : 0.0, "max_scatter_energy" : 1000.0, "timing" : 5e-8}
         elif det_switch == "P0D":
             #Warning, efficiency is arbitrary right now!
             user2 = {"samplesize" : 1000, "min_scatter_energy" : 0.0, "max_scatter_energy" : 1000.0, "efficiency" : 0.5, "sumlog" : "Events/t2k_pod_y.dat"}
@@ -242,7 +242,7 @@ def t2k_eval(d_user):
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
 
     if det_switch == "superk":
-        write_t2k(d, det=t2k_superk1000)
+        write_t2k(d, det=t2k_superK1000)
     elif det_switch == "P0D":
         write_t2k(d)
 
@@ -270,7 +270,7 @@ def numi_eval(d_user):
     signal_channel = d["signal_chan"]
 
     t0 = time.time()
-    parfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
+    outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
     #if MX/1000.0<mpi0/2.0:
     if "DIST" in d and "ANGLE" in d:
         _DIST = d["DIST"]
@@ -382,7 +382,68 @@ def numi_eval(d_user):
     print("\ntime={}\n".format(t1-t0))
     t0 = time.time()
     subp.call(["rm", outfile])
-#END OF numi_eval
+#####END OF numi_eval############
+
+def coherent_eval(d_user):
+    d = numi_defaults.copy()
+    d.update(d_user)
+    MV=d["mv"]
+    MX=d["mdm"]
+    channels = d["channels"]
+    det_switch=d["det_switch"]
+    if "alpha_D" in d:
+        alD=d["alpha_D"]
+    if 'eps' in d:
+        eps=d['eps']
+    sumlog=d["sumlog"]
+    signal_channel = d["signal_chan"]
+
+    t0 = time.time()
+    outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
+
+    proddist = []
+    prodchan = []
+    partlistfile = [    ]
+    executing=False
+    if signal_channel=="NCE_nucleon_baryonic":
+        if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay_baryonic")
+            partlistfile.append("data/particle_list.dat")
+            executing = True
+    else:
+        if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/particle_list.dat")
+            executing = True
+        if MX/1000.0<0.129/2.0 and MV<600 and MV>2*MX and _piminus_cap in channels:
+            proddist.append("")
+            prodchan.append("piminus_capture")
+            partlistfile.append("")
+            executing = True
+    if not executing:
+        return
+
+    if signal_channel=="NCE_nucleon":
+        user2 = {"samplesize" : 1000, "min_scatter_energy" : 5e-6, "max_scatter_energy" : 0.2, "efficiency" : 0.5, "sumlog" : "Events/coherent.dat", "coherent" : "true", "eps" : 1e-3, "burn_max" : 1000}
+    elif signal_channel == "NCE_nucleon_baryonic":
+        user2 = {"samplesize" : 1000, "min_scatter_energy" : 5e-6, "max_scatter_energy" : 0.2, "efficiency" : 0.5, "sumlog" : "Events/coherent_baryonic.dat", "eps" : 0.0, "coherent" : "true", "alpha_D" : 1e-4, "burn_max" : 1000}
+    d.update(user2)
+    d.update(d_user)
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "outfile" : outfile})
+    if det_switch == "csi":
+        write_coherent(d=d,det=coherent_detector_CsI)
+    else:
+        write_coherent(d=d)
+
+    subp.call(["./build/main", outfile])
+    t1 = time.time()
+    print("\ntime={}\n".format(t1-t0))
+    t0 = time.time()
+    subp.call(["rm", outfile])
+#END OF coherent_eval
+
 
 def execute_miniboone_parallel(genlist = True):
     if genlist:
@@ -423,15 +484,31 @@ def execute_t2k(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_t2k(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr={10,50,100,150,200,300,400,500,600,700,760,770,780,800,900,1000,1250,1500,1750,2000}
-    vmarr={1100,1200,1300,1400,2250,2500,2750,3000}
+    vmarr=[10,50,100,150,200,300,400,500,600,700,760,770,780,800,900,1000,1250,1500,1750,2000]
+    vmarr=vmarr+[1100,1200,1300,1400,2250,2500,2750,3000,3250,3500,3750,4000]
     epsarr={1e-3}
     chans={_pion_decay,_eta_decay,_brem,_parton}
     massarr=[[mv,mv/3.0,eps,chan] for mv in vmarr for eps in epsarr for chan in chans]
     for marr in massarr:
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "channels" : [marr[3]], "signal_chan" : "Pion_Inelastic", "outmode" : "comprehensive", "det_switch" : "P0D", "samplesize" : 1000, "model" : "Dark_Photon", "sumlog" : "Events/t2k_pod_chan.dat", "ptmax" : 2}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "channels" : [marr[3]], "signal_chan" : "NCE_nucleon", "outmode" : "comprehensive", "det_switch" : "superk", "samplesize" : 500, "model" : "Dark_Photon", "sumlog" : "Events/t2k_superk_chan2.dat", "ptmax" : 2}
         t2k_eval(d)
+
+def execute_coherent(genlist=True):
+    if genlist:
+        d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 1e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_coherent.dat"], "p_num_target" : 80}
+        write_coherent(d=d)
+        subp.call(["./build/main","parameter_run.dat"])
+    vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140]+[3,5,6,9]
+    #chimassarr=[5]
+    #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
+    massarr=[[MV,MV/3.0] for MV in vmassarr]
+    for marr in massarr:
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "csi", "samplesize" : 500, "sumlog" : "Events/coherent_CsI2.dat"}
+        coherent_eval(d)
+        d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi", "samplesize" : 500, "sumlog" : "Events/coherent_CsI2.dat"}
+        coherent_eval(d)
 
 #execute_numi(genlist=False)
 #execute_miniboone_parallel(genlist=False)
-execute_t2k(genlist=False)
+#execute_t2k(genlist=False)
+execute_coherent(genlist=False)
