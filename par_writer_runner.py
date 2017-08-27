@@ -409,13 +409,13 @@ def coherent_eval(d_user):
         if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay_baryonic")
-            partlistfile.append("data/particle_list.dat")
+            partlistfile.append("data/particle_list_coherent.dat")
             executing = True
     else:
         if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
-            partlistfile.append("data/particle_list.dat")
+            partlistfile.append("data/particle_list_coherent.dat")
             executing = True
         if MX/1000.0<0.129/2.0 and MV<600 and MV>2*MX and _piminus_cap in channels:
             proddist.append("")
@@ -424,16 +424,32 @@ def coherent_eval(d_user):
             executing = True
     if not executing:
         return
-
+    _captain_dets = ["captain","captain_off"]
+    _coherent_dets = ["csi",'csi1T']
     if signal_channel=="NCE_nucleon":
-        user2 = {"samplesize" : 1000, "min_scatter_energy" : 5e-6, "max_scatter_energy" : 0.2, "efficiency" : 0.5, "sumlog" : "Events/coherent.dat", "coherent" : "true", "eps" : 1e-3, "burn_max" : 1000}
+        if det_switch in _captain_dets:
+            user2 = {"samplesize" : 1000, "min_scatter_energy" : 0.03, "max_scatter_energy" : 0.2, "efficency" : 0.5, "coherent" : "false", "burn_max" : 1000, "sumlog" : "Events/captain.dat"}
+        else:
+                user2 = {"samplesize" : 1000, "min_scatter_energy" : 5e-6, "max_scatter_energy" : 0.2, "efficiency" : 0.5, "sumlog" : "Events/coherent.dat", "coherent" : "true", "eps" : 1e-3, "burn_max" : 1000}
     elif signal_channel == "NCE_nucleon_baryonic":
         user2 = {"samplesize" : 1000, "min_scatter_energy" : 5e-6, "max_scatter_energy" : 0.2, "efficiency" : 0.5, "sumlog" : "Events/coherent_baryonic.dat", "eps" : 0.0, "coherent" : "true", "alpha_D" : 1e-4, "burn_max" : 1000}
+    if signal_channel=="NCE_electron":
+        if det_switch in _captain_dets:
+            user2 = {"samplesize" : 1000, "min_scatter_energy" : 0.01, "max_scatter_energy" : 0.2, "efficency" : 0.5, "coherent" : "false", "burn_max" : 1000, "sumlog" : "Events/captain.dat"}
+    if signal_channel in _pion_inelastic_channels:
+        if det_switch in _captain_dets:
+            user2 = {"samplesize" : 1000, "burn_max" : 1000, "min_scatter_energy" : 0.0, "max_scatter_energy" : 1, "efficency" : 0.5, "coherent" : "false", "burn_max" : 1000, "sumlog" : "Events/captain.dat"}
     d.update(user2)
     d.update(d_user)
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "outfile" : outfile})
     if det_switch == "csi":
         write_coherent(d=d,det=coherent_detector_CsI)
+    if det_switch == 'csi1T':
+        write_coherent(d=d,det=coherent_detector_CsI_1T)
+    if det_switch == "captain":
+        write_coherent(d=d,det=captain_detector)
+    if det_switch == "captain_off_axis":
+        write_coherent(d=d,det=captain_detector_off)
     else:
         write_coherent(d=d)
 
@@ -498,15 +514,15 @@ def execute_coherent(genlist=True):
         d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 1e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_coherent.dat"], "p_num_target" : 80}
         write_coherent(d=d)
         subp.call(["./build/main","parameter_run.dat"])
-    vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140]+[3,5,6,9]
-    #chimassarr=[5]
+    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
+    vmassarr=[170,180,190,200,225,250]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "csi", "samplesize" : 500, "sumlog" : "Events/coherent_CsI2.dat"}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "csi1T", "samplesize" : 2000, "sumlog" : "Events/coherent_CsI_1T.dat"}
         coherent_eval(d)
-        d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi", "samplesize" : 500, "sumlog" : "Events/coherent_CsI2.dat"}
-        coherent_eval(d)
+        #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
+        #coherent_eval(d)
 
 #execute_numi(genlist=False)
 #execute_miniboone_parallel(genlist=False)

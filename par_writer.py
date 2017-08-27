@@ -247,6 +247,24 @@ def coherent_detector_CsI(f,xpos=19.6,ypos=0.0,zpos=0.0,radius=0.08,length=2*0.0
     f.write('\n')
     f.write(Cesium_Iodide_string)
 
+def coherent_detector_CsI_1T(f,xpos=20,ypos=0.0,zpos=0.0,radius=0.328,length=2*0.328,theta=pi/2.0,phi=pi/2.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Cesium_Iodide_string)
+
+def captain_detector(f,xpos=0.0,ypos=0.0,zpos=30.0,radius=1,length=1.15,theta=pi/2.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+def captain_detector_off(f,xpos=30.0,ypos=0.0,zpos=0.0,radius=1,length=1.15,theta=pi/2.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
 #############
 #EXPERIMENTS#
 #############
