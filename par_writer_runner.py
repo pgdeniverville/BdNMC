@@ -340,7 +340,7 @@ def numi_eval(d_user):
     	    prodchan.append("parton_production")
     	    partlistfile.append("")
             executing=True
-        if MV/2.0>MX and proton_brem_switch and _brem in channels:
+        if (MV/2.0>MX or signal_channel=="Signal_Decay") and _brem in channels:
     	    proddist.append("proton_brem")
     	    prodchan.append("V_decay")
      	    partlistfile.append("")
@@ -360,10 +360,17 @@ def numi_eval(d_user):
         outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(eps))
         user2 = {"min_scatter_energy" : 0.0, "max_scatter_energy" : 120.0,  "efficiency" : 1, "outfile" : outfile}
         if det_switch == "nova":
+            user2["sumlog"] = "Decay_Events/nova_decay.dat"
             user2["outlog"] = "Decay_Events/nova_decay_events_{}_{}.dat".format(str(MV),str(eps))
+        elif det_switch == "nova_absorber":
+            user2["sumlog"] = "Decay_Events/nova_abs_decay.dat"
+            user2["outlog"] = "Decay_Events/nova_abs_decay_events_{}_{}.dat".format(str(MV),str(eps))
         elif det_switch == "minos":
             user2["outlog"] = "Decay_Events/minos_decay_events_{}_{}.dat".format(str(MV),str(eps))
             user2["sumlog"] = "Decay_Events/minos_decay.dat"
+        elif det_switch == "minos_absorber":
+            user2["outlog"] = "Decay_Events/minos_abs_decay_events_{}_{}.dat".format(str(MV),str(eps))
+            user2["sumlog"] = "Decay_Events/minos_abs_decay.dat"
         elif det_switch == "miniboone_numi":
             user2["outlog"] = "Decay_Events/mini_numi_decay_events_{}_{}.dat".format(str(MV),str(eps))
             user2["sumlog"] = "Decay_Events/mini_numi_decay.dat"
@@ -373,8 +380,12 @@ def numi_eval(d_user):
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "nova":
         write_numi(d=d)
+    elif det_switch == "nova_absorber":
+        write_numi(d=d,det=NOvA_absorber_detector)
     elif det_switch == "minos":
         write_numi(d=d,det=MINOS_detector)
+    elif det_switch == "minos_absorber":
+        write_numi(d=d,det=MINOS_absorber_detector)
     elif det_switch == "miniboone_numi":
         write_numi(d=d,det=miniboone_detector_numi)
     subp.call(["./build/main", outfile])
@@ -475,8 +486,8 @@ def execute_miniboone_parallel(genlist = True):
     #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
     for marr in massarr:
-        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "outmode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "outmode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs}
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs}
         miniboone_eval(d)
 
 def execute_numi(genlist=True):
@@ -485,14 +496,18 @@ def execute_numi(genlist=True):
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     vmarr={10,100,300,500,770}
-    epsarr={1e-5,3e-6,1e-6,3e-7,1e-7,3e-7,1e-8,3e-8}
+    epsarr={3e-4,1e-4,3e-5,1e-5,3e-6,1e-6,3e-7,1e-7,3e-7,1e-8,3e-8}
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     for marr in massarr:
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "outmode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
         numi_eval(d)
-        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "outmode" : "comprehensive", "det_switch" : "minos", "samplesize" : 1000}
+        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos", "samplesize" : 1000}
         numi_eval(d)
-        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "outmode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
+        numi_eval(d)
+        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
+        numi_eval(d)
+        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
         numi_eval(d)
 
 def execute_t2k(genlist=True):
@@ -506,7 +521,7 @@ def execute_t2k(genlist=True):
     chans={_pion_decay,_eta_decay,_brem,_parton}
     massarr=[[mv,mv/3.0,eps,chan] for mv in vmarr for eps in epsarr for chan in chans]
     for marr in massarr:
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "channels" : [marr[3]], "signal_chan" : "NCE_nucleon", "outmode" : "comprehensive", "det_switch" : "superk", "samplesize" : 500, "model" : "Dark_Photon", "sumlog" : "Events/t2k_superk_chan2.dat", "ptmax" : 2}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "channels" : [marr[3]], "signal_chan" : "NCE_nucleon", "output_mode" : "comprehensive", "det_switch" : "superk", "samplesize" : 500, "model" : "Dark_Photon", "sumlog" : "Events/t2k_superk_chan2.dat", "ptmax" : 2}
         t2k_eval(d)
 
 def execute_coherent(genlist=True):
@@ -524,7 +539,7 @@ def execute_coherent(genlist=True):
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
 
-#execute_numi(genlist=False)
+execute_numi(genlist=False)
 #execute_miniboone_parallel(genlist=False)
 #execute_t2k(genlist=False)
-execute_coherent(genlist=False)
+#execute_coherent(genlist=False)

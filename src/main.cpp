@@ -163,7 +163,6 @@ int main(int argc, char* argv[]){
     	}
 	}
     
-
 	parstream.close();
     
 	//Run Parameters
@@ -495,6 +494,8 @@ int main(int argc, char* argv[]){
         }
         //More temporary stuff ugh
         else if(par->Model_Name()=="Dark_Photon"){
+            cout << "Setting up signal decay!"  << endl;
+            
             Particle electron(MASS_ELECTRON);
             electron.name = "Electron";
             
@@ -646,6 +647,7 @@ int main(int argc, char* argv[]){
     //SIMULATION LOOP//
  	///////////////////
     cout << "Run " << par->Run_Name()  << " Start" << endl;
+
 
     if(outmode=="comprehensive"){
 		*comprehensive_out << "Run " << par->Run_Name() << endl;

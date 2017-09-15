@@ -57,6 +57,7 @@ defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan"
 def write_experiment(write_detector,user):
     context = defaults.copy()
     context.update(user)
+    print("Writing this!")
     print(context)
     prod_chan = context["prod_chan"]; signal_chan = context["signal_chan"]; proddist = context["proddist"]; partlistfile = context["partlistfile"]
     eps = context["eps"]; mdm = context["mdm"]; mv = context["mv"]; alpha_D = context["alpha_D"]; outfile = context["outfile"];
@@ -169,6 +170,9 @@ def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=MINOS_target_z,radius=2.2,length=1.7
     f.write('\n')
     f.write(MINOS_string)
 
+def MINOS_absorber_detector(f):
+    MINOS_detector(f,zpos=MINOS_absorber_z)
+
 NOvA_absorber_d=240
 NOvA_target_d=920
 NOvA_angle=0.0575959#3.3 degree
@@ -179,6 +183,9 @@ def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_angle),zpos=NOvA_t
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')
     f.write(MINOS_string)
+
+def NOvA_absorber_detector(f):
+    NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_angle),zpos=NOvA_absorber_d*math.cos(NOvA_angle))
 
 def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,radius=2.38,length=4.76,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
