@@ -183,7 +183,7 @@ int main(int argc, char* argv[]){
 
 	//Detector setup
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
-    function<double(Particle)> det_int = bind(&detector::Ldet,det,_1);//should get rid of this eventually, just pass detector object references.
+    function<double(Particle&)> det_int = bind(&detector::Ldet,det,_1);//should get rid of this eventually, just pass detector object references.
 	//function<double(Particle)> det_int = [](Particle x){return 1.0;};
 
 	//Production Mode
@@ -513,6 +513,7 @@ int main(int argc, char* argv[]){
             
             double GV = Gamma_V(mv,mdm,kappa,alD);
             lifetime=hbar/GV;
+            cout << "Width: " << GV << " Lifetime " << lifetime << endl;
             double br = 0;
             if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON)/GV)>0){
                 Branching_Ratios.push_back(br);
@@ -630,7 +631,7 @@ int main(int argc, char* argv[]){
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
-                    if(burniter->name.compare(sig_part_name)==0){
+                    if(burniter->name==sig_part_name){
                         SigGen->probscatter(det, *burniter);
 						nburn++;
 					}

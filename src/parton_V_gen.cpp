@@ -20,7 +20,7 @@ void parton_V_gen::Evaluate_Branching_Ratio(){
 	OFF_SHELL = false;
 }
 
-bool parton_V_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle &part){
+bool parton_V_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle &part){
     double intersect1=0;
     double intersect2=0;
 

@@ -12,6 +12,7 @@ Particle::Particle(double mass){
         origin_coords[i]=0.0;
 		end_coords[i]=0.0;
 	}
+    crossing[0]=0; crossing[1]=0;
     EVENT_SET = false;
 }
 
@@ -22,6 +23,8 @@ Particle::Particle(const Particle &part){
         origin_coords[i]=part.origin_coords[i];
 		end_coords[i]=part.end_coords[i];
 	}
+    crossing[0]=part.crossing[0];
+    crossing[1]=part.crossing[1];
 	EVENT_SET = part.EVENT_SET;
 	name = part.name;
 }
@@ -35,6 +38,8 @@ Particle& Particle::operator=(const Particle& part){
 	}
 	EVENT_SET = part.EVENT_SET;
 	name = part.name;
+    crossing[0]=part.crossing[0];
+    crossing[1]=part.crossing[1];
 	return *this;
 }
 
@@ -93,9 +98,9 @@ void Particle::Set_Creation_Time(double t){
 }
 
 void Particle::Set_Time(double t){
-	end_coords[0]=(t-origin_coords[3])*Speed()*speed_of_light*px/Momentum()+origin_coords[0];
-    end_coords[1]=(t-origin_coords[3])*Speed()*speed_of_light*py/Momentum()+origin_coords[1];
-	end_coords[2]=(t-origin_coords[3])*Speed()*speed_of_light*pz/Momentum()+origin_coords[2];	
+	for(int i = 0; i!=3; i++){
+        end_coords[i]=(t-origin_coords[3])*Speed()*speed_of_light*px/Momentum()+origin_coords[i];
+    }
     end_coords[3]=t;
 }
 

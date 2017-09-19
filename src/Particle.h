@@ -42,6 +42,7 @@ public:
     //I should design custom 4 vector objects. Also 3 vector objects which 4-vectors hold.
     double origin_coords[4];//space-time location where the particle was created
 	double end_coords[4];//Stores the space-time location where the particle scatters or is otherwise destroyed.
+    double crossing[2];//This keeps track of when a particle crosses through a detector. This will eventually replace det_cross in detector objects!
     bool EVENT_SET;//I am going to have to be careful with this variable.
 };
 

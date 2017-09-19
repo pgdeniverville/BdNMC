@@ -56,7 +56,7 @@ void pion_decay_gen_baryonic::sample_dist(double& s, double& theta){
     }
 }
 
-bool pion_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool pion_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
@@ -148,7 +148,7 @@ void eta_decay_gen_baryonic::sample_dist(double& s, double& theta){
     }
 }
 
-bool eta_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool eta_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
@@ -205,7 +205,7 @@ void omega_decay_gen_baryonic::Evaluate_Branching_Ratio(){
     branchingratio = bromega_to_Vb(mv, mx, kappa,alphaD);
 }
 
-bool omega_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part ){
+bool omega_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part ){
     double intersect1=0;
     double intersect2=0;
     
@@ -257,7 +257,7 @@ void phi_decay_gen_baryonic::Evaluate_Branching_Ratio(){
     branchingratio = brphi_to_Vb(mv, mx, kappa,alphaD)*brVB_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool phi_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool phi_decay_gen_baryonic::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     

@@ -178,7 +178,8 @@ NOvA_target_d=920
 NOvA_angle=0.0575959#3.3 degree
 
 def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_angle),zpos=NOvA_target_d*math.cos(NOvA_angle),height=4.2,length=14.3,width=2.9,theta=-0.0575959,phi=0,psi=0):
-    print("This detector should not be used for event generation!")
+    print("This NOvA detector should not be used for event generation!")
+    #print("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write("\ndetector cuboid\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')

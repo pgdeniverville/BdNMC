@@ -66,7 +66,7 @@ void piminus_capture_gen::sample_dist(double& s, double& theta){
     }
 }
 
-bool piminus_capture_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle &darkphoton){
+bool piminus_capture_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle &darkphoton){
     double intersect1=0;
     double intersect2=0;
 

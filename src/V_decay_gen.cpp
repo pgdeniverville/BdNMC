@@ -25,7 +25,7 @@ void V_decay_gen::Evaluate_Branching_Ratio(){
     OFF_SHELL = false;
 }
 
-bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
 
@@ -74,7 +74,7 @@ void Do_Nothing_Gen::Evaluate_Branching_Ratio(){
 }
 
 
-bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     part.name = Part_Name;
     vec.push_back(part);
     
@@ -97,7 +97,7 @@ Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mas
     branchingratio=branching_ratio;
 }
 
-bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     Particle parent = Particle(part);
     parent.name = Part_Name;
     vec.push_back(parent);

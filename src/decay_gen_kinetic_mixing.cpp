@@ -67,7 +67,7 @@ void pion_decay_gen::sample_dist(double& s, double& theta){
     }
 }
 
-bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     Particle meson = part;
@@ -169,7 +169,7 @@ void eta_decay_gen::sample_dist(double& s, double& theta){
     }
 }
 
-bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool eta_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     
@@ -237,7 +237,7 @@ void rho_decay_gen::Evaluate_Branching_Ratio(){
     branchingratio = brrho_to_V(mv, mx, kappa,alphaD)*brV_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool rho_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part ){
+bool rho_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part ){
     double intersect1=0;
     double intersect2=0;
     
@@ -290,7 +290,7 @@ void omega_decay_gen::Evaluate_Branching_Ratio(){
     branchingratio = bromega_to_V(mv, mx, kappa,alphaD)*brV_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool omega_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part ){
+bool omega_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part ){
     double intersect1=0;
     double intersect2=0;
     
@@ -343,7 +343,7 @@ void phi_decay_gen::Evaluate_Branching_Ratio(){
     branchingratio = brphi_to_V(mv, mx, kappa,alphaD)*brV_to_dm_dm(mv,mx,kappa,alphaD);
 }
 
-bool phi_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle)> det_int, Particle& part){
+bool phi_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     double intersect1=0;
     double intersect2=0;
     

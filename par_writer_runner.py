@@ -325,12 +325,12 @@ def numi_eval(d_user):
             partlistfile.append("")
             executing=True
     else:
-        if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
+        if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             partlistfile.append("data/particle_list_numi.dat")
             executing=True
-        if MX/1000.0<meta/2.0 and MV<900.0 and _eta_decay in channels:
+        if ((MX/1000.0<meta/2.0 and MV<900.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay")
             partlistfile.append("data/particle_list_numi.dat")
@@ -495,6 +495,13 @@ def execute_numi(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
+    vmarr={100,500,700}
+    epsarr={1e-4,1e-5,1e-6,1e-7,1e-8}
+    massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    for marr in massarr:
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
+        numi_eval(d)
+    '''
     vmarr={10,100,300,500,770}
     epsarr={3e-4,1e-4,3e-5,1e-5,3e-6,1e-6,3e-7,1e-7,3e-7,1e-8,3e-8}
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
@@ -509,7 +516,7 @@ def execute_numi(genlist=True):
         numi_eval(d)
         d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
         numi_eval(d)
-
+    '''
 def execute_t2k(genlist=True):
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}

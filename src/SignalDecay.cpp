@@ -24,6 +24,7 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
     Branching_Ratios = branching_ratios;
     Final_States = final_states;
     Lifetime = lifetime;
+    //cout << "V_lifetime: " << Lifetime << endl; 
     pMax=0;
     for(unsigned i = 0; i < Final_States.size();i++){
         if(Final_States[i].size()==0){
@@ -42,9 +43,8 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
 }
 
 bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
-    //Parentit->report(cout);
-    double time1 = (*Parentit).Momentum()*det->cross_point[0]/(*Parentit).Speed()/speed_of_light;
-    double time2 = (*Parentit).Momentum()*det->cross_point[1]/(*Parentit).Speed()/speed_of_light;
+    double time1 = (*Parentit).Momentum()*(Parentit->crossing[0])/(*Parentit).Speed()/speed_of_light;
+    double time2 = (*Parentit).Momentum()*(Parentit->crossing[1])/(*Parentit).Speed()/speed_of_light;
     if(time1>time2){
         double ttmp = time1;
         time1 = time2;
@@ -52,7 +52,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
     }
     //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << endl;
 
-    double prob = decay_probability(time1, time2, Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)));
+    double prob = decay_probability(time1, time2, Lifetime*beta_gamma(Parentit->Speed()));
     double u = Random::Flat(0,1);
     //cout << prob << " " << pMax << " " << u*pMax << endl;
     if(prob>u*pMax){
@@ -100,11 +100,18 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
 }
 
 bool SignalDecay::probscatter(std::shared_ptr<detector>& det, Particle &Parent){
-    double time1 = Parent.Momentum()*det->cross_point[0]/Parent.Speed()/speed_of_light;
-    double time2 = Parent.Momentum()*det->cross_point[1]/Parent.Speed()/speed_of_light;
+    double time1 = Parent.Momentum()*(Parent.crossing[0])/Parent.Speed()/speed_of_light;
+    double time2 = Parent.Momentum()*(Parent.crossing[1])/Parent.Speed()/speed_of_light;
+    if(time1>time2){
+        double ttmp = time1;
+        time1 = time2;
+        time2 = ttmp;
+    }
+    double prob = decay_probability(time1, time2, Lifetime*beta_gamma(Parent.Speed()));
 
-    double prob = decay_probability(time1, time2, Lifetime);
-
+    //Parent.report(cout);
+    //cout << "MOM: " << Parent.Momentum() << " detcross1 :" << det->cross_point[0] << " Speed: " << Parent.Speed() << endl; 
+    //cout << "Lifetime: " << Lifetime << " Lifetime_Actual: " << Lifetime*Parent.E/Parent.m << " time1: " << time1 << " time2: " << time2 << " pos1: " << speed_of_light*time1 << " pos2: "<< speed_of_light*time2 << " prob: " << prob << endl;
     if(prob>Random::Flat(0,1)*pMax){
         if(prob>pMax)
             pMax=prob;

@@ -22,7 +22,7 @@ class Material {
 class detector {
     //double xdet, ydet, zdet, Rdet;
 public:
-    virtual double Ldet (const Particle &) = 0;
+    virtual double Ldet (Particle &) = 0;
 //	virtual void intersect (int &, int &, Particle) = 0;
     detector(){ p_num_tot=0; n_num_tot=0; e_num_tot=0;}
     virtual ~detector(){};
@@ -34,7 +34,6 @@ public:
     double M(unsigned int index) {return matvec[index].mass;}
     std::string matname(unsigned int index) {return matvec[index].matname;}
     unsigned mat_num() {return matvec.size();}
-    
     double PNtot(){ return p_num_tot;}
     double NNtot(){ return n_num_tot;}
     double ENtot(){ return e_num_tot;}
@@ -52,7 +51,7 @@ class detector_sphere: public detector{
 public:
     detector_sphere(double x, double y, double z, double R);
     ~detector_sphere(){}
-    double Ldet (const Particle &);
+    double Ldet (Particle &);
 //  void intersect (const int &, const int &, const Particle &);
 private:
     double Rdet;
@@ -63,7 +62,7 @@ class detector_cylinder: public detector{
         detector_cylinder(double xdet, double ydet, double zdet, double detlength, double radius, 
                 double detTheta, double detPhi);
         ~detector_cylinder(){}
-        double Ldet (const Particle &);
+        double Ldet (Particle &);
         //double Ldeto (const Particle &, const double offset[3]);
     private:
         double Rdet, Ldetector;
@@ -79,7 +78,7 @@ class detector_cuboid: public detector{
        
         detector_cuboid(double xdet, double ydet, double zdet, double detlength, double detwidth, double detheight, double detPhi, double detTheta ,double detPsi);
         ~detector_cuboid(){}
-        double Ldet (const Particle &);
+        double Ldet (Particle &);
     private:
         //double Hdetector, Wdetector, Ldetector;
         //These each point to the center of one of the cuboid's faces.

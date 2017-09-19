@@ -29,7 +29,7 @@ detector_sphere::detector_sphere (double x, double y, double z, double radius){
 }
 
 // distance DM travels through detector
-double detector_sphere::Ldet (const Particle &DM) {
+double detector_sphere::Ldet (Particle &DM) {
 	double Ldetenter, Ldetexit;
     double A, B, C;	
 //cout << DM.name << " " << DM.E << " " << DM.px << " " << DM.py << " " << DM.pz << " " << DM.m << " " << DM.origin_coords[0] << " " << DM.origin_coords[1] << " " << DM.origin_coords[2] << " " << DM.origin_coords[3] << " " << DM.end_coords[0] << " " << DM.end_coords[1] << " " << DM.end_coords[2] << " " << DM.end_coords[3] << std::endl;
@@ -68,8 +68,12 @@ double detector_sphere::Ldet (const Particle &DM) {
 		Ldetexit=0;
 
     if(Ldetexit>Ldetenter){
+        //deprecate this as soon as possible
         cross_point[0] = Ldetenter;
         cross_point[1] = Ldetexit;
+        //the future
+        DM.crossing[0] = Ldetenter;
+        DM.crossing[1] = Ldetexit;
         return (Ldetexit-Ldetenter)*sqrt(A);
     }
     else
@@ -102,7 +106,7 @@ detector_cylinder::detector_cylinder (double x, double y, double z, double detle
 //That means the intersection happened in the past, and we are either
 //originating in the detector, or going in the opposite direction. Both cases are handled
 //properly by the Ldet calculation.
-double detector_cylinder::Ldet (const Particle &DM){
+double detector_cylinder::Ldet (Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
    
 	for(int i=0; i<3; i++){
@@ -111,7 +115,8 @@ double detector_cylinder::Ldet (const Particle &DM){
 
     vector<double> crossings;
     double B1,B2;
-
+    B1 = 0;
+    B2 = 0;
     //Checking crossing point of circular faces.
     if(ip(b,l)!=0){//if b.l==0, beam is parallel to the circular faces.
         
@@ -143,6 +148,8 @@ double detector_cylinder::Ldet (const Particle &DM){
     
 
     double B3, B4, A3, A4;
+    B3=0;
+    B4=0;
 
     if(crossings.size()<2){
         double X = -pow(ip(b,l),2) + ip(b,b)*ip(l,l);
@@ -163,15 +170,23 @@ double detector_cylinder::Ldet (const Particle &DM){
             }
         }
     }
+    //DM.report(cout); 
+    //cout << "B1 " << B1 << " B2 " << B2 << " B3 " << B3 << " B4 " << B4 << endl;
+    //cout << "b1 " << b[0] << " b2 " << b[1] << " b3 " << b[2] << endl;
+    //cout << "o1 " << o[0] << " o2 " << o[1] << " o3 " << o[2] << endl;
+    //cout << "l1 " << l[0] << " l2 " << l[1] << " l3 " << l[2] << endl;
+    //cout << "ip(b,b) " << sqrt(ip(b,b)) << endl; 
 
-    
+
     if(crossings.size()==0)
         return 0.0;
     else if(crossings.size()==2){
         cross_point[0]=crossings[0];
         cross_point[1]=crossings[1];
-        return (crossings[1]>crossings[0] ? (crossings[1]-crossings[0])*sqrt(ip(b,b)) :\
-                (crossings[0]-crossings[1])*sqrt(ip(b,b)));
+        DM.crossing[0] = crossings[0];
+        DM.crossing[1] = crossings[1];
+        //cout << "crossing0 " << crossings[0]*sqrt(ip(b,b))  <<  " L " << (crossings[1]-crossings[0])*sqrt(ip(b,b)) << endl;
+        return abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b)));
     }
     else if(crossings.size()==1)
         //return crossings[0]*sqrt(ip(b,b));
@@ -211,13 +226,14 @@ detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, 
         for(int j=0; j<3; j++)
             face[i+3][j]=-face[i][j];
     }
+    /*
     for(int i=0; i<6; i++){
-        //cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
-    }
+        cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
+    }*/
 
 }
 
-double detector_cuboid::Ldet (const Particle &DM){
+double detector_cuboid::Ldet (Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
      
     double o[3];
@@ -271,6 +287,8 @@ double detector_cuboid::Ldet (const Particle &DM){
         //cout << "CrossReport " << entry << " " << exit << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
         cross_point[0]=entry;
         cross_point[1]=exit;
+        DM.crossing[0]=entry;
+        DM.crossing[1]=exit;
         return (exit-entry)*sqrt(ip(b,b));
     }
 }
