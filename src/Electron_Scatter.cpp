@@ -53,11 +53,13 @@ bool Electron_Scatter::probscatter (std::shared_ptr<detector>& det, Particle &DM
 bool Electron_Scatter::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
 	Particle electron(0);
 	if(probscatter(det, *DMit, electron)&&(min_angle<=0||electron.Theta()>min_angle)&&(max_angle>2*pi||electron.Theta()<max_angle)){
-		Generate_Position(det, *DMit, electron);
+		DMit->Generate_Position();
+        Link_Particles(*DMit, electron);
 		partlist.insert(std::next(DMit),electron);
         Particle DMout(DMit->m);
         DMout.name = "Recoil_DM";
         DMout.ThreeMomentum(DMit->px-electron.px,DMit->py-electron.py,DMit->pz-electron.pz);
+        Link_Particles(*DMit, DMout);
         partlist.insert(std::next(DMit),DMout);
 		return true;
 	}

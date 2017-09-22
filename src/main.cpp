@@ -664,8 +664,8 @@ int main(int argc, char* argv[]){
 	//int escat=0;
     bool scatter_switch;
     int trials_max = par->Max_Trials();
-	if(SigGen->get_pMax()==0){
-        cout << "pMax = 0, setting trials = trials_max\n";
+	if(SigGen->get_pMax()<=0.0){
+        cout << "pMax less than tolerance limit, setting trials = trials_max\n";
         trials = trials_max;
     }
     for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){

@@ -228,22 +228,23 @@ detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, 
     }
     /*
     for(int i=0; i<6; i++){
-        cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
-    }*/
+      cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
+    }
+    */
 
 }
 
 double detector_cuboid::Ldet (Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
-     
+    //cout << b[0] << " " << b[1] << " " << b[2] << endl; 
     double o[3];
 	for(int i=0; i<3; i++){
         o[i] = r[i] - DM.origin_coords[i];
     }
+    //cout << o[0] << " " << o[1] << " " << o[2] << endl; 
     double entry=0;
     double exit=0;
     //cout << "DETECTOR_START\n";
-    //DM.report(cout);
     bool consistency=false;
     for(int i=0; i<6; i++){
         double bot = ip(b,face[i]);
@@ -268,14 +269,19 @@ double detector_cuboid::Ldet (Particle &DM){
         }
         double detcross=ft/bot;
         //cout << "detcross=" << detcross << endl;
-        if(ft<0&&(detcross>entry||entry==0.0)){
-            entry=detcross;
-            //cout << "entry" << endl;
+        if(ft<0){
+            //cout << "entry"<< endl;
+            if(detcross<0){
+                return 0.0;
+            }
+            if(detcross>entry){
+                entry=detcross;
+            }
         }
         else if(detcross>0){
+            //cout << "exit" << endl;
             if(exit==0||detcross<exit){
                 exit=detcross;
-                //cout << "exit" << endl;
             }
         }
         
@@ -284,7 +290,7 @@ double detector_cuboid::Ldet (Particle &DM){
         return 0.0;
     else{
         //DM.report(cout);
-        //cout << "CrossReport " << entry << " " << exit << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
+        //cout << "CrossReport " << entry << " " << exit << " " << sqrt(ip(b,b)) << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
         cross_point[0]=entry;
         cross_point[1]=exit;
         DM.crossing[0]=entry;

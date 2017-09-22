@@ -233,13 +233,14 @@ bool Pion_Inelastic::probscatter(std::shared_ptr<detector>& det, list<Particle>&
     Delta.name = "Delta";
     Particle Nucleon(0);
     if(probscatter(det, *DMit, pion, Delta, Nucleon)&&(min_angle<=0||pion.Theta()>min_angle)&&(max_angle>2*pi||pion.Theta()<max_angle)&&(pion.Kinetic_Energy()>Escatmin)&&(pion.Kinetic_Energy()<Escatmax)){
-        Generate_Position(det, *DMit, Delta);
+        DMit->Generate_Position();
+        Link_Particles(*DMit, Delta);
         Link_Particles_Immediate(Delta, pion);
         Link_Particles_Immediate(Delta, Nucleon);
         Particle DMout(DMit->m);
         DMout.name = "Recoil_DM";
         DMout.ThreeMomentum(DMit->px-Delta.px,DMit->py-Delta.py,DMit->pz-Delta.pz);
-        
+        Link_Particles(*DMit, DMout);
         //Insert in reverse display order.
         partlist.insert(std::next(DMit),pion);
         partlist.insert(std::next(DMit),Nucleon);

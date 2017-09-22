@@ -3,6 +3,20 @@
 #include <iostream>
 #include "constants.h"
 
+//This moves a daughter particle's origin to the parent particle's end.
+void Link_Particles(Particle &parent, Particle &child){
+	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
+	child.Set_Creation_Time(parent.end_coords[3]);
+}
+
+void Link_Particles_Immediate(Particle &parent, Particle &child){
+	//parent.Set_Position(parent.origin_coords[0],parent.origin_coords[1],parent.origin_coords[2]);
+	parent.Set_Time(parent.origin_coords[3]);
+	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
+	child.Set_Creation_Time(parent.end_coords[3]);
+}
+
+
 //using std::cout; using std::endl;
 //Should update to use Set_Origin and Set_Time
 Particle::Particle(double mass){
@@ -98,9 +112,9 @@ void Particle::Set_Creation_Time(double t){
 }
 
 void Particle::Set_Time(double t){
-	for(int i = 0; i!=3; i++){
-        end_coords[i]=(t-origin_coords[3])*Speed()*speed_of_light*px/Momentum()+origin_coords[i];
-    }
+    end_coords[0]=(t-origin_coords[3])*Speed()*speed_of_light*px/Momentum()+origin_coords[0];
+    end_coords[1]=(t-origin_coords[3])*Speed()*speed_of_light*py/Momentum()+origin_coords[1];
+    end_coords[2]=(t-origin_coords[3])*Speed()*speed_of_light*pz/Momentum()+origin_coords[2];
     end_coords[3]=t;
 }
 
@@ -181,9 +195,11 @@ double Particle::Speed(){
     return Momentum()/E;
 }
 
+void Particle::Generate_Position(){
+    Generate_Position(Random::Flat(crossing[0],crossing[1]));
+}
+
 void Particle::Generate_Position(double rngpoint){
-	//This should be removed.
-    //Set_Position(px*rngpoint+origin_coords[0], py*rngpoint+origin_coords[1], pz*rngpoint+origin_coords[2]);
     if(Momentum()==0.0){
         Set_Time(origin_coords[3]);
     }

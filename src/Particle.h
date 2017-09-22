@@ -7,6 +7,9 @@
 #include <string>
 #include <iostream>
 #include <functional>
+
+#include "Random.h"
+
 class Particle{
 	
 public:
@@ -38,6 +41,7 @@ public:
     double Momentum();
     double Speed();
     double Kinetic_Energy(){return E-m;}
+    void Generate_Position();//Generates an end_coords position between crossing[0] and crossing[1].
     void Generate_Position(double);//Generates an end_coords position
     //I should design custom 4 vector objects. Also 3 vector objects which 4-vectors hold.
     double origin_coords[4];//space-time location where the particle was created
@@ -46,5 +50,7 @@ public:
     bool EVENT_SET;//I am going to have to be careful with this variable.
 };
 
+void Link_Particles(Particle &, Particle &);
+void Link_Particles_Immediate(Particle &, Particle &);
 
 #endif

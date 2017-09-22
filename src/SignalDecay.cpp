@@ -58,7 +58,10 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
     if(prob>u*pMax){
         Parentit->EVENT_SET=true;
         //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
+        cout << "Momentum " << Parentit->Momentum() << " speed " << Parentit->Speed() << " crossing1 " << Parentit->crossing[0] << " crossing2 " << Parentit->crossing[1] << " pos1 " << Parentit->crossing[0]*(Parentit->Momentum()) << endl;
+        cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl;
         if(prob>pMax){
+            
             pMax=prob;
         }
     
@@ -79,9 +82,11 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
             Particle daughter2(Final_States[i][1]);
             daughter1.EVENT_SET=true;            
             daughter2.EVENT_SET=true;
+            Parentit->Generate_Position();
             TwoBodyDecay(*Parentit, daughter1, daughter2);
-            double u = Generate_Position(det, *Parentit, daughter1);
-            Generate_Position(*Parentit, daughter2, u);
+            Parentit->report(cout);
+            daughter1.report(cout);
+            daughter2.report(cout);
             partlist.insert(std::next(Parentit),daughter1);
             partlist.insert(std::next(Parentit),daughter2);
         }
@@ -113,8 +118,11 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, Particle &Parent){
     //cout << "MOM: " << Parent.Momentum() << " detcross1 :" << det->cross_point[0] << " Speed: " << Parent.Speed() << endl; 
     //cout << "Lifetime: " << Lifetime << " Lifetime_Actual: " << Lifetime*Parent.E/Parent.m << " time1: " << time1 << " time2: " << time2 << " pos1: " << speed_of_light*time1 << " pos2: "<< speed_of_light*time2 << " prob: " << prob << endl;
     if(prob>Random::Flat(0,1)*pMax){
-        if(prob>pMax)
+        //cout << "Momentum " << Parent.Momentum() << " speed " << Parent.Speed() << " crossing1 " << Parent.crossing[0] << " crossing2 " << Parent.crossing[1] << " pos1 " << Parent.crossing[0]*Parent.Momentum() << " pos2 " <<  Parent.crossing[1]*Parent.Momentum() << endl;
+        //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parent.Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl; 
+        if(prob>pMax){
             pMax=prob;
+        }
         return true;
     } 
 

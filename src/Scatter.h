@@ -25,17 +25,6 @@ class Scatter{
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);}
 		double get_pMax(){return pMax;}
 		void set_pMax(double pm){pMax=pm;}
-        double Generate_Position(std::shared_ptr<detector>& det, Particle &DM, Particle &scat){
-            double u=Random::Flat(det->cross_point[0],det->cross_point[1]);
-			DM.Generate_Position(u);
-            Generate_Position(DM, scat, u);
-            return u;
-        }
-        void Generate_Position(Particle &DM, Particle &scat, double u){
-            scat.Set_Creation_Time(DM.end_coords[3]);
-            scat.Set_Origin(DM.end_coords[0],DM.end_coords[1],DM.end_coords[2]);
-			scat.EVENT_SET = true;
-		}
 		void set_angle_limits(double min, double max){min_angle=min;max_angle=max;}
 		//void report(std::ostreami& out) const{out << pMax << std::endl;}
         //void set_scattering_energy(double emin, double emax){Escatmin=emin; Escatemax=emax;}

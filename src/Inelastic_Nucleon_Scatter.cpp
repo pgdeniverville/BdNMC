@@ -102,7 +102,8 @@ bool Inelastic_Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Part
 bool Inelastic_Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& DMit){
 	Particle nucleon(0);
 	if(probscatter(det, *DMit)){
-		Generate_Position(det, *DMit, nucleon);
+		DMit->Generate_Position();
+        Link_Particles(*DMit, nucleon);
 		partlist.insert(std::next(DMit),nucleon);
 		return true;
 	}

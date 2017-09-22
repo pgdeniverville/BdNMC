@@ -495,21 +495,22 @@ def execute_numi(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    vmarr={10,25,50,75,100,200,300,500,770}
-    epsarr=[10**-n for n in range(-4,-8)]+[3*10**-n for n in range(-5,-9)]
-    massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    #vmarr=[10,25,50,75,100,200,300,500,770]
+    #epsarr=[10**n for n in range(-8,-4)]+[3*10**n for n in range(-9,-5)]
+    vmarr=[10]
+    epsarr=[1e-5]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     for marr in massarr:
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
-        numi_eval(d)
-        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos", "samplesize" : 1000}
-        numi_eval(d)
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
-        numi_eval(d)
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
+        #numi_eval(d)
+        #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos", "samplesize" : 1000}
+        #numi_eval(d)
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
+        #numi_eval(d)
         d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
         numi_eval(d)
-        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
-        numi_eval(d)
+        #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
+        #numi_eval(d)
 
 def execute_t2k(genlist=True):
     if genlist:
