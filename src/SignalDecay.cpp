@@ -58,8 +58,8 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
     if(prob>u*pMax){
         Parentit->EVENT_SET=true;
         //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
-        cout << "Momentum " << Parentit->Momentum() << " speed " << Parentit->Speed() << " crossing1 " << Parentit->crossing[0] << " crossing2 " << Parentit->crossing[1] << " pos1 " << Parentit->crossing[0]*(Parentit->Momentum()) << endl;
-        cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl;
+        //cout << "Momentum " << Parentit->Momentum() << " speed " << Parentit->Speed() << " crossing1 " << Parentit->crossing[0] << " crossing2 " << Parentit->crossing[1] << " pos1 " << Parentit->crossing[0]*(Parentit->Momentum()) << endl;
+        //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl;
         if(prob>pMax){
             
             pMax=prob;
@@ -84,9 +84,6 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
             daughter2.EVENT_SET=true;
             Parentit->Generate_Position();
             TwoBodyDecay(*Parentit, daughter1, daughter2);
-            Parentit->report(cout);
-            daughter1.report(cout);
-            daughter2.report(cout);
             partlist.insert(std::next(Parentit),daughter1);
             partlist.insert(std::next(Parentit),daughter2);
         }

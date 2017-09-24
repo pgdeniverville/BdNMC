@@ -38,7 +38,7 @@ public:
     double NNtot(){ return n_num_tot;}
     double ENtot(){ return e_num_tot;}
     
-    double cross_point[2];//holds the last entrance and exit points of a particle.
+    //double cross_point[2];//holds the last entrance and exit points of a particle.
 protected:
     double r[3];
     double b[3];

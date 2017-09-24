@@ -374,7 +374,9 @@ def numi_eval(d_user):
         elif det_switch == "miniboone_numi":
             user2["outlog"] = "Decay_Events/mini_numi_decay_events_{}_{}.dat".format(str(MV),str(eps))
             user2["sumlog"] = "Decay_Events/mini_numi_decay.dat"
-
+        elif det_switch == "test_sphere" or det_switch == "test_cuboid" or det_switch == "test_cylinder":
+            user2["outlog"] = det_switch
+            user2["sumlog"] = "test.dat"
     d.update(user2)
     d.update(d_user)
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
@@ -388,6 +390,12 @@ def numi_eval(d_user):
         write_numi(d=d,det=MINOS_absorber_detector)
     elif det_switch == "miniboone_numi":
         write_numi(d=d,det=miniboone_detector_numi)
+    elif det_switch == "test_sphere":
+        write_numi(d=d,det=test_sphere)
+    elif det_switch == "test_cylinder":
+        write_numi(d=d,det=test_cylinder)
+    elif det_switch == "test_cuboid":
+        write_numi(d=d,det=test_cuboid)
     subp.call(["./build/main", outfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -495,10 +503,10 @@ def execute_numi(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr=[10,25,50,75,100,200,300,500,770]
-    #epsarr=[10**n for n in range(-8,-4)]+[3*10**n for n in range(-9,-5)]
-    vmarr=[10]
-    epsarr=[1e-5]
+    #vmarr=[10,25,50,75,100,200,300]
+    #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
+    vmarr=[50]
+    epsarr=[10**-7]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}

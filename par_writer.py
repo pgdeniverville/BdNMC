@@ -160,12 +160,35 @@ def miniboone_detector_full(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=6.106):
     f.write('\n')
     f.write(Carbon_string)
 
+def test_sphere(f,xpos=0.0,ypos=0.0,zpos=0.0,radius=1.0):
+    f.write("\ndetector sphere\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
+    f.write('\n')
+    f.write(Hydrogen_string)
+    f.write('\n')
+    f.write(Carbon_string)
+
+def test_cylinder(f,xpos=0.0,ypos=0.0,zpos=0.0,radius=1.0, length=1.0, theta=0, phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Hydrogen_string)
+    f.write('\n')
+    f.write(Carbon_string)
+
+def test_cuboid(f,xpos=0.0,ypos=0.0,zpos=0.0,height=1.0,length=1.0,width=1.0,theta=0.0,phi=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Hydrogen_string)
+    f.write('\n')
+    f.write(Carbon_string)
+
 MINOS_absorber_z=270
 MINOS_target_z=950
 #Don't use this for actual event generation!
 def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=MINOS_target_z,radius=2.2,length=1.7,theta=0,phi=0):
     print("This detector should not be used for event generation!")
-    print("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')

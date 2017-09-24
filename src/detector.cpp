@@ -69,8 +69,8 @@ double detector_sphere::Ldet (Particle &DM) {
 
     if(Ldetexit>Ldetenter){
         //deprecate this as soon as possible
-        cross_point[0] = Ldetenter;
-        cross_point[1] = Ldetexit;
+        //cross_point[0] = Ldetenter;
+        //cross_point[1] = Ldetexit;
         //the future
         DM.crossing[0] = Ldetenter;
         DM.crossing[1] = Ldetexit;
@@ -176,22 +176,23 @@ double detector_cylinder::Ldet (Particle &DM){
     //cout << "o1 " << o[0] << " o2 " << o[1] << " o3 " << o[2] << endl;
     //cout << "l1 " << l[0] << " l2 " << l[1] << " l3 " << l[2] << endl;
     //cout << "ip(b,b) " << sqrt(ip(b,b)) << endl; 
-
+    
+    //cout << crossings.size() << endl;
 
     if(crossings.size()==0)
         return 0.0;
     else if(crossings.size()==2){
-        cross_point[0]=crossings[0];
-        cross_point[1]=crossings[1];
+        //cross_point[0]=crossings[0];
+        //cross_point[1]=crossings[1];
         DM.crossing[0] = crossings[0];
         DM.crossing[1] = crossings[1];
         //cout << "crossing0 " << crossings[0]*sqrt(ip(b,b))  <<  " L " << (crossings[1]-crossings[0])*sqrt(ip(b,b)) << endl;
         return abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b)));
     }
-    else if(crossings.size()==1)
-        //return crossings[0]*sqrt(ip(b,b));
-        //needs to be written better for inside of detector case.
-        return 0.0;
+    else if(crossings.size()==1){
+        DM.crossing[1] = crossings[0];
+        return crossings[0]*sqrt(ip(b,b));
+    }
     else
         throw crossings.size();
 }
@@ -291,8 +292,8 @@ double detector_cuboid::Ldet (Particle &DM){
     else{
         //DM.report(cout);
         //cout << "CrossReport " << entry << " " << exit << " " << sqrt(ip(b,b)) << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
-        cross_point[0]=entry;
-        cross_point[1]=exit;
+        //cross_point[0]=entry;
+        //cross_point[1]=exit;
         DM.crossing[0]=entry;
         DM.crossing[1]=exit;
         return (exit-entry)*sqrt(ip(b,b));
