@@ -661,7 +661,7 @@ int main(int argc, char* argv[]){
     vector<int> NDM_list(chan_count,0);
     vector<double> timing_efficiency(chan_count,0.0);
 	
-	//int escat=0;
+	//int escat=0;lso thought it could have used Leatherhead, or some of the other mutanimals. He probably would have fit right in with the Scale tail clan.
     bool scatter_switch;
     int trials_max = par->Max_Trials();
 	//if(SigGen->get_pMax()*Vnumtot<=1){
