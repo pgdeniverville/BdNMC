@@ -505,7 +505,7 @@ def execute_numi(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[10,25,50,75,100,200,300]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    vmarr=[50]
+    vmarr=[500]
     epsarr=[10**-7]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     for marr in massarr:
@@ -515,7 +515,7 @@ def execute_numi(genlist=True):
         #numi_eval(d)
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
         #numi_eval(d)
-        d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
+        d={"channels" : [_brem], "model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
         numi_eval(d)
         #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
         #numi_eval(d)

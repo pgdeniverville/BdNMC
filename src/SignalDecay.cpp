@@ -112,7 +112,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, Particle &Parent){
     double prob = decay_probability(time1, time2, Lifetime*beta_gamma(Parent.Speed()));
 
     //Parent.report(cout);
-    //cout << "MOM: " << Parent.Momentum() << " detcross1 :" << det->cross_point[0] << " Speed: " << Parent.Speed() << endl; 
+    //cout << "MOM: " << Parent.Momentum() << " crossing1: " << Parent.crossing[0] << " crossing2: " << Parent.crossing[1] << " Speed: " << Parent.Speed() << endl; 
     //cout << "Lifetime: " << Lifetime << " Lifetime_Actual: " << Lifetime*Parent.E/Parent.m << " time1: " << time1 << " time2: " << time2 << " pos1: " << speed_of_light*time1 << " pos2: "<< speed_of_light*time2 << " prob: " << prob << endl;
     if(prob>Random::Flat(0,1)*pMax){
         //cout << "Momentum " << Parent.Momentum() << " speed " << Parent.Speed() << " crossing1 " << Parent.crossing[0] << " crossing2 " << Parent.crossing[1] << " pos1 " << Parent.crossing[0]*Parent.Momentum() << " pos2 " <<  Parent.crossing[1]*Parent.Momentum() << endl;

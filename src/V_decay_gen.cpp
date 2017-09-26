@@ -36,8 +36,6 @@ bool V_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&
     Particle darkmatter2(mx);
     darkmatter2.name = "DM";
 
-
-
 	//darkphoton.report(logging);
 
     TwoBodyDecay(darkphoton, darkmatter1, darkmatter2);
@@ -76,10 +74,11 @@ void Do_Nothing_Gen::Evaluate_Branching_Ratio(){
 
 bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     part.name = Part_Name;
-    vec.push_back(part);
     
-    if(det_int(part)>0)
+    if(det_int(part)>0){
+        vec.push_back(part);
         return true;
+    }
 
     return false;
 }

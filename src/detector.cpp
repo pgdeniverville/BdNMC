@@ -182,10 +182,11 @@ double detector_cylinder::Ldet (Particle &DM){
     if(crossings.size()==0)
         return 0.0;
     else if(crossings.size()==2){
-        //cross_point[0]=crossings[0];
-        //cross_point[1]=crossings[1];
+        //cout << "Cylinder recorded a hit " << crossings[0] << " " << crossings[1] << endl;
         DM.crossing[0] = crossings[0];
         DM.crossing[1] = crossings[1];
+        //cout << DM.crossing[0] << endl;
+        //DM.report(cout); 
         //cout << "crossing0 " << crossings[0]*sqrt(ip(b,b))  <<  " L " << (crossings[1]-crossings[0])*sqrt(ip(b,b)) << endl;
         return abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b)));
     }
