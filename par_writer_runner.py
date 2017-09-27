@@ -509,14 +509,14 @@ def execute_numi(genlist=True):
     epsarr=[10**-7]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     for marr in massarr:
-        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
-        #numi_eval(d)
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
+        numi_eval(d)
         #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos", "samplesize" : 1000}
         #numi_eval(d)
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
         #numi_eval(d)
-        d={"channels" : [_brem], "model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
-        numi_eval(d)
+        #d={"channels" : [_brem], "model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
+        #numi_eval(d)
         #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
         #numi_eval(d)
 
