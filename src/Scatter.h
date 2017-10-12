@@ -26,7 +26,8 @@ class Scatter{
 		double get_pMax(){return pMax;}
 		void set_pMax(double pm){pMax=pm;}
 		void set_angle_limits(double min, double max){min_angle=min;max_angle=max;}
-		//void report(std::ostreami& out) const{out << pMax << std::endl;}
+		void set_energy_limits(double min, double max){Escatmin=min; Escatmax=max;}
+        //void report(std::ostreami& out) const{out << pMax << std::endl;}
         //void set_scattering_energy(double emin, double emax){Escatmin=emin; Escatemax=emax;}
 		//double get_MDP(){return kap;}
 		//This tells the code to rotate the end state particle with 

@@ -80,10 +80,14 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         if(Final_States[i].size() == 2){
             Particle daughter1(Final_States[i][0]);
             Particle daughter2(Final_States[i][1]);
-            daughter1.EVENT_SET=true;            
+            daughter1.EVENT_SET=true; 
             daughter2.EVENT_SET=true;
             Parentit->Generate_Position();
             TwoBodyDecay(*Parentit, daughter1, daughter2);
+            double angular_spread = Angle_Spread(daughter1.px,daughter1.py,daughter1.pz,daughter2.px,daughter2.py,daughter2.pz);  
+            if(angular_spread<min_angle||angular_spread>max_angle||daughter1.E<Escatmin||daughter2.E<Escatmin){
+                return false;
+            }
             partlist.insert(std::next(Parentit),daughter1);
             partlist.insert(std::next(Parentit),daughter2);
         }

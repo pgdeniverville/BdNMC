@@ -2,6 +2,7 @@ from par_writer import *
 import numpy as np
 import sys
 import math
+import copy
 
 import time
 
@@ -357,7 +358,7 @@ def numi_eval(d_user):
     if not executing:
         return
     if signal_channel == "Signal_Decay":
-        outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(eps))
+        outfile="parameter_run_{0}_{1}_{2}.dat".format(str(MV),str(eps),str(det_switch))
         user2 = {"min_scatter_energy" : 0.0, "max_scatter_energy" : 120.0,  "efficiency" : 1, "outfile" : outfile}
         if det_switch == "nova":
             user2["sumlog"] = "Decay_Events/nova_decay.dat"
@@ -503,22 +504,31 @@ def execute_numi(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr=[10,25,50,75,100,200,300]
-    #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    vmarr=[500]
-    epsarr=[10**-7]
+    vmarr=[10,25,50,75,100,125,150,175,200,250,300,350,400]
+    epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
+    #vmarr=[50]
+    #epsarr=[10**-7]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 1, "min_scatter_angle" : 0.0349066});
+    d_list=[]
     for marr in massarr:
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova", "samplesize" : 1000, "model" : "Dark_Photon"}
-        numi_eval(d)
-        #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos", "samplesize" : 1000}
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"det_switch" : "minos_absorber","channels" : [_pion_decay,_eta_decay,_brem]})
         #numi_eval(d)
-        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "nova_absorber", "samplesize" : 1000, "model" : "Dark_Photon"}
+        d_list.append(copy.deepcopy(d))
+        d.update({"det_switch" : "minos","channels" : [_pion_decay,_eta_decay,_brem]})
+        d_list.append(copy.deepcopy(d))
         #numi_eval(d)
-        #d={"channels" : [_brem], "model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "minos_absorber", "samplesize" : 1000}
+        #d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,brem]})
+        #d_list.append(d)
+        #numi_eval(d)
+        d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem]})
+        d_list.append(copy.deepcopy(d))
         #numi_eval(d)
         #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
         #numi_eval(d)
+    pool = Pool(processes=4)
+    pool.map(numi_eval,d_list)
 
 def execute_t2k(genlist=True):
     if genlist:

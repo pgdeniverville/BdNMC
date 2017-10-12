@@ -23,8 +23,9 @@ double calculatetheta (double px, double py, double pz, double p0) {
 }
 //
 double phi (double px, double py, double pz, double p0) {
-    if(px==0 && py==0)
+    if(px==0 && py==0){
         return 0;
+    }
 	if (px > 0 && py > 0) 
 	{
 		return atan(fabs(py/px));
@@ -65,6 +66,10 @@ double TriangleFunc2(double m1, double m2, double m3){
 
 double beta_gamma(double beta){
     return 1.0/sqrt(1-pow(beta,2));
+}
+
+double Angle_Spread(double x1, double y1, double z1, double x2, double y2, double z2){
+    return acos((x1*x2+y1*y2+z1*z2)/sqrt(x1*x1+y1*y1+z1*z1)/sqrt(x2*x2+y2*y2+z2*z2));
 }
 
 //Kinematics for DM+X->DM+X scattering, with X at rest.

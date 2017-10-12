@@ -565,8 +565,9 @@ int main(int argc, char* argv[]){
     
 
 	SigGen->set_angle_limits(min_angle, max_angle);
-
-	//Begin Run
+	SigGen->set_energy_limits(min_scatter_energy, max_scatter_energy);
+	
+    //Begin Run
 	cout << "--------------------" << endl;	
     cout << "Run parameters:" << endl;	
     cout << "--------------------" << endl;	
