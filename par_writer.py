@@ -51,6 +51,8 @@ Cesium_Iodide_string = "material Cesium\nnumber_density 1.04e22\nproton_number 5
 #Don't know what the atomic makeup of the MINOS detector is. Not using this for event generation, so it should be okay.
 MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0\n"
 
+NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
+
 defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan" : ["pi0_decay"], "signal_chan" : "NCE_nucleon", "outfile" : "parameter_run.dat", "proddist" : [""], "partlistfile" : ["Source/particle_list.dat"], "sumlog" : "Events/miniboone.dat", "outlog" : "Events/miniboone_events.dat", "output_mode" :"summary", "samplesize" : 5000, "min_scatter_energy" : 0.035, "max_scatter_energy" : 1.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 8.9, "n_num_target" :
         4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon_DM", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0}
 
@@ -197,20 +199,24 @@ def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=MINOS_target_z,radius=2.2,length=1.7
 def MINOS_absorber_detector(f):
     MINOS_detector(f,zpos=MINOS_absorber_z)
 
-NOvA_absorber_d=240
-NOvA_target_d=920
-NOvA_angle=0.0575959#3.3 degree
+#NOvA_absorber_d=240
+#NOvA_target_d=920
+NOvA_absorber_d=447
+NOvA_target_d=990
+#NOvA_angle=0.0575959#3.3 degree
+NOvA_Target_Angle=0.0122
+NOvA_Absorber_Angle=0.024
 
-def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_angle),zpos=NOvA_target_d*math.cos(NOvA_angle),height=4.2,length=14.3,width=2.9,theta=-0.0575959,phi=0,psi=0):
-    print("This NOvA detector should not be used for event generation!")
+def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_Target_Angle),zpos=NOvA_target_d*math.cos(NOvA_Target_Angle),height=4.2,length=14.3,width=2.9,theta=-NOvA_Target_Angle,phi=0,psi=0):
+    print("This NOvA detector is prelimary!")
     #print("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write("\ndetector cuboid\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')
-    f.write(MINOS_string)
+    f.write(NOvA_string)
 
 def NOvA_absorber_detector(f):
-    NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_angle),zpos=NOvA_absorber_d*math.cos(NOvA_angle))
+    NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_Absorber_Angle),zpos=NOvA_absorber_d*math.cos(NOvA_Absorber_Angle))
 
 def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,radius=2.38,length=4.76,theta=0,phi=0):
     f.write("\ndetector cylinder\n");

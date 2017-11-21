@@ -43,13 +43,13 @@ def MINOS_detector_modular(f,xpos=0.0,radius=2,length=1.7,theta=0,phi=0):
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
     f.write(MINOS_string)
-
+'''
 def NOvA_detector_modular(f,xpos=0.0,radius=2,length=14,theta=-NOvA_angle,phi=0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
     f.write(MINOS_string)
-
+'''
 def miniboone_detector_modular(f,radius=5.0):
     f.write("\ndetector sphere\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius)))
@@ -378,7 +378,7 @@ def numi_eval(d_user):
         elif det_switch == "test_sphere" or det_switch == "test_cuboid" or det_switch == "test_cylinder":
             user2["outlog"] = det_switch
             user2["sumlog"] = "test.dat"
-    d.update(user2)
+        d.update(user2)
     d.update(d_user)
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "nova":
@@ -504,12 +504,40 @@ def execute_numi(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    vmarr=[10,25,50,75,100,125,150,175,200,250,300,350,400]
-    epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
+    #vmarr=[10,25,50,75,100,125,150,175,200,250,300,350,400]
+    vmarr=[10,20,30,40,60,80,100,150,200,250,300,400,500,550,600,700,800,900,1000]
+    #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
+    #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
+    epsarr=[1e-3]
     #vmarr=[50]
     #epsarr=[10**-7]
+    #massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
-    d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 1, "min_scatter_angle" : 0.0349066});
+    #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
+    #massarr=[[1000,300,1e-3]]
+    #d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
+    d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    d_list=[]
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_low.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
+        #d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec.dat"})
+        #numi_eval(d)
+        d_list.append(copy.deepcopy(d))
+        #d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs.dat"})
+        d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_low.dat"})
+        #numi_eval(d)
+        d_list.append(copy.deepcopy(d))
+    pool = Pool(processes=3)
+    pool.map(numi_eval,d_list)
+    '''
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        numi_eval(d)
+        #d_list.append(copy.deepcopy(d))
+        numi_eval(d)
+    '''
+    '''
     d_list=[]
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -529,6 +557,8 @@ def execute_numi(genlist=True):
         #numi_eval(d)
     pool = Pool(processes=4)
     pool.map(numi_eval,d_list)
+    '''
+
 
 def execute_t2k(genlist=True):
     if genlist:

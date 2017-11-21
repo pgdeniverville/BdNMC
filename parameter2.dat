@@ -99,17 +99,17 @@ output_mode comprehensive
 
 #Detector Parameters
 detector cuboid
-#detector cuboid
-x-position 0.0
-y-position 0.0
-z-position 100.0
+#detector sphere
+x-position 4.0
+y-position 4.0
+z-position 490.0
 #radius 10.0
-width 20.0
-height 20.0
-length 2.0
+width 8.0
+height 8.0
+length 8.0
 det-phi 0.0
 det-theta 0.0
-det-psi 1.57
+det-psi 0.0
 
 #Material parameters
 #Mass is set in GeV.
