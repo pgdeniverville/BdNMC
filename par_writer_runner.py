@@ -505,30 +505,50 @@ def execute_numi(genlist=True):
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[10,25,50,75,100,125,150,175,200,250,300,350,400]
-    #vmarr=[10,20,30,40,60,80,100,150,200,250,300,400,500,550,600,700,800,900,1000]
+    vmarr=[10,20,30,40,60,80,100,150,200,250,300,400,500,550,600,700,725,750,760,770,780,790,800,900,1000]
     #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    vmarr=[10]
+    #vmarr=[10]
     epsarr=[1e-3]
     #vmarr=[50]
     #epsarr=[10**-7]
     massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
-    #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[1000,300,1e-3]]
-    #d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
     d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     d_list=[]
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_high.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
-        #d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec.dat"})
+        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_low.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
         #numi_eval(d)
         d_list.append(copy.deepcopy(d))
-        #d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs.dat"})
+        d_list.append(copy.deepcopy(d_low))
         d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_high.dat"})
+        d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_low.dat"})
         #numi_eval(d)
         d_list.append(copy.deepcopy(d))
+        d_list.append(copy.deepcopy(d_low))
+
+    vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
+    epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
+    massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
+    d_low=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_high.dat"})
+        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_low.dat"})
+        d_list.append(copy.deepcopy(d))
+        d_list.append(copy.deepcopy(d_low))
+        d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_high.dat"})
+        d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_low.dat"})
+        d_list.append(copy.deepcopy(d))
+        d_list.append(copy.deepcopy(d_low))
+
     pool = Pool(processes=3)
     pool.map(numi_eval,d_list)
     '''

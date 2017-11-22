@@ -100,8 +100,8 @@ output_mode comprehensive
 #Detector Parameters
 detector cuboid
 #detector sphere
-x-position 8.0
-y-position 8.0
+x-position 5.0
+y-position 15.0
 #z-position 490.0
 z-position 100.0
 #radius 10.0
