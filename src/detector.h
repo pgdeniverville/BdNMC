@@ -83,7 +83,8 @@ class detector_cuboid: public detector{
         //double Hdetector, Wdetector, Ldetector;
         //These each point to the center of one of the cuboid's faces.
         double face[6][3];
-        double dim[6];
+        //double dim[6];
+        double face_dist[3];
 };
 
 #endif

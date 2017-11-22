@@ -264,8 +264,10 @@ int main(int argc, char* argv[]){
 			cerr << "Invalid or missing distribution " << proddist << " declared for particle_list outmode\n Terminating run.\n";
 			return -1;
 		}
-	    
-        if(par->Model_Name()=="Axion_Dark_Photon"||(par->Model_Name()=="Dark_Photon"&&mv<2*mdm&&sigchoice=="Signal_Decay")){
+        cout << proddist << " " << prodchoice << endl; 
+        
+        //Signal_Decay HANDLING
+        if(par->Model_Name()=="Axion_Dark_Photon"||(par->Model_Name()=="Dark_Photon"&&sigchoice=="Signal_Decay")){
             if(proddist=="proton_brem"){
                 DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
                 cout << DMGen->Channel_Name() << endl;
@@ -275,20 +277,35 @@ int main(int argc, char* argv[]){
                 gamma.name = "Photon";
                 Particle dp(mv);
                 dp.name = "Dark_Photon";
+                //Code repeat here. Need to reorganize to eliminate this.
+                if(proddist=="default"){
+				    std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
+				    sw->set_fit_parameters(*proditer);
+				    PartDist = sw; //std::shared_ptr<Distribution>(&sw);
+                }
                 if(prodchoice=="pi0_decay"){
+                    if(mv>mpi0){
+                        cerr << "Attempting to produce on-shell mediator with mass " << mv << " larger than pion mass " << mpi0 << ".";
+                        return -1;
+                    }
                     DMGen = std::shared_ptr<DMGenerator>(new 
                             Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),
                             MASS_PION_NEUTRAL,"Pion",dp,gamma));
                     PartDist->set_mass(MASS_PION_NEUTRAL);
                 }
                 else if (prodchoice=="eta_decay"){
+                    if(mv>meta){
+                        cerr << "Attempting to produce on-shell mediator with mass " << mv << " larger than eta " << meta << ".";
+                        return -1;
+                    }
                     DMGen = std::shared_ptr<DMGenerator>(new 
                             Two_Body_Decay_Gen(bretatoVgamma(mv,mdm,kappa,alD),
                             MASS_ETA,"Eta",dp,gamma));
                     PartDist->set_mass(MASS_ETA);
                 }
                 if(proditer->Meson_Per_Pi0()<=0){
-				    Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
+				    //default for eta
+                    Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
                 }
 			    else{
 				    Vnum = DMGen->BranchingRatio()*num_pi0*
@@ -301,12 +318,11 @@ int main(int argc, char* argv[]){
                 return -1;
             }
         }
-        else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){ 
-			
+        else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){	
 			if(proddist=="default"){
 				std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
 				sw->set_fit_parameters(*proditer);
-				sw->sample_momentum(p1,p2,p3);//Can I remove this line now?
+				//sw->sample_momentum(p1,p2,p3);//Can I remove this line now?
 				PartDist = sw; //std::shared_ptr<Distribution>(&sw);
 			}
 			PartDist->set_mass(mpi0);
@@ -607,14 +623,40 @@ int main(int argc, char* argv[]){
 	//START OF BURN-IN//
 	////////////////////
         
+/*
+    //TESTING DETECTOR
+    cout << "TESTING DETECTOR" << endl;
+    Particle test_0(0.01);
+    test_0.ThreeMomentum(0.0,0.0,1);
+    Particle test_1(0.01);
+    test_1.ThreeMomentum(0.04,0.04,1);
+    Particle test_2(0.01);
+    test_2.ThreeMomentum(0.07,0.07,1);
+    Particle test_3(0.01);
+    test_3.ThreeMomentum(0.1,0.04,1);
 
-	double BURN_MAX = par->Burn_In();
-	
+    det_int(test_0);
+    cout << "TEST_1\n";
+    det_int(test_1);
+    cout << "TEST 2\n";
+    det_int(test_2);
+    cout << "TEST_3\n";
+    det_int(test_3);
+    //END DETECTOR TEST
+*/
+    double BURN_MAX = par->Burn_In();
+	if(BURN_MAX<0){
+        cout << "burn_max < 0 specified. Assuming default value burn_max=1000\n";
+        BURN_MAX=1000;
+    }
+   
     if(outmode=="dm_detector_distribution"){
         BURN_MAX = 0;
         cout << "Detector_Mode selected.\nSkipping Burn-In.\n";
     }
+
     
+
     double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0;BURN_MAX!=0&&i<chan_count; i++){
         int nburn = 0;
@@ -667,68 +709,69 @@ int main(int argc, char* argv[]){
     int trials_max = par->Max_Trials();
 	//if(SigGen->get_pMax()*Vnumtot<=1){
     if(SigGen->get_pMax()<=0){
-        cout << "pMax less than tolerance limit, setting trials = trials_max\n";
-        trials = trials_max;
+        cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
-    for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
-        int i;
-		scatter_switch = false;
-		double vrnd = Random::Flat(0.0,1)*Vnumtot;
-		for(i=0; i<chan_count; i++){
-			//cout << i << " vrnd=" <<  vrnd << " vs Vnum_list " << Vnum_list[i] <<  endl;
-			if(vrnd<=Vnum_list[i]){
-				break;
-			}
-			else{
-				vrnd-=Vnum_list[i];
-			}
-		}
-		trials_list[i]++; 
-		list<Particle> vec;
-		Particle dist_part (0);
-		PartDist_list[i]->Sample_Particle(dist_part);
-        if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
-			//Yes, this list is named vec.  
-            for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
-           	//The way this is structured means I can't do my usual repeat thing to boost stats. 
-                if(iter->name.compare(sig_part_name)==0){
-                    //iter->report(logging);
-                    NDM_list[i]++;
-					if(outmode=="dm_detector_distribution"){
-                        *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
-                        iter->report(*comprehensive_out);
-						scatter_switch=true;
-						continue;;
-					}
-					//may need to replace this with a list<Particle> later
-                    //cout << SigGen->get_pMax() << endl;
-					if(SigGen->probscatter(det, vec, iter)){
-						//cout << "Scatter?\n"; 
-                        scat_list[i]++;
-						if(timing_cut>0){
-							timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
-                        }
-						else{
-							timing_efficiency[i]+=1;
-                        }
-                        scatter_switch = true;	
-                    }
-                    else{
-                        iter = vec.erase(iter);
-                        iter--;
-                    }
-                }    
+    else{
+        for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
+            int i;
+            scatter_switch = false;
+            double vrnd = Random::Flat(0.0,1)*Vnumtot;
+            for(i=0; i<chan_count; i++){
+                //cout << i << " vrnd=" <<  vrnd << " vs Vnum_list " << Vnum_list[i] <<  endl;
+                if(vrnd<=Vnum_list[i]){
+                    break;
+                }
+                else{
+                    vrnd-=Vnum_list[i];
+                }
             }
-            
-        }
-        if(scatter_switch&&outmode=="comprehensive"){
-            *comprehensive_out << "event " << ++nevent << endl;
-            Record_Particles(*comprehensive_out, vec);
-            *comprehensive_out << "endevent " << nevent << endl << endl;    
-        }
-		else if(scatter_switch)
-			++nevent;
-    } 
+            trials_list[i]++; 
+            list<Particle> vec;
+            Particle dist_part (0);
+            PartDist_list[i]->Sample_Particle(dist_part);
+            if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
+                //Yes, this list is named vec.  
+                for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
+                //The way this is structured means I can't do my usual repeat thing to boost stats. 
+                    if(iter->name.compare(sig_part_name)==0){
+                        //iter->report(logging);
+                        NDM_list[i]++;
+                        if(outmode=="dm_detector_distribution"){
+                            *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
+                            iter->report(*comprehensive_out);
+                            scatter_switch=true;
+                            continue;;
+                        }
+                        //may need to replace this with a list<Particle> later
+                        //cout << SigGen->get_pMax() << endl;
+                        if(SigGen->probscatter(det, vec, iter)){
+                            //cout << "Scatter?\n"; 
+                            scat_list[i]++;
+                            if(timing_cut>0){
+                                timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
+                            }
+                            else{
+                                timing_efficiency[i]+=1;
+                            }
+                            scatter_switch = true;	
+                        }
+                        else{
+                            iter = vec.erase(iter);
+                            iter--;
+                        }
+                    }    
+                }
+                
+            }
+            if(scatter_switch&&outmode=="comprehensive"){
+                *comprehensive_out << "event " << ++nevent << endl;
+                Record_Particles(*comprehensive_out, vec);
+                *comprehensive_out << "endevent " << nevent << endl << endl;    
+            }
+            else if(scatter_switch)
+                ++nevent;
+        } 
+    }
 	cout << "Run complete\n";
 
     //This will be moved later.

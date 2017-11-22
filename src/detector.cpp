@@ -221,6 +221,9 @@ detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, 
     face[0][0]=detwidth/2.0;
     face[1][1]=detheight/2.0;
     face[2][2]=detlength/2.0;
+    face_dist[0]=detwidth;
+    face_dist[1]=detheight;
+    face_dist[2]=detlength;
     //dim[0]=pow(detwidth/2.0,2);
     //dim[1]=pow(detheight/2.0,2);
     //dim[2]=pow(detlength/2.0,2);
@@ -229,22 +232,22 @@ detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, 
         for(int j=0; j<3; j++)
             face[i+3][j]=-face[i][j];
     }
-    
+   /* 
     for(int i=0; i<6; i++){
       cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
     }
-    
+    */
 
 }
 
 double detector_cuboid::Ldet (Particle &DM){
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
-    cout << b[0] << " " << b[1] << " " << b[2] << endl; 
+    //cout << b[0] << " " << b[1] << " " << b[2] << endl; 
     double o[3];
 	for(int i=0; i<3; i++){
         o[i] = r[i] - DM.origin_coords[i];
     }
-    cout << o[0] << " " << o[1] << " " << o[2] << endl; 
+    //cout << o[0] << " " << o[1] << " " << o[2] << endl; 
     double entry=0;
     double exit=0;
  /*   
@@ -270,10 +273,26 @@ double detector_cuboid::Ldet (Particle &DM){
         }
     }
    */ 
-    
+    //bool zero_later=false;
     for(int i=0; i<3; i++){
         double bot1 = ip(b,face[i]);
         if(bot1==0){
+            double dist=(ip(face[i],face[i])+ip(o,face[i]))/face_dist[i]*2;
+            //cout << "dist1 = " << dist << endl;
+            if(dist<0){
+                dist*=-1;
+            }
+            if(dist>face_dist[i]){
+                return 0.0;
+            }
+            dist=(ip(face[i+3],face[i+3])+ip(o,face[i+3]))/face_dist[i]*2;
+            if(dist<0){
+                dist*=-1;
+            }
+            //cout << "dist2 = " << dist << endl;
+            if(dist>face_dist[i]){
+                return 0.0;
+            }
             continue;
         }
 
@@ -282,60 +301,60 @@ double detector_cuboid::Ldet (Particle &DM){
         double detc1 = ft1/bot1;
         double detc2 = ft2/ip(b,face[i+3]);
         bool enter=false;
-
-        cout << "i=" << i << " ft1=" << ft1 << " ft2=" << ft2 << " detc1= " << detc1 << " detc2=" << detc2 << endl; 
+        //cout << "i=" << i << " ft1=" << ft1 << " ft2=" << ft2 << " detc1= " << detc1 << " detc2=" << detc2 << endl; 
         if(ft1<=0){
-            cout << "Entry found\n";
+            //cout << "Entry found\n";
             enter=true;
         }
         else if(ft2<=0){
-            cout << "Entry found, swapping\n";
+            //cout << "Entry found, swapping\n";
             std::swap(ft1,ft2);
             std::swap(detc1,detc2);
             enter=true;
         }
 
         if(enter){
-            if(detc1>detc2){
-                cout << "This one should return zero! " << detc1 << ">" << detc2 << endl;
-                //return 0.0;
+            if(detc1>detc2){//Every entry face has an opposite exit face.
+                //cout << "This one should return zero! " << detc1 << ">" << detc2 << endl;
+                //zero_later=true; 
+                return 0.0;
             }
             if(detc1>entry){
-                cout << "Updated entry detc1\n";
+                //cout << "Updated entry detc1\n";
                 entry=detc1;
             }
         }
-        else{
-            if(detc1<exit||exit==0){
-                cout << "Updated exit detc1\n";
+        else{//Only care about exit faces in the future, so detc1,detc2>0
+            if(detc1>0&&(detc1<exit||exit==0)){
+                //cout << "Updated exit detc1\n";
                 exit=detc1;
             }
         }
-        if(detc2<exit||exit==0){
-            cout << "Updated exit detc2\n";
+        if(detc2>0&&(detc2<exit||exit==0)){
+            //cout << "Updated exit detc2\n";
             exit=detc2;
         }
     }  
-
+/*
     for(int i=0; i<6; i++){
         double bot = ip(b,face[i]);
-        cout << "i=" << i << endl;
-        cout << "bot=" << bot << endl;
+        //cout << "i=" << i << endl;
+        //cout << "bot=" << bot << endl;
         if(bot==0){
             continue;
         }
         double ft = ip(o,face[i])+ip(face[i],face[i]);
-        cout << "ft" << i << "= " << ft << endl;
-        cout << face[i][0] << " " << face[i][1] << " " << face[i][2] << endl;
-        cout << ip(o,face[i]) << endl;
-        cout << ip(face[i],face[i]) << endl;
+        //cout << "ft" << i << "= " << ft << endl;
+        //cout << face[i][0] << " " << face[i][1] << " " << face[i][2] << endl;
+        //cout << ip(o,face[i]) << endl;
+        //cout << ip(face[i],face[i]) << endl;
         
         if(ft==0){
             continue;
         }
         double detcross=ft/bot;
-        cout << "detcross=" << detcross << endl;
-        /*
+        //cout << "detcross=" << detcross << endl;
+        
         if(ft<0){
             cout << "entry"<< endl;
             if(detcross<0){
@@ -350,15 +369,17 @@ double detector_cuboid::Ldet (Particle &DM){
             if(exit==0||detcross<exit){
                 exit=detcross;
             }
-        }*/
-        
-    }
-    cout << "exit=" << exit << " entry=" << entry << endl;
+        }      
+    }*/
+    //cout << "exit=" << exit << " entry=" << entry << endl;
+   /* if(zero_later){
+        return 0.0;
+    } */ 
     if(entry>=exit||entry<0)
         return 0.0;
     else{
-        DM.report(cout);
-        cout << "CrossReport " << entry << " " << exit << " " << sqrt(ip(b,b)) << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
+        //DM.report(cout);
+        //cout << "CrossReport " << entry << " " << exit << " " << sqrt(ip(b,b)) << " " << (exit-entry)*sqrt(ip(b,b)) << endl;
         //cross_point[0]=entry;
         //cross_point[1]=exit;
         DM.crossing[0]=entry;

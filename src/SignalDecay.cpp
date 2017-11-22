@@ -24,7 +24,7 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
     Branching_Ratios = branching_ratios;
     Final_States = final_states;
     Lifetime = lifetime;
-    //cout << "V_lifetime: " << Lifetime << endl; 
+    cout << "V_lifetime: " << Lifetime << endl; 
     pMax=0;
     for(unsigned i = 0; i < Final_States.size();i++){
         if(Final_States[i].size()==0){
