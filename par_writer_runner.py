@@ -515,9 +515,19 @@ def execute_numi(genlist=True):
     massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[1000,300,1e-3]]
+    '''
     d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    '''
+    d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.01, "max_scatter_energy" : 2, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat"});
+    d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 2, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat"});
     d_list=[]
+    for marr in massarr:
+        d_miniboone.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d_miniboone_nucleon.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d_list.append(copy.deepcopy(d_miniboone))
+        d_list.append(copy.deepcopy(d_miniboone_nucleon))
+    '''
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -531,7 +541,6 @@ def execute_numi(genlist=True):
         #numi_eval(d)
         d_list.append(copy.deepcopy(d))
         d_list.append(copy.deepcopy(d_low))
-
     vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
@@ -548,6 +557,7 @@ def execute_numi(genlist=True):
         d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_low.dat"})
         d_list.append(copy.deepcopy(d))
         d_list.append(copy.deepcopy(d_low))
+    '''
 
     pool = Pool(processes=3)
     pool.map(numi_eval,d_list)
