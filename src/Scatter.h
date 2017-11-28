@@ -38,6 +38,27 @@ class Scatter{
 		//bool _End_state_with_DM_parallel_to_z=false;
 };
 
+//This should replace all the elastic scattering channels.
+//I would also like to generalize all inelastic scattering, but
+//that seems much more complicated.
+class Elastic_Scatter : public Scatter{
+    public:
+        Elastic_Scatter();
+        ~Elastic_Scatter(){};
+        bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
+        void set_Model_Parameters(vector<Particle>);
+    private:
+        //total value of the cross section for a given
+        std::vector<std::function<double(double)> > cross_tot; 
+        //maximum value of the cross section for a given energy.
+        std::vector<std::function<double(double)> > cross_maxima;
+        //differential cross section dsigma(E_DM_i,E_recoil)/dE_recoil
+        std::vector<std::function<double(double, double)> > dsigma;
+        //Recoil particle
+        std::vector<Particle> recoil_particle;
+};
+
 /*
  * Nucleon_scatter also handles the generation of interpolation functions for the nucleon scattering
  * cross section. 
