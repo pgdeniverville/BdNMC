@@ -45,9 +45,12 @@ class Elastic_Scatter : public Scatter{
     public:
         Elastic_Scatter();
         ~Elastic_Scatter(){};
+        void add_channel(Particle& end_state, std::function<double(double)>& cross_total, 
+                std::function<double(double)>& cross_max, std::function<double(double, double)>& dsig,
+                double& num_density)
         bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
         bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
-        void set_Model_Parameters(vector<Particle>);
+        void set_Model_Parameters(){};
     private:
         //total value of the cross section for a given
         std::vector<std::function<double(double)> > cross_tot; 
@@ -57,6 +60,9 @@ class Elastic_Scatter : public Scatter{
         std::vector<std::function<double(double, double)> > dsigma;
         //Recoil particle
         std::vector<Particle> recoil_particle;
+        //number density associated with a given scattering channel. 
+        std::vector<double> number_density;
+        int chan_number;
 };
 
 /*
