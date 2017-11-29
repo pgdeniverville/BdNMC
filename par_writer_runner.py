@@ -508,7 +508,7 @@ def execute_numi(genlist=True):
     vmarr=[10,20,30,40,60,80,100,150,200,250,300,400,500,550,600,700,725,750,760,770,780,790,800,900,1000]
     #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    #vmarr=[10]
+    #vmarr=[20]
     epsarr=[1e-3]
     #vmarr=[50]
     #epsarr=[10**-7]
@@ -519,8 +519,8 @@ def execute_numi(genlist=True):
     d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     '''
-    d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.01, "max_scatter_energy" : 2, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat"});
-    d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 2, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat"});
+    d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
+    d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat","ptmax" : 5, "burn_max" : 100});
     d_list=[]
     for marr in massarr:
         d_miniboone.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})

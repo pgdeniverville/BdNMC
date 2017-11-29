@@ -146,7 +146,10 @@ def miniboone_detector(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=5.0):
     f.write('\n')
     f.write(Carbon_string)
 
-def miniboone_detector_numi(f,xpos=0.0,ypos=0.0,zpos=100.0,radius=5.0):
+mini_numi_angle=0.10472
+mini_numi_distance=745
+
+def miniboone_detector_numi(f,xpos=mini_numi_distance*math.sin(mini_numi_angle),ypos=0.0,zpos=mini_numi_distance*math.cos(mini_numi_angle),radius=5.0):
     f.write("\ndetector sphere\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
     f.write('\n')
