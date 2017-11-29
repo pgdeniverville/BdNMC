@@ -9,19 +9,19 @@ namespace elastic_scattering{
     //E1i: Incident energy of particle 1
     //m1,2: masses of particle 1 and 2
     double Theta_from_E2f(double E2f, double E1i, double m1, double m2){
-        return(acos(sqrt((E2f-m2)/(E2f+m2))*(E1i+m2)/sqrt(E1i*E1i-m1*m1)));
+        return acos(sqrt((E2f-m2)/(E2f+m2))*(E1i+m2)/sqrt(E1i*E1i-m1*m1));
     }
     //This is the inverse of Theta_from_E2f.
     double E2f_from_Theta(double theta2, double E1i, double m1, double m2){
-        return(m2 ((E1i - m1)*(E1i + m1)*pow(cos(theta),2) + pow((E1i + m2),2))/(pow(E1i + m2,2) + (-pow(E1i,2) + pow(m1,2))*pow(cos(theta),2)));
+        return m2 ((E1i - m1)*(E1i + m1)*pow(cos(theta),2) + pow((E1i + m2),2))/(pow(E1i + m2,2) + (-pow(E1i,2) + pow(m1,2))*pow(cos(theta),2));
     }
     //Maximum and minimum energy of outgoing recoil particle
     //as function of masses and incoming energy E1i
     double E2fMax(double E1i, double m1, double m2){
-        return(E2f_from_Theta(0.0, E1o, m1, m2));
+        return E2f_from_Theta(0.0, E1o, m1, m2);
     }
     double E2fMin(double E1i, double m1, double m2){
-        return(E2f_from_Theta(M_PI/2.0, E1o, m1, m2));
+        return E2f_from_Theta(M_PI/2.0, E1o, m1, m2);
     }
 }
 
