@@ -254,6 +254,83 @@ def t2k_eval(d_user):
     subp.call(["rm", outfile])
 #END OF t2k_eval
 
+ship_defaults = {"mv" : 30, "mdm" : 10, 'channels' : {_parton,_brem,_pion_decay,_eta_decay,_phi_decay}, "signal_chan" : "NCE_electron", 'det_switch' : 'ship', 'sumlog' : "Events/ship.dat"}
+
+def ship_eval(d_user):
+    d = ship_defaults.copy()
+    d.update(d_user)
+    MV=d["mv"]
+    MX=d["mdm"]
+    channels = d["channels"]
+    det_switch=d["det_switch"]
+    if "alpha_D" in d:
+        alD=d["alpha_D"]
+    if 'eps' in d:
+        eps=d['eps']
+    sumlog=d["sumlog"]
+    signal_channel = d["signal_chan"]
+
+    t0 = time.time()
+    outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
+
+    BEAM_ENERGY=400
+    zmin=max(3*MV/1000.0/BEAM_ENERGY,0.1)
+    zmax=1-zmin
+
+    proddist = []
+    prodchan = []
+    partlistfile = [    ]
+    executing=False
+
+    if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" or signal_channel=="Baryonic_Test":
+        print("Need to implement Baryonic!")
+    else:
+        if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/particle_list_ship.dat")
+            executing=True
+        if ((MX/1000.0<meta/2.0 and MV<900.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay")
+            partlistfile.append("data/particle_list_ship.dat")
+            executing=True
+        if MV/1000.0>=mrho and _parton in channels:
+            proddist.append("parton_V")
+    	    prodchan.append("parton_production")
+    	    partlistfile.append("")
+            executing=True
+        if (MV/2.0>MX or signal_channel=="Signal_Decay") and _brem in channels:
+    	    proddist.append("proton_brem")
+    	    prodchan.append("V_decay")
+     	    partlistfile.append("")
+            executing=True
+        if MV/1000.0>=mrho and MV<=1250 and _phi_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("phi_decay")
+            partlistfile.append("data/particle_list_ship.dat")
+            executing=True
+
+    if not executing:
+        print("No valid channels, skipping!")
+        return
+
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    if det_switch == "ship":
+        write_ship(d=d)
+    elif det_switch == "test_sphere":
+        write_ship(d=d,det=test_sphere)
+    elif det_switch == "test_cylinder":
+        write_ship(d=d,det=test_cylinder)
+    elif det_switch == "test_cuboid":
+        write_ship(d=d,det=test_cuboid)
+    subp.call(["./build/main", outfile])
+    t1 = time.time()
+    print("\ntime={}\n".format(t1-t0))
+    t0 = time.time()
+    subp.call(["rm", outfile])
+
+
 numi_defaults = {"mv" : 30, "mdm" : 10, 'channels' : {_parton,_brem,_pion_decay,_eta_decay,_phi_decay}, "signal_chan" : "Signal_Decay", 'det_switch' : 'nova', 'sumlog' : "Events/nova_decay.dat"}
 
 def numi_eval(d_user):
@@ -499,6 +576,33 @@ def execute_miniboone_parallel(genlist = True):
         d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs}
         miniboone_eval(d)
 
+def execute_ship(genlist=True):
+    if genlist:
+        d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_ship.dat"]}
+        write_ship(d=d)
+        subp.call(["./build/main", "parameter_run.dat"])
+    massarr=[[600,200,1e-3]]
+    d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"det_switch" : "test_sphere"})
+        ship_eval(d)
+
+
+def execute_numi_test(genlist=True):
+    if genlist:
+        d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
+        write_numi(d=d)
+        subp.call(["./build/main", "parameter_run.dat"])
+    massarr=[[600,200,1e-3]]
+    d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"det_switch" : "test_sphere"})
+        numi_eval(d)
+
+
+
 def execute_numi(genlist=True):
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
@@ -515,13 +619,12 @@ def execute_numi(genlist=True):
     massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[1000,300,1e-3]]
-    '''
-    d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
-    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
-    '''
-    d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
-    d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat","ptmax" : 5, "burn_max" : 100});
     d_list=[]
+    d=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    d_low=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    #d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
+    #d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat","ptmax" : 5, "burn_max" : 100});
+    '''
     for marr in massarr:
         d_miniboone.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_miniboone_nucleon.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -531,16 +634,17 @@ def execute_numi(genlist=True):
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_high.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
-        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_low.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
+        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_nucleon_high.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
+        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_nucleon_low.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
         #numi_eval(d)
         d_list.append(copy.deepcopy(d))
         d_list.append(copy.deepcopy(d_low))
-        d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_high.dat"})
-        d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_low.dat"})
+        #d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_high.dat"})
+        #d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_low.dat"})
         #numi_eval(d)
-        d_list.append(copy.deepcopy(d))
-        d_list.append(copy.deepcopy(d_low))
+        #d_list.append(copy.deepcopy(d))
+        #d_list.append(copy.deepcopy(d_low))
+    '''
     vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
@@ -620,7 +724,8 @@ def execute_coherent(genlist=True):
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
 
-execute_numi(genlist=False)
+#execute_numi(genlist=False)
+execute_ship(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_t2k(genlist=False)
 #execute_coherent(genlist=False)

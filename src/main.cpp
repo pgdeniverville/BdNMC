@@ -708,7 +708,7 @@ int main(int argc, char* argv[]){
     bool scatter_switch;
     int trials_max = par->Max_Trials();
 	//if(SigGen->get_pMax()*Vnumtot<=1){
-    if(SigGen->get_pMax()<=0){
+    if(SigGen->get_pMax()<=0&&outmode!="dm_detector_distribution"){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
