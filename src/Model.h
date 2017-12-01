@@ -27,34 +27,63 @@ struct Decay_Channels{
 
 class Model{
     public:
-        Model();
+        Model(Parameter& par){Model_Name=par->Model_Name(); Prepare_Model(par);}
         ~Model(){};
-        virtual void Set_Model_Parameters(Parameter& par) = 0;
+        //This is the only point at which the Model class gets access to a
+        //Parameter object. It should use this opportunity to prepare DMGen_list, PartDist_list and Signal_list.
+        void Prepare_Model(Parameter& par){
+            if(!Set_Model_Parameters()){
+                std::cerr << "Model " << Model_Name << " is missing required model parameters\n";
+                throw -1;
+            }
+            std::cout << "Preparing signal channel " << par->Signal_Channel() << std::endl;
+            scat_max = par->Max_Scatter_Energy();
+            scat_min = par->Min_Scatter_Energy();
+            if(!Prepare_Signal_Channel(par)){
+                std::cerr << "Something is wrong with signal channel declaration\n";
+                throw -1;
+            }
+        };
+        virtual bool Set_Model_Parameters(Parameter& par) = 0;
+        virtual bool Prepare_Signal_Channel(Parameter& par) = 0;
         virtual void Report(std::ostream& out, double tot) = 0;
         virtual void Branching_Ratios();
         //These functions supply the prepared DMGenerator, Distribution and Scatter lists.
-        virtual void DMGen(std::vector<std::shared_ptr<DMGenerator> > DMGen_list);
-        virtual void Distribution(std::vector<std::shared_ptr<Distribution> > PartDist_list);
-        virtual void SigGen(std::vector<std::shared_ptr<Scatter> > Signal_list);        
+        void get_DMGen(std::vector<std::shared_ptr<DMGenerator> > DMGen_list){DMGen_list = Gen_list;}
+        void get_Distribution(std::vector<std::shared_ptr<Distribution> > PartDist_list){PartDist_list = Dist_list;}
+        void get_SigGen(std::vector<std::shared_ptr<Scatter> > Signal_list){Signal_list = Sig_list;} 
+        std::string model_name(){return Model_Name;}
     private:
+        std::string Model_Name = "MODEL_NAME";
         std::vector<Decay_Channels> decay_channels;
         std::vector<std::shared_ptr<Scatter> > Sig_list;
         std::vector<std::shared_ptr<Distribution> > Dist_list;
         std::vector<std::shared_ptr<DMGenerator> > Gen_list;
+        
+        //Minimum and maximum scattering energies;
+        double scat_max, scat_min;
 };
 
 class Pseudoscalar : public Model{
     public:
-        Pseudoscalar();
+        Pseudoscalar(Parameter& par){Model_Name=par->Model_Name(); Prepare_Model(par)}
         ~Pseudoscalar(){};
-        void Set_Model_Parameters(Parameter& par);
+        bool Set_Model_Parameters(Parameter& par);
+        bool Prepare_Signal_Channel(Parameter& par);
         void Report(std::ostream& out, double tot){};
         void Branching_Ratios(){};
-        void DMGen(std::vector<std::shared_ptr<DMGenerator> > DMGen_list);
-        void Distribution(std::vector<std::shared_ptr<Distribution> > PartDist_list);
-        void SigGen(std::vector<std::shared_ptr<Scatter> > Signal_list);        
+        //void get_DMGen(std::vector<std::shared_ptr<DMGenerator> > DMGen_list);
+        //void get_Distribution(std::vector<std::shared_ptr<Distribution> > PartDist_list);
+        //void get_SigGen(std::vector<std::shared_ptr<Scatter> > Signal_list);
+
+        void dsigma_dEf_electron(double Ei, double Ef);
+        void sigma_Ef_electron(double Ei, double Ef);
     private :
-            
+        //gchi is the dark matter charge, mchi is the dark matter mass, 
+        //ma is the mass of the pseudoscalar mediator
+        double gchi, ma, mchi;
+        
+
 }
 
 
