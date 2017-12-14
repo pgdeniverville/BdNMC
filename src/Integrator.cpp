@@ -218,6 +218,44 @@ double Linear_Interpolation::Interpolate(double xval){
     return (lowindex+1-index)*yvals[lowindex]+(index-lowindex)*yvals[lowindex+1];
 }
 
+void Linear_Interpolation::Convert_to_CDF(){
+    for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
+        *it += *(it-1);
+    }
+}
+
+//Convert f(x) = y to f(y) = x. This will only work if the interpolation is monotonically increasing (or decreasing).
+void Linear_Interpolation::Invert(){
+    double sign = 1;
+    double ymin,ymax;
+    if(yvals[0]>yvals[1]){
+        sign = -1;
+        ymax=Interpolate(xmin);
+        ymin=Interpolate(xmax);
+    }
+    else{
+        ymin=Interpolate(xmin);
+        ymax=Interpolate(xmax);
+    }
+
+    for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
+        if(sign*(*it)<=(sign)*(*(it-1))){
+            std::cerr << "Cannot invert this function, not monotonically increasing or decreasing." << endl;
+            throw -1;
+        }
+    }
+    vector<double> xvals;
+    double n = (xmax-xmin)/xres; 
+    double yres=(ymax-ymin)/n;
+    for(double i=ymin;i<=ymax;i+=yres){
+        xvals.push_back(Interpolate(i));
+    }
+    xmin = ymin;
+    xmax = ymax;
+    xres = yres;
+    yvals = xvals;
+}
+
 Linear_Interpolation::Linear_Interpolation(const Linear_Interpolation &LI){
     yvals = LI.yvals;
     xmin = LI.xmin;

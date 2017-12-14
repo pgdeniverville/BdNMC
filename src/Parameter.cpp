@@ -83,6 +83,7 @@ bool production_channel::query_dist_param(const string &key, double &var){
 production_distribution::production_distribution(){
 	dist_mod = "";
 }
+
 double production_distribution::get_offset(int i){
 	if(i>3||i<0){
 		std::cerr << "Out of domain for get_offset\n";
@@ -198,6 +199,10 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.parton_V_n_file=val;
 			else if(key==parton_V_proton_file_key)
 				tmpprod.parton_V_p_file=val;
+            else if(key==proton_pdf_file_key)
+                tmpprod.proton_pdf_file=val;
+            else if(key==neutron_pdf_file_key)
+                tmpprod.neutron_pdf_file=val;
 			else if(key==zmax_key)
 				tmpprod.ZMAX=stod(val);
 			else if(key==zmin_key)

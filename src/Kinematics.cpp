@@ -13,16 +13,97 @@ namespace elastic_scattering{
     }
     //This is the inverse of Theta_from_E2f.
     double E2f_from_Theta(double theta2, double E1i, double m1, double m2){
-        return m2 ((E1i - m1)*(E1i + m1)*pow(cos(theta),2) + pow((E1i + m2),2))/(pow(E1i + m2,2) + (-pow(E1i,2) + pow(m1,2))*pow(cos(theta),2));
+        return m2*((E1i - m1)*(E1i + m1)*pow(cos(theta2),2) + pow((E1i + m2),2))/(pow(E1i + m2,2) + (-pow(E1i,2) + pow(m1,2))*pow(cos(theta2),2));
     }
     //Maximum and minimum energy of outgoing recoil particle
     //as function of masses and incoming energy E1i
     double E2fMax(double E1i, double m1, double m2){
-        return E2f_from_Theta(0.0, E1o, m1, m2);
+        return E2f_from_Theta(0.0, E1i, m1, m2);
     }
     double E2fMin(double E1i, double m1, double m2){
-        return E2f_from_Theta(M_PI/2.0, E1o, m1, m2);
+        return E2f_from_Theta(M_PI/2.0, E1i, m1, m2);
     }
+}
+
+namespace annihilation{
+	//lab frame 1+2 -> 3+4, where m1=m2, m3=m4.
+	double E3_from_Theta(double E1, double m1, double theta, double m3){
+		return (m1*pow(E1 + m1,2) + sqrt((E1 - m1)*pow(E1 + m1,3)*(-m3 + m1)*(m3 + m1)*
+        pow(cos(theta),2) + pow(m3,2)*pow(pow(E1,2) - pow(m1,2),2)*
+        pow(cos(theta),4)))/((E1 + m1)*(E1 + m1 + (-E1 + m1)*pow(cos(theta),2)));
+	}
+
+	double p1cm(double E1, double m1){
+		return sqrt(m1*(E1-m1)/2);
+	}
+
+	double p3cm(double E1, double m1, double m3){
+		return sqrt(m1*(E1-m1)/2-m3*m3);
+	}
+
+	//These provide the limits on t=(p1-p3)^2, which provide limints on E3.
+	double t0(double E1, double m1, double m3){
+		return -pow(p1cm(E1,m1)-p3cm(E1,m1,m3),2);
+	}
+
+	double t1(double E1, double m1, double m3){
+		return -pow(p1cm(E1,m1)+p3cm(E1,m1,m3),2);
+	}
+
+	double E3_from_t(double E1, double m1, double m3, double t){
+		return (2*E1*m1+m1*m1-m3*m3+t)/(2*m1);
+	}
+
+	double E3Min(double E1, double m1, double m3){
+		return E3_from_t(E1, m1, m3, t1(E1, m1, m3));
+	}
+
+	double E3Max(double E1, double m1, double m3){
+		return E3_from_t(E1, m1, m3, t0(E1, m1, m3));
+	}
+}
+
+namespace annihilation_to_pair{
+	//lab frame 1+2->3+4 where m3=m4, but m1!=m2.
+	double shat(double E1, double m1, double m2){
+		return m1*m1+m2*m2+2*E1*m2;
+	}
+
+	double p1cm(double E1, double m1, double m2){
+		return sqrt(E1*E1-m1*m1)*m2/sqrt(shat(E1, m1, m2));
+	}
+
+	double p3cm(double E1, double m1, double m2, double m3){
+		return sqrt(shat(E1, m1, m2)/4.0-m3*m3);
+	}
+
+	double t0(double E1, double m1, double m2, double m3){
+		return pow(m1*m1-m2*m2,2)/4.0/shat(E1,m1,m2)-pow(p1cm(E1,m1,m2)-p3cm(E1,m1,m2,m3),2);
+	}
+
+	double t1(double E1, double m1, double m2, double m3){
+		return pow(m1*m1-m2*m2,2)/4.0/shat(E1,m1,m2)-pow(p1cm(E1,m1,m2)+p3cm(E1,m1,m2,m3),2);
+	}
+
+	double E4_from_t(double m2, double m4, double t){
+		return (m2*m2+m4*m4-t)/(2*m2);
+	}
+
+	double E3_from_t(double E1, double m1, double m2, double m3, double t){
+		return m2+E1-E4_from_t(m2, m3, t);
+	}
+
+	double Theta_from_E3(double E1,double m1,double m2,double E3,double m3){
+		return (2*E1*E3+2*(E1-E3)*m2-m1*m1-m2*m2)/2/sqrt(E1*E1-m1*m1)/sqrt(E3*E3-m3*m3);
+	}
+
+	double E3Min(double E1, double m1, double m2, double m3){
+		return E3_from_t(E1, m1, m2, m3, t1(E1,m1,m2,m3));
+	}
+
+	double E3Max(double E1, double m1, double m2, double m3){
+		return E3_from_t(E1, m1, m2, m3, t0(E1,m1,m2,m3));
+	}
 }
 
 //

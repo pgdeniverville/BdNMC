@@ -22,4 +22,29 @@ namespace elastic_scattering{
     double E2fMin(double E1i, double m1, double m2);
 }
 
+namespace annihilation_to_pair{
+	//lab frame 1+2->3+4 where m3=m4, but m1!=m2.
+	double shat(double E1, double m1, double m2);
+	double p1cm(double E1, double m1, double m2);
+	double p3cm(double E1, double m1, double m2, double m3);
+	double t0(double E1, double m1, double m2, double m3);
+	double t1(double E1, double m1, double m2, double m3);
+	double E4_from_t(double m2, double m4, double t);
+	double E3_from_t(double E1, double m1, double m2, double m3, double t);
+	double E3Min(double E1, double m1, double m2, double m3);
+	double E3Max(double E1, double m1, double m2, double m3);
+	double Theta_from_E3(double E1,double m1,double m2,double E3,double m3);
+}
+
+namespace annihilation{
+	double E3_from_Theta(double E1, double m1, double theta, double m3);
+	double p1cm(double E1, double m1);
+	double p3cm(double E1, double m1, double m3);
+	double t0(double E1, double m1, double m3);
+	double t1(double E1, double m1, double m3);
+	double E3_from_t(double E1, double m1, double m3, double t);
+	double E3Min(double E1, double m1, double m3);
+	double E3Max(double E1, double m1, double m3);
+}
+
 #endif

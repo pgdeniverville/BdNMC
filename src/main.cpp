@@ -15,6 +15,7 @@
 #include "sanfordwang.h"
 #include "BurmanSmith.h"
 #include "BMPT_dist.h"
+#include "Model.h"
 
 #include "Integrator.h"
 #include "detector.h"
@@ -32,6 +33,7 @@
 #include "Position_Distributions.h"
 #include "Axion_Dark_Photon.h"
 #include "SignalDecay.h"
+
 
 //Plotting stuff
 //#include "DMNscattering.h"
@@ -199,256 +201,13 @@ int main(int argc, char* argv[]){
 	double target_p = par->Target_P_Num();
     double target_p_cross = par->P_Cross();
 	
+	std::shared_ptr<Model> model;
 	std::shared_ptr<list<production_channel> > prodlist = par->Get_Production_List();	
 	int chan_count = prodlist->size(); 
-
-	for(list<production_channel>::iterator proditer = prodlist->begin(); proditer!=prodlist->end(); proditer++){
-		string prodchoice = proditer->Production_Channel(); 
-		string proddist = proditer->Prod_Dist();
-		std::shared_ptr<DMGenerator> DMGen;
-		std::shared_ptr<Distribution> PartDist;
-		double Vnum;
-		cout << "Setting up distribution " << proddist << " for channel " << prodchoice << endl;
-		//Don't delete these without good reason! They're used immediately!
-		double p1,p2,p3;
-		if(proddist=="pi0_sanfordwang"||proddist=="k0_sanfordwang"){
-			std::shared_ptr<sanfordwang> sw(new sanfordwang(proddist));
-			sw->set_fit_parameters(*proditer);//This does nothing if no fit parameters have been set.
-			PartDist = sw;
-		}
-		else if(proddist=="particle_list"){
-			bool set_pos = proditer->par_list_pos();
-			if(set_pos){
-				cout << "position off-sets were read from particle_list file\n";
-			}
-			std::shared_ptr<Particle_List> pl(new Particle_List(proditer->particle_list_file,set_pos));
-			PartDist = pl;
-		}
-		else if(proddist=="burmansmith"){
-			std::shared_ptr<BurmanSmith> bs(new BurmanSmith(beam_energy,target_p));
-			//beam_energy should be kinetic energy for this case
-			PartDist = bs;
-		}
-		else if(proddist=="bmpt"){
-			cout << "Energy = " << beam_energy << endl;
-			cout << "Mass Number = " << target_n+target_p << endl;
-			std::shared_ptr<BMPT> bmpt(new BMPT(beam_energy,target_n+target_p));
-			cout << "BMPT burn-in complete\n";
-			PartDist = bmpt;
-		}
-		else if(proddist=="parton_V"||proddist=="parton_V_baryonic"){
-			std::string proton_file = proditer->Parton_V_Proton_File();
-			std::string neutron_file = proditer->Parton_V_Neutron_File();
-			std::shared_ptr<parton_sample> parsam(new parton_sample(proton_file,neutron_file,\
-						target_p,target_n));
-			Vnum = POT*parsam->production_proton_cross_section()*microbarn/target_p_cross*(target_p+\
-					target_n);
-			if(proddist=="parton_V"){
-				Vnum*=pow(kappa,2);
-			}
-			else
-				Vnum*=alD;
-			PartDist = parsam;
-		}
-		else if(proddist=="proton_brem"||proddist=="proton_brem_baryonic"){
-			if(proditer->ptmax()<proditer->ptmin() || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
-				cerr << "Invalid properties for production_distribution proton_brem." << endl;
-				return -1;
-			}
-			std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist,proditer->ptmin()));
-			//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
-			Vnum = pbd->V_prod_rate()*POT;
-			PartDist = pbd;
-		}
-		else if(outmode=="particle_list"){
-			cerr << "Invalid or missing distribution " << proddist << " declared for particle_list outmode\n Terminating run.\n";
-			return -1;
-		}
-        cout << proddist << " " << prodchoice << endl; 
-        
-        //Signal_Decay HANDLING
-        if(par->Model_Name()=="Axion_Dark_Photon"||(par->Model_Name()=="Dark_Photon"&&sigchoice=="Signal_Decay")){
-            if(proddist=="proton_brem"){
-                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
-                cout << DMGen->Channel_Name() << endl;
-            }
-            else if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){
-                Particle gamma(0);
-                gamma.name = "Photon";
-                Particle dp(mv);
-                dp.name = "Dark_Photon";
-                //Code repeat here. Need to reorganize to eliminate this.
-                if(proddist=="default"){
-				    std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
-				    sw->set_fit_parameters(*proditer);
-				    PartDist = sw; //std::shared_ptr<Distribution>(&sw);
-                }
-                if(prodchoice=="pi0_decay"){
-                    if(mv>mpi0){
-                        cerr << "Attempting to produce on-shell mediator with mass " << mv << " larger than pion mass " << mpi0 << ".";
-                        return -1;
-                    }
-                    DMGen = std::shared_ptr<DMGenerator>(new 
-                            Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),
-                            MASS_PION_NEUTRAL,"Pion",dp,gamma));
-                    PartDist->set_mass(MASS_PION_NEUTRAL);
-                }
-                else if (prodchoice=="eta_decay"){
-                    if(mv>meta){
-                        cerr << "Attempting to produce on-shell mediator with mass " << mv << " larger than eta " << meta << ".";
-                        return -1;
-                    }
-                    DMGen = std::shared_ptr<DMGenerator>(new 
-                            Two_Body_Decay_Gen(bretatoVgamma(mv,mdm,kappa,alD),
-                            MASS_ETA,"Eta",dp,gamma));
-                    PartDist->set_mass(MASS_ETA);
-                }
-                if(proditer->Meson_Per_Pi0()<=0){
-				    //default for eta
-                    Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
-                }
-			    else{
-				    Vnum = DMGen->BranchingRatio()*num_pi0*
-                        (proditer->Meson_Per_Pi0());
-                }
-                DMGen->Set_Channel_Name(prodchoice);
-            }
-            else{
-                cerr << "Invalid production or distribution selected\n Axion_Dark_Photon is still in dev, so may react oddly.\n";
-                return -1;
-            }
-        }
-        else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){	
-			if(proddist=="default"){
-				std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
-				sw->set_fit_parameters(*proditer);
-				//sw->sample_momentum(p1,p2,p3);//Can I remove this line now?
-				PartDist = sw; //std::shared_ptr<Distribution>(&sw);
-			}
-			PartDist->set_mass(mpi0);
-			if(prodchoice=="pi0_decay"){
-				DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen(mv, mdm, kappa, alD));
-			}
-			else{
-				DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen_baryonic(mv, mdm, kappa, alD));
-			}
-			if(proditer->Meson_Per_Pi0()<=0)
-				Vnum = DMGen->BranchingRatio()*num_pi0;
-			else
-				Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
-		}
-		else if(prodchoice=="eta_decay"||prodchoice=="eta_decay_baryonic"){
-            if(proddist=="default"){
-				std::shared_ptr<sanfordwang> sw(new sanfordwang("k0_sanfordwang"));
-				sw->set_fit_parameters(*proditer);
-				PartDist = sw;
-			}
-
-			PartDist->set_mass(meta);
-			
-			if(prodchoice=="eta_decay"){ 
-				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen(mv, mdm, kappa, alD));
-			}
-			else{
-				DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen_baryonic(mv, mdm, kappa, alD));
-			}
-			if(proditer->Meson_Per_Pi0()<=0)
-				Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
-			else
-				Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
-		}
-		else if(prodchoice=="omega_decay"||prodchoice=="rho_decay"||
-                prodchoice=="phi_decay"||prodchoice=="omega_decay_baryonic"||prodchoice=="phi_decay_baryonic"){
-			if(proddist=="default"){
-				std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
-				sw->set_fit_parameters(*proditer);
-				sw->sample_momentum(p1,p2,p3);
-				PartDist = sw; //std::shared_ptr<Distribution>(&sw);
-			}
-			if(prodchoice=="omega_decay"){
-				PartDist->set_mass(momega);
-				DMGen = std::shared_ptr<DMGenerator>(new omega_decay_gen(mv, mdm, kappa, alD));
-			}
-			else if(prodchoice=="rho_decay"){
-				PartDist->set_mass(mrho);
-				DMGen = std::shared_ptr<DMGenerator>(new rho_decay_gen(mv, mdm, kappa, alD));
-			}
-			else if(prodchoice=="phi_decay"){
-				PartDist->set_mass(mphi);
-				DMGen = std::shared_ptr<DMGenerator>(new phi_decay_gen(mv, mdm, kappa, alD));
-			}
-			else if(prodchoice=="omega_decay_baryonic"){
-				PartDist->set_mass(momega);
-				DMGen = std::shared_ptr<DMGenerator>(new omega_decay_gen_baryonic(mv, mdm, kappa, alD));
-			}
-			else if(prodchoice=="phi_decay_baryonic"){
-				PartDist->set_mass(mphi);
-				DMGen = std::shared_ptr<DMGenerator>(new phi_decay_gen_baryonic(mv, mdm, kappa, alD));
-			}
-			Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
-		}
-		else if(prodchoice=="parton_production_baryonic"||prodchoice=="parton_production"){
-			PartDist->set_mass(mv);
-			DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
-		}
-		else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||
-                prodchoice=="V_decay_baryonic"){
-			PartDist->set_mass(mv);
-			DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
-			Vnum *= DMGen->BranchingRatio();
-		}
-        else if(prodchoice=="piminus_capture"){
-            PartDist = std::shared_ptr<Distribution>(new DoNothingDist());
-            if(proddist!="default"){
-                cerr << "No production distribution supported for piminus_capture";
-            }
-			DMGen = std::shared_ptr<DMGenerator>(new piminus_capture_gen(mv,mdm,kappa,alD));
-            Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
-        }
-		else{
-			cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
-			return -1;
-		}
-
-		std::shared_ptr<list<production_distribution> > distmodlist = proditer-> Get_Dist_Mods_List();
-		for(list<production_distribution>::iterator distiter = distmodlist->begin(); distiter!=distmodlist->end();distiter++){
-			list<std::shared_ptr<Distribution> > distlist;
-			if(distiter->name()=="position_offset"){
-				std::shared_ptr<Distribution> tmpdist (new Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
-				PartDist->Add_Dist(tmpdist);
-			}
-		}
-		if(outmode=="particle_list"){
-			Particle part(0);
-			std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
-			cout << "--------------------" << endl;
-			cout << "Run parameters:" << endl;
-			cout << "--------------------" << endl;	
-			cout << "Number of events to be generated = " << samplesize  << endl;
-			cout << "Production Distribution = " << proddist << endl;
-			cout << "Writing to " << proditer->Part_List_File() << endl;
-			for(int num = 0; num < samplesize; num++){
-				PartDist->Sample_Particle(part);
-				parstream << part.px << " " << part.py << " " << part.pz << " " << part.E << " " << part.end_coords[0] << " " << part.end_coords[1] << " " << part.end_coords[2] << " " << part.end_coords[3] << endl;
-			}
-			parstream.close();
-			return 0;
-		}
-		proddist_vec.push_back(proddist);
-		DMGen_list.push_back(DMGen);
-		PartDist_list.push_back(PartDist);
-		Vnum_list.push_back(Vnum);
-		Vnumtot+=Vnum;
-	}//End of Production distribution loop. 
-	if(Vnumtot==0){
-		cout << "No DM production expected. Terminating run.\n";
-		return 0;
-	}
-	//return 0;
-
+	
 	double EDMRES = par->EDM_RES();
 
-	std::unique_ptr<Scatter> SigGen;
+	std::shared_ptr<Scatter> SigGen;
 //Update this so it scales energy to Beam energy.
 	double max_dm_energy = par->Max_DM_Energy();
 	//Should add scatter angle to this as well at some point.	
@@ -456,6 +215,262 @@ int main(int argc, char* argv[]){
 	double min_scatter_energy = par->Min_Scatter_Energy();
 	double min_angle = par->Min_Angle();
 	double max_angle = par->Max_Angle();
+	
+	if(par->Model_Name()=="Pseudoscalar_Mediator"){
+		std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
+		//This will eventually get moved to the bottom, once the big else statements is moved into models.
+		mod->get_DMGen(DMGen_list);
+		mod->get_Distribution(PartDist_list);
+		mod->get_first_SigGen(SigGen);
+		mod->get_Vnum(Vnum_list);
+		Vnumtot = mod->get_Vnumtot();
+		model = mod;
+	}
+	else{
+		for(list<production_channel>::iterator proditer = prodlist->begin(); proditer!=prodlist->end(); proditer++){
+			string prodchoice = proditer->Production_Channel(); 
+			string proddist = proditer->Prod_Dist();
+			std::shared_ptr<DMGenerator> DMGen;
+			std::shared_ptr<Distribution> PartDist;
+			double Vnum;
+			cout << "Setting up distribution " << proddist << " for channel " << prodchoice << endl;
+			//Don't delete these without good reason! They're used immediately!
+			double p1,p2,p3;
+			if(proddist=="pi0_sanfordwang"||proddist=="k0_sanfordwang"){
+				std::shared_ptr<sanfordwang> sw(new sanfordwang(proddist));
+				sw->set_fit_parameters(*proditer);//This does nothing if no fit parameters have been set.
+				PartDist = sw;
+			}
+			else if(proddist=="particle_list"){
+				bool set_pos = proditer->par_list_pos();
+				if(set_pos){
+					cout << "position off-sets were read from particle_list file\n";
+				}
+				std::shared_ptr<Particle_List> pl(new Particle_List(proditer->particle_list_file,set_pos));
+				PartDist = pl;
+			}
+			else if(proddist=="burmansmith"){
+				std::shared_ptr<BurmanSmith> bs(new BurmanSmith(beam_energy,target_p));
+				//beam_energy should be kinetic energy for this case
+				PartDist = bs;
+			}
+			else if(proddist=="bmpt"){
+				cout << "Energy = " << beam_energy << endl;
+				cout << "Mass Number = " << target_n+target_p << endl;
+				std::shared_ptr<BMPT> bmpt(new BMPT(beam_energy,target_n+target_p));
+				cout << "BMPT burn-in complete\n";
+				PartDist = bmpt;
+			}
+			else if(proddist=="parton_V"||proddist=="parton_V_baryonic"){
+				std::string proton_file = proditer->Parton_V_Proton_File();
+				std::string neutron_file = proditer->Parton_V_Neutron_File();
+				std::shared_ptr<parton_sample> parsam(new parton_sample(proton_file,neutron_file,\
+							target_p,target_n));
+				Vnum = POT*parsam->production_proton_cross_section()*microbarn/target_p_cross*(target_p+\
+						target_n);
+				if(proddist=="parton_V"){
+					Vnum*=pow(kappa,2);
+				}
+				else
+					Vnum*=alD;
+				PartDist = parsam;
+			}
+			else if(proddist=="proton_brem"||proddist=="proton_brem_baryonic"){
+				if(proditer->ptmax()<proditer->ptmin() || proditer->zmax() < 0 || proditer->zmax()<proditer->zmin() || proditer->zmin() < 0){
+					cerr << "Invalid properties for production_distribution proton_brem." << endl;
+					return -1;
+			}	
+				std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(beam_energy, kappa,mv,proditer->ptmax(),proditer->zmax(),proditer->zmin(),alD,proddist,proditer->ptmin()));
+				//cout << "kappa = " << kappa << " mv = " << mv << " " << proditer->ptmax() << " " << proditer->zmax() << " " << proditer->zmin() << endl;
+				Vnum = pbd->V_prod_rate()*POT;
+				PartDist = pbd;
+			}
+			else if(outmode=="particle_list"){
+				cerr << "Invalid or missing distribution " << proddist << " declared for particle_list outmode\n Terminating run.\n";
+				return -1;
+			}
+	        cout << proddist << " " << prodchoice << endl; 
+	        
+	        //Signal_Decay HANDLING
+	        if(par->Model_Name()=="Axion_Dark_Photon"||(par->Model_Name()=="Dark_Photon"&&sigchoice=="Signal_Decay")){
+	            if(proddist=="proton_brem"){
+	                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
+	                cout << DMGen->Channel_Name() << endl;
+	            }
+	            else if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){
+	                Particle gamma(0);
+	                gamma.name = "Photon";
+	                Particle dp(mv);
+	                dp.name = "Dark_Photon";
+	                //Code repeat here. Need to reorganize to eliminate this.
+	                if(proddist=="default"){
+					    std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
+					    sw->set_fit_parameters(*proditer);
+					    PartDist = sw; //std::shared_ptr<Distribution>(&sw);
+	                }
+	                if(prodchoice=="pi0_decay"){
+	                    if(mv>mpi0){
+	                        cerr << "Attempting to produce on-shell mediator with mass " << mv << " larger than pion mass " << mpi0 << ".";
+	                        return -1;
+	                    }
+	                    DMGen = std::shared_ptr<DMGenerator>(new 
+	                            Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),
+	                            MASS_PION_NEUTRAL,"Pion",dp,gamma));
+	                    PartDist->set_mass(MASS_PION_NEUTRAL);
+	                }
+	                else if (prodchoice=="eta_decay"){
+	                    if(mv>meta){
+	                        cerr << "Attempting to produce on-shell mediator with mass " << mv << " larger than eta " << meta << ".";
+	                        return -1;
+	                    }
+	                    DMGen = std::shared_ptr<DMGenerator>(new 
+	                            Two_Body_Decay_Gen(bretatoVgamma(mv,mdm,kappa,alD),
+	                            MASS_ETA,"Eta",dp,gamma));
+	                    PartDist->set_mass(MASS_ETA);
+	                }
+	                if(proditer->Meson_Per_Pi0()<=0){
+					    //default for eta
+	                    Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
+	                }
+				    else{
+					    Vnum = DMGen->BranchingRatio()*num_pi0*
+	                        (proditer->Meson_Per_Pi0());
+	                }
+	                DMGen->Set_Channel_Name(prodchoice);
+	            }
+	            else{
+	                cerr << "Invalid production or distribution selected\n Axion_Dark_Photon is still in dev, so may react oddly.\n";
+	                return -1;
+	            }
+	        }
+	        else if(prodchoice=="pi0_decay"||prodchoice=="pi0_decay_baryonic"){	
+				if(proddist=="default"){
+					std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
+					sw->set_fit_parameters(*proditer);
+					//sw->sample_momentum(p1,p2,p3);//Can I remove this line now?
+					PartDist = sw; //std::shared_ptr<Distribution>(&sw);
+				}
+				PartDist->set_mass(mpi0);
+				if(prodchoice=="pi0_decay"){
+					DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen(mv, mdm, kappa, alD));
+				}
+				else{
+					DMGen = std::shared_ptr<DMGenerator>(new pion_decay_gen_baryonic(mv, mdm, kappa, alD));
+				}
+				if(proditer->Meson_Per_Pi0()<=0)
+					Vnum = DMGen->BranchingRatio()*num_pi0;
+				else
+					Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+			}
+			else if(prodchoice=="eta_decay"||prodchoice=="eta_decay_baryonic"){
+	            if(proddist=="default"){
+					std::shared_ptr<sanfordwang> sw(new sanfordwang("k0_sanfordwang"));
+					sw->set_fit_parameters(*proditer);
+					PartDist = sw;
+				}
+
+				PartDist->set_mass(meta);
+				
+				if(prodchoice=="eta_decay"){ 
+					DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen(mv, mdm, kappa, alD));
+				}
+				else{
+					DMGen = std::shared_ptr<DMGenerator>(new eta_decay_gen_baryonic(mv, mdm, kappa, alD));
+				}
+				if(proditer->Meson_Per_Pi0()<=0)
+					Vnum = DMGen->BranchingRatio()*num_pi0/30.0;
+				else
+					Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+			}
+			else if(prodchoice=="omega_decay"||prodchoice=="rho_decay"||
+	                prodchoice=="phi_decay"||prodchoice=="omega_decay_baryonic"||prodchoice=="phi_decay_baryonic"){
+				if(proddist=="default"){
+					std::shared_ptr<sanfordwang> sw(new sanfordwang("pi0_sanfordwang"));
+					sw->set_fit_parameters(*proditer);
+					sw->sample_momentum(p1,p2,p3);
+					PartDist = sw; //std::shared_ptr<Distribution>(&sw);
+				}
+				if(prodchoice=="omega_decay"){
+					PartDist->set_mass(momega);
+					DMGen = std::shared_ptr<DMGenerator>(new omega_decay_gen(mv, mdm, kappa, alD));
+				}
+				else if(prodchoice=="rho_decay"){
+					PartDist->set_mass(mrho);
+					DMGen = std::shared_ptr<DMGenerator>(new rho_decay_gen(mv, mdm, kappa, alD));
+				}
+				else if(prodchoice=="phi_decay"){
+					PartDist->set_mass(mphi);
+					DMGen = std::shared_ptr<DMGenerator>(new phi_decay_gen(mv, mdm, kappa, alD));
+				}
+				else if(prodchoice=="omega_decay_baryonic"){
+					PartDist->set_mass(momega);
+					DMGen = std::shared_ptr<DMGenerator>(new omega_decay_gen_baryonic(mv, mdm, kappa, alD));
+				}
+				else if(prodchoice=="phi_decay_baryonic"){
+					PartDist->set_mass(mphi);
+					DMGen = std::shared_ptr<DMGenerator>(new phi_decay_gen_baryonic(mv, mdm, kappa, alD));
+				}
+				Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+			}
+			else if(prodchoice=="parton_production_baryonic"||prodchoice=="parton_production"){
+				PartDist->set_mass(mv);
+				DMGen = std::shared_ptr<DMGenerator>(new parton_V_gen(mv, mdm, kappa, alD, prodchoice));
+			}
+			else if(prodchoice=="V_decay"||prodchoice=="Brem_V"||
+	                prodchoice=="V_decay_baryonic"){
+				PartDist->set_mass(mv);
+				DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mv,mdm,kappa,alD,proddist));
+				Vnum *= DMGen->BranchingRatio();
+			}
+	        else if(prodchoice=="piminus_capture"){
+	            PartDist = std::shared_ptr<Distribution>(new DoNothingDist());
+	            if(proddist!="default"){
+	                cerr << "No production distribution supported for piminus_capture";
+	            }
+				DMGen = std::shared_ptr<DMGenerator>(new piminus_capture_gen(mv,mdm,kappa,alD));
+	            Vnum = DMGen->BranchingRatio()*num_pi0*(proditer->Meson_Per_Pi0());
+	        }
+			else{
+				cerr << "Invalid Production Channel Selection: " << prodchoice  << "\n";
+				return -1;
+			}
+
+			std::shared_ptr<list<production_distribution> > distmodlist = proditer-> Get_Dist_Mods_List();
+			for(list<production_distribution>::iterator distiter = distmodlist->begin(); distiter!=distmodlist->end();distiter++){
+				list<std::shared_ptr<Distribution> > distlist;
+				if(distiter->name()=="position_offset"){
+					std::shared_ptr<Distribution> tmpdist (new Position_Offset(distiter->get_offset(0),distiter->get_offset(1),distiter->get_offset(2),distiter->get_offset(3)));
+					PartDist->Add_Dist(tmpdist);
+				}
+			}
+			if(outmode=="particle_list"){
+				Particle part(0);
+				std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
+				cout << "--------------------" << endl;
+				cout << "Run parameters:" << endl;
+				cout << "--------------------" << endl;	
+				cout << "Number of events to be generated = " << samplesize  << endl;
+				cout << "Production Distribution = " << proddist << endl;
+				cout << "Writing to " << proditer->Part_List_File() << endl;
+				for(int num = 0; num < samplesize; num++){
+					PartDist->Sample_Particle(part);
+					parstream << part.px << " " << part.py << " " << part.pz << " " << part.E << " " << part.end_coords[0] << " " << part.end_coords[1] << " " << part.end_coords[2] << " " << part.end_coords[3] << endl;
+				}
+				parstream.close();
+				return 0;
+			}
+			proddist_vec.push_back(proddist);
+			DMGen_list.push_back(DMGen);
+			PartDist_list.push_back(PartDist);
+			Vnum_list.push_back(Vnum);
+			Vnumtot+=Vnum;
+		}//End of Production distribution loop. 
+		if(Vnumtot==0){
+			cout << "No DM production expected. Terminating run.\n";
+			return 0;
+	}
+	//return 0;
+
 	cout << "Preparing signal channel " << sigchoice << endl;
 	if(sigchoice=="NCE_electron"){
 		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
@@ -567,7 +582,7 @@ int main(int argc, char* argv[]){
             }
 
             SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
-        }
+    	}
         else{
             cerr << "No model declared for Signal_Decay.\n";
             return -1;
@@ -578,7 +593,9 @@ int main(int argc, char* argv[]){
 		cerr << "Invalid Channel Selection: " << sigchoice << endl;
 		return -1;
 	}
-    
+	    
+	}
+	
 
 	SigGen->set_angle_limits(min_angle, max_angle);
 	SigGen->set_energy_limits(min_scatter_energy, max_scatter_energy);

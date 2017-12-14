@@ -9,6 +9,7 @@
 class Distribution {
 	public:
 		Distribution(){part_mass=0;}
+		~Distribution(){};
 		void Sample_Particle(Particle &part)
 		{
 			part.Set_Mass(part_mass);
@@ -29,7 +30,17 @@ class Distribution {
 
 class DoNothingDist : public Distribution{
     public:
-        void sample_particle(Particle &part){return;} 
+        void sample_particle(Particle &part){return;}
 };
 
+//This samples the proton beam itself. Currently it
+//is monoenergetic and parallel to z axis, but I
+//will figure out how to add angular and energy spreads later.
+class BeamDistribution: public Distribution{
+	public:
+		BeamDistribution(double Energy, double mass){beam_energy=Energy; beam_mass = mass;}
+	private:
+		double beam_energy, beam_mass;
+		void sample_particle(Particle &);
+};
 #endif

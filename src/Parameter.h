@@ -18,13 +18,13 @@ class production_distribution{
 		double get_offset(int i);
 		std::string name(){return dist_mod;}
 		std::string DIST_MOD(){return dist_mod;}
-};
+};	
 
 class production_channel{
 	public:
 		std::string prod_chan, prod_dist, particle_list_file;
 		std::string sanfordwang_file;
-		std::string parton_V_n_file, parton_V_p_file;
+		std::string parton_V_n_file, parton_V_p_file,proton_pdf_file,neutron_pdf_file;
 		//This map holds sanfordwang parameters.
 		std::map<std::string, std::string> dist_param_map;
 		double meson_per_pi0, PTMAX, PTMIN, ZMIN, ZMAX;
@@ -42,6 +42,8 @@ class production_channel{
 		std::string Part_List_File(){return particle_list_file;}
 		std::string Parton_V_Neutron_File(){return parton_V_n_file;}
 		std::string Parton_V_Proton_File(){return parton_V_p_file;}
+        std::string Proton_PDF_File(){return proton_pdf_file;}
+        std::string Neutron_PDF_File(){return neutron_pdf_file;}
         std::string Production_Channel(){return prod_chan;}
 		std::shared_ptr<std::list<production_distribution> > Get_Dist_Mods_List(){return dist_mods;}
 		std::shared_ptr<std::list<production_distribution> > dist_mods;//Should probably be private

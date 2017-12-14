@@ -45,14 +45,17 @@ class Elastic_Scatter : public Scatter{
     public:
         Elastic_Scatter();
         ~Elastic_Scatter(){};
-        void add_channel(Particle& end_state, std::function<double(double)>& cross_total, 
-                std::function<double(double)>& cross_max, std::function<double(double, double)>& dsig,
-                double& num_density)
+        void add_channel(Particle& end_state, std::function<double(double)>& cross_total, std::function<double(double)>& cross_max, std::function<double(double, double)>& dsig,double num_density);
         bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
-        bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &part);
         void set_Model_Parameters(){};
     private:
-        //total value of the cross section for a given
+        double scatmax(double E1, double m1, double m2);
+        double scatmin(double E1, double m1, double m2);
+        void scatterevent(Particle &particle, Particle &recoil, std::function<double(double)> cross_section, std::function<double(double)> cross_maxima);
+        
+        //total value of the cross section for a given signal channel
         std::vector<std::function<double(double)> > cross_tot; 
         //maximum value of the cross section for a given energy.
         std::vector<std::function<double(double)> > cross_maxima;
