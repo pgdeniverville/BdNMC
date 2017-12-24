@@ -1,11 +1,14 @@
 #include "Integrator.h"
+#include "minimization.h"
+
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
 #include "constants.h"
 
 using std::cout; using std::endl;
-
+using std::cerr;
+using namespace std::placeholders;
 const int DDMAX = 20;
 
 using std::vector;
@@ -186,6 +189,32 @@ double SimpsonsRule(std::function<double(double)> f, double min, double max, int
     return (sum1+sum2+f(min)+f(max)) * dx/3.0;
 }
 
+//This works on CDFs only.
+bool Interpolation1D::Find_Y(double y, double &x){
+    if(!IS_CDF){
+        cerr << "Is not a CDF\n";
+        return false;
+    }
+    if(Interpolate(xmin)>Interpolate(xmax)){
+        if(Interpolate(xmin)<y||Interpolate(xmax)>y){
+            cerr << "xmin= " << Interpolate(xmin) << "<" << y << " or xmax=" << Interpolate(xmax) << ">" << y << endl; 
+            return false;
+        }
+    }
+    else{
+        if(Interpolate(xmin)>y||Interpolate(xmax)<y){
+            cerr << "ymin= " << Interpolate(xmin) << ">" << y << " or xmax=" << Interpolate(xmax) << "<" << y << endl;
+            return false;
+        }
+    }
+    std::function<double(double)> f = std::bind(&Interpolation1D::Dif,this,_1,y);
+    double a = xmin;
+    double c = xmax;
+    double b = (xmax+xmin)/2.0;
+    golden(a,b,c,f,1e-3,std::abs(xmin-xmax)/100.0,x);
+    return true;
+}
+
 /*
  *  Linear_Interpolation takes a set of data Yvals whose elements map to xvals between Xmin
  *  and Xmax such that Yvals[0] = f(Xmin), Yvals[i] = f(Xmin + i*xres), where xres is defined
@@ -218,18 +247,32 @@ double Linear_Interpolation::Interpolate(double xval){
     return (lowindex+1-index)*yvals[lowindex]+(index-lowindex)*yvals[lowindex+1];
 }
 
+bool Linear_Interpolation::QCDF(){
+    double sign = 1;
+    if(yvals[0]>yvals[1]){
+        sign = -1;
+    }
+
+    for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
+        //This is DICEY
+        if(sign*(*it)<(sign)*(*(it-1))){
+            return false;
+        }
+    }
+    return true;
+}
+
 void Linear_Interpolation::Convert_to_CDF(){
     for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
         *it += *(it-1);
     }
+    IS_CDF=true;
 }
 
 //Convert f(x) = y to f(y) = x. This will only work if the interpolation is monotonically increasing (or decreasing).
 void Linear_Interpolation::Invert(){
-    double sign = 1;
     double ymin,ymax;
     if(yvals[0]>yvals[1]){
-        sign = -1;
         ymax=Interpolate(xmin);
         ymin=Interpolate(xmax);
     }
@@ -238,17 +281,24 @@ void Linear_Interpolation::Invert(){
         ymax=Interpolate(xmax);
     }
 
-    for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
-        if(sign*(*it)<=(sign)*(*(it-1))){
-            std::cerr << "Cannot invert this function, not monotonically increasing or decreasing." << endl;
-            throw -1;
-        }
+    if(!QCDF()){
+        std::cerr << "Cannot invert this function, not monotonically increasing or decreasing." << endl;
+        //Is there some form of range error?
+        throw -1;
     }
+
     vector<double> xvals;
     double n = (xmax-xmin)/xres; 
     double yres=(ymax-ymin)/n;
+    double x;
     for(double i=ymin;i<=ymax;i+=yres){
-        xvals.push_back(Interpolate(i));
+        if(Find_Y(i,x)){
+            xvals.push_back(x);
+        }
+        else{
+            cerr << "Invert() could not find expected y_val." << endl;
+            throw std::domain_error("yval not in range");
+        }
     }
     xmin = ymin;
     xmax = ymax;
@@ -269,4 +319,146 @@ Linear_Interpolation& Linear_Interpolation::operator=(const Linear_Interpolation
     xmax = LI.xmax;
     xres = LI.xres;
     return *this;
+}
+
+void Linear_Interpolation::Report(){
+    cout << "Interpolation report: Linear_Interpolation" << endl;
+    cout << "x_min=" << xmin << " x_max=" << xmax << endl;
+    for(unsigned it=0; it!= yvals.size(); it++){
+        cout << it*xres+xmin << " " << yvals[it] << endl;
+    }
+}
+
+/*
+ *  Linear_Interpolation2 takes a set of data Yvals whose elements map to a set of x values Xvals, such that Y[i] = f(Xvals[i]). 
+ *  It is assumed that Xvals[i]<Xvals[i+1].
+ */
+Linear_Interpolation2::Linear_Interpolation2(vector<double> Xvals, vector<double> Yvals){
+    if(Yvals.size()!=Xvals.size()){
+        cerr << Yvals.size() << "!=" << Xvals.size() << endl;
+        throw std::domain_error("Linear_Interpolation2 requires the length of Yvals to equal the length of Xvals.");
+    }
+    yvals.resize(Yvals.size());
+    std::copy(Yvals.begin(),Yvals.end(),yvals.begin());
+    xvals.resize(Xvals.size());
+    std::copy(Xvals.begin(),Xvals.end(),xvals.begin());
+    xmin = Xvals.front();
+    xmax = Xvals.back();
+}
+
+//Finds the index i corresponding to the largest x[i]<=xval.
+double Find_Index(const double xval, const vector<double>& xvals){
+    unsigned L = 0;
+    unsigned R = xvals.size()-1;
+    unsigned m;
+    while(R-L>1){ 
+        m=(unsigned)std::floor((L+R)/2);
+        //cout << "Find_Index L=" << L << " R=" << R << " m" << m << " xvals[m]=" << xvals[m] << endl;
+        if(xvals[m]>xval){
+            R=m-1;
+        }
+        else if(xvals[m]<xval){
+            L=m+1;
+        }
+        else{
+            return m;
+        }
+    }
+    return L;
+}
+
+/*
+ * Interpolate returns the value of f(xval) for xmin<=xval<=xmax. Values outside this range will
+ * evaluate to zero.
+ * It has to be done somewhere, added error checking. Returns 0.0 rather
+ * than trying to extrapolate.
+ */
+double Linear_Interpolation2::Interpolate(const double xval){
+    if(xval<xmin)
+        return 0.0;
+    else if(xval>xmax)
+        return 0.0;
+/*
+    if(xmin==xval){
+        return yvals[0];
+    }
+    else if(xmax == xval){
+        return yvals[-1];
+    }*/
+    //cout << "Begin Interpolation for xval=" << xval << endl;
+    double lowindex = Find_Index(xval, xvals);
+    //cout << "Found lowindex=" << lowindex << " " << xvals[lowindex] << " " << xvals[lowindex+1] << endl;
+    //cout << "Returning " << yvals[lowindex] << " " << yvals[lowindex+1] << " " << ((xvals[lowindex+1]-xval)*yvals[lowindex]+(xval-xvals[lowindex])*yvals[lowindex+1])/(xvals[lowindex+1]-xvals[lowindex]) << endl;
+    //throw -1;
+    if(xvals[lowindex]==xval){
+        return yvals[lowindex];
+    }
+    return ((xvals[lowindex+1]-xval)*yvals[lowindex]+(xval-xvals[lowindex])*yvals[lowindex+1])/(xvals[lowindex+1]-xvals[lowindex]);
+}
+
+bool Linear_Interpolation2::QCDF(){
+    double sign = 1;
+    if(yvals[0]>yvals[1]){
+        sign = -1;
+    }
+
+    for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
+        //This is DICEY
+        if(sign*(*it)<(sign)*(*(it-1))){
+            return false;
+        }
+    }
+    return true;
+}
+
+void Linear_Interpolation2::Convert_to_CDF(){
+    for(vector<double>::iterator it = yvals.begin()+1; it!=yvals.end(); it++){
+        *it += *(it-1);
+    }
+    IS_CDF=true;
+}
+
+//Convert f(x) = y to f(y) = x. This will only work if the interpolation is monotonically increasing (or decreasing).
+void Linear_Interpolation2::Invert(){
+    if(!QCDF()){
+        std::cerr << "Cannot invert this function, not monotonically increasing or decreasing." << endl;
+        //Is there some form of range error?
+        throw -1;
+    }
+//    double ymin,ymax;
+    vector<double> tmpvals;
+    if(yvals[0]>yvals[1]){
+        tmpvals.resize(yvals.size());
+        std::reverse_copy(yvals.begin(), yvals.end(), tmpvals.begin());
+    }
+    else{
+        tmpvals = yvals;
+    }
+    yvals = xvals;
+    xvals = tmpvals;
+    xmin = xvals.front();
+    xmax = xvals.back();
+}
+
+Linear_Interpolation2::Linear_Interpolation2(const Linear_Interpolation2 &LI){
+    yvals = LI.yvals;
+    xvals = LI.xvals;
+    xmin = LI.xmin;
+    xmax = LI.xmax;
+}
+
+Linear_Interpolation2& Linear_Interpolation2::operator=(const Linear_Interpolation2& LI){
+    yvals = LI.yvals;
+    xvals = LI.xvals;
+    xmin = LI.xmin;
+    xmax = LI.xmax;
+    return *this;
+}
+
+void Linear_Interpolation2::Report(){
+    cout << "Interpolation report: Linear_Interpolation" << endl;
+    cout << "x_min=" << xmin << " x_max=" << xmax << endl;
+    for(unsigned it=0; it!= yvals.size(); it++){
+        cout << xvals[it] << " " << yvals[it] << endl;
+    }
 }

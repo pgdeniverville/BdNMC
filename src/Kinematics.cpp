@@ -24,49 +24,29 @@ namespace elastic_scattering{
         return E2f_from_Theta(M_PI/2.0, E1i, m1, m2);
     }
 }
-
+/*
 namespace annihilation{
-	//lab frame 1+2 -> 3+4, where m1=m2, m3=m4.
-	double E3_from_Theta(double E1, double m1, double theta, double m3){
-		return (m1*pow(E1 + m1,2) + sqrt((E1 - m1)*pow(E1 + m1,3)*(-m3 + m1)*(m3 + m1)*
-        pow(cos(theta),2) + pow(m3,2)*pow(pow(E1,2) - pow(m1,2),2)*
-        pow(cos(theta),4)))/((E1 + m1)*(E1 + m1 + (-E1 + m1)*pow(cos(theta),2)));
+	//Center of mass frame annihilation, 1+2->3+4.
+
+	//s as calculated with lab frame variables
+	double shat_lab(double E1, double m1, double m2){
+		return m1*m1+m2*m2+2*E1*m2;
 	}
 
-	double p1cm(double E1, double m1){
-		return sqrt(m1*(E1-m1)/2);
-	}
-
-	double p3cm(double E1, double m1, double m3){
-		return sqrt(m1*(E1-m1)/2-m3*m3);
-	}
-
-	//These provide the limits on t=(p1-p3)^2, which provide limints on E3.
-	double t0(double E1, double m1, double m3){
-		return -pow(p1cm(E1,m1)-p3cm(E1,m1,m3),2);
-	}
-
-	double t1(double E1, double m1, double m3){
-		return -pow(p1cm(E1,m1)+p3cm(E1,m1,m3),2);
-	}
-
-	double E3_from_t(double E1, double m1, double m3, double t){
-		return (2*E1*m1+m1*m1-m3*m3+t)/(2*m1);
-	}
-
-	double E3Min(double E1, double m1, double m3){
-		return E3_from_t(E1, m1, m3, t1(E1, m1, m3));
-	}
-
-	double E3Max(double E1, double m1, double m3){
-		return E3_from_t(E1, m1, m3, t0(E1, m1, m3));
+	//s as calculated with center of mass frame Energy
+	double shat_cm(double Ecm){
+		return 4*Ecm*Ecm;
 	}
 }
-
+*/
 namespace annihilation_to_pair{
 	//lab frame 1+2->3+4 where m3=m4, but m1!=m2.
 	double shat(double E1, double m1, double m2){
 		return m1*m1+m2*m2+2*E1*m2;
+	}
+
+	double t_hat(double E1, double m1, double m2, double E3, double m3){
+		return m3*m3-m2*m2+2*m2*(E3-E1);
 	}
 
 	double p1cm(double E1, double m1, double m2){
@@ -93,8 +73,12 @@ namespace annihilation_to_pair{
 		return m2+E1-E4_from_t(m2, m3, t);
 	}
 
-	double Theta_from_E3(double E1,double m1,double m2,double E3,double m3){
-		return (2*E1*E3+2*(E1-E3)*m2-m1*m1-m2*m2)/2/sqrt(E1*E1-m1*m1)/sqrt(E3*E3-m3*m3);
+/*	double Theta_from_E3(double E1,double m1,double m2,double E3,double m3){
+		return acos((2*E1*E3+2*(E1-E3)*m2-m1*m1-m2*m2)/2/sqrt(E1*E1-m1*m1)/sqrt(E3*E3-m3*m3));
+	}*/
+
+	double Theta_from_E3(double E1, double m1, double m2, double E3, double m3){
+		return acos((t_hat(E1,m1,m2,E3,m3)-m1*m1-m3*m3+2*E1*E3)/(2*sqrt(E1*E1-m1*m1)*sqrt(E3*E3-m3*m3)));
 	}
 
 	double E3Min(double E1, double m1, double m2, double m3){

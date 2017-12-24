@@ -35,7 +35,7 @@ namespace annihilation_to_pair{
 	double E3Max(double E1, double m1, double m2, double m3);
 	double Theta_from_E3(double E1,double m1,double m2,double E3,double m3);
 }
-
+/*
 namespace annihilation{
 	double E3_from_Theta(double E1, double m1, double theta, double m3);
 	double p1cm(double E1, double m1);
@@ -46,5 +46,5 @@ namespace annihilation{
 	double E3Min(double E1, double m1, double m3);
 	double E3Max(double E1, double m1, double m3);
 }
-
+*/
 #endif

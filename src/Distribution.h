@@ -4,6 +4,7 @@
 #include "Particle.h"
 #include <list>
 #include <memory>
+#include <string>
 
 //Distribution can alter the origin_coords, momentum or both.
 class Distribution {
@@ -20,10 +21,13 @@ class Distribution {
 			}
 		}
 		void set_mass(double m){part_mass=m;}
+		void set_name(std::string name){dist_name=name;}
+		std::string get_name(){return dist_name;}
 		void Add_Dist(std::shared_ptr<Distribution> distptr){dist_list.push_back(distptr);}//This should be unique, need to figure out proper syntax.
 	protected:
 		virtual void sample_particle(Particle &part) = 0;
 		std::list<std::shared_ptr<Distribution> > dist_list;
+		std::string dist_name;
 	private:
 		double part_mass;
 };

@@ -29,6 +29,9 @@ const string ptmin_key = "ptmin";
 const string zmin_key = "zmin";
 const string zmax_key = "zmax";
 const string part_list_pos_key = "particle_list_position";
+const string prod_tolerance_key = "tolerance";
+const string energy_bins_key = "energy_bins";
+const string qmin_key = "qmin";
 
 const string dist_mod_key = "dist_mod";
 const string pos_offset_key = "position_offset";

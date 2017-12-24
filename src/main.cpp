@@ -218,13 +218,15 @@ int main(int argc, char* argv[]){
 	
 	if(par->Model_Name()=="Pseudoscalar_Mediator"){
 		std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
+		mod->Prepare_Model(*par);
 		//This will eventually get moved to the bottom, once the big else statements is moved into models.
-		mod->get_DMGen(DMGen_list);
-		mod->get_Distribution(PartDist_list);
-		mod->get_first_SigGen(SigGen);
-		mod->get_Vnum(Vnum_list);
+		DMGen_list=mod->get_DMGen();
+		PartDist_list=mod->get_Distribution();
+		SigGen=mod->get_SigGen(0);
+		Vnum_list=mod->get_Vnum();
 		Vnumtot = mod->get_Vnumtot();
 		model = mod;
+		cout << "Model assigned" << endl;
 	}
 	else{
 		for(list<production_channel>::iterator proditer = prodlist->begin(); proditer!=prodlist->end(); proditer++){
@@ -459,7 +461,8 @@ int main(int argc, char* argv[]){
 				parstream.close();
 				return 0;
 			}
-			proddist_vec.push_back(proddist);
+			PartDist->set_name(proddist);
+			//proddist_vec.push_back(proddist);
 			DMGen_list.push_back(DMGen);
 			PartDist_list.push_back(PartDist);
 			Vnum_list.push_back(Vnum);
@@ -468,134 +471,135 @@ int main(int argc, char* argv[]){
 		if(Vnumtot==0){
 			cout << "No DM production expected. Terminating run.\n";
 			return 0;
-	}
+		}
 	//return 0;
 
-	cout << "Preparing signal channel " << sigchoice << endl;
-	if(sigchoice=="NCE_electron"){
-		SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
-	}
-	else if(sigchoice=="NCE_nucleon"){
-        SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Kinetic_V",par->Coherent(),det));	
-	}
-    //Eventually these won't have to be separate channels, they'll just check the model!
-	else if(sigchoice=="NCE_nucleon_baryonic"){
-		SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Baryonic_V",par->Coherent(),det));
-	}
-	else if(sigchoice=="Pion_Inelastic"||sigchoice=="Pion_Inelastic_Charged"||sigchoice=="Inelastic_Delta_to_Gamma"){
-		//I might need some checking for allowed energies.
-        if(sigchoice=="Pion_Inelastic"){
-		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
-        }
-        else if(sigchoice=="Inelastic_Delta_to_Gamma"){
-		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,1));
-        }
-        //This covers both charged and neutral pion production
-        else if(sigchoice=="Pion_Inelastic_Charged"){
-		    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,2));
-        }
-	}
-	else if(sigchoice=="Inelastic_Nucleon_Scattering_Baryonic" || sigchoice=="Inelastic_Nucleon_Scattering"){
-		if(par->Scatter_Dist_Filename()==""){
-			cerr << "No scatter_dist_filename provided for " << sigchoice << endl;
+		cout << "Preparing signal channel " << sigchoice << endl;
+		if(sigchoice=="NCE_electron"){
+			SigGen = std::unique_ptr<Scatter>(new Electron_Scatter(mdm, mv, alD, kappa,max_scatter_energy,min_scatter_energy));
+		}
+		else if(sigchoice=="NCE_nucleon"){
+	        SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Kinetic_V",par->Coherent(),det));	
+		}
+	    //Eventually these won't have to be separate channels, they'll just check the model!
+		else if(sigchoice=="NCE_nucleon_baryonic"){
+			SigGen = std::unique_ptr<Scatter>(new Nucleon_Scatter(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,"Baryonic_V",par->Coherent(),det));
+		}
+		else if(sigchoice=="Pion_Inelastic"||sigchoice=="Pion_Inelastic_Charged"||sigchoice=="Inelastic_Delta_to_Gamma"){
+			//I might need some checking for allowed energies.
+	        if(sigchoice=="Pion_Inelastic"){
+			    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy));
+	        }
+	        else if(sigchoice=="Inelastic_Delta_to_Gamma"){
+			    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,1));
+	        }
+	        //This covers both charged and neutral pion production
+	        else if(sigchoice=="Pion_Inelastic_Charged"){
+			    SigGen = std::unique_ptr<Scatter>(new Pion_Inelastic(mdm+EDMRES/100.0,max_dm_energy,EDMRES,mdm,mv,alD,kappa,max_scatter_energy,min_scatter_energy,2));
+	        }
+		}
+		else if(sigchoice=="Inelastic_Nucleon_Scattering_Baryonic" || sigchoice=="Inelastic_Nucleon_Scattering"){
+			if(par->Scatter_Dist_Filename()==""){
+				cerr << "No scatter_dist_filename provided for " << sigchoice << endl;
+				return -1;
+			}
+			if(outmode=="comprehensive"){
+				cerr << sigchoice << " does not support comprehensive output. Use summary mode instead.\n";
+				return -1;
+			}
+			SigGen = std::unique_ptr<Scatter>(new Inelastic_Nucleon_Scatter(mdm,mv,alD,kappa,sigchoice,par->Scatter_Dist_Filename()));
+			min_scatter_energy=0;
+			max_scatter_energy=1e9;
+		}
+	    //I'm going to have to rewrite this at some point.
+	    //Going to shift more of the setup into the model class.
+	    //Probably also going to make a model class superclass. Pass names of particles/channels to it,
+	    //and it supplies details about those particles/channels.
+	    else if(sigchoice=="Signal_Decay"){
+	        double lifetime;
+	        vector<double> Branching_Ratios;
+	        vector<vector<Particle> > Final_States;
+	        if(par->Model_Name()=="Axion_Dark_Photon"){
+	            lifetime=adp.Lifetime();
+	            adp.Branching_Ratios(Branching_Ratios);
+	            adp.Final_States(Final_States);
+	            sig_part_name = dark_axion_signal_string;
+	            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
+	        }
+	        //More temporary stuff ugh
+	        else if(par->Model_Name()=="Dark_Photon"){
+	            cout << "Setting up signal decay!"  << endl;
+	            
+	            Particle electron(MASS_ELECTRON);
+	            electron.name = "Electron";
+	            
+	            Particle DM(mdm);
+	            DM.name="DM";
+
+	            Particle muon(MASS_MUON);
+	            muon.name = "Muon";
+
+	            Particle hadronic(0);
+	            hadronic.name = "Hadronic Stuff";
+	            
+	            //PLaceholder
+	            sig_part_name = dark_axion_signal_string;
+	            
+	            double GV = Gamma_V(mv,mdm,kappa,alD);
+	            lifetime=hbar/GV;
+	            cout << "Width: " << GV << " Lifetime " << lifetime << endl;
+	            double br = 0;
+	            if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON)/GV)>0){
+	                Branching_Ratios.push_back(br);
+	                cout << "BR(V->e e) = " << br << endl;
+	                vector<Particle> vec;
+	                vec.push_back(electron);
+	                vec.push_back(electron);
+	                Final_States.push_back(vec);
+	            }
+	            
+	            if((br=Gamma_V_to_leptons(mv,kappa,MASS_MUON)/GV)>0){
+	                Branching_Ratios.push_back(br);
+	                cout << "BR(V->mu mu) = " << br << endl;
+	                vector<Particle> vec;
+	                vec.push_back(muon);
+	                vec.push_back(muon);
+	                Final_States.push_back(vec);
+	            }
+
+	            if((br=Gamma_V_to_hadrons(mv,kappa)/GV)>0){
+	                Branching_Ratios.push_back(br);
+	                cout << "BR(V->hadronic) = " << br << endl;
+	                vector<Particle> vec;
+	                vec.push_back(hadronic);
+	                Final_States.push_back(vec);
+	            }
+	            
+	            if((br=GammaV_to_dm_dm(mv,mdm,kappa,alD)/GV)>0){
+	                Branching_Ratios.push_back(br);
+	                cout << "BR(V->DM DM) = " << br << endl;
+	                vector<Particle> vec;
+	                vec.push_back(DM);
+	                vec.push_back(DM);
+	                Final_States.push_back(vec);
+	            }
+
+	            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
+	    	}
+	        else{
+	            cerr << "No model declared for Signal_Decay.\n";
+	            return -1;
+	        }
+
+	    }
+	    else{
+			cerr << "Invalid Channel Selection: " << sigchoice << endl;
 			return -1;
 		}
-		if(outmode=="comprehensive"){
-			cerr << sigchoice << " does not support comprehensive output. Use summary mode instead.\n";
-			return -1;
-		}
-		SigGen = std::unique_ptr<Scatter>(new Inelastic_Nucleon_Scatter(mdm,mv,alD,kappa,sigchoice,par->Scatter_Dist_Filename()));
-		min_scatter_energy=0;
-		max_scatter_energy=1e9;
-	}
-    //I'm going to have to rewrite this at some point.
-    //Going to shift more of the setup into the model class.
-    //Probably also going to make a model class superclass. Pass names of particles/channels to it,
-    //and it supplies details about those particles/channels.
-    else if(sigchoice=="Signal_Decay"){
-        double lifetime;
-        vector<double> Branching_Ratios;
-        vector<vector<Particle> > Final_States;
-        if(par->Model_Name()=="Axion_Dark_Photon"){
-            lifetime=adp.Lifetime();
-            adp.Branching_Ratios(Branching_Ratios);
-            adp.Final_States(Final_States);
-            sig_part_name = dark_axion_signal_string;
-            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
-        }
-        //More temporary stuff ugh
-        else if(par->Model_Name()=="Dark_Photon"){
-            cout << "Setting up signal decay!"  << endl;
-            
-            Particle electron(MASS_ELECTRON);
-            electron.name = "Electron";
-            
-            Particle DM(mdm);
-            DM.name="DM";
-
-            Particle muon(MASS_MUON);
-            muon.name = "Muon";
-
-            Particle hadronic(0);
-            hadronic.name = "Hadronic Stuff";
-            
-            //PLaceholder
-            sig_part_name = dark_axion_signal_string;
-            
-            double GV = Gamma_V(mv,mdm,kappa,alD);
-            lifetime=hbar/GV;
-            cout << "Width: " << GV << " Lifetime " << lifetime << endl;
-            double br = 0;
-            if((br=Gamma_V_to_leptons(mv,kappa,MASS_ELECTRON)/GV)>0){
-                Branching_Ratios.push_back(br);
-                cout << "BR(V->e e) = " << br << endl;
-                vector<Particle> vec;
-                vec.push_back(electron);
-                vec.push_back(electron);
-                Final_States.push_back(vec);
-            }
-            
-            if((br=Gamma_V_to_leptons(mv,kappa,MASS_MUON)/GV)>0){
-                Branching_Ratios.push_back(br);
-                cout << "BR(V->mu mu) = " << br << endl;
-                vector<Particle> vec;
-                vec.push_back(muon);
-                vec.push_back(muon);
-                Final_States.push_back(vec);
-            }
-
-            if((br=Gamma_V_to_hadrons(mv,kappa)/GV)>0){
-                Branching_Ratios.push_back(br);
-                cout << "BR(V->hadronic) = " << br << endl;
-                vector<Particle> vec;
-                vec.push_back(hadronic);
-                Final_States.push_back(vec);
-            }
-            
-            if((br=GammaV_to_dm_dm(mv,mdm,kappa,alD)/GV)>0){
-                Branching_Ratios.push_back(br);
-                cout << "BR(V->DM DM) = " << br << endl;
-                vector<Particle> vec;
-                vec.push_back(DM);
-                vec.push_back(DM);
-                Final_States.push_back(vec);
-            }
-
-            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
-    	}
-        else{
-            cerr << "No model declared for Signal_Decay.\n";
-            return -1;
-        }
-
-    }
-    else{
-		cerr << "Invalid Channel Selection: " << sigchoice << endl;
-		return -1;
-	}
 	    
-	}
+	}//End of setup.
 	
+	cout << "Exited the setup loop successfully!" << endl;
 
 	SigGen->set_angle_limits(min_angle, max_angle);
 	SigGen->set_energy_limits(min_scatter_energy, max_scatter_energy);
@@ -603,24 +607,30 @@ int main(int argc, char* argv[]){
     //Begin Run
 	cout << "--------------------" << endl;	
     cout << "Run parameters:" << endl;	
-    cout << "--------------------" << endl;	
-    cout << "Number of events to be generated = " << samplesize  << endl;	
-    cout << "Dark photon mass = " << mv << " GeV" << endl;	
-    cout << "Dark matter mass = " << mdm << " GeV" << endl;	
-    cout << "alphaD = " << alD << endl;	
-    cout << "kappa = " << kappa << endl;
+    cout << "--------------------" << endl;
+    cout << "Number of events to be generated = " << samplesize  << endl;
+    //This will eventually be default.
+    if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
+    	model->Report_Model();
+    }
+    else{
+	    cout << "Dark photon mass = " << mv << " GeV" << endl;	
+	    cout << "Dark matter mass = " << mdm << " GeV" << endl;	
+	    cout << "alphaD = " << alD << endl;	
+	    cout << "kappa = " << kappa << endl;
+	}
 	for(int i = 0; i<chan_count; i++){
+		cout << "ABOUT TO FAIL?" << endl;
         cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();
 		if(DMGen_list[i]->query_off_shell()){
 			cout << " in Off-Shell mode.\n";
 		} 
 		else
 			cout << " in On-Shell mode.\n";
-		cout << "Production Distribution " << i+1 << " = " << proddist_vec[i] << endl;
+		cout << "Production Distribution " << i+1 << " = " << PartDist_list[i]->get_name() << endl;
 		cout << "Branching Ratio "  << i+1 << " = " << DMGen_list[i]->BranchingRatio() << endl;
-	   	cout <<	"V's produced in channel " << i+1 << " = " << Vnum_list[i] << endl;
+	   	cout <<	"Production events in channel " << i+1 << " = " << Vnum_list[i] << endl;
 	}
-	
     cout << "Signal Channel = " << sigchoice << endl;
  	cout << "Beam Energy = " << beam_energy << " GeV" << endl;
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
@@ -814,14 +824,30 @@ int main(int argc, char* argv[]){
 		cout << "Events: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||
                 outmode=="comprehensive"){
-            *summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
+			if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
+				//This is temporary.
+    			*summary_out << DMGen_list[i]->Channel_Name() << " ";
+    			model->Report(*summary_out);
+    			*summary_out << signal_list[i] << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
+    		}
+    		else{
+            	*summary_out << DMGen_list[i]->Channel_Name() << " " << mv  <<  " "  << mdm << " " << signal_list[i] << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
+    		}
         }
         NDM+=NDM_list[i]; 
 		signal+=signal_list[i];
  	}
 	if(outmode=="summary"||outmode=="dm_detector_distribution"||
             outmode=="comprehensive"){
-		*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+		if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
+			*summary_out << "Total ";
+			model->Report(*summary_out);
+			*summary_out << signal << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+		}
+		else{
+
+			*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+		}
         if(par->Model_Name()=="Axion_Dark_Photon"){
             adp.Report(*summary_out, signal);
         }

@@ -27,7 +27,7 @@ class production_channel{
 		std::string parton_V_n_file, parton_V_p_file,proton_pdf_file,neutron_pdf_file;
 		//This map holds sanfordwang parameters.
 		std::map<std::string, std::string> dist_param_map;
-		double meson_per_pi0, PTMAX, PTMIN, ZMIN, ZMAX;
+		double energy_bins, meson_per_pi0, PTMAX, PTMIN, QMIN, tolerance, ZMIN, ZMAX;
 		bool particle_list_position;
 		production_channel();
 		bool query_dist_param(){return (dist_param_map.size()!=0);}
@@ -38,6 +38,9 @@ class production_channel{
 		double ptmax(){return PTMAX;}
 		double zmin(){return ZMIN;}
 		double zmax(){return ZMAX;}
+		double TOL(){return tolerance;}
+		double Energy_Bins(){return energy_bins;}
+		double QMin(){return QMIN;}
 		std::string Prod_Dist(){return prod_dist;}
 		std::string Part_List_File(){return particle_list_file;}
 		std::string Parton_V_Neutron_File(){return parton_V_n_file;}

@@ -27,25 +27,31 @@ struct Decay_Channels{
 
 class Model{
     public:
-        Model(Parameter& par){Model_Name=par.Model_Name(); Vnumtot=0; Prepare_Model(par);}
+        Model(Parameter& par){Model_Name=par.Model_Name(); Vnumtot=0;}
         ~Model(){};
         //This is the only point at which the Model class gets access to a
         //Parameter object. It should use this opportunity to prepare DMGen_list, PartDist_list and Signal_list.
         //Should probably move this implementation into a Model.cpp
         void Prepare_Model(Parameter& par);
+        void Report_Model(std::ostream);
         virtual bool Set_Model_Parameters(Parameter& par) = 0;
         virtual bool Prepare_Signal_Channel(Parameter& par) = 0;
-        virtual bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator> DMGen, std::shared_ptr<Distribution>, double& Vnum, Parameter& par) = 0;
+        virtual bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par) = 0;
         //Model can handle this itself, since Distributions use SM physics.
-        bool Prepare_Production_Distribution(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<Distribution> Dist, Parameter& par);
-        virtual void Report(std::ostream& out, double tot) = 0;
+        bool Prepare_Production_Distribution(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<Distribution>& Dist, Parameter& par);
+        virtual void Report(std::ostream& out) = 0;
+        virtual void Report_Model() = 0;
         virtual void Branching_Ratios() = 0;
         //These functions supply the prepared DMGenerator, Distribution and Scatter lists.
-        void get_DMGen(std::vector<std::shared_ptr<DMGenerator> > DMGen_list){DMGen_list = Gen_list;}
-        void get_Distribution(std::vector<std::shared_ptr<Distribution> > PartDist_list){PartDist_list = Dist_list;}
-        void get_SigGen(std::vector<std::shared_ptr<Scatter> > Signal_list){Signal_list = Sig_list;}
-        void get_first_SigGen(std::shared_ptr<Scatter> Signal){Signal = Sig_list.front();}
-        void get_Vnum(std::vector<double> vnum){vnum = Vnum_list;}
+        void get_DMGen(std::vector<std::shared_ptr<DMGenerator> >& DMGen_list){DMGen_list = Gen_list;}
+        std::vector<std::shared_ptr<DMGenerator> > get_DMGen(){return Gen_list;}
+        void get_Distribution(std::vector<std::shared_ptr<Distribution> >& PartDist_list){PartDist_list = Dist_list;}
+        std::vector<std::shared_ptr<Distribution> > get_Distribution(){return Dist_list;}
+        void get_SigGen(std::vector<std::shared_ptr<Scatter> >& Signal_list){Signal_list = Sig_list;}
+        void get_first_SigGen(std::shared_ptr<Scatter>& Signal){Signal = Sig_list.front();}
+        std::shared_ptr<Scatter> get_SigGen(int i){return Sig_list[i];}
+        void get_Vnum(std::vector<double>& vnum){vnum = Vnum_list;}
+        std::vector<double> get_Vnum(){return Vnum_list;}
         double get_Vnumtot(){return Vnumtot;}
         std::string model_name(){return Model_Name;}
     protected:
@@ -66,9 +72,10 @@ class Pseudoscalar : public Model{
         //~Pseudoscalar(){};
         //bool Set_Model_Parame ters(Parameter& par);
         bool Prepare_Signal_Channel(Parameter& par);
-        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator> DMGen, std::shared_ptr<Distribution>, double& Vnum, Parameter& par);
+        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);
-        void Report(std::ostream& out, double tot){};
+        void Report_Model();
+        void Report(std::ostream& out);
         void Branching_Ratios(){};
         //void get_DMGen(std::vector<std::shared_ptr<DMGenerator> > DMGen_list);
         //void get_Distribution(std::vector<std::shared_ptr<Distribution> > PartDist_list);
@@ -77,13 +84,14 @@ class Pseudoscalar : public Model{
         double dsigma_dEf_electron(double Ei, double Ef);
         double sigma_Ef_electron(double Ei, double Ef);
         double dsigma_dEk_qq_to_chichi(double Ek, double EA, double x,double y, double gf, double MASS);
+        double sigma_hat_qq_to_chi_chi(double EA, double x, double y, double t);
         //p_1 = x P_A, p_2 = y P_B, E_k is outgoing energy of p_3 (one of the 
         //chi particles).
        
     private :
         //gchi is the dark matter charge, mchi is the dark matter mass, 
         //ma is the mass of the pseudoscalar mediator
-        double gchi, ma, mchi;
+        double gchi, gq, ma, mchi;
         double dsig_max(double Ei);
         double sigma_tot_electron(double Ei);
 

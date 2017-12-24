@@ -5,6 +5,7 @@
 #include <math.h>
 
 using std::vector; using std::function;
+using std::cout; using std::endl;
 
 using namespace elastic_scattering;
 using namespace std::placeholders;
@@ -43,10 +44,14 @@ bool Elastic_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<Part
 //This samples the scattering cross-section, useful for burn-in, where
 //we do not care what the final state particle is.
 bool Elastic_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& part){
+    //cout << "Hi there!" << endl;
     double LXDet = convmcm*(det->Ldet(part));
     double total=0; vector<double> prob;
+    //part.report(cout);
+    //cout << "LXDet " << LXDet << endl;
     for(int i = 0; i < chan_number; i++){
        prob.push_back(LXDet*convGeV2cm2*( cross_tot[i](part.E) )*number_density[i]);
+       //cout << "cross_section =" << cross_tot[i](part.E) << " num_dens=" << number_density[i] << endl;
        total+=prob.back();
     }
     if(total > pMax*Random::Flat(0,1)){
@@ -62,6 +67,7 @@ bool Elastic_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& part
 //part is the incoming particle, recoil is the target particle after scattering.
 bool Elastic_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil){
     double LXDet = convmcm*(det->Ldet(part));
+    //cout << LXDet << endl;
     double total=0; vector<double> prob;
     for(int i = 0; i < chan_number; i++){
        prob.push_back(LXDet*convGeV2cm2*( cross_tot[i](part.E) )*number_density[i]);

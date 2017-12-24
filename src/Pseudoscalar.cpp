@@ -11,9 +11,10 @@ using std::max; using std::min;
 using std::cout; using std::endl;
 
 const double me = MASS_ELECTRON;
-const double gq = G_ELEC; 
+//const double gq = G_ELEC; 
 
 const string g_chi_key="g_chi";
+const string g_quark_key="g_quark";
 const string dark_mediator_mass_key="dark_mediator_mass";
 const string dark_matter_mass_key="dark_matter_mass";
 
@@ -22,7 +23,7 @@ using namespace std::placeholders;
 using namespace elastic_scattering;
 
 bool Pseudoscalar::Set_Model_Parameters(Parameter& par){
-    if(par.Query_Map(g_chi_key,gchi)&&(par.Query_Map(dark_matter_mass_key,mchi))&&par.Query_Map(dark_mediator_mass_key, ma)){
+    if(par.Query_Map(g_chi_key,gchi)&&(par.Query_Map(dark_matter_mass_key,mchi))&&par.Query_Map(dark_mediator_mass_key, ma)&&par.Query_Map(g_quark_key,gq)){
         return true;
     }
     return false;
@@ -47,12 +48,15 @@ bool Pseudoscalar::Prepare_Signal_Channel(Parameter& par){
     return false;
 }
 
-bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator> DMGen, std::shared_ptr<Distribution>, double& Vnum, Parameter& par){
+bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
     if(prodchoice=="Drell_Yan"){
         function<double(double, double, double, double, double)> dsig_dEk = std::bind(&Pseudoscalar::dsigma_dEk_qq_to_chichi,this,_1,par.Beam_Energy(),_2,_3,_4,_5);
-        std::shared_ptr<Drell_Yan_Gen> tmp_gen(new Drell_Yan_Gen(mchi,par.Beam_Energy(),dsig_dEk,par.Target_P_Num(),par.Target_N_Num(),prodchan.Proton_PDF_File(),prodchan.Neutron_PDF_File(),prodchoice,1e-3));
-        Vnum=tmp_gen->Interaction_Probability_Density()*par.Protons_on_Target()*par.Target_Length();
-        cout << "Compare " << Vnum << " with V_num estimate " << tmp_gen->Sig_P()*par.Protons_on_Target()/par.P_Cross()*convGeV2cm2*(par.Target_N_Num()+par.Target_P_Num()) << endl;
+        std::shared_ptr<Drell_Yan_Gen> tmp_gen(new Drell_Yan_Gen(mchi,par.Beam_Energy(),dsig_dEk,par.Target_P_Num(),par.Target_N_Num(),prodchan));
+        Vnum=tmp_gen->Interaction_Cross_Section()*par.Protons_on_Target()*par.Target_Length()*par.Target_N_Dens()*convGeV2cm2*m_to_cm;
+        cout << "Compare " << Vnum << " with V_num estimate " << tmp_gen->Sig_P()*par.Protons_on_Target()/par.P_Cross()*convGeV2cm2 << endl;
+        cout << "Compare " << Vnum << " with V_num estimate " << tmp_gen->Interaction_Cross_Section()*par.Protons_on_Target()/par.P_Cross()/8.0*convGeV2cm2 << endl;
+        cout << tmp_gen->Sig_P() << " " << par.P_Cross() << " " << tmp_gen->Interaction_Cross_Section() << " " << par.Target_N_Dens() << endl;
+        cout << "Note overestimate due to 1.75 interaction lengths of material.\n";
         DMGen = tmp_gen;
         return true;
     }
@@ -62,12 +66,12 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
 //Differential scattering cross section for chi+e->chi+e.
 //gq is electron charge?
 double Pseudoscalar::dsigma_dEf_electron(double Ei, double Ef){
-    return 1.0/8.0/pi*pow(gchi*gq,2)/(Ei*Ei-mchi*mchi)*pow(Ef-me,2)/pow(2*me*me -2*me*Ef-ma*ma,2);
+    return 1.0/8.0/pi*pow(gchi*gq,2)/(Ei*Ei-mchi*mchi)*me*pow(Ef-me,2)/pow(2*me*me -2*me*Ef-ma*ma,2);
 }
 
 //Integrated version of dsigma_dEf_electron.
 double Pseudoscalar::sigma_Ef_electron(double Ei, double Ef){
-    return -(pow(gchi,2)*pow(gq,2)*(-2*Ef*me + 2*pow(me,2) + pow(ma,4)/(pow(ma,2) + 2*(Ef - me)*me) + 2*pow(ma,2)*log(pow(ma,2) + 2*(Ef - me)*me)))/(64.*(pow(Ei,2) - pow(mchi,2))*pow(me,2)*pi);
+    return -(pow(gchi*gq,2)*(-2*Ef*me + 2*pow(me,2) + pow(ma,4)/(pow(ma,2) + 2*(Ef - me)*me) + 2*pow(ma,2)*log(pow(ma,2) + 2*(Ef - me)*me)))/(64.*(pow(Ei,2) - pow(mchi,2))*pow(me,2)*pi);
 }
 
 double Pseudoscalar::dsig_max(double Ei){
@@ -75,10 +79,32 @@ double Pseudoscalar::dsig_max(double Ei){
 }
 
 double Pseudoscalar::sigma_tot_electron(double Ei){
-    return sigma_Ef_electron(Ei,min(scat_max,E2fMin(Ei,mchi,me)))-sigma_Ef_electron(Ei,max(scat_min, E2fMin(Ei,mchi,me)));
+    return sigma_Ef_electron(Ei,min(scat_max,E2fMax(Ei,mchi,me)))-sigma_Ef_electron(Ei,max(scat_min,E2fMin(Ei,mchi,me)));
 }
 
+//gf has no effecr!
 double Pseudoscalar::dsigma_dEk_qq_to_chichi(double Ek, double EA, double x, double y, double gf, double MASS){
     double s_hat = pow(x*MASS_PROTON,2) + pow(y*MASS,2) + 2*x*y*EA*MASS;
-    return 1.0/16/pi*pow(gf*gchi,2)/(s_hat-ma*ma)*s_hat/(x*EA);
+    return 1/3.0*1.0/16/pi*pow(gq*gchi,2)/pow(s_hat-ma*ma,2)*s_hat/(x*EA);
+}
+
+double Pseudoscalar::sigma_hat_qq_to_chi_chi(double EA, double x, double y, double MASS, double t){
+    double s_hat=annihilation_to_pair::shat(EA*x,)
+}
+
+void Pseudoscalar::Report(std::ostream& out){
+    out << ma << " " << mchi << " " << gchi << " ";
+/*    cout << "Self-Check!" << endl;
+    cout << dsigma_dEf_electron(1, 0.4) << endl;
+    cout << sigma_Ef_electron(1, 0.4) << endl;
+    cout << sigma_tot_electron(1) << endl;
+    cout << "Efmax,min=" << min(scat_max,E2fMax(1,mchi,me)) << " , " << max(scat_min,E2fMin(1,mchi,me)) << endl;
+    cout << "gq=" << gq << " gchi=" << gchi << " ma=" << ma << " me=" << me << " mx" << mchi << endl;*/
+}
+
+void Pseudoscalar::Report_Model(){
+    cout << "Dark pseudoscalar mediator mass = " << ma << " GeV" << endl;  
+    cout << "Dark matter mass = " << mchi << " GeV" << endl; 
+    cout << "g_chi = " << gchi << endl; 
+    //    cout << "kappa = " << kappa << endl;
 }
