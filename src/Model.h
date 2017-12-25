@@ -84,14 +84,16 @@ class Pseudoscalar : public Model{
         double dsigma_dEf_electron(double Ei, double Ef);
         double sigma_Ef_electron(double Ei, double Ef);
         double dsigma_dEk_qq_to_chichi(double Ek, double EA, double x,double y, double gf, double MASS);
-        double sigma_hat_qq_to_chi_chi(double EA, double x, double y, double t);
+        double dsigma_hat_dt_qq_to_chi_chi(double EA, double t, double x, double y, double qf, double MASS);
+        double sigma_hat_tot_qq_to_chi_chi(double EA, double x, double y, double qf, double MASS);
         //p_1 = x P_A, p_2 = y P_B, E_k is outgoing energy of p_3 (one of the 
         //chi particles).
        
     private :
         //gchi is the dark matter charge, mchi is the dark matter mass, 
         //ma is the mass of the pseudoscalar mediator
-        double gchi, gq, ma, mchi;
+        //gq is the A-quark coupling, qe is the A-electron coupling.
+        double gchi, gq, gae, ma, mchi;
         double dsig_max(double Ei);
         double sigma_tot_electron(double Ei);
 
