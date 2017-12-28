@@ -620,7 +620,6 @@ int main(int argc, char* argv[]){
 	    cout << "kappa = " << kappa << endl;
 	}
 	for(int i = 0; i<chan_count; i++){
-		cout << "ABOUT TO FAIL?" << endl;
         cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();
 		if(DMGen_list[i]->query_off_shell()){
 			cout << " in Off-Shell mode.\n";
@@ -795,8 +794,9 @@ int main(int argc, char* argv[]){
                 Record_Particles(*comprehensive_out, vec);
                 *comprehensive_out << "endevent " << nevent << endl << endl;    
             }
-            else if(scatter_switch)
+            else if(scatter_switch){
                 ++nevent;
+	        }
         } 
     }
 	cout << "Run complete\n";

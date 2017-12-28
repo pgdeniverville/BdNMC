@@ -78,7 +78,11 @@ namespace annihilation_to_pair{
 	}*/
 
 	double Theta_from_E3(double E1, double m1, double m2, double E3, double m3){
-		return acos((t_hat(E1,m1,m2,E3,m3)-m1*m1-m3*m3+2*E1*E3)/(2*sqrt(E1*E1-m1*m1)*sqrt(E3*E3-m3*m3)));
+		double bot = (2*sqrt(E1*E1-m1*m1)*sqrt(E3*E3-m3*m3));
+		if(bot==0){
+			return M_PI;
+		}
+		return acos((t_hat(E1,m1,m2,E3,m3)-m1*m1-m3*m3+2*E1*E3)/bot);
 	}
 
 	double E3Min(double E1, double m1, double m2, double m3){
