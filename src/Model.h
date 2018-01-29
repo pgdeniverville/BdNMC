@@ -99,5 +99,18 @@ class Pseudoscalar : public Model{
 
 };
 
+class Kinetic_Mixing : public Model{
+    public:
+        Kinetic_Mixing(Parameter& par) : Model(par)();
+        bool Prepare_Signal_Channel(Parameter& par);
+        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
+        bool Set_Model_Parameters(Parameter& par);
+        void Report_Model();
+        void Report(std::ostream& out);
+        void Branching_Ratios(){};
+    private:
+        //model parameters
+        double alpha_D, mv, mx, eps;
+}
 
 #endif

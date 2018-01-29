@@ -37,6 +37,7 @@ bool Pseudoscalar::Prepare_Signal_Channel(Parameter& par){
         std::shared_ptr<Elastic_Scatter> els(new Elastic_Scatter);
         
         Particle electron(me); 
+        electron.name = "Electron";
         function<double(double, double)> dsig = bind(&Pseudoscalar::dsigma_dEf_electron,this,_1,_2);
         function<double(double)> sig_tot = bind(&Pseudoscalar::sigma_tot_electron,this,_1);
         function<double(double)> sig_max =  bind(&Pseudoscalar::dsig_max,this,_1);
@@ -119,6 +120,8 @@ void Pseudoscalar::Report(std::ostream& out){
 void Pseudoscalar::Report_Model(){
     cout << "Dark pseudoscalar mediator mass = " << ma << " GeV" << endl;  
     cout << "Dark matter mass = " << mchi << " GeV" << endl; 
-    cout << "g_chi = " << gchi << endl; 
+    cout << "g_chi = " << gchi << endl;
+    cout << "g_electron = " << gae << endl;
+    cout << "g_quark = " << gq << endl; 
     //    cout << "kappa = " << kappa << endl;
 }
