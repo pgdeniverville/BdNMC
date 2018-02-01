@@ -722,7 +722,7 @@ def execute_coherent(genlist=True):
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
 
-execute_numi(genlist=False)
+execute_numi(genlist=True)
 #execute_ship(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_t2k(genlist=False)
