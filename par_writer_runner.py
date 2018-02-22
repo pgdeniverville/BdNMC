@@ -95,9 +95,9 @@ def miniboone_eval(d_user):
             prodchan.append("eta_decay_baryonic")
             partlistfile.append("data/particle_list_k0.dat")
         if MV/1000.0>=mrho and partonic_switch:
-	    proddist.append("parton_V_baryonic")
-	    prodchan.append("parton_production_baryonic")
-	    partlistfile.append("")
+            proddist.append("parton_V_baryonic")
+            prodchan.append("parton_production_baryonic")
+            partlistfile.append("")
         if ((MV<1200) and (MV>=350)) and rho_decay_switch:
             proddist.append("particle_list")
             prodchan.append("omega_decay_baryonic")
@@ -118,9 +118,9 @@ def miniboone_eval(d_user):
             partlistfile.append("data/particle_list_k0.dat")
             executing=True
         if MV/1000.0>=mrho and MV>2*MX and _parton in channels:
-	    proddist.append("parton_V")
-	    prodchan.append("parton_production")
-	    partlistfile.append("")
+            proddist.append("parton_V")
+            prodchan.append("parton_production")
+            partlistfile.append("")
             executing=True
         if (MV/2.0>MX or signal_channel=="Signal_Decay") and zmin<zmax and _brem in channels:
             proddist.append("proton_brem")
@@ -206,13 +206,13 @@ def t2k_eval(d_user):
             executing=True
         if MV/1000.0>=mrho and _parton in channels:
             proddist.append("parton_V")
-    	    prodchan.append("parton_production")
-    	    partlistfile.append("")
+            prodchan.append("parton_production")
+            partlistfile.append("")
             executing=True
         if MV/2.0>MX and _brem in channels:
-    	    proddist.append("proton_brem")
-    	    prodchan.append("V_decay")
-     	    partlistfile.append("")
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
             executing=True
         if MV/1000.0>=mrho and MV<=1250 and _phi_decay in channels:
             proddist.append("particle_list")
@@ -297,13 +297,13 @@ def ship_eval(d_user):
             executing=True
         if MV/1000.0>=mrho and _parton in channels:
             proddist.append("parton_V")
-    	    prodchan.append("parton_production")
-    	    partlistfile.append("")
+            prodchan.append("parton_production")
+            partlistfile.append("")
             executing=True
         if (MV/2.0>MX or signal_channel=="Signal_Decay") and _brem in channels:
-    	    proddist.append("proton_brem")
-    	    prodchan.append("V_decay")
-     	    partlistfile.append("")
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
             executing=True
         if MV/1000.0>=mrho and MV<=1250 and _phi_decay in channels:
             proddist.append("particle_list")
@@ -415,13 +415,13 @@ def numi_eval(d_user):
             executing=True
         if MV/1000.0>=mrho and _parton in channels:
             proddist.append("parton_V")
-    	    prodchan.append("parton_production")
-    	    partlistfile.append("")
+            prodchan.append("parton_production")
+            partlistfile.append("")
             executing=True
         if (MV/2.0>MX or signal_channel=="Signal_Decay") and _brem in channels:
-    	    proddist.append("proton_brem")
-    	    prodchan.append("V_decay")
-     	    partlistfile.append("")
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
             executing=True
         if MV/1000.0>=mrho and MV<=1250 and _phi_decay in channels:
             proddist.append("particle_list")
@@ -557,6 +557,53 @@ def coherent_eval(d_user):
     subp.call(["rm", outfile])
 #END OF coherent_eval
 
+def lsnd_eval(d_user):
+    d = numi_defaults.copy()
+    d.update(d_user)
+    MV=d["mv"]
+    MX=d["mdm"]
+    channels = d["channels"]
+    det_switch=d["det_switch"]
+    if "alpha_D" in d:
+        alD=d["alpha_D"]
+    if 'eps' in d:
+        eps=d['eps']
+    sumlog=d["sumlog"]
+    signal_channel = d["signal_chan"]
+
+    zmin =0
+    zmax =1
+
+    t0 = time.time()
+    outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
+    proddist = []
+    prodchan = []
+    partlistfile = [    ]
+    executing=False
+    if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" or signal_channel=="Baryonic_Test":
+        pass
+    else:
+        print("trying this")
+        if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/particle_list_numi.dat")
+            executing=True
+    if not executing:
+        return
+
+    d.update(d_user)
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    if det_switch == "lsnd":
+        write_lsnd(d=d)
+    subp.call(["./build/main", outfile])
+    t1 = time.time()
+    print("\ntime={}\n".format(t1-t0))
+    t0 = time.time()
+    subp.call(["rm", outfile])
+#####END OF lsnd_eval############
+
+
 
 def execute_miniboone_parallel(genlist = True):
     if genlist:
@@ -609,10 +656,10 @@ def execute_numi(genlist=True):
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[10,25,50,75,100,125,150,175,200,250,300,350,400]
-    vmarr=[10,20,30,40,60,80,100,150,200,250,300,400,500,550,600,700,725,750,760,770,780,790,800,900,1000]
+    #vmarr=[10,20,30,40,60,80,100,150,200,250,300,400,500,550,600,700,725,750,760,770,780,790,800,900,1000]
     #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    #vmarr=[20]
+    vmarr=[10,20,50,100,200,300,500,600,700,800,900,1000,1500,2000]
     epsarr=[1e-3]
     #vmarr=[50]
     #epsarr=[10**-7]
@@ -620,22 +667,25 @@ def execute_numi(genlist=True):
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[1000,300,1e-3]]
     d_list=[]
+    d=({"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 5, "max_scatter_energy" : 35, "min_scatter_angle" : 0});
+    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_low=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
     #d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat","ptmax" : 5, "burn_max" : 100});
+    #d = ({"signal_chan" : "NCE_electron", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 100, "output_mode" : "comprehensive", "efficiency" : 1})
     '''
     for marr in massarr:
         d_miniboone.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_miniboone_nucleon.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_list.append(copy.deepcopy(d_miniboone))
         d_list.append(copy.deepcopy(d_miniboone_nucleon))
-
+    '''
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_nucleon_high.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
-        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_nucleon_low.dat", "outlog" : "Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
+        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron.dat", "outlog" : "Scatter_Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
+        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron_low.dat", "outlog" : "Scatter_Events/nova_electron_low_{}_{}.dat".format(marr[0],marr[1])})
         #numi_eval(d)
         d_list.append(copy.deepcopy(d))
         d_list.append(copy.deepcopy(d_low))
@@ -644,12 +694,13 @@ def execute_numi(genlist=True):
         #numi_eval(d)
         #d_list.append(copy.deepcopy(d))
         #d_list.append(copy.deepcopy(d_low))
-    '''
+
     #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
-    epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
-    d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
-    d_low=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
+    #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
+    #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    #d=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
+    #d_low=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
+    '''
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -664,6 +715,7 @@ def execute_numi(genlist=True):
 
     pool = Pool(processes=3)
     pool.map(numi_eval,d_list)
+    '''
     '''
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -688,9 +740,10 @@ def execute_numi(genlist=True):
         #numi_eval(d)
         #d={"model" : "Dark_Photon", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_numi", "samplesize" : 1000}
         #numi_eval(d)
-    pool = Pool(processes=4)
-    pool.map(numi_eval,d_list)
     '''
+    pool = Pool(processes=3)
+    pool.map(numi_eval,d_list)
+
 
 
 def execute_t2k(genlist=True):
@@ -722,7 +775,36 @@ def execute_coherent(genlist=True):
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
 
-execute_numi(genlist=True)
+def execute_lsnd(genlist=True):
+    if genlist:
+        d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 0.55e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_lsnd_low.dat"], "p_num_target" : 8}
+        write_lsnd(d=d)
+        subp.call(["./build/main","parameter_run.dat"])
+        d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 0.45e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_lsnd_high.dat"], "p_num_target" : 70}
+        write_lsnd(d=d)
+        subp.call(["./build/main","parameter_run.dat"])
+        arr1 = np.loadtxt("data/particle_list_lsnd_low.dat")
+        arr2 = np.loadtxt("data/particle_list_lsnd_high.dat")
+        arr3 = np.append(arr1,arr2,axis=0)
+        np.random.shuffle(arr3)
+        np.savetxt("data/particle_list_lsnd.dat",arr3)
+    #vmassarr = [1,2,3,4,5,7,9,10,12,15,17]+[x for x in range(20,135,5)]+[131,132,133,134,135,136,137,139]+[x for x in range(140,200,10)]+[x for x in range(200,700,25)]
+    #dmarr =[1,2,3,4,5,7,9,10,12,15,17]+[x for x in range(20,135,5)]+[64,66]
+    vmarr = [1,2,3,4,5,6,7,8,9,10]
+    dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
+    massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
+    d_list=[]
+    #massarr = [[4,1]]
+    for marr in massarr:
+        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 1000, "sumlog" : "Events/lsnd.dat"}
+        d_list.append(copy.deepcopy(d))
+    pool = Pool(processes=4)
+    pool.map(lsnd_eval,d_list)
+
+
+
+execute_lsnd(genlist=False)
+#execute_numi(genlist=True)
 #execute_ship(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_t2k(genlist=False)

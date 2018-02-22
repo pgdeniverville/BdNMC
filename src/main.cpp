@@ -819,6 +819,10 @@ int main(int argc, char* argv[]){
 
     summary_out->close();
 	
+    if(outmode =="comprehensive"){
+        *comprehensive_out << endl <<  "Summary " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
+    }
+
   	if(outmode=="dm_detector_distribution"||outmode=="comprehensive")
 		comprehensive_out->close();
 
