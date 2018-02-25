@@ -111,6 +111,6 @@ class Kinetic_Mixing : public Model{
     private:
         //model parameters
         double alpha_D, mv, mx, eps;
-}
+};
 
 #endif

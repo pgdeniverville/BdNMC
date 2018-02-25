@@ -1,5 +1,6 @@
 #include "Kinematics.h"
 #include <math.h>
+#include <iostream>
 
 namespace elastic_scattering{
     //This namespace deals with 2->2 elastic scattering

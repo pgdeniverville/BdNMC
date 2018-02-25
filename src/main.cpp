@@ -9,6 +9,8 @@
 #include <numeric>
 #include <memory>
 
+#include "record.h"
+
 #include "constants.h"
 
 #include "Distribution.h"
@@ -19,7 +21,7 @@
 
 #include "Integrator.h"
 #include "detector.h"
-#include "record.h"
+
 #include "Particle.h"
 #include "Random.h"
 #include "decay.h"
