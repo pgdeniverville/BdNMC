@@ -862,6 +862,18 @@ int main(int argc, char* argv[]){
         *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
     }
 
+    if(outmode =="comprehensive"){
+    	if(par->Model_Name()!="Dark_Photon"){
+    		*comprehensive_out << endl << " Summary " << signal << " ";
+    		model->Report(*comprehensive_out);
+    		*comprehensive_out << sigchoice << " " << POT << " " <<    par->Efficiency() << " " << samplesize << " " << endl;
+    	}
+    	else{
+        	*comprehensive_out << endl <<  "Summary " << mv  <<  " "  << mdm << " " <<  signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " <<    par->Efficiency() << " " << samplesize << " " << endl;
+    	}
+    }
+
+
     summary_out->close();
 	
   	if(outmode=="dm_detector_distribution"||outmode=="comprehensive")

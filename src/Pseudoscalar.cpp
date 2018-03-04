@@ -3,6 +3,7 @@
 #include "Kinematics.h"
 #include "Drell_Yan_Gen.h"
 
+
 #include <math.h>
 
 using std::cerr; using std::vector;
@@ -52,9 +53,9 @@ bool Pseudoscalar::Prepare_Signal_Channel(Parameter& par){
 
 bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
     if(prodchoice=="Drell_Yan"){
-        //cout << "ma=" << ma << " mx=" << mchi << endl;
-        //cout << dsigma_dEk_qq_to_chichi(2,8.9,0.3,0.15,1,MASS_PROTON) << endl;
-        //cout <<  "Test sigma for EA=8, x=0.5, y=0.25, MASS=0.938 : " << sigma_hat_tot_qq_to_chi_chi(8, 0.5, 0.25, 1, 0.938) << endl;
+//        cout << "ma=" << ma << " mx=" << mchi << endl;
+//        cout << dsigma_dEk_qq_to_chichi(2,8.9,0.3,0.15,1,MASS_PROTON) << endl;
+        cout <<  "Test sigma for EA=20, x=0.3, y=0.15, MASS=0.938 : " << dsigma_hat_dt_qq_to_chi_chi(20, 0, 0.3, 0.15, 1, 0.938) << endl;
         function<double(double, double, double, double, double)> dsig_dEk = std::bind(&Pseudoscalar::dsigma_dEk_qq_to_chichi,this,_1,par.Beam_Energy(),_2,_3,_4,_5);
         std::shared_ptr<Drell_Yan_Gen> tmp_gen(new Drell_Yan_Gen(mchi,par.Beam_Energy(),dsig_dEk,par.Target_P_Num(),par.Target_N_Num(),prodchan));
         Vnum=tmp_gen->Interaction_Cross_Section()*par.Protons_on_Target()*par.Target_Length()*par.Target_N_Dens()*convGeV2cm2*m_to_cm;
@@ -93,13 +94,13 @@ double Pseudoscalar::dsigma_dEk_qq_to_chichi(double Ek, double EA, double x, dou
     double s_hat = annihilation_to_pair::shat(EA*x,x*MASS_PROTON,y*MASS);
     //return 1/3.0*1.0/16/pi*pow(gq*gchi,2)/pow(s_hat-ma*ma,2)*s_hat/(x*EA);
     //return (pow(gf,2)*pow(gchi,2)*s_hat*(-s_hat + pow(MASS_PROTON*x - MASS*y,2)))/(96.*MASS*(pow(E1cm_hat,2) - pow(x*MASS_PROTON,2))*pi*pow(pow(ma,2) - s_hat,2)*pow(x,2)*y);
-    return -pow(gchi*gq,2)*s_hat*(pow(x*MASS_PROTON-y*MASS,2)-s_hat)/(96*pi*y*pow(EA*x,2)*MASS)/pow(ma*ma-s_hat,2);
+    return -pow(gchi*gq,2)*s_hat*(pow(x*MASS_PROTON-y*MASS,2)-s_hat)/(96*pi*y*pow(x,2)*(pow(EA,2)-pow(MASS_PROTON,2))*MASS)/pow(ma*ma-s_hat,2);
 }
 
 double Pseudoscalar::dsigma_hat_dt_qq_to_chi_chi(double EA, double t, double x, double y, double qf, double MASS){
     double s_hat=annihilation_to_pair::shat(EA*x,x*MASS_PROTON,y*MASS);
-    double E1cm_hat = (s_hat+pow(x*MASS_PROTON,2)-pow(y*MASS,2))/(2*sqrt(s_hat));
-    return pow(gq*gchi,2)*(s_hat-pow(MASS_PROTON*x-MASS*y,2))/192.0/pi/(pow(E1cm_hat,2)-pow(x*MASS_PROTON,2))/pow(ma*ma-s_hat,2);
+    //double E1cm_hat = (s_hat+pow(x*MASS_PROTON,2)-pow(y*MASS,2))/(2*sqrt(s_hat));
+    return pow(gq*gchi,2)*s_hat*(s_hat-pow(MASS_PROTON*x-MASS*y,2))/192.0/pi/pow(MASS,2)/pow(x*y,2)/(pow(EA,2)-pow(MASS_PROTON,2))/pow(ma*ma-s_hat,2);
 }
 
 double Pseudoscalar::sigma_hat_tot_qq_to_chi_chi(double EA, double x, double y, double qf, double MASS){
@@ -112,7 +113,7 @@ double Pseudoscalar::sigma_hat_tot_qq_to_chi_chi(double EA, double x, double y, 
 }
 
 void Pseudoscalar::Report(std::ostream& out){
-    out << ma << " " << mchi << " " << gchi << " ";
+    out << ma << " " << mchi << " " << gchi << " " << gq << " " << gae << " ";
 /*    cout << "Self-Check!" << endl;
     cout << dsigma_dEf_electron(1, 0.4) << endl;
     cout << sigma_Ef_electron(1, 0.4) << endl;
