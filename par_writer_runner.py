@@ -651,24 +651,24 @@ def execute_numi_test(genlist=True):
 
 
 def execute_numi(genlist=True):
+    d_list=[]
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
         write_numi(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[10,25,50,75,100,125,150,175,200,250,300,350,400]
-    vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
+    #vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
     #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
     #vmarr=[10,20,30,50,70,100,200,300,500,600,700,800,900,1000,1500,2000]
-    epsarr=[1e-3]
+    #epsarr=[1e-3]
     #vmarr=[50]
     #epsarr=[10**-7]
-    massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
+    #massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[1000,300,1e-3]]
-    d_list=[]
     #d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 5, "max_scatter_energy" : 35, "min_scatter_angle" : 0});
-    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
+    #d_low=({"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_low=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
@@ -680,6 +680,7 @@ def execute_numi(genlist=True):
         d_miniboone_nucleon.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_list.append(copy.deepcopy(d_miniboone))
         d_list.append(copy.deepcopy(d_miniboone_nucleon))
+    '''
     '''
     for marr in massarr:
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -694,28 +695,25 @@ def execute_numi(genlist=True):
         #numi_eval(d)
         #d_list.append(copy.deepcopy(d))
         #d_list.append(copy.deepcopy(d_low))
-
+    '''
+    vmarr=[100]
+    epsarr=[2.6*10**-5]
     #vmarr=[10,30,60,100,150,200,250,300,400,500,600,700,800,900,1000]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #d=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
-    #d_low=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
-    '''
+    d_low=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 5000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_high.dat"})
-        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_low.dat"})
+        #d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_high.dat"})
+        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Decay_Events/nova_dec_low.dat", "outlog" : "Decay_Events/nova_dec_low_TEST.eps"})
         d_list.append(copy.deepcopy(d))
+        #d_list.append(copy.deepcopy(d_low))
+        #d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_high.dat"})
+        d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_low.dat", "outlog" : "Decay_Events/nova_dec_abs_low_TEST.eps"})
+        #d_list.append(copy.deepcopy(d))
         d_list.append(copy.deepcopy(d_low))
-        d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_high.dat"})
-        d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem], "sumlog" : "Events/nova_dec_abs_low.dat"})
-        d_list.append(copy.deepcopy(d))
-        d_list.append(copy.deepcopy(d_low))
-
-    pool = Pool(processes=3)
-    pool.map(numi_eval,d_list)
-    '''
     '''
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
@@ -804,7 +802,7 @@ def execute_lsnd(genlist=True):
 
 
 #execute_lsnd(genlist=False)
-execute_numi(genlist=False)
+execute_numi(genlist=True)
 #execute_ship(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_t2k(genlist=False)
