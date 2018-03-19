@@ -788,21 +788,23 @@ def execute_lsnd(genlist=True):
         np.savetxt("data/particle_list_lsnd.dat",arr3)
     #vmassarr = [1,2,3,4,5,7,9,10,12,15,17]+[x for x in range(20,135,5)]+[131,132,133,134,135,136,137,139]+[x for x in range(140,200,10)]+[x for x in range(200,700,25)]
     #dmarr =[1,2,3,4,5,7,9,10,12,15,17]+[x for x in range(20,135,5)]+[64,66]
-    vmarr = [1,2,3,4,5,6,7,8,9,10]
-    dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
+    #vmarr = [1,2,3,4,5,6,7,8,9,10]
+    #dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
+    vmarr=[10,9]
+    dmarr=[1,3]
     massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
     d_list=[]
     #massarr = [[4,1]]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 1000, "sumlog" : "Events/lsnd.dat"}
+        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 1000, "sumlog" : "Events/lsnd_test.dat"}
         d_list.append(copy.deepcopy(d))
     pool = Pool(processes=4)
     pool.map(lsnd_eval,d_list)
 
 
 
-#execute_lsnd(genlist=False)
-execute_numi(genlist=True)
+execute_lsnd(genlist=False)
+#execute_numi(genlist=True)
 #execute_ship(genlist=True)
 #execute_miniboone_parallel(genlist=False)
 #execute_t2k(genlist=False)
