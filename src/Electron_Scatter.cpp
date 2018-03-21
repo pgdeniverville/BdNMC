@@ -23,7 +23,10 @@ Electron_Scatter::Electron_Scatter(double MDM, double MV, double alphaprime, dou
 	Escatmax = eEmax+Me;
 	Escatmin = eEmin+Me;
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
+    //cout << sigma2(0.3,MDM,MV,kappa,alphaprime,scatmax(0.3, MDM),scatmin(0.3,MDM)) << endl;
+    //cout << dsigmadEe(0.05, 0.3, MDM, MV, kappa, alphaprime)<< endl;
 }
+
 
 bool Electron_Scatter::probscatter (std::shared_ptr<detector>& det, Particle &DM){
 	

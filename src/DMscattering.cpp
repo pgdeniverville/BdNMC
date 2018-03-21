@@ -90,7 +90,6 @@ double sigma (double EDM, double MDM, double MDP, double kappa, double alphaD) {
 	return(rsig);
 }
 
-
 double sigma2 (double EDM, double MDM, double MDP, double kappa, double alphaD, double Emax, double Emin) {
 	if(Emax<Emin)
 		return 0;

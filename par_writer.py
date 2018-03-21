@@ -270,6 +270,14 @@ def lsnd_detector(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3
     f.write('\n')
     f.write(Hydrogen_string)
 
+def lsnd_detector_test(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3,theta=0,phi=0):
+    f.write("\ndetector sphere\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
+    f.write('\n')
+    f.write(Carbon_string)
+    f.write('\n')
+    f.write(Hydrogen_string)
+
 def coherent_detector_LAr(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.48,length=0.96,theta=pi/2.0,phi=pi/2.0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
