@@ -55,7 +55,7 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
     if(prodchoice=="Drell_Yan"){
 //        cout << "ma=" << ma << " mx=" << mchi << endl;
 //        cout << dsigma_dEk_qq_to_chichi(2,8.9,0.3,0.15,1,MASS_PROTON) << endl;
-        cout <<  "Test sigma for EA=20, x=0.3, y=0.15, MASS=0.938 : " << dsigma_hat_dt_qq_to_chi_chi(20, 0, 0.3, 0.15, 1, 0.938) << endl;
+        //cout <<  "Test sigma for EA=20, x=0.3, y=0.15, MASS=0.938 : " << dsigma_hat_dt_qq_to_chi_chi(20, 0, 0.3, 0.15, 1, 0.938) << endl;
         function<double(double, double, double, double, double)> dsig_dEk = std::bind(&Pseudoscalar::dsigma_dEk_qq_to_chichi,this,_1,par.Beam_Energy(),_2,_3,_4,_5);
         std::shared_ptr<Drell_Yan_Gen> tmp_gen(new Drell_Yan_Gen(mchi,par.Beam_Energy(),dsig_dEk,par.Target_P_Num(),par.Target_N_Num(),prodchan));
         Vnum=tmp_gen->Interaction_Cross_Section()*par.Protons_on_Target()*par.Target_Length()*par.Target_N_Dens()*convGeV2cm2*m_to_cm;
