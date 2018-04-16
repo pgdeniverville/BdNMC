@@ -32,6 +32,8 @@ meson_per_pi0_lsnd = {'pi0_decay' : '1.0'}
 
 meson_per_pi0_coherent = {'pi0_decay' : 1.0, 'piminus_capture' : '0.63'}
 
+meson_per_pi0_lanl = {'pi0_decay' : 1.0, 'piminus_capture' : '0.63'}
+
 meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
@@ -314,6 +316,18 @@ def captain_detector_off(f,xpos=30.0,ypos=0.0,zpos=0.0,radius=1,length=1.15,thet
     f.write('\n')
     f.write(Argon_string)
 
+def lanl_detector(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=1.056,length=1.227,theta=pi/2.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+def lanl_detector_far(f,xpos=40.0,ypos=0.0,zpos=0.0,radius=1.056,length=1.227,theta=pi/2.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
 #############
 #EXPERIMENTS#
 #############
@@ -354,6 +368,14 @@ coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlist
 
 def write_coherent(d={}, det=coherent_detector_LAr):
     context = coherent_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+LANL_test_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 0.018, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.5, "beam_energy" : 0.8, "p_num_target" : 74, "n_num_target" : 109, "POT" : 1.15e21, "pi0_per_POT" : 0.0425, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" :
+        meson_per_pi0_coherent, "outlog" : "Events/coherent_events.dat"}
+
+def write_lanl(d={}, det=lanl_detector):
+    context = LANL_test_default.copy()
     context.update(d)
     write_experiment(det,context)
 

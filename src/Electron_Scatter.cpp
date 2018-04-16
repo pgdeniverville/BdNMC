@@ -23,6 +23,11 @@ Electron_Scatter::Electron_Scatter(double MDM, double MV, double alphaprime, dou
 	Escatmax = eEmax+Me;
 	Escatmin = eEmin+Me;
 	set_Model_Parameters(MDM, MV, alphaprime, kappa);
+    //cout << "sigma test1=" << sigma(1,MDM,MV,kappa,alphaprime) << endl;
+    //cout << "sigma test2=" << sigma(5,MDM,MV,kappa,alphaprime) << endl;
+    //cout << "sigma test3=" << sigma(10,MDM,MV,kappa,alphaprime) << endl;
+    //cout << "sigma test4=" << sigma(50,MDM,MV,kappa,alphaprime) << endl;
+    //cout << "sigma test5=" << sigma(1000,MDM,MV,kappa,alphaprime) << endl;
     //cout << sigma2(0.3,MDM,MV,kappa,alphaprime,scatmax(0.3, MDM),scatmin(0.3,MDM)) << endl;
     //cout << dsigmadEe(0.05, 0.3, MDM, MV, kappa, alphaprime)<< endl;
 }
