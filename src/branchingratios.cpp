@@ -236,6 +236,11 @@ double wpp_scalar(double z, double pt2, double mA, double epsilon){
 	double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
 	return pow(epsilon,2)*alphaEM/(8*pi)*(8*pow(mp,4)*(z-1)*pow(z,3)/pow(H,3)+4*pow(mp*mA,2)*(z-1)*pow(z,3)/pow(H,3)-8*pow(mp,2)*(z-1)*z/pow(H,2)+z/H);
 }
+/*
+double wpp_v_scalar(double z, double pt2, double ma){
+    double H = pt2+(1-z)*ma*ma+pow(z*mp,2);
+    return 1.0/16.0/pi/pi
+}*/
 
 /********************
  *BARYONIC COUPLING

@@ -882,7 +882,7 @@ def execute_lanl(genlist=True):
         d={"mv" : marr[0], "alpha_D" : 1e-3, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channelb, "det_switch" : "lanl_far", "samplesize" : 2000, "sumlog" : "Events/lanl40_b.dat"}
         lanl_eval(d)
 
-execute_lanl(genlist=True)
+execute_lanl(genlist=False)
 #execute_lsnd(genlist=False)
 #execute_numi(genlist=False)
 #execute_ship(genlist=True)
