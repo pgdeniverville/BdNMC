@@ -225,7 +225,6 @@ int main(int argc, char* argv[]){
 			PartDist = pl;
 		}
 		else if(proddist=="burmansmith"){
-            cout << "Is this working?" << endl;
 			std::shared_ptr<BurmanSmith> bs(new BurmanSmith(beam_energy,target_p));
 			//beam_energy should be kinetic energy for this case
 			PartDist = bs;
