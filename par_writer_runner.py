@@ -463,6 +463,7 @@ def numi_eval(d_user):
     elif det_switch == "nova_absorber":
         write_numi(d=d,det=NOvA_absorber_detector)
     elif det_switch == "minos":
+        print("EXECUTING MINOS")
         write_numi(d=d,det=MINOS_detector)
     elif det_switch == "minos_absorber":
         write_numi(d=d,det=MINOS_absorber_detector)
@@ -686,7 +687,7 @@ def execute_miniboone_parallel(genlist = True):
     #epsarr={1e-6,3e-7,1e-7,3e-7,1e-8}
     #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
-    massarr=[[90,30,1e-3]]
+    massarr=[[90,30,1e-3],[600,200,1e-3]]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs}
@@ -718,8 +719,6 @@ def execute_numi_test(genlist=True):
         d.update({"det_switch" : "test_sphere"})
         numi_eval(d)
 
-
-
 def execute_numi(genlist=True):
     d_list=[]
     if genlist:
@@ -730,9 +729,9 @@ def execute_numi(genlist=True):
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
     #massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
-    massarr=[[90,30,1e-3]]
+    massarr=[[90,30,1e-3],[600,200,1e-3]]
     #d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 5, "max_scatter_energy" : 35, "min_scatter_angle" : 0});
-    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
+    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 10000, "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0});
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_low=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
@@ -749,8 +748,10 @@ def execute_numi(genlist=True):
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         #d.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron.dat", "outlog" : "Scatter_Events/nova_electron_{}_{}.dat".format(marr[0],marr[1])})
-        d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron_low.dat", "outlog" : "Scatter_Events/nova_electron_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        d_low.update({"det_switch" : "miniboone_numi","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron_low.dat", "outlog" : "Scatter_Events/nova_electron_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
         numi_eval(d_low)
+        #d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron_low.dat", "outlog" : "Scatter_Events/nova_electron_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        #numi_eval(d_low)
         #d_list.append(copy.deepcopy(d))
         #d_list.append(copy.deepcopy(d_low))
         #d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_high.dat"})
@@ -882,10 +883,10 @@ def execute_lanl(genlist=True):
         d={"mv" : marr[0], "alpha_D" : 1e-3, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channelb, "det_switch" : "lanl_far", "samplesize" : 2000, "sumlog" : "Events/lanl40_b.dat"}
         lanl_eval(d)
 
-execute_lanl(genlist=True)
+#execute_lanl(genlist=True)
 #execute_lsnd(genlist=False)
-#execute_numi(genlist=False)
+execute_numi(genlist=False)
 #execute_ship(genlist=True)
-#execute_miniboone_parallel(genlist=False)
+#execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
 #execute_coherent(genlist=False)

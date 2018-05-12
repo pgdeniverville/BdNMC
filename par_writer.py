@@ -44,6 +44,9 @@ Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nne
 
 Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
 
+#Temporary!
+Steel_string = Carbon_string
+
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 
 Sodium_Iodide_string = "material Sodium\nnumber_density 1.58e22\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
@@ -194,13 +197,14 @@ def test_cuboid(f,xpos=0.0,ypos=0.0,zpos=0.0,height=1.0,length=1.0,width=1.0,the
 MINOS_absorber_z=270
 MINOS_target_z=950
 #Don't use this for actual event generation!
+'''
 def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=MINOS_target_z,radius=2.2,length=1.7,theta=0,phi=0):
     print("This detector should not be used for event generation!")
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
     f.write(MINOS_string)
-
+'''
 def MINOS_absorber_detector(f):
     MINOS_detector(f,zpos=MINOS_absorber_z)
 
@@ -219,6 +223,12 @@ def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_Target_Angle),zpos
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')
     f.write(NOvA_string)
+
+def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=1040,radius=2,length=16.6,theta=0,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),     str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(MINOS_string)
 
 def NOvA_absorber_detector(f):
     NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_Absorber_Angle),zpos=NOvA_absorber_d*math.cos(NOvA_Absorber_Angle))
