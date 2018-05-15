@@ -76,5 +76,9 @@ namespace Ax_DP {
     double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep);
 }
 
+//GENERIC FUNCTIONS
+
+double brem_split_pseudoscalar(double z, double pt2, double mA, double g);
+
 
 #endif

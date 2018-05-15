@@ -237,6 +237,7 @@ double wpp_scalar(double z, double pt2, double mA, double epsilon){
 	return pow(epsilon,2)*alphaEM/(8*pi)*(8*pow(mp,4)*(z-1)*pow(z,3)/pow(H,3)+4*pow(mp*mA,2)*(z-1)*pow(z,3)/pow(H,3)-8*pow(mp,2)*(z-1)*z/pow(H,2)+z/H);
 }
 
+
 /********************
  *BARYONIC COUPLING
  ********************/
@@ -419,3 +420,13 @@ namespace Ax_DP{
         return Gamma_dp_to_3gamma(mA, eps, ep)/Gamma_dp(mA, ma, Gagpg, eps, ep);
     }
 }//End of namespace Ax_DP
+
+/*******************
+**GENERIC FUNCTIONS*
+********************/
+
+//mA is the mass of the emitted pseudoscalar, g is its coupling to the proton.
+double brem_split_pseudoscalar(double z, double pt2, double mA, double g){
+    double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
+    return pow(g,2)*z*(H*H+2*H*ma*ma*(z-1)-2*ma*ma*(z-1)*(pow(MASS_PROTON*z,2)-ma*ma*(z-1)))/(16*pow(pi*H,2));
+}

@@ -2,7 +2,7 @@
 #include "constants.h"
 #include "Kinematics.h"
 #include "Drell_Yan_Gen.h"
-
+#include "branchingratios.h"
 
 #include <math.h>
 
@@ -51,6 +51,7 @@ bool Pseudoscalar::Prepare_Signal_Channel(Parameter& par){
     return false;
 }
 
+//Production channel comes from Parameter.h!
 bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
     if(prodchoice=="Drell_Yan"){
 //        cout << "ma=" << ma << " mx=" << mchi << endl;
@@ -64,10 +65,19 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
         cout << tmp_gen->Sig_P() << " " << par.P_Cross() << " " << tmp_gen->Interaction_Cross_Section() << " " << par.Target_N_Dens() << endl;
         cout << "Note overestimate due to 1.75 interaction lengths of material.\n";
         DMGen = tmp_gen;
-
         return true;
     }
+    //This might need to be proddist?
+    if(prodchoice=="Proton_Bremsstrahlung"){
+        //Not sure if this is the right coupling.
+        function<double(double, double)> dsig_dpt2dz = std::bind(brem_split_pseudoscalar,_1,_2,ma,gq*proton_form_factor(ma*ma));
+        std::share_ptr<Proton_Brem> tmp_dist(new Proton_Brem())
+    }
     return false;
+}
+//Placeholder, no idea what it looks like!
+double proton_form_factor(q2){
+    return 1.0;
 }
 
 //Differential scattering cross section for chi+e->chi+e.
