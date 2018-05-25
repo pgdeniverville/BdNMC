@@ -54,7 +54,9 @@ class Model{
         std::vector<double> get_Vnum(){return Vnum_list;}
         double get_Vnumtot(){return Vnumtot;}
         std::string model_name(){return Model_Name;}
+        std::string get_sig_part_name(){return sig_part_name;}
     protected:
+        std::string sig_part_name="DM";
         std::string Model_Name = "MODEL_NAME";
         std::vector<Decay_Channels> decay_channels;
         std::vector<std::shared_ptr<Scatter> > Sig_list;
@@ -88,7 +90,8 @@ class Pseudoscalar : public Model{
         double sigma_hat_tot_qq_to_chi_chi(double EA, double x, double y, double qf, double MASS);
         //p_1 = x P_A, p_2 = y P_B, E_k is outgoing energy of p_3 (one of the 
         //chi particles).
-       
+        double proton_form_factor(double q2);
+
     private :
         //gchi is the dark matter charge, mchi is the dark matter mass, 
         //ma is the mass of the pseudoscalar mediator

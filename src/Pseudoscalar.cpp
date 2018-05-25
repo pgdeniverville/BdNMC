@@ -3,13 +3,18 @@
 #include "Kinematics.h"
 #include "Drell_Yan_Gen.h"
 #include "branchingratios.h"
+#include "DMgenerator.h"
+#include "Proton_Brem.h"
 
+#include <memory>
 #include <math.h>
 
 using std::cerr; using std::vector;
 using std::string; using std::function;
 using std::max; using std::min;
 using std::cout; using std::endl;
+
+using std::shared_ptr;
 
 const double me = MASS_ELECTRON;
 //const double gq = G_ELEC; 
@@ -71,12 +76,33 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
     if(prodchoice=="Proton_Bremsstrahlung"){
         //Not sure if this is the right coupling.
         function<double(double, double)> dsig_dpt2dz = std::bind(brem_split_pseudoscalar,_1,_2,ma,gq*proton_form_factor(ma*ma));
-        std::share_ptr<Proton_Brem> tmp_dist(new Proton_Brem())
+        
+        std::shared_ptr<DMGenerator> dmgen;
+        if(ma<mchi*2){
+            double branching_ratio_to_neutrinos=1;
+            Particle neutrino(0);
+            neutrino.name = "Neutrino";
+            dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_neutrinos,ma,"Pseudoscalar",neutrino, neutrino));
+            sig_part_name = "Neutrino";
+        }
+        else{
+            double branching_ratio_to_invisible=1;
+            Particle dm(mchi);
+            dm.name = "DM";
+            dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_invisible,ma,"Pseudoscalar",dm, dm));
+            sig_part_name = "DM";
+        }
+        Particle med(ma);
+        med.name = "Pseudoscalar";
+        string prod_chan_name = "Proton_Bremsstrahlung_Pseudoscalar";
+        std::shared_ptr<Proton_Brem> tmp_gen(new Proton_Brem(par.Beam_Energy(),dsig_dpt2dz,med,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),prod_chan_name, dmgen, prodchan.ptmin()));
+        Vnum=tmp_gen->BranchingRatio()*par.Protons_on_Target();
+        DMGen = tmp_gen;
     }
     return false;
 }
 //Placeholder, no idea what it looks like!
-double proton_form_factor(q2){
+double Pseudoscalar::proton_form_factor(double q2){
     return 1.0;
 }
 

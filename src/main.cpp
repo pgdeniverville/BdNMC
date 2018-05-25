@@ -227,6 +227,7 @@ int main(int argc, char* argv[]){
 		SigGen=mod->get_SigGen(0);
 		Vnum_list=mod->get_Vnum();
 		Vnumtot = mod->get_Vnumtot();
+		sig_part_name = mod->get_sig_part_name();
 		model = mod;
 		cout << "Model assigned" << endl;
 	}

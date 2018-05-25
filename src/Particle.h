@@ -32,6 +32,7 @@ public:
     void     Rotate_x(double);
     void     Rotate_y(double);
     void     Rotate_z(double);
+    void     Rotate(Particle&);
     void     report(std::ostream&) const;
     //void    Generate_4Vector(double s);
 	void 	Set_Origin(double x, double y, double z);

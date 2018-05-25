@@ -65,6 +65,11 @@ double Particle::Phi(){
     return phi(px, py, pz, E);
 }
 
+void Particle::Rotate(Particle &part){
+    Rotate_y(part.Theta());
+    Rotate_z(part.Phi());
+}
+
 void Particle::FourMomentum(double PX, double PY, double PZ, double P0){
 
 	px = PX;

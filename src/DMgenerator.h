@@ -13,6 +13,7 @@ class DMGenerator{
         DMGenerator(){}
         virtual bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part) {return false;}
         double BranchingRatio(){return branchingratio;}
+        void set_BranchingRatio(double br){branchingratio=br;}
         void Set_Channel_Name(std::string ch_na){chan_name=ch_na;}
         std::string Channel_Name(){return chan_name;}
         void set_model_params(double MV, double MX, double kap, double alp){mv=MV; mx=MX; kappa=kap; alphaD=alp; Evaluate_Branching_Ratio();}
@@ -149,12 +150,14 @@ class Do_Nothing_Gen: public DMGenerator{
 
 class Two_Body_Decay_Gen: public DMGenerator{
     public:
-        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string parent_name, Particle daughter1, Particle daughter2); 
+        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0); 
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
     private:
         void Evaluate_Branching(){return;}
         Particle daughter1, daughter2;
         std::string Part_Name;
+        //Lifetime of particle, not yet implemented.
+        double tau;
 };
 
 

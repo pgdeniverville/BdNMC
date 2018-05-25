@@ -426,7 +426,7 @@ namespace Ax_DP{
 ********************/
 
 //mA is the mass of the emitted pseudoscalar, g is its coupling to the proton.
-double brem_split_pseudoscalar(double z, double pt2, double mA, double g){
-    double H = pt2+(1-z)*mA*mA + pow(z*mp,2);
+double brem_split_pseudoscalar(double z, double pt2, double ma, double g){
+    double H = pt2+(1-z)*ma*ma + pow(z*mp,2);
     return pow(g,2)*z*(H*H+2*H*ma*ma*(z-1)-2*ma*ma*(z-1)*(pow(MASS_PROTON*z,2)-ma*ma*(z-1)))/(16*pow(pi*H,2));
 }
