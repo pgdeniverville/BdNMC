@@ -41,6 +41,7 @@ void Proton_Brem::calc_V_prod_rate(){
     else
         vprodrate = SimpsonCubature(func,ZMIN,ZMAX,100,PTMIN,PTMAX,100);//Will need to tweak this. Hopefully come up with a more general algorithm at some point.
 
+    branchingratio = V_prod_rate();
     max_prod=d2N_proton_brem_to_out(ZMIN,PTMIN);
 };
 

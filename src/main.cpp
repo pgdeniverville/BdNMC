@@ -219,6 +219,7 @@ int main(int argc, char* argv[]){
 	double max_angle = par->Max_Angle();
 	
 	if(par->Model_Name()=="Pseudoscalar_Mediator"){
+		cout << "Setting up model " << par->Model_Name() << endl;
 		std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
 		mod->Prepare_Model(*par);
 		//This will eventually get moved to the bottom, once the big else statements is moved into models.
@@ -737,7 +738,7 @@ int main(int argc, char* argv[]){
     bool scatter_switch;
     int trials_max = par->Max_Trials();
 	//if(SigGen->get_pMax()*Vnumtot<=1){
-    if(SigGen->get_pMax()<=0){
+    if(SigGen->get_pMax()<=0 && outmode!="dm_detector_distribution"){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{

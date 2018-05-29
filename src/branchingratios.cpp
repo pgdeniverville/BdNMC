@@ -430,3 +430,7 @@ double brem_split_pseudoscalar(double z, double pt2, double ma, double g){
     double H = pt2+(1-z)*ma*ma + pow(z*mp,2);
     return pow(g,2)*z*(H*H+2*H*ma*ma*(z-1)-2*ma*ma*(z-1)*(pow(MASS_PROTON*z,2)-ma*ma*(z-1)))/(16*pow(pi*H,2));
 }
+
+double Gamma_pseudoscalar_to_2fermion(double g, double m_parent, double m_daughter){
+    return 3*g*g/8.0*m_parent*sqrt(1-pow(4*m_daughter/m_parent,2));
+}

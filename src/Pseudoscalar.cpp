@@ -73,7 +73,7 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
         return true;
     }
     //This might need to be proddist?
-    if(prodchoice=="Proton_Bremsstrahlung"){
+    else if(prodchoice=="Proton_Bremsstrahlung"){
         //Not sure if this is the right coupling.
         function<double(double, double)> dsig_dpt2dz = std::bind(brem_split_pseudoscalar,_1,_2,ma,gq*proton_form_factor(ma*ma));
         
@@ -82,7 +82,7 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
             double branching_ratio_to_neutrinos=1;
             Particle neutrino(0);
             neutrino.name = "Neutrino";
-            dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_neutrinos,ma,"Pseudoscalar",neutrino, neutrino));
+            dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_neutrinos,ma,"Pseudoscalar",neutrino, neutrino, Gamma_pseudoscalar_to_2fermion(gae,ma,0)));
             sig_part_name = "Neutrino";
         }
         else{
@@ -98,6 +98,7 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
         std::shared_ptr<Proton_Brem> tmp_gen(new Proton_Brem(par.Beam_Energy(),dsig_dpt2dz,med,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),prod_chan_name, dmgen, prodchan.ptmin()));
         Vnum=tmp_gen->BranchingRatio()*par.Protons_on_Target();
         DMGen = tmp_gen;
+        return true;
     }
     return false;
 }

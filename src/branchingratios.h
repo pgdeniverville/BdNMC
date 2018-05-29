@@ -79,6 +79,6 @@ namespace Ax_DP {
 //GENERIC FUNCTIONS
 
 double brem_split_pseudoscalar(double z, double pt2, double mA, double g);
-
+double Gamma_pseudoscalar_to_2fermion(double g, double m_parent, double m_daughter);
 
 #endif

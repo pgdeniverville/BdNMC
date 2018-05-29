@@ -11,6 +11,7 @@ class Proton_Brem : public DMGenerator{
     public:
         Proton_Brem(double Beam_E, std::function<double(double, double)> splitting_function, Particle &mediator, double ptmax, double zmax, double zmin, std::string &mode, std::shared_ptr<DMGenerator> V_decay, double ptmin=0);
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
+        //double BranchingRatio(){return V_prod_rate();}
         double V_prod_rate(){return vprodrate*V_decay->BranchingRatio();}
         void sample_particle(Particle &);
         void sample_momentum(double &, double &, double &);
