@@ -146,7 +146,6 @@ def miniboone_eval(d_user):
         user2 = {"min_scatter_energy" : 0.0, "max_scatter_energy" : 10.0, "outlog" : "Decay_Events/miniboone_decay_events_{}_{}.dat".format(str(MV),str(eps)), "efficiency" : 1, "outfile" : outfile}
         if det_switch == "sbnd":
             user2["outlog"] = "Events/sbnd_decay_events_{}_{}".format(str(MV),str(eps))
-
     d.update(user2)
     d.update(d_user)
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
@@ -672,8 +671,6 @@ def lsnd_eval(d_user):
     subp.call(["rm", outfile])
 #####END OF lsnd_eval############
 
-
-
 def execute_miniboone_parallel(genlist = True):
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["pi0_sanfordwang"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list.dat"]}
@@ -687,11 +684,14 @@ def execute_miniboone_parallel(genlist = True):
     #epsarr={1e-6,3e-7,1e-7,3e-7,1e-8}
     #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
-    massarr=[[90,30,1e-3],[600,200,1e-3]]
+    massarr=[[90,30,1e-3],[300,100,1e-3],[600,200,1e-3]]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs}
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs}
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", 'max_scatter_energy' : 3, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'outlog' : "Events/sbnd_electron_{}_{}.dat".format(marr[0],marr[1])}
+        miniboone_eval(d)
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, 'max_scatter_energy' : 3, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'outlog' :  "Events/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])}
         miniboone_eval(d)
 
 def execute_ship(genlist=True):
@@ -727,7 +727,7 @@ def execute_numi(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    vmarr=[300]
+    vmarr=[90]
     epsarr=[1e-3]
     massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
@@ -749,16 +749,19 @@ def execute_numi(genlist=True):
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d.update({"det_switch" : "miniboone_numi", "channels" : [_pion_decay,_eta_decay,_brem,_parton],  "outlog" : "Scatter_Events/miniboone_numi_nucleon_{}_{}.dat".format(marr[0],marr[1])})
-        d_low.update({"det_switch" : "nova", "channels" : [_pion_decay,_eta_decay,_brem,_parton], "outlog" : "Scatter_Events/nova_nucleon_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        #d.update({"det_switch" : "miniboone_numi", "channels" : [_pion_decay,_eta_decay,_brem,_parton],  "outlog" : "Scatter_Events/miniboone_numi_nucleon_{}_{}.dat".format(marr[0],marr[1])})
+        d_low.update({"det_switch" : "nova", 'signal_chan' : 'NCE_electron', "channels" : [_pion_decay,_eta_decay,_brem,_parton], 'outmode' : 'comprehensive', "outlog" : "Claudia/nova_elec_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        numi_eval(d_low)
+        d_low.update({"det_switch" : "nova", "channels" : [_pion_decay,_eta_decay,_brem,_parton], 'outmode' : 'dm_detector_distribution', "outlog" : "Claudia/nova_dm_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        numi_eval(d_low)
         #numi_eval(d_low)
         #d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron_low.dat", "outlog" : "Scatter_Events/nova_electron_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
-        numi_eval(d_low)
+        #numi_eval(d_low)
         #d_list.append(copy.deepcopy(d))
         #d_list.append(copy.deepcopy(d_low))
         #d.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_high.dat"})
         #d_low.update({"det_switch" : "nova_absorber","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/nova_electron_abs_low.dat"})
-        numi_eval(d)
+        #numi_eval(d)
         #d_list.append(copy.deepcopy(d))
         #d_list.append(copy.deepcopy(d_low))
     '''
@@ -851,14 +854,17 @@ def execute_lsnd(genlist=True):
         np.savetxt("data/particle_list_lsnd.dat",arr3)
     #vmassarr = [1,2,3,4,5,7,9,10,12,15,17]+[x for x in range(20,135,5)]+[131,132,133,134,135,136,137,139]+[x for x in range(140,200,10)]+[x for x in range(200,700,25)]
     #dmarr =[1,2,3,4,5,7,9,10,12,15,17]+[x for x in range(20,135,5)]+[64,66]
-    vmarr = [1,2,3,4,5,6,7,8,9,10]
-    dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
-    massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
-    #massarr = [[v,v/3.0] for v in vmarr]
+    #vmarr = [1,2,3,4,5,6,7,8,9,10]
+    #dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
+    #massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
+    vmarr=[90]
+    massarr = [[v,v/3.0] for v in vmarr]
     d_list=[]
     #massarr = [[4,1]]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 1000, "sumlog" : "Events/lsnd_test.dat"}
+        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_dm_{}_{}.dat'.format(marr[0],marr[1]), 'outmode' : 'dm_detector_distribution'}
+        lsnd_eval(d)
+        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_elec_{}_{}.dat'.format(marr[0],marr[1]), 'outmode' : 'comprehensive'}
         lsnd_eval(d)
         #d_list.append(copy.deepcopy(d))
     #pool = Pool(processes=4)

@@ -44,6 +44,7 @@ Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nne
 
 Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
 
+Argon_string_SBND = "material Argon\nnumber_density 2.24e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
 #Temporary!
 Steel_string = Carbon_string
 
@@ -232,12 +233,20 @@ def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=1040,radius=2,length=16.6,theta=0,ph
 
 def NOvA_absorber_detector(f):
     NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_Absorber_Angle),zpos=NOvA_absorber_d*math.cos(NOvA_Absorber_Angle))
-
+'''
 def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,radius=2.38,length=4.76,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write()
     f.write('\n')
     f.write(Argon_string)
+'''
+
+def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,width=4,height=4,length=5,theta=0,phi=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Argon_string_SBND)
 
 def SBND_detector_old(f,xpos=0.0,ypos=0,zpos=62.0,width=2.38,length=4.76,theta=0,phi=0):
     f.write("\ndetector cylinder\n");
