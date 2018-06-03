@@ -684,14 +684,14 @@ def execute_miniboone_parallel(genlist = True):
     #epsarr={1e-6,3e-7,1e-7,3e-7,1e-8}
     #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
-    massarr=[[90,30,1e-3],[300,100,1e-3],[600,200,1e-3]]
+    massarr=[[90,30,1e-3]]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
-        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs}
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs}
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", 'max_scatter_energy' : 3, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'outlog' : "Events/sbnd_electron_{}_{}.dat".format(marr[0],marr[1])}
-        miniboone_eval(d)
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, 'max_scatter_energy' : 3, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'outlog' :  "Events/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])}
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", 'max_scatter_energy' : 3, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'outlog' : "Events/sbnd_electron_{}_{}.dat".format(marr[0],marr[1])}
+        #miniboone_eval(d)
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, 'max_scatter_energy' : 3, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'outlog' :  "Events/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])}
         miniboone_eval(d)
 
 def execute_ship(genlist=True):
@@ -893,8 +893,8 @@ def execute_lanl(genlist=True):
 
 #execute_lanl(genlist=True)
 #execute_lsnd(genlist=False)
-execute_numi(genlist=False)
+#execute_numi(genlist=False)
 #execute_ship(genlist=True)
-#execute_miniboone_parallel(genlist=True)
+execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
 #execute_coherent(genlist=False)
