@@ -104,7 +104,7 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
 
     double decay_time=tau*log(1/(1-Random::Flat()));
     double boost = 1/sqrt(1-pow(parent.Speed(),2));
-
+    //cout << decay_time << " " << boost << endl;
     parent.Set_Time(decay_time*boost);
 
     TwoBodyDecay(parent, daughter1, daughter2);
@@ -117,5 +117,9 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
         intersect=true;
         vec.push_back(daughter2);
     }
+    //cout << "EVENT GEN\n";
+    //parent.report(cout);
+    //daughter1.report(cout);
+    //daughter2.report(cout);
     return intersect;
 }

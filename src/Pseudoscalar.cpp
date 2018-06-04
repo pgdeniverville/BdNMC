@@ -24,6 +24,7 @@ const string g_quark_key="g_quark";
 const string g_electron_key = "g_pseudoscalar_electron";
 const string dark_mediator_mass_key="dark_mediator_mass";
 const string dark_matter_mass_key="dark_matter_mass";
+const string g_neutrino_key="g_neutrino";
 
 using namespace std::placeholders;
 
@@ -31,6 +32,7 @@ using namespace elastic_scattering;
 
 bool Pseudoscalar::Set_Model_Parameters(Parameter& par){
     if(par.Query_Map(g_chi_key,gchi)&&(par.Query_Map(dark_matter_mass_key,mchi))&&par.Query_Map(dark_mediator_mass_key, ma)&&par.Query_Map(g_quark_key,gq)&&par.Query_Map(g_electron_key,gae)){
+        par.Query_Map(g_neutrino_key,gnu);
         return true;
     }
     return false;
@@ -82,7 +84,7 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
             double branching_ratio_to_neutrinos=1;
             Particle neutrino(0);
             neutrino.name = "Neutrino";
-            dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_neutrinos,ma,"Pseudoscalar",neutrino, neutrino, Gamma_pseudoscalar_to_2fermion(gae,ma,0)));
+            dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_neutrinos,ma,"Pseudoscalar",neutrino, neutrino, hbar/Gamma_pseudoscalar_to_2fermion(gnu,ma,0)));
             sig_part_name = "Neutrino";
         }
         else{
@@ -165,5 +167,6 @@ void Pseudoscalar::Report_Model(){
     cout << "g_chi = " << gchi << endl;
     cout << "g_electron = " << gae << endl;
     cout << "g_quark = " << gq << endl; 
+    cout << "g_neutrino = " << gnu << endl;
     //    cout << "kappa = " << kappa << endl;
 }

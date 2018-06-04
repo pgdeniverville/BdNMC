@@ -841,6 +841,12 @@ int main(int argc, char* argv[]){
         NDM+=NDM_list[i]; 
 		signal+=signal_list[i];
  	}
+
+
+    if(outmode=="dm_detector_distribution"){
+        *comprehensive_out << "Total " << trials << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
+    }
+
 	if(outmode=="summary"||outmode=="dm_detector_distribution"||
             outmode=="comprehensive"){
 		if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
@@ -849,19 +855,19 @@ int main(int argc, char* argv[]){
 			*summary_out << signal << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
 		}
 		else{
-
 			*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
 		}
         if(par->Model_Name()=="Axion_Dark_Photon"){
             adp.Report(*summary_out, signal);
         }
     }
-
 //    if(outmode=="summary"||outmode=="comprehensive"){
 //        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
 //    }
     else if(outmode=="dm_detector_distribution"){
+    	cout << "Outputting summary" << endl;
         *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
+        *comprehensive_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
     }
 
     if(outmode =="comprehensive"){

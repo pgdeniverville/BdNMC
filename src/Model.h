@@ -97,6 +97,7 @@ class Pseudoscalar : public Model{
         //ma is the mass of the pseudoscalar mediator
         //gq is the A-quark coupling, qe is the A-electron coupling.
         double gchi, gq, gae, ma, mchi;
+        double gnu=1;
         double dsig_max(double Ei);
         double sigma_tot_electron(double Ei);
 
