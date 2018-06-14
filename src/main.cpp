@@ -649,7 +649,6 @@ int main(int argc, char* argv[]){
         cout << "burn_max < 0 specified. Assuming default value burn_max=1000\n";
         BURN_MAX=1000;
     }
-   
     if(outmode=="dm_detector_distribution"){
         BURN_MAX = 0;
         cout << "Detector_Mode selected.\nSkipping Burn-In.\n";
@@ -813,8 +812,8 @@ int main(int argc, char* argv[]){
 //    if(outmode=="summary"||outmode=="comprehensive"){
 //        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
 //    }
-    else if(outmode=="dm_detector_distribution"){
-        *summary_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
+    if(outmode=="dm_detector_distribution"){
+        *comprehensive_out << "Total " << mv  <<  " "  << mdm << " " << trials << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
     }
 
     summary_out->close();
