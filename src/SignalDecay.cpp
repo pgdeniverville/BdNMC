@@ -16,7 +16,7 @@ double decay_probability(double t1, double t2, double lifetime){
 }
 
 double generate_decay_time(double t1, double t2, double lifetime){
-    return -log(exp(-t1/lifetime)-Random::Flat(0,1)/(exp(-t1/lifetime)-exp(-t2/lifetime)))*lifetime;
+    return -log(exp(-t1/lifetime)-Random::Flat(0,1)*(exp(-t1/lifetime)-exp(-t2/lifetime)))*lifetime;
 }
 
 //Need to create local copies of the input vectors
@@ -60,8 +60,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
         //cout << "Momentum " << Parentit->Momentum() << " speed " << Parentit->Speed() << " crossing1 " << Parentit->crossing[0] << " crossing2 " << Parentit->crossing[1] << " pos1 " << Parentit->crossing[0]*(Parentit->Momentum()) << endl;
         //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl;
-        if(prob>pMax){
-            
+        if(prob>pMax){    
             pMax=prob;
         }
     
@@ -82,7 +81,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
             Particle daughter2(Final_States[i][1]);
             daughter1.EVENT_SET=true; 
             daughter2.EVENT_SET=true;
-            Parentit->Generate_Position();
+            //Parentit->Generate_Position();
             TwoBodyDecay(*Parentit, daughter1, daughter2);
             double angular_spread = Angle_Spread(daughter1.px,daughter1.py,daughter1.pz,daughter2.px,daughter2.py,daughter2.pz);  
             if(angular_spread<min_angle||angular_spread>max_angle||daughter1.E<Escatmin||daughter2.E<Escatmin){

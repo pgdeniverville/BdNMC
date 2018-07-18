@@ -680,25 +680,26 @@ def execute_miniboone_parallel(genlist = True):
         write_miniboone(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     channs={_brem,_pion_decay,_eta_decay}
-    #vmarr={10,100,300,500,770}
+    vmarr={1,5,10,50,100,200,300,400,500}
     #epsarr={1e-6,3e-7,1e-7,3e-7,1e-8}
     #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
-    massarr=[[90,30,1e-3],[300,100,1e-3]]
+    #massarr=[[90,30,1e-3],[300,100,1e-3]]
+    massarr=[[mv,mv/3.0,1e-3] for mv in vmarr]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs}
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs}
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2],"samplesize" : 10000, "signal_chan" : "NCE_electron", 'max_scatter_energy' : 3, 'min_scatter_energy' : 0, 'max_scatter_angle' : 6, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'sumlog' : "Claudia/sbnd.dat", 'outlog' : "Claudia/sbnd_electron_{}_{}.dat".format(marr[0],marr[1]),'efficiency' : 1}
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2],"samplesize" : 50000, "signal_chan" : "NCE_electron", 'max_scatter_energy' : 10, 'min_scatter_energy' : 0.01, 'max_scatter_angle' :6, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'sumlog' : "Claudia/sbnd_elec.dat", 'outlog' : "Claudia/sbnd_electron_{}_{}.dat".format(marr[0],marr[1]),'efficiency' : 1, "POT" : 5e20}
         miniboone_eval(d)
-        d.update({"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", 'sumlog' : "Claudia/sbnd.dat", 'outlog' : "Claudia/sbnd_dm_{}_{}.dat".format(marr[0],marr[1])})
-        miniboone_eval(d)
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])})
-        miniboone_eval(d)
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_no_cut_{}_{}.dat".format(marr[0],marr[1])})
-        miniboone_eval(d)
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "channels" : channs, 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_dm_{}_{}.dat".format(marr[0],marr[1])})
-        miniboone_eval(d)
+        #d.update({"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", 'sumlog' : "Claudia/sbnd.dat", 'outlog' : "Claudia/sbnd_dm_{}_{}.dat".format(marr[0],marr[1])})
+        #miniboone_eval(d)
+        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])})
+        #miniboone_eval(d)
+        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_no_cut_{}_{}.dat".format(marr[0],marr[1])})
+        #miniboone_eval(d)
+        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "channels" : channs, 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_dm_{}_{}.dat".format(marr[0],marr[1])})
+        #miniboone_eval(d)
 
 def execute_ship(genlist=True):
     if genlist:
@@ -733,14 +734,15 @@ def execute_numi(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    vmarr=[90]
+    vmarr=[30]
     epsarr=[1e-3]
     massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[90,30,1e-3],[600,200,1e-3]]
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "sumlog" : "Scatter_Events/miniboone_numi_high.dat", "model" : "Dark_Photon","min_scatter_energy" : 0.05, "max_scatter_energy" : 100, "min_scatter_angle" : 0, "ptmax" : 5});
-    d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 10000,  "sumlog" : "Claudia/nova_scatter_events.dat", "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0, "ptmax" : 5});
-    #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 5, "max_scatter_energy" : 35, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    #d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 10000,  "sumlog" : "Claudia/nova_scatter_events.dat", "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0, "ptmax" : 5});
+    d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 1, "alpha_D" : 0.05, "POT" : 3e20, 'sumlog' : "Claudia_low_cut/test.dat"});
+    #d_high=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 5, "max_scatter_energy" : 15, "efficiency" : 1, "alpha_D" : 0.05, "POT" : 3e20, 'sumlog' : "Claudia_high_cut/nova_elec_high_2.dat"});
     #d_low=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 100, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
     #d_miniboone_nucleon=({"signal_chan" : "NCE_nucleon", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.1, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_nucleon.dat","ptmax" : 5, "burn_max" : 100});
@@ -754,12 +756,14 @@ def execute_numi(genlist=True):
     '''
     for marr in massarr:
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d_low.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], 'outlog' : "Claudia_low_cut/nova_elec_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        numi_eval(d)
+        #d_high.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], 'outlog' : "Claudia_high_cut/nova_high_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        #numi_eval(d_high)
         #d.update({"det_switch" : "miniboone_numi", "channels" : [_pion_decay,_eta_decay,_brem,_parton],  "outlog" : "Scatter_Events/miniboone_numi_nucleon_{}_{}.dat".format(marr[0],marr[1])})
-        d_low.update({"det_switch" : "nova", 'signal_chan' : 'NCE_electron', "channels" : [_pion_decay,_eta_decay,_brem,_parton], 'output_mode' : 'comprehensive', "outlog" : "Claudia/nova_elec_{}_{}.dat".format(marr[0],round(marr[1],2))})
-        numi_eval(d_low)
-        d_low.update({"det_switch" : "nova", "channels" : [_pion_decay,_eta_decay,_brem,_parton], 'output_mode' : 'dm_detector_distribution', "outlog" : "Claudia/nova_dm_{}_{}.dat".format(marr[0],round(marr[1],2))})
-        numi_eval(d_low)
+        #d_low.update({"det_switch" : "nova", 'signal_chan' : 'NCE_electron', "channels" : [_pion_decay,_eta_decay,_brem,_parton], 'output_mode' : 'summary', "outlog" : "Claudia/nova_elec_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        #d_low.update({"det_switch" : "nova", "channels" : [_pion_decay,_eta_decay,_brem,_parton], 'output_mode' : 'dm_detector_distribution', "outlog" : "Claudia/nova_dm_{}_{}.dat".format(marr[0],round(marr[1],2))})
+        #numi_eval(d_low)
         #numi_eval(d_low)
         #d_low.update({"det_switch" : "nova","channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Scatter_Events/nova_electron_low.dat", "outlog" : "Scatter_Events/nova_electron_low_{}_{}.dat".format(marr[0],round(marr[1],2))})
         #numi_eval(d_low)
@@ -863,14 +867,14 @@ def execute_lsnd(genlist=True):
     #vmarr = [1,2,3,4,5,6,7,8,9,10]
     #dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
     #massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
-    vmarr=[90]
+    vmarr=[20,30,40]
     massarr = [[v,v/3.0] for v in vmarr]
     d_list=[]
     #massarr = [[4,1]]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_dm_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'dm_detector_distribution'}
-        lsnd_eval(d)
-        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_elec_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'comprehensive'}
+        #d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_dm_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'dm_detector_distribution'}
+        #lsnd_eval(d)
+        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_elec_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'summary'}
         lsnd_eval(d)
         #d_list.append(copy.deepcopy(d))
     #pool = Pool(processes=4)
@@ -901,6 +905,6 @@ def execute_lanl(genlist=True):
 #execute_lsnd(genlist=False)
 #execute_numi(genlist=False)
 #execute_ship(genlist=True)
-execute_miniboone_parallel(genlist=False)
+execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
 #execute_coherent(genlist=False)
