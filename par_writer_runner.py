@@ -851,7 +851,7 @@ def execute_coherent(genlist=True):
 
 def execute_lsnd(genlist=True):
     if genlist:
-        d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 0.55e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_lsnd_low.dat"], "p_num_target" : 8}
+        d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 0.55e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_lsnd_low.dat"], "p_num_target" : 6}
         write_lsnd(d=d)
         subp.call(["./build/main","parameter_run.dat"])
         d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 0.45e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_lsnd_high.dat"], "p_num_target" : 70}
@@ -867,14 +867,14 @@ def execute_lsnd(genlist=True):
     #vmarr = [1,2,3,4,5,6,7,8,9,10]
     #dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
     #massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
-    vmarr=[20,30,40]
+    vmarr=[30]
     massarr = [[v,v/3.0] for v in vmarr]
     d_list=[]
     #massarr = [[4,1]]
     for marr in massarr:
         #d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_dm_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'dm_detector_distribution'}
         #lsnd_eval(d)
-        d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_elec_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'summary'}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_elec_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'summary'}
         lsnd_eval(d)
         #d_list.append(copy.deepcopy(d))
     #pool = Pool(processes=4)
@@ -902,9 +902,9 @@ def execute_lanl(genlist=True):
         lanl_eval(d)
 
 #execute_lanl(genlist=True)
-#execute_lsnd(genlist=False)
+execute_lsnd(genlist=False)
 #execute_numi(genlist=False)
 #execute_ship(genlist=True)
-execute_miniboone_parallel(genlist=True)
+#execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
 #execute_coherent(genlist=False)
