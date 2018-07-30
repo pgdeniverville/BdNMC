@@ -664,6 +664,8 @@ def lsnd_eval(d_user):
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "lsnd":
         write_lsnd(d=d)
+    elif det_switch == "test":
+        write_lsnd(d=d,det=test_sphere)
     subp.call(["./build/main", outfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -867,14 +869,14 @@ def execute_lsnd(genlist=True):
     #vmarr = [1,2,3,4,5,6,7,8,9,10]
     #dmarr = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
     #massarr = [[v,x] for v in vmarr for x in dmarr if x<=v/2.0 and x<134/2.0]
-    vmarr=[30]
+    vmarr=[3,90]
     massarr = [[v,v/3.0] for v in vmarr]
     d_list=[]
     #massarr = [[4,1]]
     for marr in massarr:
         #d={"mv" : marr[0], "alpha_D" : 0.1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_dm_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'dm_detector_distribution'}
         #lsnd_eval(d)
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "Claudia/lsnd.dat", 'outlog' : 'Claudia/lsnd_elec_{}_{}.dat'.format(marr[0],marr[1]), 'output_mode' : 'summary'}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "eps" : 1, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lsnd", "samplesize" : 10000, "sumlog" : "lsnd.dat", 'outlog' : 'lsnd_elec_events.dat'.format(marr[0],marr[1]), 'output_mode' : 'summary', "max_scatter_energy" : 0.0528}
         lsnd_eval(d)
         #d_list.append(copy.deepcopy(d))
     #pool = Pool(processes=4)

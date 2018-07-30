@@ -1,5 +1,6 @@
 #include "BurmanSmith.h"
 #include "constants.h"
+#include <algorithm>
 #include <iostream>
 
 const double degree = pi/180.0;
@@ -13,11 +14,23 @@ const double md = MASS_DEUTERON*1000.0;
 const double mpion = MASS_PION_CHARGED*1000.0;
 
 //recursive spline definition. Slow, but it should be fine for low spline orders.
+
+using std::cout; using std::endl;
+//Returns too large a value at the knot points, but okay everywhere else.
 double Bspline(int p, int i, double theta){
     if(p==0)
-        return ((theta>=knots[i] && theta<=knots[i+1]) ? 1.0 : 0.0);
-    else
-        return ((knots[i+p]==knots[i]) ? 0 : (theta-knots[i])/(knots[i+p]-knots[i])*Bspline(p-1,i,theta))+((knots[i+p+1]==knots[i+1]) ? 0 : (knots[i+p+1]-theta)/(knots[i+p+1]-knots[i+1])*Bspline(p-1,i+1,theta));
+        return ((theta>=knots[i] && theta<=knots[i+1]) ? 1.0 : 0.0); 
+    double tot=0;
+
+    if(knots[i+p]!=knots[i]){
+        tot+=(theta-knots[i])/(knots[i+p]-knots[i])*Bspline(p-1,i,theta);
+    }
+    if(knots[i+1]!=knots[i+p+1]){
+        tot+=(knots[i+p+1]-theta)/(knots[i+p+1]-knots[i+1])*Bspline(p-1,i+1,theta);
+    }
+    return tot;
+
+       // return ((knots[i+p]==knots[i]) ? 0 : (theta-knots[i])/(knots[i+p]-knots[i])*Bspline(p-1,i,theta))+((knots[i+p+1]==knots[i+1]) ? 0 : (knots[i+p+1]-theta)/(knots[i+p+1]-knots[i+1])*Bspline(p-1,i+1,theta));
 }
 
 BurmanSmith::BurmanSmith(double BeamEnergy, int ProtonNumber){
@@ -35,7 +48,7 @@ BurmanSmith::BurmanSmith(double BeamEnergy, int ProtonNumber){
         sigmaAZ730 = 127.0;
         sigmaAZ585 = 155.0;
     }
-else if(Z<=8){
+    else if(Z<=8){
         TAZ730 = 34.2;
         TAZ585 = 28.9;
         sigmaAZ730 = 150.0;
@@ -66,11 +79,24 @@ else if(Z<=8){
         Z1coefficient = 0.7;
     }
 
-    ampz[0] = Zfactor*(((27.0-4.0*pow((730.0-Tp)/(730.0-585.0),2))<27.0) ? (27.0-4.0*pow((730.0-Tp)/(730.0-585.0),2)) : 27.0);
-    ampz[1] = Zfactor*18.2; ampz[2] = 8.0; ampz[3] = Zfactor*(13.0+(Z-12.0)/10.0); ampz[4] = Zfactor*(9.0+(Z-12.0)/10.0-(Tp-685.0)/20.0);
+    ampz[0] = Zfactor*std::min((27.0-4.0*pow((730.0-Tp)/(730.0-585.0),2)),27.0); 
+    ampz[1] = Zfactor*18.2; ampz[2] = Zfactor*8.0; ampz[3] = Zfactor*(13.0+(Z-12.0)/10.0); ampz[4] = Zfactor*(9.0+(Z-12.0)/10.0-(Tp-685.0)/20.0);
 
     Tpimax = Tp - mpion;
     fpimax=0;
+   /* 
+    for(double i=0; i<181; i++){
+        cout << i;
+        for(int iter=0; iter<=4; iter++){
+             cout << " " << Bspline(2,iter,i);
+        //ampz[iter]*
+        }
+        cout << std::endl;
+        //std::cout << i << " " << Amp(i) << std::endl;
+    }
+   */
+    
+
     //burn in
     double p, t, ph;
 	for(int iter=0; iter < 1000; iter++){
