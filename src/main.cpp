@@ -64,8 +64,7 @@ double t_delay_fraction(double tcut, double pos, double speed){
 
 int main(int argc, char* argv[]){
 
-
-
+    
 /**************************************
 	Making plots!
 **************************************/

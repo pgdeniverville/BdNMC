@@ -55,11 +55,9 @@ double F1 (double Ee, double EDM, double MDM, double MDP) {
 }
 //  differential DM - electron scattering cross section dsigma/dEe
 double dsigmadEe (double Ee, double EDM, double MDM, double MDP, double kappa, double alphaD) {
-	double rdsig;
-	double coef;
-	coef = 4*Pi*kappa*kappa*alphaEM*alphaD;
-	rdsig = coef*F1(Ee,EDM,MDM,MDP);
-	return(rdsig);
+    //cout << Ee << " " << EDM << " " << MDM << " " << MDP << " " << kappa << " " << alphaD << endl;
+	//cout << 4*Pi*kappa*kappa*alphaEM*alphaD*(2*EDM*Me*(-Ee+EDM+Me)+MDM*MDM*(Me-Ee))/(EDM-MDM)/(EDM+MDM)/pow(2*Me*(Ee-Me)+MDP*MDP,2) << endl;
+	return(4*Pi*kappa*kappa*alphaEM*alphaD*(2*EDM*Me*(-Ee+EDM+Me)+MDM*MDM*(Me-Ee))/(EDM-MDM)/(EDM+MDM)/pow(2*Me*(Ee-Me)+MDP*MDP,2));
 }
 
 double dsigmadEe_scaled (double Ee, double EDM, double MDM, double MDP, double kappa, double alphaD) {
@@ -70,28 +68,25 @@ double dsigmadEe_scaled (double Ee, double EDM, double MDM, double MDP, double k
 // Total DM - electron scattering cross section equals
 // sigma =  4*Pi*kappa*kappa*alpha*alphaD*( F2(EeMax)- F2(EeMin) ) 
 double F2 (double Ee, double EDM, double MDM, double MDP) {
-	double rF2;
-	double F2N1, F2N2, F2D;
-	F2N1 = (4*EDM*EDM*Me*Me+2*EDM*Me*MDP*MDP + MDP*MDP*MDM*MDM)/(2*Ee*Me-2*Me*Me+MDP*MDP);
-	F2N2 = (2*EDM*Me+MDM*MDM)*log(2*Ee*Me-2*Me*Me+MDP*MDP);
-	F2D  = 4*Me*Me*(EDM*EDM-MDM*MDM);
-	rF2  = -(F2N1+F2N2)/F2D;
-	return(rF2);
+	return( -((4*EDM*EDM*Me*Me+2*EDM*Me*MDP*MDP+MDP*MDP*MDM*MDM)/(2*Me*(Ee-Me)+MDP*MDP)+(2*EDM*Me+MDM*MDM)*log(2*Me*(Ee-Me)+MDP*MDP))/(Me*Me*(EDM-MDM)*(EDM+MDM)) );
 }
 // DM - electron scattering total cross section sigma
 double sigma (double EDM, double MDM, double MDP, double kappa, double alphaD) {
 	double rsig;
 	double coef;
-	coef = 4*Pi*kappa*kappa*alphaEM*alphaD;
+	coef = Pi*kappa*kappa*alphaEM*alphaD;
 	double EeMaxA, EeMinA;
 	EeMaxA = EeTMax(EDM,MDM);
 	EeMinA = EeTMin(EDM,MDM);
-	rsig = coef*(F2(EeMaxA,EDM,MDM,MDP)-F2(EeMinA,EDM,MDM,MDP));
+    cout << coef*F2(EeMaxA,EDM,MDM,MDP) << " " << coef*F2(EeMinA,EDM,MDM,MDP) << endl;
+    rsig = coef*(F2(EeMaxA,EDM,MDM,MDP)-F2(EeMinA,EDM,MDM,MDP));
 	return(rsig);
 }
 
 double sigma2 (double EDM, double MDM, double MDP, double kappa, double alphaD, double Emax, double Emin) {
 	if(Emax<Emin)
 		return 0;
-	return(4*Pi*kappa*kappa*alphaEM*alphaD*(F2(Emax,EDM,MDM,MDP)-F2(Emin,EDM,MDM,MDP)));
+    //cout << EDM << " " << MDM << " " << MDP << " " << kappa << " " << alphaD << " " << Emax << " " << Emin << endl;
+	//cout << Pi*kappa*kappa*alphaEM*alphaD*(F2(Emax,EDM,MDM,MDP)) - Pi*kappa*kappa*alphaEM*alphaD*F2(Emin,EDM,MDM,MDP) << endl;
+    return(Pi*kappa*kappa*alphaEM*alphaD*(F2(Emax,EDM,MDM,MDP)-F2(Emin,EDM,MDM,MDP)));
 }
