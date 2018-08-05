@@ -38,6 +38,36 @@ class Scatter{
 		//bool _End_state_with_DM_parallel_to_z=false;
 };
 
+//This should replace all the elastic scattering channels.
+//I would also like to generalize all inelastic scattering, but
+//that seems much more complicated.
+class Elastic_Scatter : public Scatter{
+    public:
+        Elastic_Scatter();
+        ~Elastic_Scatter(){};
+        void add_channel(Particle& end_state, std::function<double(double)>& cross_total, std::function<double(double)>& cross_max, std::function<double(double, double)>& dsig,double num_density);
+        bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &part);
+        void set_Model_Parameters(){};
+    private:
+        double scatmax(double E1, double m1, double m2);
+        double scatmin(double E1, double m1, double m2);
+        void scatterevent(Particle &particle, Particle &recoil, std::function<double(double)> cross_section, std::function<double(double)> cross_maxima);
+        
+        //total value of the cross section for a given signal channel
+        std::vector<std::function<double(double)> > cross_tot; 
+        //maximum value of the cross section for a given energy.
+        std::vector<std::function<double(double)> > cross_maxima;
+        //differential cross section dsigma(E_DM_i,E_recoil)/dE_recoil
+        std::vector<std::function<double(double, double)> > dsigma;
+        //Recoil particle
+        std::vector<Particle> recoil_particle;
+        //number density associated with a given scattering channel. 
+        std::vector<double> number_density;
+        int chan_number;
+};
+
 /*
  * Nucleon_scatter also handles the generation of interpolation functions for the nucleon scattering
  * cross section. 

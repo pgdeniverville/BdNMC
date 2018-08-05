@@ -18,6 +18,7 @@ const double femtobarn = 1e-43;//In m^2
 const double RADIANS_PER_DEGREE = pi/180.0; 
 const double convGeV2cm2 = 3.89e-28;
 const double GeVtofm=0.197;
+const double m_to_cm = 100;
 
 //Particle Masses in GeV
 const double MASS_PROTON = 0.938272;

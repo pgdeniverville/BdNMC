@@ -9,8 +9,6 @@
 
 #include <complex>
 
-#include <iostream>
-
 using std::complex;
 
 using std::bind;

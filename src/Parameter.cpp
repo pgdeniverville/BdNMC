@@ -83,6 +83,7 @@ bool production_channel::query_dist_param(const string &key, double &var){
 production_distribution::production_distribution(){
 	dist_mod = "";
 }
+
 double production_distribution::get_offset(int i){
 	if(i>3||i<0){
 		std::cerr << "Out of domain for get_offset\n";
@@ -154,6 +155,9 @@ production_channel::production_channel(){
     ZMIN=-1;
    	ZMAX=-1;
 	particle_list_position=false;
+    tolerance=5e-2;
+    energy_bins=100;
+    QMIN=1.3;
 	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
 }
 
@@ -198,7 +202,15 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.parton_V_n_file=val;
 			else if(key==parton_V_proton_file_key)
 				tmpprod.parton_V_p_file=val;
-			else if(key==zmax_key)
+            else if(key==proton_pdf_file_key)
+                tmpprod.proton_pdf_file=val;
+            else if(key==neutron_pdf_file_key)
+                tmpprod.neutron_pdf_file=val;
+            else if(key==prod_tolerance_key)
+                tmpprod.tolerance=stod(val);
+			else if(key==energy_bins_key)
+                tmpprod.energy_bins=stod(val);
+            else if(key==zmax_key)
 				tmpprod.ZMAX=stod(val);
 			else if(key==zmin_key)
 				tmpprod.ZMIN=stod(val);
@@ -206,7 +218,9 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.PTMAX=stod(val);
             else if(key==ptmin_key)
                 tmpprod.PTMIN=stod(val);
-			else if(key==part_list_pos_key){
+			else if(key==qmin_key)
+                tmpprod.QMIN=stod(val);
+            else if(key==part_list_pos_key){
 				if(lowercase(val)=="true")
 					tmpprod.particle_list_position=true;
 			}
@@ -602,10 +616,10 @@ void Parameter::Set_Target_Parameters(map<string, string> &keymap){
 }
 
 void Parameter::Set_Model_Parameters(map<string, string> &keymap){
-    Set_Double(dmkey, mass_dm, keymap);
-    Set_Double(Vkey, mass_V, keymap);
-    Set_Double(epskey, epsilon, keymap);
-    Set_Double(alkey, alpha_D, keymap);
+    Set_Double(dmkey, mass_dm, keymap,0.01);
+    Set_Double(Vkey, mass_V, keymap,0.1);
+    Set_Double(epskey, epsilon, keymap,1e-3);
+    Set_Double(alkey, alpha_D, keymap,0.1);
 }
 
 bool Parameter::Query_Map(const string key, double& val){

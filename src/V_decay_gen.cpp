@@ -85,7 +85,7 @@ bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
 
 //A general isotropic two body decay. Only cares about the kinematics!
 
-Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string part_name, Particle Daughter1, Particle Daughter2){
+Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string part_name, Particle Daughter1, Particle Daughter2, double lifetime){
     if(parent_mass < Daughter1.m+Daughter2.m){
         std::cerr << "Parent_Mass is smaller than daughter masses, invalid decay!\n";
         throw -30;
@@ -94,12 +94,18 @@ Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mas
     daughter1 = Particle(Daughter1);
     daughter2 = Particle(Daughter2);
     branchingratio=branching_ratio;
+    tau = lifetime;
 }
 
 bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     Particle parent = Particle(part);
     parent.name = Part_Name;
     vec.push_back(parent);
+
+    double decay_time=tau*log(1/(1-Random::Flat()));
+    double boost = 1/sqrt(1-pow(parent.Speed(),2));
+    //cout << decay_time << " " << boost << endl;
+    parent.Set_Time(decay_time*boost);
 
     TwoBodyDecay(parent, daughter1, daughter2);
     bool intersect=false;
@@ -111,5 +117,9 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
         intersect=true;
         vec.push_back(daughter2);
     }
+    //cout << "EVENT GEN\n";
+    //parent.report(cout);
+    //daughter1.report(cout);
+    //daughter2.report(cout);
     return intersect;
 }
