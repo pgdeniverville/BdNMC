@@ -85,14 +85,14 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
             Particle neutrino(0);
             neutrino.name = "Neutrino";
             dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_neutrinos,ma,"Pseudoscalar",neutrino, neutrino, hbar/Gamma_pseudoscalar_to_2fermion(gnu,ma,0)));
-            sig_part_name = "Neutrino";
+            sig_part_vec.push_back(string("Neutrino"));
         }
         else{
             double branching_ratio_to_invisible=1;
             Particle dm(mchi);
             dm.name = "DM";
             dmgen = shared_ptr<DMGenerator>(new Two_Body_Decay_Gen(branching_ratio_to_invisible,ma,"Pseudoscalar",dm, dm));
-            sig_part_name = "DM";
+            sig_part_vec.push_back(string("DM"));
         }
         Particle med(ma);
         med.name = "Pseudoscalar";

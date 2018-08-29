@@ -35,6 +35,28 @@ namespace annihilation_to_pair{
 	double E3Max(double E1, double m1, double m2, double m3);
 	double Theta_from_E3(double E1,double m1,double m2,double E3,double m3);
 }
+
+namespace two_to_two_scattering{
+    //1+2->3+4.
+    //2 is stationary in lab frame.
+    double s_lab(double E1lab, double m1, double m2);
+    //t=(p2-p4)^2
+    double t_lab(double E4, double m2, double m4);
+    //E1 is E1lab. This is equation 47.37
+    double p1cm(double E1, double m1, double m2);
+    double E3cm(double E1, double m1, double m2, double m3, double m4);
+    double p3cm(double E1, double m1, double m2, double m3, double m4);
+    double t0(double E1lab, double m1, double m2, double m3, double m4);
+    double t1(double E1lab, double m1, double m2, double m3, double m4);
+    double E4_from_t(double m2, double m4, double t);
+    //E1 is in lab frame
+    double E3_from_t(double E1, double m1, double m2, double m3, double m4, double t);
+    //E1 is in lab frame
+    double Theta_from_E4(double E1, double E4, double m1, double m2 , double m3, double m4);
+    //Need to check that these are correct, might need to swap t0 and t1. t1 gives E3min, so that should be E4max.
+    double E4min(double E1lab, double m1, double m2, double m3, double m4);
+    double E4max(double E1lab, double m1, double m2, double m3, double m4);
+}
 /*
 namespace annihilation{
 	double E3_from_Theta(double E1, double m1, double theta, double m3);

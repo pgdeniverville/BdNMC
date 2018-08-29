@@ -100,20 +100,25 @@ Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mas
 bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
     Particle parent = Particle(part);
     parent.name = Part_Name;
-    vec.push_back(parent);
 
     double decay_time=tau*log(1/(1-Random::Flat()));
     double boost = 1/sqrt(1-pow(parent.Speed(),2));
     //cout << decay_time << " " << boost << endl;
+    //Need to turn on END_SET;
+    parent.END_SET=true;
     parent.Set_Time(decay_time*boost);
+
+    if(record_parent)
+        vec.push_back(parent);
+
 
     TwoBodyDecay(parent, daughter1, daughter2);
     bool intersect=false;
-    if(det_int(daughter1)>0){
+    if(d1&&det_int(daughter1)>0){
         intersect=true;
         vec.push_back(daughter1);
     }
-    if(det_int(daughter2)>0){
+    if(d2&&det_int(daughter2)>0){
         intersect=true;
         vec.push_back(daughter2);
     }

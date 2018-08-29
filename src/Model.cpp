@@ -1,6 +1,10 @@
 #include "Model.h" 
 #include "constants.h"
 #include "Position_Distributions.h"
+#include "BurmanSmith.h"
+#include "sanfordwang.h"
+#include "BMPT_dist.h"
+#include "Particle_List.h"
 
 #include <list>
 
@@ -47,6 +51,7 @@ void Model::Prepare_Model(Parameter& par){
         Dist_list.push_back(PartDist);
         Vnum_list.push_back(Vnum);
         Vnumtot+=Vnum;
+        cout << "Vnumtot= " << Vnum << endl;
     };
     //cout << "Gen_list size = " << Gen_list.size() << endl;
     //cout << Gen_list[0]->Channel_Name() << endl;
@@ -54,14 +59,49 @@ void Model::Prepare_Model(Parameter& par){
 
 bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<Distribution>& Dist, Parameter& par){
     //Eventually all of the main distributions will be handled here.
+    //Remember that proditer->func() becomes prodchan.func()!
     if(proddist=="proton_beam"){
         Dist = std::shared_ptr<Distribution>(new BeamDistribution(par.Beam_Energy(),MASS_PROTON));
+    }
+    else if(proddist=="burmansmith"){
+        std::shared_ptr<BurmanSmith> bs(new BurmanSmith(par.Beam_Energy(),par.Target_P_Num()));
+        //beam_energy should be kinetic energy for this case
+        Dist = bs;
+    }
+    else if(proddist=="pi0_sanfordwang"||proddist=="k0_sanfordwang"){
+        std::shared_ptr<sanfordwang> sw(new sanfordwang(proddist));
+        sw->set_fit_parameters(prodchan);//This does nothing if no fit parameters have been set.
+        Dist = sw;
+    }
+    else if(proddist=="bmpt"){
+        cout << "Energy = " << par.Beam_Energy() << endl;
+        cout << "Mass Number = " << par.Target_P_Num()+par.Target_N_Num() << endl;
+        std::shared_ptr<BMPT> bmpt(new BMPT(par.Beam_Energy(),par.Target_P_Num()+par.Target_N_Num()));
+        cout << "BMPT burn-in complete\n";
+        Dist = bmpt;
+    }
+    else if(proddist=="particle_list"){
+        bool set_pos = prodchan.par_list_pos();
+        if(set_pos){
+            cout << "position off-sets were read from particle_list file\n";
+        }
+        std::shared_ptr<Particle_List> pl(new Particle_List(prodchan.particle_list_file,set_pos));
+        Dist = pl;
     }
     else{
         return false;
     }
     Dist->set_name(proddist);
+    if(prodchoice=="pi0_decay"){
+        Dist->set_mass(MASS_PION_NEUTRAL);
+    }
+    else if(prodchoice=="eta_decay"){
+        Dist->set_mass(MASS_ETA);
+    }
+
     list<production_distribution> distmodlist = *(prodchan.Get_Dist_Mods_List());
+
+    //This might need more support in the future!
     for(list<production_distribution>::iterator distiter = distmodlist.begin(); distiter!=distmodlist.end();distiter++){
         //list<std::shared_ptr<Distribution> > distlist;
         if(distiter->name()=="position_offset"){

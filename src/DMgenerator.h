@@ -19,6 +19,7 @@ class DMGenerator{
         void set_model_params(double MV, double MX, double kap, double alp){mv=MV; mx=MX; kappa=kap; alphaD=alp; Evaluate_Branching_Ratio();}
         bool query_off_shell(){return OFF_SHELL;}
         virtual ~DMGenerator(){};
+        bool record_parent = true;
     protected:
         virtual void Evaluate_Branching_Ratio() {};
         double mv, mx, kappa, alphaD;
@@ -148,20 +149,48 @@ class Do_Nothing_Gen: public DMGenerator{
         std::string Part_Name="";
 };
 
+//Defined in V_decay_gen.cpp
 class Two_Body_Decay_Gen: public DMGenerator{
     public:
-        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0); 
+        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0); 
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
+        //If true, then this daughter is checked for intersection with the detector.
+        bool d1 = true;
+        bool d2 = true;
     private:
         void Evaluate_Branching(){return;}
         Particle daughter1, daughter2;
         std::string Part_Name;
-        //Lifetime of particle, not yet implemented.
         double tau;
 };
 
-
-
-
+//This is nearly complete!
+//If I go above 3-body final states, it would make sense to turn everything into lists.
+class Three_Body_Decay_Gen: public DMGenerator{
+    public:
+        //std::shared_ptr<DMGenerator> decaygen1, std::shared_ptr<DMGenerator> decaygen2, std::shared_ptr<DMGenerator> decaygen3, will be added in when I add decays of component particles.
+        Three_Body_Decay_Gen(Particle& parent, Particle& daughter1, Particle& daughter2, Particle& daughter3, std::string prodchoice,  double lifetime, std::function<double(double, double, double, double, double, double)> &amp);
+        bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
+        //Turns on decays for daughter 1, 2 or 3.
+        //Do I want this to be a reference? Probably, yeah.
+        void Toggle_Daughter_Decay(int index, std::shared_ptr<DMGenerator> daughter_decay_gen);
+        //Are these particles checked for intersection with the detector?
+        bool d1 = true;
+        bool d2 = true;
+        bool d3 = true;
+    private:
+        void Evaluate_Branching(){return;}
+        Particle mother, daughter1, daughter2, daughter3;
+        //Lifetime of particle, not yet implemented.
+        double tau;
+        std::string prodchoice;
+        std::function<double(double, double, double, double, double, double)> amp;
+        bool d1_unstable = false;
+        bool d2_unstable = false;
+        bool d3_unstable = false;
+        std::shared_ptr<DMGenerator> d1_decay;
+        std::shared_ptr<DMGenerator> d2_decay;
+        std::shared_ptr<DMGenerator> d3_decay;
+};
 
 #endif

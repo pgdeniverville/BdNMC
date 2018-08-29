@@ -106,7 +106,7 @@ void Elastic_Scatter::scatterevent (Particle &part, Particle &recoil, std::funct
     while(true){
         xe = Random::Flat(0,1)*(Efmax-Efmin)+Efmin;//Recoil energy
         if(Xsec(xe)/dsigmax > Random::Flat(0,1)){
-            thetaN = E2f_from_Theta(part.E,xe,part.m,recoil.m);
+            thetaN = Theta_from_E2f(xe,part.E,part.m,recoil.m);
             phiN = Random::Flat(0,1)*2*pi;
             pN = sqrt(pow(xe,2)-pow(recoil.m,2));
             recoil.ThreeMomentum(pN*sin(thetaN)*cos(phiN),pN*sin(thetaN)*sin(phiN),cos(thetaN)*pN);

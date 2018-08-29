@@ -220,6 +220,8 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
                 tmpprod.PTMIN=stod(val);
 			else if(key==qmin_key)
                 tmpprod.QMIN=stod(val);
+            else if(key==meson_per_pi0_key)
+                tmpprod.meson_per_pi0=stod(val);
             else if(key==part_list_pos_key){
 				if(lowercase(val)=="true")
 					tmpprod.particle_list_position=true;
@@ -232,8 +234,6 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				(tmpprod.dist_mods)->push_back(parse_distribution_mod(instream, hold, key, val, line_num, error_state, last_pos));
 				instream.seekg(last_pos);
                 continue;
-
-			//	cout << hold << endl;
 			}
 			else{
 				line_num--;
@@ -321,6 +321,7 @@ Parameter::Parameter(std::ifstream &instream){
         integrity=0;
         while(getline(instream, hold)){
 			line_num++;
+            //cout << line_num << ": " << hold << endl;
 			//cout << "Position: " << instream.tellg() << endl;
 			//cout << "parameter parser line " << line_num << ": " << hold << endl;
             if((error_state=split_string(hold, key, val))==0);
@@ -420,7 +421,6 @@ Parameter::Parameter(std::ifstream &instream){
 		Set_Integer(max_trials_key,max_trials,keymap,-1);
 
 		Set_Double(efficiency_key, efficiency, keymap, 1.0);
-		Set_Double(meson_per_pi0_key, meson_per_pi0, keymap, -1.0);
 		//output file
         if(keymap.count(outkey)==1){
             output_file = keymap[outkey];

@@ -31,12 +31,20 @@ const double MASS_DELTA = 1.232;
 //Mesons
 const double MASS_PION_NEUTRAL=0.1349766;
 const double mpi0= MASS_PION_NEUTRAL;
+const double PION_DECAY_CONSTANT = 0.093;//GeV
 const double MASS_PION_CHARGED=0.13957018;
 const double MASS_ETA = 0.547862;
 const double meta= MASS_ETA;
 const double momega=0.78265;
 const double mrho = 0.77527;
 const double mphi = 1.019461;
+
+
+const double brpi0to2gamma = 0.98823;
+const double bretato2gamma = 0.3941;
+
+const double WIDTH_PION_NEUTRAL=7.4692633e-9;//GeV^-1
+const double WIDTH_ETA=1.31e-6;
 
 //Vectors
 const double MASS_PHOTON=0.0;

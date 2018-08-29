@@ -21,14 +21,17 @@ public:
     
 
     double   m, px, py, pz, E;//Eventually, these variables are going to be made private.
+    double width=0;
     std::string name;
     double   Theta();
-    double   Phi(); 
+    double   Phi();
+    double Width(){return width;} 
     void     Set_Mass(double);
     void     FourMomentum(double, double, double, double);
     void     ThreeMomentum(double PX, double PY, double PZ);
     void	 ThreeMomentumPolar(double mom, double theta, double phi);
 	void     Lorentz(Particle&);
+    void     Lorentz(double beta, double betax, double betay, double betaz);
     void     Rotate_x(double);
     void     Rotate_y(double);
     void     Rotate_z(double);
@@ -38,6 +41,7 @@ public:
 	void 	Set_Origin(double x, double y, double z);
 //    void    Set_Position(double x, double y, double z);
 	void 	Set_Creation_Time(double t);
+    //If END_SET=true, this also updates dec_time.
     void    Set_Time(double t); 
     double Momentum();
     double Speed();
@@ -48,6 +52,8 @@ public:
     double origin_coords[4];//space-time location where the particle was created
 	double end_coords[4];//Stores the space-time location where the particle scatters or is otherwise destroyed.
     double crossing[2];//This keeps track of when a particle crosses through a detector. This will eventually replace det_cross in detector objects!
+    double dec_time=0;//tracks when a particle is destroyed by scattering or decay if END_SET=true. Multiply by momentum() to retrieve distance.
+    bool END_SET=false;//Indicates that this particle decays or scatters at a distance of Momentum()*dec_time.
     bool EVENT_SET;//I am going to have to be careful with this variable.
 };
 

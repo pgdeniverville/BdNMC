@@ -9,6 +9,9 @@
 #include <vector>
 #include <list>
 #include <string>
+
+void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::function<double(double)> ER_Min, std::function<double(double)> ER_Max, std::shared_ptr<Linear_Interpolation>& cross, std::shared_ptr<Linear_Interpolation>& maxima, double E_in_min, double E_in_max, double E_in_res);
+
 /*
  * The scatter class is designed to handle all of the scattering for a single detector in a given
  * scattering channel. If, in the future, I want to handle multiple detectors at a time, I will
@@ -66,6 +69,39 @@ class Elastic_Scatter : public Scatter{
         //number density associated with a given scattering channel. 
         std::vector<double> number_density;
         int chan_number;
+};
+
+//Here's the effort to generalize all inelastic scattering.
+class Two_to_Two_Scatter : public Scatter{
+    public:
+        Two_to_Two_Scatter();
+        ~Two_to_Two_Scatter(){};
+        void add_channel(Particle& out_state, Particle& end_state, double targ_mass, std::function<double(double)>& cross_total, std::function<double(double)>& cross_max, std::function<double(double, double)>& dsig, double num_density, const std::string in_state);
+        bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator& partit);
+        bool probscatter(std::shared_ptr<detector>& det, Particle& part);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil, Particle &recoil2);
+        double scatmax(double E1, double m1, double m2, double m3, double m4);
+        double scatmin(double E1, double m1, double m2, double m3, double m4);
+    private:
+        int chan_number;
+
+        void scatterevent (Particle &part, double targ_mass, Particle &recoil, Particle &recoil2, std::function<double(double)> Xsec,std::function<double(double)> Xmax);
+        //total value of the cross section for a given signal channel.
+        std::vector<std::function<double(double)> > cross_tot; 
+        //maximum value of the cross section for a given incoming energy.
+        std::vector<std::function<double(double)> > cross_maxima;
+        //differential cross section dsigma(E_1,E_4)/dE_4.
+        std::vector<std::function<double(double, double)> > dsigma;
+        //Recoil Target particle. This is particle 4.
+        std::vector<Particle> recoil_particle;
+        //Recoiling other particle. If one is invisible, it's this one! This is particle 3
+        std::vector<Particle> out_particle;
+        //number density associated with a given scattering channel. 
+        std::vector<double> number_density;
+        //name of incoming particle.
+        std::vector<std::string> in_name;
+        //mass of target particle for a given channel. This is particle 2
+        std::vector<double> target_mass;
 };
 
 /*

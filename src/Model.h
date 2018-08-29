@@ -12,6 +12,7 @@
 #include "Scatter.h"
 #include "DMgenerator.h"
 #include "Distribution.h"
+
 //The decays of each particle in the scenario are captured by
 //a Decay_Channels object. These can be used by Signal_Decay
 //later on.
@@ -54,9 +55,10 @@ class Model{
         std::vector<double> get_Vnum(){return Vnum_list;}
         double get_Vnumtot(){return Vnumtot;}
         std::string model_name(){return Model_Name;}
-        std::string get_sig_part_name(){return sig_part_name;}
+        std::vector<std::string> get_sig_part_vec(){return sig_part_vec;}
     protected:
-        std::string sig_part_name="DM";
+        //std::string sig_part_name="DM";
+        std::vector<std::string> sig_part_vec;
         std::string Model_Name = "MODEL_NAME";
         std::vector<Decay_Channels> decay_channels;
         std::vector<std::shared_ptr<Scatter> > Sig_list;
@@ -65,6 +67,37 @@ class Model{
         std::vector<double> Vnum_list;
         //Minimum and maximum scattering energies;
         double scat_max, scat_min,Vnumtot;
+};
+
+class Axion_Dark_Photon : public Model{
+    public:
+        //Might not be enough, we'll see.
+        Axion_Dark_Photon(Parameter& par) : Model(par){};
+        bool Prepare_Signal_Channel(Parameter& par);
+        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
+        bool Set_Model_Parameters(Parameter& par);
+        void Report_Model();
+        void Report(std::ostream& out);
+        void Branching_Ratios(){};
+    private:
+        double mass_axion, mass_dp, Gagg, Gagpg, Gagpgp, epsilon;
+        double pi0_decay_amplitude2(double m12s, double s, double mgamma, double ma, double mA);
+        double pi0_decay_amplitude2_b(double m12, double CosTheta, double m0, double m1, double m2, double m3);
+        double pi0_decay_amplitude2_c(double m12s, double s, double m0, double m1, double m2, double m3);
+        double pi0_decay_amplitude2(double m12, double CosTheta, double m0, double m1, double m2, double m3);
+        double pi0_decay_width(double m12s, double s, double mgamma, double ma, double mA);
+        double pi0_decay_width_2(double m12, double ct1, double mpion, double mgamma, double maxion, double mdarkphoton);
+
+        double eta_decay_amplitude2_c(double m12s, double s, double m0, double m1, double m2, double m3);
+        double meson_decay_amplitude2(double m12s, double s, double mmeson, double mgamma, double ma, double mA);
+        double eta_decay_width_2(double m12, double CosTheta, double m0, double m1, double m2, double m3);
+
+        double A_to_a_gamma_width(double ma, double mA);
+        double A_width(double ma, double mA);
+
+        double Axion_DP_electron_Amp(double s, double t, double mA, double mR);
+        double dsigma_a_to_DP(double E1lab, double E4, double mA, double mR);
+        double dsigma_DP_to_a(double E1lab, double E4, double mA, double mR);
 };
 
 class Pseudoscalar : public Model{

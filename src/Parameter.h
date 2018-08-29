@@ -120,7 +120,6 @@ class Parameter{
 		std::string run_name;	
 		std::shared_ptr<std::list<production_channel> >  prodlist; 
 	
-
 		double angle_upper_limit;
 		double angle_lower_limit;
 		double edmres;
@@ -130,7 +129,6 @@ class Parameter{
 		int seed;
 		int sample_gen;
 		int max_trials;
-		double meson_per_pi0;
         std::string output_file;
         std::string summary_file;
 		std::string output_mode;

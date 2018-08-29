@@ -68,6 +68,10 @@ double detector_sphere::Ldet (Particle &DM) {
 	if(Ldetexit<0)
 		Ldetexit=0;
 
+    if(DM.END_SET&&DM.dec_time<Ldetexit){
+        Ldetexit = DM.END_SET;
+    }
+
     if(Ldetexit>Ldetenter){
         //deprecate this as soon as possible
         //cross_point[0] = Ldetenter;
@@ -184,14 +188,34 @@ double detector_cylinder::Ldet (Particle &DM){
         return 0.0;
     else if(crossings.size()==2){
         //cout << "Cylinder recorded a hit " << crossings[0] << " " << crossings[1] << endl;
+        //cout << "crossings " << crossings[0] << " " << crossings[1] << " " << abs((crossings[1]-crossings[0])*sqrt(ip(b,b))) << endl;
+
+        //DM.report(cout);
+
+        if(crossings[0]>crossings[1]){
+            double tmp = crossings[0];
+            crossings[0] = crossings[1];
+            crossings[1] = tmp;
+        }
+
+        if(DM.END_SET&&DM.dec_time<crossings[1]){
+            if(DM.dec_time<crossings[0])
+                return 0.0;
+            crossings[1]=DM.dec_time;
+        }
+
         DM.crossing[0] = crossings[0];
         DM.crossing[1] = crossings[1];
+        
         //cout << DM.crossing[0] << endl;
         //DM.report(cout); 
         //cout << "crossing0 " << crossings[0]*sqrt(ip(b,b))  <<  " L " << (crossings[1]-crossings[0])*sqrt(ip(b,b)) << endl;
+
         return abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b)));
     }
     else if(crossings.size()==1){
+        if(DM.END_SET&&DM.dec_time<crossings[0])
+            crossings[0]=DM.dec_time;
         DM.crossing[1] = crossings[0];
         return crossings[0]*sqrt(ip(b,b));
     }
@@ -375,6 +399,8 @@ double detector_cuboid::Ldet (Particle &DM){
    /* if(zero_later){
         return 0.0;
     } */ 
+    if(DM.END_SET&&DM.dec_time<exit)
+        exit = DM.dec_time;
     if(entry>=exit||entry<0)
         return 0.0;
     else{

@@ -33,7 +33,6 @@
 #include "partonsample.h"
 #include "Proton_Brem_Distribution.h"
 #include "Position_Distributions.h"
-#include "Axion_Dark_Photon.h"
 #include "SignalDecay.h"
 
 
@@ -47,9 +46,6 @@ using std::bind;    using std::function;
 using std::list;    using std::vector;
 using std::exception;
 using std::cerr;
-
-//Temporary! I will clean this up in the big revision
-const string dark_axion_signal_string = "Dark_Photon";
 
 //const double mp = MASS_PROTON;
 //const double mn = MASS_NEUTRON;
@@ -67,7 +63,6 @@ double t_delay_fraction(double tcut, double pos, double speed){
 }
 
 int main(int argc, char* argv[]){
-
     
 /**************************************
 	Making plots!
@@ -152,6 +147,7 @@ int main(int argc, char* argv[]){
     //detector and passed to Scatter.probscatter.
     
     string sig_part_name = "DM";
+    vector<string> sig_part_vec; 
 	
 	string outmode; 
 	std::unique_ptr<std::ofstream> comprehensive_out; 
@@ -180,9 +176,6 @@ int main(int argc, char* argv[]){
     double alD = par->alD();
     double mv = par->MassDP();
     double mdm = par->MassDM();	
-
-    //This will turn into a Model class later on.
-    Axion_Dark_Photon adp(par);
 
 	//Detector setup
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
@@ -216,19 +209,27 @@ int main(int argc, char* argv[]){
 	double min_scatter_energy = par->Min_Scatter_Energy();
 	double min_angle = par->Min_Angle();
 	double max_angle = par->Max_Angle();
-	
-	if(par->Model_Name()=="Pseudoscalar_Mediator"){
+	if((par->Model_Name())!="Dark_Photon"){
 		cout << "Setting up model " << par->Model_Name() << endl;
-		std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
-		mod->Prepare_Model(*par);
-		//This will eventually get moved to the bottom, once the big else statements is moved into models.
-		DMGen_list=mod->get_DMGen();
-		PartDist_list=mod->get_Distribution();
-		SigGen=mod->get_SigGen(0);
-		Vnum_list=mod->get_Vnum();
-		Vnumtot = mod->get_Vnumtot();
-		sig_part_name = mod->get_sig_part_name();
-		model = mod;
+		if(par->Model_Name()=="Pseudoscalar_Mediator"){
+			std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
+			model = mod;
+		}
+		else if(par->Model_Name()=="Axion_Dark_Photon"){
+			std::shared_ptr<Axion_Dark_Photon> mod(new Axion_Dark_Photon(*par));
+			model = mod;
+		}
+		model->Prepare_Model(*par);
+		//This will eventually get moved to the bottom, once the big else statement is moved into models.
+		model->get_DMGen(DMGen_list);
+		PartDist_list=model->get_Distribution();
+		//This will be a list eventually, but SigGen is still a pointer to a single Signal Gen.
+		model->get_first_SigGen(SigGen);
+
+		model->get_Vnum(Vnum_list);
+		Vnumtot=model->get_Vnumtot();
+		sig_part_vec = model->get_sig_part_vec();
+		
 		cout << "Model assigned" << endl;
 	}
 	else{
@@ -297,8 +298,9 @@ int main(int argc, char* argv[]){
 	        cout << proddist << " " << prodchoice << endl; 
 	        
 	        //Signal_Decay HANDLING
-	        if(par->Model_Name()=="Axion_Dark_Photon"||(par->Model_Name()=="Dark_Photon"&&sigchoice=="Signal_Decay")){
+	        if((par->Model_Name()=="Dark_Photon"&&sigchoice=="Signal_Decay")){
 	            if(proddist=="proton_brem"){
+					string dark_axion_signal_string = "Dark_Photon";//This thing is getting killed as soon as possible.
 	                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
 	                cout << DMGen->Channel_Name() << endl;
 	            }
@@ -440,7 +442,7 @@ int main(int argc, char* argv[]){
 				return -1;
 			}
 
-			std::shared_ptr<list<production_distribution> > distmodlist = proditer-> Get_Dist_Mods_List();
+			std::shared_ptr<list<production_distribution> > distmodlist = proditer->Get_Dist_Mods_List();
 			for(list<production_distribution>::iterator distiter = distmodlist->begin(); distiter!=distmodlist->end();distiter++){
 				list<std::shared_ptr<Distribution> > distlist;
 				if(distiter->name()=="position_offset"){
@@ -521,16 +523,16 @@ int main(int argc, char* argv[]){
 	    else if(sigchoice=="Signal_Decay"){
 	        double lifetime;
 	        vector<double> Branching_Ratios;
-	        vector<vector<Particle> > Final_States;
+	        vector<vector<Particle> > Final_States;/*
 	        if(par->Model_Name()=="Axion_Dark_Photon"){
 	            lifetime=adp.Lifetime();
 	            adp.Branching_Ratios(Branching_Ratios);
 	            adp.Final_States(Final_States);
 	            sig_part_name = dark_axion_signal_string;
 	            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
-	        }
+	        }*/
 	        //More temporary stuff ugh
-	        else if(par->Model_Name()=="Dark_Photon"){
+	        if(par->Model_Name()=="Dark_Photon"){
 	            cout << "Setting up signal decay!"  << endl;
 	            
 	            Particle electron(MASS_ELECTRON);
@@ -544,9 +546,6 @@ int main(int argc, char* argv[]){
 
 	            Particle hadronic(0);
 	            hadronic.name = "Hadronic Stuff";
-	            
-	            //PLaceholder
-	            sig_part_name = dark_axion_signal_string;
 	            
 	            double GV = Gamma_V(mv,mdm,kappa,alD);
 	            lifetime=hbar/GV;
@@ -682,8 +681,10 @@ int main(int argc, char* argv[]){
         BURN_MAX = 0;
         cout << "Detector_Mode selected.\nSkipping Burn-In.\n";
     }
-
-    
+    //This bit should be deprecated once everything moves over to model classes.
+    if(sig_part_vec.empty()){
+	    sig_part_vec.push_back(sig_part_name);
+	}
 
     double BURN_OVERRIDE = par->Burn_Timeout();
 	for(int i=0;BURN_MAX!=0&&i<chan_count; i++){
@@ -702,7 +703,7 @@ int main(int argc, char* argv[]){
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
 				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
-                    if(burniter->name==sig_part_name){
+                    if(std::find(sig_part_vec.begin(),sig_part_vec.end(), burniter->name)!=sig_part_vec.end()){
                         SigGen->probscatter(det, *burniter);
 						nburn++;
 					}
@@ -761,7 +762,7 @@ int main(int argc, char* argv[]){
                 //Yes, this list is named vec.  
                 for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
                 //The way this is structured means I can't do my usual repeat thing to boost stats. 
-                    if(iter->name.compare(sig_part_name)==0){
+                    if(std::find(sig_part_vec.begin(),sig_part_vec.end(), iter->name)!=sig_part_vec.end()){
                         //iter->report(logging);
                         NDM_list[i]++;
                         if(outmode=="dm_detector_distribution"){
@@ -855,9 +856,6 @@ int main(int argc, char* argv[]){
 		else{
 			*summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
 		}
-        if(par->Model_Name()=="Axion_Dark_Photon"){
-            adp.Report(*summary_out, signal);
-        }
     }
 //    if(outmode=="summary"||outmode=="comprehensive"){
 //        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
