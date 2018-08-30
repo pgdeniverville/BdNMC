@@ -736,14 +736,14 @@ def execute_numi(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
-    vmarr=[30]
+    vmarr=[60]
     epsarr=[1e-3]
     massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[90,30,1e-3],[600,200,1e-3]]
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "sumlog" : "Scatter_Events/miniboone_numi_high.dat", "model" : "Dark_Photon","min_scatter_energy" : 0.05, "max_scatter_energy" : 100, "min_scatter_angle" : 0, "ptmax" : 5});
     #d_low=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 10000,  "sumlog" : "Claudia/nova_scatter_events.dat", "model" : "Dark_Photon","min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "min_scatter_angle" : 0, "ptmax" : 5});
-    d=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 5, "efficiency" : 1, "alpha_D" : 0.05, "POT" : 3e20, 'sumlog' : "Claudia_low_cut/test.dat"});
+    d=({"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "min_scatter_energy" : 0.5, "max_scatter_energy" : 15, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 6e21, 'sumlog' : "Claudia_low_cut/test.dat"});
     #d_high=({"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 5, "max_scatter_energy" : 15, "efficiency" : 1, "alpha_D" : 0.05, "POT" : 3e20, 'sumlog' : "Claudia_high_cut/nova_elec_high_2.dat"});
     #d_low=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 100, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d_miniboone=({"signal_chan" : "NCE_electron", "det_switch" : "miniboone_numi", "output_mode" : "summary", "samplesize" : 1000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 10, "efficiency" : 0.35, "alpha_D" : 0.5, "POT" : 6e20,"channels" : [_pion_decay,_eta_decay,_brem,_parton], "sumlog" : "Events/mini_numi_electron.dat", "ptmax" : 5, "burn_max" : 100});
@@ -904,8 +904,8 @@ def execute_lanl(genlist=True):
         lanl_eval(d)
 
 #execute_lanl(genlist=True)
-execute_lsnd(genlist=False)
-#execute_numi(genlist=False)
+#execute_lsnd(genlist=False)
+execute_numi(genlist=False)
 #execute_ship(genlist=True)
 #execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
