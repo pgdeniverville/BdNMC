@@ -182,7 +182,7 @@ void Particle::Lorentz(double beta, double betax, double betay, double betaz){
 }
 //Need to test that this works, but should be fine!
 
-void Particle::Lorentz2(Particle& parent){
+void Particle::Lorentz(Particle& parent){
     double gamma = parent.E/parent.m;
     double beta = sqrt(1.0-1.0/gamma/gamma);
     cout << beta << endl;

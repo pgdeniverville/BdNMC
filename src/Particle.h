@@ -31,7 +31,6 @@ public:
     void     ThreeMomentum(double PX, double PY, double PZ);
     void	 ThreeMomentumPolar(double mom, double theta, double phi);
 	void     Lorentz(Particle&);
-    void     Lorentz2(Particle&);
     void     Lorentz(double beta, double betax, double betay, double betaz);
     void     Rotate_x(double);
     void     Rotate_y(double);
