@@ -97,8 +97,7 @@ Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mas
     tau = lifetime;
 }
 
-bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
-    Particle parent = Particle(part);
+bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& parent){
     parent.name = Part_Name;
 
     double decay_time=tau*log(1/(1-Random::Flat()));
@@ -108,9 +107,10 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
     parent.END_SET=true;
     parent.Set_Time(decay_time*boost);
 
-    if(record_parent)
-        vec.push_back(parent);
+//    cout << "decay distance = " << decay_time*boost*parent.Speed()*speed_of_light << endl;
 
+    if(record_parent)
+        vec.push_back(Particle(parent));
 
     TwoBodyDecay(parent, daughter1, daughter2);
     bool intersect=false;

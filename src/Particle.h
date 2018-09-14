@@ -31,12 +31,14 @@ public:
     void     ThreeMomentum(double PX, double PY, double PZ);
     void	 ThreeMomentumPolar(double mom, double theta, double phi);
 	void     Lorentz(Particle&);
+    void     Lorentz2(Particle&);
     void     Lorentz(double beta, double betax, double betay, double betaz);
     void     Rotate_x(double);
     void     Rotate_y(double);
     void     Rotate_z(double);
     void     Rotate(Particle&);
     void     report(std::ostream&) const;
+    void     report(){report(std::cout);}
     //void    Generate_4Vector(double s);
 	void 	Set_Origin(double x, double y, double z);
 //    void    Set_Position(double x, double y, double z);

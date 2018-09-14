@@ -27,17 +27,17 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     daughter2 = Particle(Daughter2);
     daughter3 = Particle(Daughter3);
     
-    //Double differential width/dm12/dcost
+    //Double differential width/dm12/dcos(theta)
     function<double(double, double)> d2width = bind(d_decay_width_2,amplitude,_1,_2,mother.m,daughter1.m,daughter2.m,daughter3.m);
-//  cout << mother.width << endl;
 
-    int n=800;
+    int n=100;
     double resx = ((mother.m-daughter3.m) - (daughter1.m+daughter2.m))/n;
 
     double resy = 2.0/n;
     double tot=0.0;
     for(int nx=0; nx<n; nx++){
         for(int ny=0; ny<n; ny++){
+            //cout << (daughter1.m+daughter2.m)+nx*resx << " " << -1+ny*resy << " " <<  d2width((daughter1.m+daughter2.m)+nx*resx,-1+ny*resy) << endl;
             tot+=d2width((daughter1.m+daughter2.m)+nx*resx,-1+ny*resy);
         }
     }
@@ -76,12 +76,12 @@ void Three_Body_Decay_Gen::Toggle_Daughter_Decay(int index, std::shared_ptr<DMGe
     }
     else{
         std::cerr << "Toggle_Daughter_Decay index must be 1, 2 or 3. Index supplied was " << index << endl;
+        throw -1;
     }
 }
 
 
-bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part){
-    Particle parent = Particle(part);
+bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& parent){
     parent.name = mother.name;
 
 /*
@@ -105,11 +105,11 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
     parent.Set_Time(decay_time*boost);
 
     if(record_parent){
-        vec.push_back(parent);
+        vec.push_back(Particle(parent));
     }
 
     Three_Body_Decay(parent, daughter1, daughter2, daughter3, pmax, amp);
-/*
+
     std::list<Particle>::iterator bookmark = vec.end();
     if(d1_unstable&&(d1_decay->GenDM(vec, det_int, daughter1))){
         vec.insert(bookmark,daughter1);
@@ -123,7 +123,7 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
         vec.insert(bookmark,daughter3);
         bookmark = vec.end();
     }
-*/
+
 /*
     cout << "Report on THREE_BODY_DECAY\n";
 

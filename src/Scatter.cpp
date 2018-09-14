@@ -19,6 +19,7 @@ void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::fun
         double E_r_max=ER_Max(iter);
         //cout << iter << " " << E_r_min << " " << E_r_max << " " << 2*pow(MASS_ELECTRON,2)-2*MASS_ELECTRON*E_r_min << " " << 2*pow(MASS_ELECTRON,2)-2*MASS_ELECTRON*E_r_max << endl;
         if(E_r_min>=E_r_max){
+            //cout << "cross = 0\n";
             vec_cross.push_back(0);
             vec_maxima.push_back(0);
             continue;
@@ -30,7 +31,7 @@ void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::fun
 
         vec_cross.push_back(DoubleExponential_adapt(f,E_r_min,E_r_max,200,0.1,1e-4));
 
-        //cout << vec_cross.back() << endl;
+        //cout << "cross = " << vec_cross.back() << endl;
 
         a=E_r_min; b=(E_r_max+E_r_min)/2.0;
 

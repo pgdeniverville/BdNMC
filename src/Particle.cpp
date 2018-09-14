@@ -140,51 +140,57 @@ void Particle::Set_Time(double t){
 //Optimize the lorentz transformations at a later date, I can squeeze more speed out of these.
 void Particle::Lorentz(double beta, double betax, double betay, double betaz){
     
-    double E2 = E;
-    double p2x = px;
-    double p2y = py;
-    double p2z = pz;
-    double E3, p3x, p3y, p3z;       
-    double gamma, v;
-    double vx, vy, vz;  
-    double Lam11, Lam12, Lam13, Lam14;  
-    double Lam21, Lam22, Lam23, Lam24;  
-    double Lam31, Lam32, Lam33, Lam34;
-    double Lam41, Lam42, Lam43, Lam44;  
-    gamma = 1/sqrt(1-beta*beta);
-    v = beta;
     if(beta==0.0)
         return;
-    vx = betax;
-    vy = betay;
-    vz = betaz;
+    double gamma = 1/sqrt(1-beta*beta);
 
- //   cout << "gamma = " << gamma << " v = " << v << " vx = " << vx << " vy = " << vy << " vz = " << vz << endl;
+    cout << "gamma=" << gamma << endl;
+    cout << beta << " " << betax << " " << betay << " " << " " << betaz << endl;
 
-    Lam11 = gamma;
-    Lam12 = gamma*vx;
-    Lam13 = gamma*vy;
-    Lam14 = gamma*vz;
-    Lam21 = gamma*vx;
-    Lam22 = 1+(gamma-1)*vx*vx/v/v;
-    Lam23 = (gamma-1)*vx*vy/v/v;
-    Lam24 = (gamma-1)*vx*vz/v/v;
-    Lam31 = gamma*vy;
-    Lam32 = (gamma-1)*vy*vx/v/v;
-    Lam33 = 1+(gamma-1)*vy*vy/v/v;
-    Lam34 = (gamma-1)*vy*vz/v/v;
-    Lam41 = gamma*vz;
-    Lam42 = (gamma-1)*vz*vx/v/v;
-    Lam43 = (gamma-1)*vz*vy/v/v;
-    Lam44 = 1+(gamma-1)*vz*vz/v/v;
-    E3   = Lam11*E2+Lam12*p2x+Lam13*p2y+Lam14*p2z;  
-    p3x  = Lam21*E2+Lam22*p2x+Lam23*p2y+Lam24*p2z;  
-    p3y  = Lam31*E2+Lam32*p2x+Lam33*p2y+Lam34*p2z;  
-    p3z  = Lam41*E2+Lam42*p2x+Lam43*p2y+Lam44*p2z;
+    double nx = betax/beta;
+    double ny = betay/beta;
+    double nz = betaz/beta;
+
+    double Lam11 = gamma;
+    double Lam12 = gamma*betax;
+    double Lam13 = gamma*betay;
+    double Lam14 = gamma*betaz;
+    double Lam21 = Lam12;
+    double Lam22 = 1+(gamma-1)*nx*nx;
+    double Lam23 = (gamma-1)*nx*ny;
+    double Lam24 = (gamma-1)*nx*nz;
+    double Lam31 = Lam13;
+    double Lam32 = Lam23;
+    double Lam33 = 1+(gamma-1)*ny*ny;
+    double Lam34 = (gamma-1)*ny*nz;
+    double Lam41 = Lam14;
+    double Lam42 = Lam24;
+    double Lam43 = Lam34;
+    double Lam44 = 1+(gamma-1)*nz*nz;
+
+    cout << Lam11 << " " << Lam12 << " " << Lam13 << " " << Lam14 << endl;
+    cout << Lam21 << " " << Lam22 << " " << Lam23 << " " << Lam24 << endl;
+    cout << Lam31 << " " << Lam32 << " " << Lam33 << " " << Lam34 << endl;
+    cout << Lam41 << " " << Lam42 << " " << Lam43 << " " << Lam44 << endl;
+
+    double E2   = Lam11*E+Lam12*px+Lam13*py+Lam14*pz;
+    double p2x  = Lam21*E+Lam22*px+Lam23*py+Lam24*pz;  
+    double p2y  = Lam31*E+Lam32*px+Lam33*py+Lam34*pz;  
+    double p2z  = Lam41*E+Lam42*px+Lam43*py+Lam44*pz;
         
-    FourMomentum(p3x, p3y, p3z, E3);
+    FourMomentum(p2x, p2y, p2z, E2);
 }
+//Need to test that this works, but should be fine!
 
+void Particle::Lorentz2(Particle& parent){
+    double gamma = parent.E/parent.m;
+    double beta = sqrt(1.0-1.0/gamma/gamma);
+    cout << beta << endl;
+    if(beta==0)
+        return;
+    Lorentz(beta, parent.px/parent.E, parent.py/parent.E, parent.pz/parent.E);
+}
+/*
 void Particle::Lorentz(Particle& parent){
 	
 	double M1 = parent.m;
@@ -210,6 +216,8 @@ void Particle::Lorentz(Particle& parent){
     vx = p1x/E1;
 	vy = p1y/E1;
 	vz = p1z/E1;
+    cout << "gamma=" << gamma << endl;
+    cout << v << " " << vx << " " << vy << " " << vz << endl;
 
 //    cout << "gamma = " << gamma << " v = " << v << " vx = " << vx << " vy = " << vy << " vz = " << vz << endl;
 
@@ -233,10 +241,15 @@ void Particle::Lorentz(Particle& parent){
 	p3x  = Lam21*E2+Lam22*p2x+Lam23*p2y+Lam24*p2z;	
 	p3y  = Lam31*E2+Lam32*p2x+Lam33*p2y+Lam34*p2z;	
 	p3z  = Lam41*E2+Lam42*p2x+Lam43*p2y+Lam44*p2z;
+
+    cout << Lam11 << " " << Lam12 << " " << Lam13 << " " << Lam14 << endl;
+    cout << Lam21 << " " << Lam22 << " " << Lam23 << " " << Lam24 << endl;
+    cout << Lam31 << " " << Lam32 << " " << Lam33 << " " << Lam34 << endl;
+    cout << Lam41 << " " << Lam42 << " " << Lam43 << " " << Lam44 << endl;
 		
 	FourMomentum(p3x, p3y, p3z, E3);
 }
-
+*/
 void Particle::Rotate_x(double psi){
     double zr = pz*cos(psi)+py*sin(psi);
     double yr = py*cos(psi)-pz*sin(psi);

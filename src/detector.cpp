@@ -197,10 +197,20 @@ double detector_cylinder::Ldet (Particle &DM){
             crossings[0] = crossings[1];
             crossings[1] = tmp;
         }
+/* DEBUG STUFF
+        if(DM.END_SET){
+            cout << "DM_SET!\n";
+            DM.report(cout);
+            cout << "Decay Time = " << DM.dec_time << " Momentum  " << sqrt(ip(b,b)) << " " << DM.Momentum() << " Decay distance = " << DM.dec_time*sqrt(ip(b,b)) << " crossings= " << crossings[0] << " " <<crossings[1] << " distances = " << crossings[0]*sqrt(ip(b,b)) << " " << crossings[1]*sqrt(ip(b,b)) << endl;
+
+        }
+*/
 
         if(DM.END_SET&&DM.dec_time<crossings[1]){
-            if(DM.dec_time<crossings[0])
+            if(DM.dec_time<crossings[0]){
+                //cout << "Miss due to early decay\n";
                 return 0.0;
+            }
             crossings[1]=DM.dec_time;
         }
 

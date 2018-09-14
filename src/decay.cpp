@@ -216,6 +216,7 @@ namespace Three_Body_Decay_Space{
         if(m12<=m1+m2){
             return 0;
         }
+        //cout << endl << "d_decay_width_2 test " << amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3),m0,m1,m2,m3) << " " << m12*m12 << " " << Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3) << " " << p2p3(m12*m12,cos_t,m0,m1,m2,m3) << " " << p1star(m12,m1,m2) << " " << p3rest(m12,m0,m3) << " " << 1/(pow(2*pi,5)*16*m0*m0) << endl;
         return amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3),m0,m1,m2,m3)/(pow(2*pi,5)*16*m0*m0)*p1star(m12,m1,m2)*p3rest(m12,m0,m3);
     }
 

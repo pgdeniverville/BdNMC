@@ -104,7 +104,8 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
         if(total > pMax){
             pMax = total;
         }
-        
+        //cout << "Accepted for scattering\n";
+        //part.report(cout);
         double u=Random::Flat(0,1);
         double p=0; 
         for(int i = 0; i < chan_number; i++){
@@ -118,6 +119,10 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
                     return false;
                 }
                 scatterevent(part, target_mass[i], recoil,recoil2,Xsec,cross_maxima[i]);
+                //recoil.report(cout);
+                //recoil2.report(cout);
+                //Stop cycling through channels once we have a hit.
+                break;
             }
         }
         return true;
@@ -126,12 +131,15 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
 }
 
 void Two_to_Two_Scatter::scatterevent (Particle &part, double targ_mass, Particle &recoil, Particle &recoil2, std::function<double(double)> Xsec,std::function<double(double)> Xmax){
-    double Efmax = scatmax(part.E, part.m, targ_mass, recoil.m, recoil2.m);
-    double Efmin = scatmin(part.E, part.m, targ_mass, recoil.m, recoil2.m); 
-    double dsigmax = std::max(Xsec(Efmax),Xmax(part.E));
+    double Efmax = scatmax(part.E, part.m, targ_mass, recoil2.m,recoil.m);
+    double Efmin = scatmin(part.E, part.m, targ_mass, recoil2.m, recoil.m); 
+    double dsigmax = Xmax(part.E);
     double xe,thetaN,phiN,pN;
+    //part.report(); 
+    //cout << "Efmax=" << Efmax << " Efmin = " << Efmin << endl;
     while(true){
         xe = Random::Flat(Efmin,Efmax);//Recoil energy
+        //cout << "xe = " << xe << " dsigmax = " << dsigmax << " Xsec = " << Xsec(xe) << endl; 
         if(Xsec(xe)/dsigmax > Random::Flat(0,1)){
             thetaN =  Theta_from_E4(part.E, xe, part.m, targ_mass, recoil2.m, recoil.m);
             phiN = Random::Flat(0,1)*2*pi;
@@ -151,5 +159,6 @@ double Two_to_Two_Scatter::scatmax(double E1, double m1, double m2, double m3, d
 }
 
 double Two_to_Two_Scatter::scatmin(double E1, double m1, double m2, double m3, double m4){
+    //cout << "Escatmin = " << Escatmin << endl; 
     return(std::max(Escatmin,E4min(E1,m1,m2,m3,m4)));
 }

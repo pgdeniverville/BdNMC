@@ -55,11 +55,17 @@ namespace two_to_two_scattering{
 
     double t0(double E1lab, double m1, double m2, double m3, double m4){
         double s = s_lab(E1lab, m1, m2);
+        if(s<pow(m3+m4,2)){
+            return 0;
+        }
         return pow((m1*m1-m3*m3-m2*m2+m4*m4)/(2*sqrt(s)),2) - pow(p1cm(E1lab, m1, m2)-p3cm(E1lab, m1, m2, m3, m4),2);
     }
 
     double t1(double E1lab, double m1, double m2, double m3, double m4){
         double s = s_lab(E1lab, m1, m2);
+        if(s<pow(m3+m4,2)){
+            return 0;
+        }
         return pow((m1*m1-m3*m3-m2*m2+m4*m4)/(2*sqrt(s)),2) - pow(p1cm(E1lab, m1, m2)+p3cm(E1lab, m1, m2, m3, m4),2);
     }
 
@@ -91,11 +97,16 @@ namespace two_to_two_scattering{
 
     //Need to check that these are correct, might need to swap t0 and t1. t1 gives E3min, so that should be E4max.
     double E4min(double E1lab, double m1, double m2, double m3, double m4){
-        //cout << E1lab << " " << s_lab(E1lab, m1, m2) << " " << t0(E1lab, m1, m2, m3, m4) << " " << E4_from_t(m2, m4, t0(E1lab, m1, m2, m3, m4)) << " " << t1(E1lab, m1, m2, m3, m4) << " " << E4_from_t(m2, m4, t1(E1lab, m1, m2, m3, m4)) << " " << p1cm(E1lab,  m1,  m2) << " " <<  E3cm( E1lab,  m1,  m2,  m3,  m4) << endl;
+        //cout << E1lab << " " << s_lab(E1lab, m1, m2) << " " << t0(E1lab, m1, m2, m3, m4) << " " << E4_from_t(m2, m4, t0(E1lab, m1, m2, m3, m4)) << " " << t1(E1lab, m1, m2, m3, m4) << " " << E4_from_t(m2, m4, t1(E1lab, m1, m2, m3, m4)) << " m2,m3,m4? " << m2 << " " << m3 << " " << m4 << endl;
         return E4_from_t(m2, m4, t0(E1lab, m1, m2, m3, m4));
     }
 
     double E4max(double E1lab, double m1, double m2, double m3, double m4){
+        //cout << p1cm(E1lab, m1, m2) << " " << p3cm(E1lab, m1, m2, m3, m4) << " " << E3cm(E1lab,m1,m2,m3,m4) << " t1lab = " << t1(E1lab, m1, m2, m3, m4) << endl;
+        //This returns nonsensical results if E3cm is too small.
+        if(E3cm(E1lab,m1,m2,m3,m4)<m3){
+            return 0;
+        }
         return E4_from_t(m2, m4, t1(E1lab, m1, m2, m3, m4));
     }
 }

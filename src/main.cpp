@@ -78,6 +78,7 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 */
+
     //std::ofstream logging("log2.dat", std::ofstream::out);
 	using namespace std::placeholders;
     string parameter_file;
