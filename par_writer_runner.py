@@ -708,11 +708,13 @@ def execute_ship(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_ship.dat"]}
         write_ship(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    massarr=[[600,200,1e-3]]
-    d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    mvarr = [1,5,134,135+545]+[x for x in range(10,131,10)]+[x for x in range(140,200,20)]+[200,650,25]
+    massarr=[[mv,mv/3.0,1e-3] for mv in mvarr]
+    #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
+    d=({"channels" : [_pion_decay, _eta_decay] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon"})
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d.update({"det_switch" : "test_sphere"})
+        d.update({"det_switch" : "ship"})
         ship_eval(d)
 
 
@@ -842,11 +844,11 @@ def execute_coherent(genlist=True):
         write_coherent(d=d)
         subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
-    vmassarr=[170,180,190,200,225,250]
+    vmassarr=[10,30,60,90]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "csi1T", "samplesize" : 2000, "sumlog" : "Events/coherent_CsI_1T.dat"}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "Ar", "samplesize" : 10000, "sumlog" : "Events_coherent/coherent_Ar_1T.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 1e-6, "max_scatter_energy" : 0.05, "output_mode" : "comprehensive", "coherent" : "true", "POT" : 1e22, "model" : "Dark_Photon"}
         coherent_eval(d)
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
@@ -904,9 +906,9 @@ def execute_lanl(genlist=True):
         lanl_eval(d)
 
 #execute_lanl(genlist=True)
-execute_lsnd(genlist=False)
+#execute_lsnd(genlist=False)
 #execute_numi(genlist=False)
-#execute_ship(genlist=True)
+#execute_ship(genlist=False)
 #execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
-#execute_coherent(genlist=False)
+execute_coherent(genlist=False)

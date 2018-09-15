@@ -144,9 +144,6 @@ void Particle::Lorentz(double beta, double betax, double betay, double betaz){
         return;
     double gamma = 1/sqrt(1-beta*beta);
 
-    cout << "gamma=" << gamma << endl;
-    cout << beta << " " << betax << " " << betay << " " << " " << betaz << endl;
-
     double nx = betax/beta;
     double ny = betay/beta;
     double nz = betaz/beta;
@@ -168,11 +165,6 @@ void Particle::Lorentz(double beta, double betax, double betay, double betaz){
     double Lam43 = Lam34;
     double Lam44 = 1+(gamma-1)*nz*nz;
 
-    cout << Lam11 << " " << Lam12 << " " << Lam13 << " " << Lam14 << endl;
-    cout << Lam21 << " " << Lam22 << " " << Lam23 << " " << Lam24 << endl;
-    cout << Lam31 << " " << Lam32 << " " << Lam33 << " " << Lam34 << endl;
-    cout << Lam41 << " " << Lam42 << " " << Lam43 << " " << Lam44 << endl;
-
     double E2   = Lam11*E+Lam12*px+Lam13*py+Lam14*pz;
     double p2x  = Lam21*E+Lam22*px+Lam23*py+Lam24*pz;  
     double p2y  = Lam31*E+Lam32*px+Lam33*py+Lam34*pz;  
@@ -185,7 +177,6 @@ void Particle::Lorentz(double beta, double betax, double betay, double betaz){
 void Particle::Lorentz(Particle& parent){
     double gamma = parent.E/parent.m;
     double beta = sqrt(1.0-1.0/gamma/gamma);
-    cout << beta << endl;
     if(beta==0)
         return;
     Lorentz(beta, parent.px/parent.E, parent.py/parent.E, parent.pz/parent.E);

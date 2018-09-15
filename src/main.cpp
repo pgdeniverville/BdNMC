@@ -210,7 +210,7 @@ int main(int argc, char* argv[]){
 	double min_scatter_energy = par->Min_Scatter_Energy();
 	double min_angle = par->Min_Angle();
 	double max_angle = par->Max_Angle();
-	if((par->Model_Name())!="Dark_Photon"){
+	if((par->Model_Name())!="Dark_Photon"&&par->Model_Name()!="Dark_Photon_DM"){
 		cout << "Setting up model " << par->Model_Name() << endl;
 		if(par->Model_Name()=="Pseudoscalar_Mediator"){
 			std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
@@ -601,8 +601,6 @@ int main(int argc, char* argv[]){
 		}
 	    
 	}//End of setup.
-	
-	cout << "Exited the setup loop successfully!" << endl;
 
 	SigGen->set_angle_limits(min_angle, max_angle);
 	SigGen->set_energy_limits(min_scatter_energy, max_scatter_energy);
@@ -613,7 +611,7 @@ int main(int argc, char* argv[]){
     cout << "--------------------" << endl;
     cout << "Number of events to be generated = " << samplesize  << endl;
     //This will eventually be default.
-    if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
+    if(par->Model_Name()!="Dark_Photon"&&par->Model_Name()!="Axion_Dark_Photon"){
     	model->Report_Model();
     }
     else{
@@ -828,7 +826,7 @@ int main(int argc, char* argv[]){
 		cout << "Events: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||
                 outmode=="comprehensive"){
-			if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
+			if(par->Model_Name()!="Dark_Photon"&&par->Model_Name()!="Axion_Dark_Photon"){
 				//This is temporary.
     			*summary_out << DMGen_list[i]->Channel_Name() << " ";
     			model->Report(*summary_out);
@@ -849,7 +847,7 @@ int main(int argc, char* argv[]){
 
 	if(outmode=="summary"||outmode=="dm_detector_distribution"||
             outmode=="comprehensive"){
-		if(par->Model_Name()!="Dark_Photon"||par->Model_Name()!="Axion_Dark_Photon"){
+		if(par->Model_Name()!="Dark_Photon"&&par->Model_Name()!="Axion_Dark_Photon"){
 			*summary_out << "Total ";
 			model->Report(*summary_out);
 			*summary_out << signal << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
