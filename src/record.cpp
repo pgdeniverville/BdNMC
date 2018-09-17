@@ -12,7 +12,7 @@ ostream& Record_Particles(ostream& outstr, list<Particle> &partlist){
         outstr << std::setfill(' ') << std::left;
         outstr << setw(MAXWIDTH) << it->name << setw(MAXWIDTH) << it->px << setw(MAXWIDTH) << it->py << setw(MAXWIDTH) << it->pz << setw(MAXWIDTH) << it->E;
         //if(it->EVENT_SET){
-            outstr << setw(MAXWIDTH) << it->origin_coords[0] << setw(MAXWIDTH) << it->origin_coords[1] << setw(MAXWIDTH) << it->origin_coords[2] << setw(MAXWIDTH) << it->origin_coords[3];
+            outstr << setw(MAXWIDTH) << it->origin_coords[0] << setw(MAXWIDTH) << it->origin_coords[1] << setw(MAXWIDTH) << it->origin_coords[2] << setw(MAXWIDTH) << it->origin_coords[3] << " " << it->E-it->m;
         //}
         outstr << endl;
     }
