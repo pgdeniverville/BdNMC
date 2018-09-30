@@ -8,6 +8,7 @@
 #include <exception>
 #include <numeric>
 #include <memory>
+#include <climits>
 
 #include "record.h"
 
@@ -724,7 +725,7 @@ int main(int argc, char* argv[]){
 		*comprehensive_out << "Run " << par->Run_Name() << endl;
     }	
 
-    int trials = 0;
+    long long int trials = 0;
     vector<long> trials_list(chan_count,0);
 	vector<int> scat_list(chan_count,0);
     int nevent=0;
@@ -733,7 +734,11 @@ int main(int argc, char* argv[]){
 	
 	//int escat=0;lso thought it could have used Leatherhead, or some of the other mutanimals. He probably would have fit right in with the Scale tail clan.
     bool scatter_switch;
-    int trials_max = par->Max_Trials();
+    long long int trials_max = par->Max_Trials();
+    if(trials_max<0){
+        trials_max = LLONG_MAX;
+        cout << "Setting trials to " << trials_max << endl;
+    }
 	//if(SigGen->get_pMax()*Vnumtot<=1){
     if(SigGen->get_pMax()<=0 && outmode!="dm_detector_distribution"){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";

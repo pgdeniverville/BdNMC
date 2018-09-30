@@ -93,7 +93,7 @@ class Parameter{
 		int Sample_Size(){return samplesize;}
 		int Burn_In(){return burn_in;}
 		int Burn_Timeout(){return burn_timeout;}
-		int Max_Trials(){return max_trials;}
+		long long int Max_Trials(){return max_trials;}
 		int Repeat(){return repeat;}
         int Seed(){return seed;}
 		double Protons_on_Target(){return POT;}
@@ -129,7 +129,7 @@ class Parameter{
 		int repeat;
 		int seed;
 		int sample_gen;
-		int max_trials;
+	    long long int max_trials;
 		double meson_per_pi0;
         std::string output_file;
         std::string summary_file;
@@ -166,9 +166,11 @@ class Parameter{
 		//void parse_parameter_file(const std::string &, std::map<std::string, std::string> &parammap);
         void Set_Double(const std::string &, double &, std::map<std::string, std::string> &keymap);
         void Set_Integer(const std::string &, int &, std::map<std::string, std::string> &keymap);
+        void Set_Long(const std::string &, long long int &, std::map<std::string, std::string> &keymap);
         void Set_Bool(const std::string &, bool &, std::map<std::string, std::string> &keymap, const bool &def);
         void Set_Double(const std::string &, double &, std::map<std::string, std::string> &keymap, const double &def);
         void Set_Integer(const std::string &, int &, std::map<std::string, std::string> &keymap, const int &def);
+        void Set_Long(const std::string &, long long int &, std::map<std::string, std::string> &keymap, const long long int &def);
 		void Set_String(const std::string &, std::string &, std::map<std::string, std::string> &keymap, const std::string &def);
 		void Set_Model_Parameters(std::map<std::string, std::string> &keymap);
         void Build_Detector(std::map<std::string, std::string> &keymap);

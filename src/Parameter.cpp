@@ -417,7 +417,7 @@ Parameter::Parameter(std::ifstream &instream){
 		Set_Integer(repeat_key, repeat, keymap, 1);
 		Set_Integer(seed_key, seed, keymap, -1);
 		
-		Set_Integer(max_trials_key,max_trials,keymap,-1);
+		Set_Long(max_trials_key,max_trials,keymap,-1);
 
 		Set_Double(efficiency_key, efficiency, keymap, 1.0);
 		Set_Double(meson_per_pi0_key, meson_per_pi0, keymap, -1.0);
@@ -577,6 +577,23 @@ void Parameter::Set_Integer(const string &key, int &var, map<string, string> &ke
     }
 }
 
+void Parameter::Set_Long(const string &key, long long int &var, map<string, string> &keymap){
+    try{
+        if(keymap.count(key)==1){
+            var = stoll(keymap[key]);
+        }
+        else{
+            cerr << key << " not set." << endl;
+            integrity = -1;
+        }
+    }
+    catch(exception& e){
+            cerr << "Invalid model parameter: " << key << endl;
+            integrity = -1;
+    }
+}
+
+
 void Parameter::Set_Integer(const string &key, int &var, map<string, string> &keymap, const int &def){
     try{
         if(keymap.count(key)==1){
@@ -591,6 +608,22 @@ void Parameter::Set_Integer(const string &key, int &var, map<string, string> &ke
             integrity = -1;
     }
 }
+
+void Parameter::Set_Long(const string &key, long long int &var, map<string, string> &keymap, const long long int &def){
+    try{
+        if(keymap.count(key)==1){
+            var = stoll(keymap[key]);
+        }
+        else{
+            var = def;
+        }
+    }
+    catch(exception& e){
+            cerr << "Invalid model parameter: " << key << endl;
+            integrity = -1;
+    }
+}
+
 
 void Parameter::Set_String(const string &key, string &var, map<string, string> &keymap, const string &def){
 	if(keymap.count(key)==1)

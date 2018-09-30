@@ -709,11 +709,11 @@ def execute_ship(genlist=True):
         write_ship(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #mvarr = [1,5,134,135,545]+[x for x in range(10,131,10)]+[x for x in range(140,200,20)]+[x for x in range(200,650,25)]
-    mvarr = [10]
-    massarr=[[mv,mv/3.0,1e-3] for mv in mvarr]
+    mvarr = [100]
+    massarr=[[mv,mv/3.0,0.0033] for mv in mvarr]
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
     #d=({"channels" : [_pion_decay, _eta_decay] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angler" : 0.02})
-    d=({"channels" : [_pion_decay, _eta_decay] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "eps" : 0.0033, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angler" : 0.02})
+    d=({"channels" : [_pion_decay, _eta_decay,_brem] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angler" : 0.02})
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d.update({"det_switch" : "ship"})
@@ -851,7 +851,7 @@ def execute_coherent(genlist=True):
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "Ar", "samplesize" : 10000, "sumlog" : "Events_coherent/coherent_Ar_1T.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 0, "max_scatter_energy" : 0.05, "output_mode" : "comprehensive", "coherent" : "true", "POT" : 1e22, "model" : "Dark_Photon"}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "Ar", "samplesize" : 200000, "max_trials" : -1, "sumlog" : "Events_coherent/coherent_Ar_1T.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "output_mode" : "comprehensive", "coherent" : "true", "POT" : 1e22, "model" : "Dark_Photon"}
         coherent_eval(d)
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
@@ -911,7 +911,7 @@ def execute_lanl(genlist=True):
 #execute_lanl(genlist=True)
 #execute_lsnd(genlist=False)
 #execute_numi(genlist=False)
-execute_ship(genlist=False)
+#execute_ship(genlist=False)
 #execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
 #execute_coherent(genlist=False)
