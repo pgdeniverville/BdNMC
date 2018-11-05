@@ -34,10 +34,13 @@ double detector_sphere::Ldet (Particle &DM) {
 	double Ldetenter, Ldetexit;
     double A, B, C;	
 //cout << DM.name << " " << DM.E << " " << DM.px << " " << DM.py << " " << DM.pz << " " << DM.m << " " << DM.origin_coords[0] << " " << DM.origin_coords[1] << " " << DM.origin_coords[2] << " " << DM.origin_coords[3] << " " << DM.end_coords[0] << " " << DM.end_coords[1] << " " << DM.end_coords[2] << " " << DM.end_coords[3] << std::endl;
+
+    //cout << "Detector Report" << endl;
+    //DM.report(cout);
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
 	o[0]=r[0]-DM.origin_coords[0];o[1]=r[1]-DM.origin_coords[1];o[2]=r[2]-DM.origin_coords[2];
 	/*
-	for(int i=0; i<3; i++)
+    for(int i=0; i<3; i++)
 		cout << " r" << i << "=" << r[i];
 	
 	for(int i=0; i<3; i++)
@@ -47,15 +50,17 @@ double detector_sphere::Ldet (Particle &DM) {
 	for(int i=0; i<3; i++)
 		cout << " o" << i << "=" << o[i];
 	cout << endl;	
-	*/
+    */
     A = ip(b,b);
     B = -2*ip(o,b);
     C = ip(o,o)-pow(Rdet,2);
 	
+    //cout << A << " " << B << " " << C << endl;
+
 	if((pow(B,2)-4*A*C)<0||A==0){
         return 0.0;
     }
-	
+
 	//DM.report(std::cout);
 
     Ldetenter = (-B-sqrt(pow(B,2)-4*A*C))/(2*A); 

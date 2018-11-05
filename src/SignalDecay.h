@@ -57,12 +57,40 @@ class SignalDecay: public Scatter{
         void set_Model_Parameters(double lifetime, std::vector<double> branching_ratios, std::vector<std::vector<Particle> >);
 
        //void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, std::vector<Particle> &scat); 
-
+        double get_pMax(){return pMax;}
     private:
         std::vector<std::vector<Particle> > Final_States; 
         std::vector<double> Branching_Ratios;
         double Lifetime;
         std::vector<std::string> Channel_Name;
+        //std::vector<int> decay_counts;
+};
+
+
+//New and improved signal decay channel
+class SignalDecay_2: public Scatter{
+    public:
+        //The DMGenerators should be 2 or 3 body decay. Abusing it to generate those end states and add them to the partlist!
+        //At some point I could implement cuts on a per channel basis, would need to write some kind of cut class that took particle lists? 
+        //REMEMBER: Set the lifetime of DMGenerator objects to 0, so they decay immediately. The decay time was already calculated by SignalDecay_2!
+        SignalDecay_2(double lifetime, std::vector<std::shared_ptr<DMGenerator> >);
+        ~SignalDecay_2(){};
+
+        bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
+        bool probscatter(std::shared_ptr<detector>& det, Particle &Parent);
+
+        //The branching ratio of the final states we're looking for may be smaller than one!
+        double get_pMax(){return br_total*pMax;}
+
+        void set_Model_Parameters(double lifetime, std::vector<std::string> chan_names, std::vector<std::vector<Particle> >);
+
+       //void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, std::vector<Particle> &scat); 
+
+    private: 
+        double Lifetime,br_total;
+        std::vector<std::string> Channel_Name;
+        std::vector<std::shared_ptr<DMGenerator> > Channels;
+        double min_energy;
         //std::vector<int> decay_counts;
 };
 

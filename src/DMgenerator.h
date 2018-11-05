@@ -152,7 +152,7 @@ class Do_Nothing_Gen: public DMGenerator{
 //Defined in V_decay_gen.cpp
 class Two_Body_Decay_Gen: public DMGenerator{
     public:
-        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0); 
+        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0);
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
         //If true, then this daughter is checked for intersection with the detector.
         bool d1 = true;

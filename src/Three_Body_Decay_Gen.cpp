@@ -30,10 +30,11 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     //Double differential width/dm12/dcos(theta)
     function<double(double, double)> d2width = bind(d_decay_width_2,amplitude,_1,_2,mother.m,daughter1.m,daughter2.m,daughter3.m);
 
+    //Should probably make this adaptive in the future, at least increase the resolution once to check for accuracy.
     int n=100;
     double resx = ((mother.m-daughter3.m) - (daughter1.m+daughter2.m))/n;
 
-    double resy = 2.0/n;
+    double resy=2.0/n;
     double tot=0.0;
     for(int nx=0; nx<n; nx++){
         for(int ny=0; ny<n; ny++){
@@ -89,8 +90,12 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
 
     parent.report(cout);
 */
-    double decay_time=tau*log(1/(1-Random::Flat()));
-    double boost = 1/sqrt(1-pow(parent.Speed(),2));
+
+    if(tau>0){
+        double decay_time=tau*log(1/(1-Random::Flat()));
+        double boost = parent.E/parent.m;
+        parent.Increment_Time(decay_time*boost);
+    }
 /*
     cout << "decay_time = " << decay_time << endl;
     cout << "parent.Speed() = " << parent.Speed() << endl;
@@ -101,8 +106,7 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
 
     //cout << decay_time << " " << boost << endl;
  */
-    parent.END_SET=true;
-    parent.Set_Time(decay_time*boost);
+
 
     if(record_parent){
         vec.push_back(Particle(parent));
@@ -123,13 +127,14 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
         vec.insert(bookmark,daughter3);
         bookmark = vec.end();
     }
-
 /*
-    cout << "Report on THREE_BODY_DECAY\n";
-
-    daughter1.report(cout);
-    daughter2.report(cout);
-    daughter3.report(cout);
+    if(parent.name=="Dark_Photon"){
+        cout << "Report on THREE_BODY_DECAY\n";
+        parent.report();
+        daughter1.report(cout);
+        daughter2.report(cout);
+        daughter3.report(cout);
+    }
 */
     bool intersect=false;
     //Need to decay these daughter particles!
@@ -146,8 +151,7 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
     if(d3&&(det_int(daughter3)>0)){
         //cout << "daughter3 hit!\n";
         intersect=true;
-        vec.push_back(daughter3);
-        
+        vec.push_back(daughter3);    
     }
 /*
     cout << "EVENT GEN\n";

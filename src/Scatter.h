@@ -5,6 +5,7 @@
 #include "Particle.h"
 #include "Integrator.h"
 #include "Random.h"
+#include "DMgenerator.h"
 #include <memory>
 #include <vector>
 #include <list>
@@ -24,9 +25,14 @@ class Scatter{
 		virtual ~Scatter(){};
 		virtual bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&) = 0;
 		virtual bool probscatter(std::shared_ptr<detector>& det, Particle &DM) = 0;
+        void add_decay(const std::string parent_name, std::shared_ptr<DMGenerator> decay_gen){
+            parent_name_vec.push_back(parent_name);
+            decay_gen_vec.push_back(decay_gen);
+            decay=true;
+            }
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);}
-		double get_pMax(){return pMax;}
+		virtual double get_pMax(){return pMax;}
 		void set_pMax(double pm){pMax=pm;}
 		void set_angle_limits(double min, double max){min_angle=min;max_angle=max;}
 		void set_energy_limits(double min, double max){Escatmin=min; Escatmax=max;}
@@ -36,9 +42,13 @@ class Scatter{
 		//This tells the code to rotate the end state particle with 
 		//bool set_end_state(bool t){_End_state_with_DM_parallel_to_z=t;}
 	protected:	
+        //If true, then one of the recoil particles can be expected to decay.
+        bool decay;
 		double pMax, MDP, mdm, alD, kap;
 		double Escatmax, Escatmin,min_angle,max_angle;
 		//bool _End_state_with_DM_parallel_to_z=false;
+        std::vector<std::string> parent_name_vec;
+        std::vector<std::shared_ptr<DMGenerator> > decay_gen_vec;
 };
 
 //This should replace all the elastic scattering channels.
@@ -53,6 +63,7 @@ class Elastic_Scatter : public Scatter{
         bool probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil);
         bool probscatter(std::shared_ptr<detector>& det, Particle &part);
         void set_Model_Parameters(){};
+        double get_pMax(){return pMax;}
     private:
         double scatmax(double E1, double m1, double m2);
         double scatmin(double E1, double m1, double m2);
@@ -82,6 +93,7 @@ class Two_to_Two_Scatter : public Scatter{
         bool probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil, Particle &recoil2);
         double scatmax(double E1, double m1, double m2, double m3, double m4);
         double scatmin(double E1, double m1, double m2, double m3, double m4);
+        double get_pMax(){return pMax;}
     private:
         int chan_number;
 
@@ -127,6 +139,7 @@ class Nucleon_Scatter: public Scatter{
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
             generate_coherent_cross_sections(det);
         }
+        double get_pMax(){return pMax;}
 	private:
         bool coherent;
 		double scatmax(double);
@@ -166,6 +179,7 @@ class Inelastic_Nucleon_Scatter: public Scatter{
 		void set_Model_Parameters(double MDM, double MV, double alphaprime, double kappa){
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
 		}
+        double get_pMax(){return pMax;}
 	private:
 		void scatterevent(Particle &DM, Particle &nucleon, std::function<double(double)>, Linear_Interpolation&);
 		void load_cross_sections(const std::string &filename);
@@ -205,7 +219,7 @@ class Electron_Scatter: public Scatter{
 		bool probscatter(std::shared_ptr<detector>& det, std::list<Particle> &partlist, std::list<Particle>::iterator& it);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM, Particle &nucleon);
 		bool probscatter(std::shared_ptr<detector>& det, Particle &DM);
-		void get_pMax(){}
+        double get_pMax(){return pMax;}
 	private:
 		void scatterevent(Particle &DM, Particle &electron);
 		double scatmax(double, double);
@@ -226,6 +240,7 @@ class Pion_Inelastic: public Scatter{
 			mdm=MDM; MDP=MV; alD=alphaprime; kap=kappa; set_pMax(0);
 			generate_cross_sections();
 		}
+        double get_pMax(){return pMax;}
 	private:
 		double Ermax(double DM_Energy, double DM_Mass, double Nucleon_Mass);
 		double Ermin(double DM_Energy, double DM_Mass, double Nucleon_Mass);

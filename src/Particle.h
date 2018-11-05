@@ -43,7 +43,8 @@ public:
 //    void    Set_Position(double x, double y, double z);
 	void 	Set_Creation_Time(double t);
     //If END_SET=true, this also updates dec_time.
-    void    Set_Time(double t); 
+    void    Set_Time(double t);
+    void    Increment_Time(double t){END_SET=true; Set_Time(t+origin_coords[3]+end_coords[3]);} 
     double Momentum();
     double Speed();
     double Kinetic_Energy(){return E-m;}
@@ -56,6 +57,11 @@ public:
     double dec_time=0;//tracks when a particle is destroyed by scattering or decay if END_SET=true. Multiply by momentum() to retrieve distance.
     bool END_SET=false;//Indicates that this particle decays or scatters at a distance of Momentum()*dec_time.
     bool EVENT_SET;//I am going to have to be careful with this variable.
+    
+    //Going to revamp output soon. my_id will be its position in the particle list. Every particle will keep track of its parent. Option for both parents if produced in scattering, but parent_2 mostly unused.
+    int my_id=-1;
+    int parent_1_id=-1;
+    int parent_2_id=-1;
 };
 
 void Link_Particles(Particle &, Particle &);

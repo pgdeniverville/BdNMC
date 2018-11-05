@@ -25,6 +25,9 @@ void Model::Prepare_Model(Parameter& par){
         throw -1;
     }
 
+    std::sort( sig_part_vec.begin(), sig_part_vec.end() );
+    sig_part_vec.erase( unique( sig_part_vec.begin(), sig_part_vec.end() ), sig_part_vec.end() );
+
     std::shared_ptr<list<production_channel> > prodlist = par.Get_Production_List();   
     //int chan_count = prodlist->size(); 
 
@@ -60,6 +63,7 @@ void Model::Prepare_Model(Parameter& par){
 bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<Distribution>& Dist, Parameter& par){
     //Eventually all of the main distributions will be handled here.
     //Remember that proditer->func() becomes prodchan.func()!
+
     if(proddist=="proton_beam"){
         Dist = std::shared_ptr<Distribution>(new BeamDistribution(par.Beam_Energy(),MASS_PROTON));
     }

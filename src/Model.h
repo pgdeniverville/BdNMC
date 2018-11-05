@@ -93,7 +93,9 @@ class Axion_Dark_Photon : public Model{
         double eta_decay_width_2(double m12, double CosTheta, double m0, double m1, double m2, double m3);
 
         double A_to_a_gamma_width(double ma, double mA);
+        double A_to_a_elec_pos_amplitude(double m12s, double m23s, double mA, double me, double me2, double ma);
         double A_width(double ma, double mA);
+
 
         double Axion_DP_electron_Amp(double s, double t, double mA, double mR);
         double dsigma_a_to_DP(double E1lab, double E4, double mA, double mR);

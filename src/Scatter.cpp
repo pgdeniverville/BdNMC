@@ -15,6 +15,7 @@ void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::fun
     std::vector<double> vec_cross;
     std::vector<double> vec_maxima;
     for(double iter=E_in_min+E_in_res; iter<=E_in_max; iter+=E_in_res){
+
         double E_r_min=ER_Min(iter);
         double E_r_max=ER_Max(iter);
         //cout << iter << " " << E_r_min << " " << E_r_max << " " << 2*pow(MASS_ELECTRON,2)-2*MASS_ELECTRON*E_r_min << " " << 2*pow(MASS_ELECTRON,2)-2*MASS_ELECTRON*E_r_max << endl;

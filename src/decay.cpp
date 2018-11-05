@@ -220,7 +220,6 @@ namespace Three_Body_Decay_Space{
         return amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3),m0,m1,m2,m3)/(pow(2*pi,5)*16*m0*m0)*p1star(m12,m1,m2)*p3rest(m12,m0,m3);
     }
 
-    //Still incomplete, need to include possible decays of daughter particles.
     void Three_Body_Decay(Particle &parent, Particle &daughter1, Particle &daughter2, Particle &daughter3, double &d_width_max, std::function<double(double, double, double, double, double, double)> &amp){
         
         double d_width = 0;

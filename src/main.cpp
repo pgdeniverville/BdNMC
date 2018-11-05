@@ -44,7 +44,7 @@ using std::cout;    using std::endl;
 using std::vector;  using std::string;
 using std::bind;    using std::function;
 using std::list;    using std::vector;
-using std::exception;
+using std::exception; using std::next;
 using std::cerr;
 
 //const double mp = MASS_PROTON;
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]){
     	if(!comprehensive_out->is_open()){
         	cout << "Unable to open output file: " << output_filename << endl;
         	parstream.close();
-        	return 1;
+        	return -1;
     	}
 	}
     
@@ -611,7 +611,7 @@ int main(int argc, char* argv[]){
     cout << "--------------------" << endl;
     cout << "Number of events to be generated = " << samplesize  << endl;
     //This will eventually be default.
-    if(par->Model_Name()!="Dark_Photon"&&par->Model_Name()!="Axion_Dark_Photon"){
+    if(par->Model_Name()!="Dark_Photon"){
     	model->Report_Model();
     }
     else{
@@ -643,7 +643,7 @@ int main(int argc, char* argv[]){
 	if(!summary_out->is_open()){
         cerr << "Unable to open output file: " << summary_filename << endl;
         parstream.close();
-        return 1;
+        return -1;
     }
 
 	////////////////////
@@ -686,6 +686,12 @@ int main(int argc, char* argv[]){
 	}
 
     double BURN_OVERRIDE = par->Burn_Timeout();
+
+    if(Vnumtot< par->Min_Event()){
+    	cout << "Fewer than " << par->Min_Event() << " events possible, skipping BURN_IN and setting pMax=0 to skip run.\n";
+    	BURN_MAX=0;
+    }
+
 	for(int i=0;BURN_MAX!=0&&i<chan_count; i++){
         int nburn = 0;
 		if(Vnum_list[i]==0){
@@ -695,16 +701,20 @@ int main(int argc, char* argv[]){
 		else{
 			cout << "Begin Channel " << i+1 << " Burn-In" << endl;
 		}
+		list<Particle>::iterator burniter;
+		list<Particle>::iterator nextit;
 		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
             list<Particle> vecburn;
 			Particle dist_part (0);
 			PartDist_list[i]->Sample_Particle(dist_part);
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
-				for(list<Particle>::iterator burniter = vecburn.begin(); burniter != vecburn.end(); burniter++){
+				burniter = vecburn.begin();
+				for(nextit=next(burniter); burniter != vecburn.end(); burniter=nextit++){
                     if(std::find(sig_part_vec.begin(),sig_part_vec.end(), burniter->name)!=sig_part_vec.end()){
                         SigGen->probscatter(det, *burniter);
 						nburn++;
+						//burniter=next;
 					}
 				}
 			}
@@ -735,8 +745,10 @@ int main(int argc, char* argv[]){
 	//int escat=0;lso thought it could have used Leatherhead, or some of the other mutanimals. He probably would have fit right in with the Scale tail clan.
     bool scatter_switch;
     int trials_max = par->Max_Trials();
-	//if(SigGen->get_pMax()*Vnumtot<=1){
-    if(SigGen->get_pMax()<=0 && outmode!="dm_detector_distribution"){
+
+    cout << "Maximum Trials set to " << trials_max << endl;
+
+    if((SigGen->get_pMax()<=0 || SigGen->get_pMax()*Vnumtot<=par->Min_Event()) && outmode!="dm_detector_distribution"){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
@@ -757,11 +769,17 @@ int main(int argc, char* argv[]){
             list<Particle> vec;
             Particle dist_part (0);
             PartDist_list[i]->Sample_Particle(dist_part);
+            
+            list<Particle>::iterator iter;
+            list<Particle>::iterator nextit;
+
             if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
-                //Yes, this list is named vec.  
-                for(list<Particle>::iterator iter = vec.begin(); iter != vec.end();iter++){
-                //The way this is structured means I can't do my usual repeat thing to boost stats. 
+                //Yes, this list is named vec.
+                iter = vec.begin();
+                for(nextit=next(iter) ; iter != vec.end();iter=nextit++){
+                //The way this is structured means I can't do my usual repeat thing to boost stats.
                     if(std::find(sig_part_vec.begin(),sig_part_vec.end(), iter->name)!=sig_part_vec.end()){
+                    	//keep track of the next spot.
                         //iter->report(logging);
                         NDM_list[i]++;
                         if(outmode=="dm_detector_distribution"){
@@ -785,7 +803,6 @@ int main(int argc, char* argv[]){
                         }
                         else{
                             iter = vec.erase(iter);
-                            iter--;
                         }
                     }    
                 }
@@ -826,7 +843,7 @@ int main(int argc, char* argv[]){
 		cout << "Events: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||
                 outmode=="comprehensive"){
-			if(par->Model_Name()!="Dark_Photon"&&par->Model_Name()!="Axion_Dark_Photon"){
+			if(par->Model_Name()!="Dark_Photon"){
 				//This is temporary.
     			*summary_out << DMGen_list[i]->Channel_Name() << " ";
     			model->Report(*summary_out);
@@ -847,7 +864,7 @@ int main(int argc, char* argv[]){
 
 	if(outmode=="summary"||outmode=="dm_detector_distribution"||
             outmode=="comprehensive"){
-		if(par->Model_Name()!="Dark_Photon"&&par->Model_Name()!="Axion_Dark_Photon"){
+		if(par->Model_Name()!="Dark_Photon"){
 			*summary_out << "Total ";
 			model->Report(*summary_out);
 			*summary_out << signal << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;

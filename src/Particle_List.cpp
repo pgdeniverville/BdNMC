@@ -49,9 +49,9 @@ int Particle_List::load_particle_batch(){
 		}
 		else if(error_state==-1){
 			if(!POS)
-				cerr << "Format required is p_x p_y p_z" << endl;
+				cerr << "Format required is p_x p_y p_z E" << endl;
 			else
-				cerr << "Format required is p_x p_y p_z x y z t" << endl;
+				cerr << "Format required is p_x p_y p_z E x y z t" << endl;
 			cerr << "Line is improperly formatted: " << hold << endl;
 		}
 		else{
@@ -76,9 +76,13 @@ int Particle_List::parse_line(string& line){
 	double px, py, pz, E;
 	try{
 		px = stod(sublist[0]);
+
 		py = stod(sublist[1]);
+
 		pz = stod(sublist[2]);
+
 		E = stod(sublist[3]);
+
 		double x,y,z,t;
 		x=0;y=0;z=0;t=0;
 		if(POS){
@@ -93,6 +97,7 @@ int Particle_List::parse_line(string& line){
 		partlist.push_back(_part(px,py,pz,E,x,y,z,t));
 	}
 	catch(std::exception e){
+		cout << "parse_line encounterd error: " << e.what() << endl;
 		return -1;
 	}
 	return 0;

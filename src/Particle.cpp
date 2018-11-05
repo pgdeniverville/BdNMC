@@ -9,6 +9,8 @@ using std::cout; using std::endl;
 void Link_Particles(Particle &parent, Particle &child){
 	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
 	child.Set_Creation_Time(parent.end_coords[3]);
+    child.parent_1_id=parent.my_id;
+    child.EVENT_SET = parent.EVENT_SET;
 }
 
 void Link_Particles_Immediate(Particle &parent, Particle &child){
@@ -16,6 +18,8 @@ void Link_Particles_Immediate(Particle &parent, Particle &child){
 	parent.Set_Time(parent.origin_coords[3]);
 	child.Set_Origin(parent.end_coords[0],parent.end_coords[1],parent.end_coords[2]);
 	child.Set_Creation_Time(parent.end_coords[3]);
+    child.parent_1_id=parent.my_id;
+    child.EVENT_SET = parent.EVENT_SET;
 }
 
 

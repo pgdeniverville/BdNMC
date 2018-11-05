@@ -29,6 +29,7 @@ void Two_to_Two_Scatter::add_channel(Particle& out_state, Particle& end_state, d
     chan_number++;
 }
 
+
 //This creates Particle objects for the recoiling particles.
 bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator& partit){
     //This one is the more important recoil particle!
@@ -43,6 +44,15 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<P
         //recoil2 handled by probscatter, which passes it off to scatterevent!
         Link_Particles(*partit, recoil2);
         partlist.insert(std::next(partit),recoil2);
+        if(parent_name_vec.size()>0){
+            std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
+            for(unsigned int i = 0; i!=parent_name_vec.size(); i++){
+                if(parent_name_vec[i]==recoil.name)
+                    decay_gen_vec[i]->GenDM(partlist, det_int, recoil);
+                if(parent_name_vec[i]==recoil2.name)
+                    decay_gen_vec[i]->GenDM(partlist, det_int, recoil2);
+            }
+        }
         return true;
     }
     return false;

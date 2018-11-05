@@ -148,7 +148,7 @@ production_channel::production_channel(){
 	particle_list_file="";
    	sanfordwang_file="";
    	parton_V_n_file=""; 
-	parton_V_p_file=""; 
+	parton_V_p_file="";
 	meson_per_pi0=-1; 
 	PTMAX=-1; 
 	PTMIN=0;
@@ -158,6 +158,7 @@ production_channel::production_channel(){
     tolerance=5e-2;
     energy_bins=100;
     QMIN=1.3;
+    num_per_pot=0;
 	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
 }
 
@@ -222,6 +223,8 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
                 tmpprod.QMIN=stod(val);
             else if(key==meson_per_pi0_key)
                 tmpprod.meson_per_pi0=stod(val);
+            else if(key==Num_per_POT_key)
+                tmpprod.num_per_pot=stod(val);
             else if(key==part_list_pos_key){
 				if(lowercase(val)=="true")
 					tmpprod.particle_list_position=true;
@@ -360,6 +363,7 @@ Parameter::Parameter(std::ifstream &instream){
         Set_String(modelkey,model_name,keymap,"Hidden_Sector_DM");
         Set_Model_Parameters(keymap);    
         Set_Double(POTkey, POT, keymap);
+        Set_Double(min_event_key,min_event,keymap,-1.0);
 		Set_Double(pi0_ratio_key,pi0ratio,keymap,0.9);
 		Set_Integer("samplesize", samplesize, keymap);
         //Production Channel

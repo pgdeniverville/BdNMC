@@ -24,6 +24,8 @@ const string proton_pdf_file_key = "proton_pdf_file_path";
 const string neutron_pdf_file_key = "neutron_pdf_file_path";
 const string sanford_wang_key = "sanfordwang_file";
 const string distribution_parameter_key = "distribution_parameter_file";
+const string Num_per_POT_key = "num_per_pot";
+
 const string ptmax_key = "ptmax";
 const string ptmin_key = "ptmin";
 const string zmin_key = "zmin";
@@ -58,6 +60,8 @@ const string repeat_key = "repeat_count";
 const string max_trials_key = "max_trials";
 const string seed_key = "seed";
 const string p_cross_key = "proton_target_cross_section";
+const string min_event_key = "min_event";
+
 
 vector<string> spherearr = {"radius","x-position","y-position","z-position"};
 vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};

@@ -6,6 +6,7 @@
 #include "DMgenerator.h"
 #include "Model.h"
 #include "Kinematics.h"
+#include "SignalDecay.h"
 
 using std::string;
 using std::vector;
@@ -37,11 +38,13 @@ pow(m23s - pow(mmeson,2),2) + pow(m2,4)*(pow(m23s,2) + pow(mmeson,4)) + 2*m12s*m
 }*/
 
 double Axion_Dark_Photon::eta_decay_amplitude2_c(double m12s, double s, double m0, double m1, double m2, double m3){
-    return WIDTH_ETA/WIDTH_PION_NEUTRAL*bretato2gamma/brpi0to2gamma*meson_decay_amplitude2(m12s,s,m0,m1,m2,m3);
+    //WIDTH_ETA/WIDTH_PION_NEUTRAL*bretato2gamma/brpi0to2gamma*
+    return meson_decay_amplitude2(m12s,s,m0,m1,m2,m3);
 }
 
 double Axion_Dark_Photon::eta_decay_width_2(double m12, double CosTheta, double m0, double m1, double m2, double m3){
-    return WIDTH_ETA/WIDTH_PION_NEUTRAL*bretato2gamma/brpi0to2gamma*meson_decay_amplitude2(m12*m12,Three_Body_Decay_Space::Cos_Theta_to_m23s(m12*m12, CosTheta, m0, m1, m2, m3),m0,m1,m2,m3);
+    //WIDTH_ETA/WIDTH_PION_NEUTRAL*bretato2gamma/brpi0to2gamma*
+    return meson_decay_amplitude2(m12*m12,Three_Body_Decay_Space::Cos_Theta_to_m23s(m12*m12, CosTheta, m0, m1, m2, m3),m0,m1,m2,m3);
 }
 
 double Axion_Dark_Photon::pi0_decay_amplitude2(double m12s, double m23s, double mgamma, double ma, double mA){
@@ -112,6 +115,20 @@ double Axion_Dark_Photon::A_to_a_gamma_width(double ma, double mA){
     return pow(Gagpg,2)*pow(mA*mA-ma*ma,3)/(96*pi*pow(mA,3));
 }
 
+//Decay of DP to axion+electron+positron, me2 is a dummy variable, should be the same as me.
+//p1 -> elec, p2 -> positron, p3 -> axion
+double Axion_Dark_Photon::A_to_a_elec_pos_amplitude(double m12s, double m23s, double mA, double me, double me2, double ma){
+    if(mA<ma+2*MASS_ELECTRON)
+        return 0.0;
+    return (pow(G_ELEC,2)*pow(Gagpg,2)*(m12s*
+        (pow(m12s,2) + 2*m12s*m23s + 2*pow(m23s,2) - 2*m12s*pow(ma,2) - 
+          2*m23s*pow(ma,2) + pow(ma,4) - 2*(m12s + m23s)*pow(mA,2) + 
+          pow(mA,4)) - 2*(-pow(pow(ma,2) - pow(mA,2),2) + 
+          m12s*(2*m23s + pow(ma,2) + pow(mA,2)))*pow(me,2) + 
+       2*m12s*pow(me,4)))/pow(m12s,2);
+}
+
+//Currently ignores DP->ae^+e^-.
 double Axion_Dark_Photon::A_width(double ma, double mA){
     return A_to_a_gamma_width(ma,mA);
 }
@@ -129,7 +146,6 @@ bool Axion_Dark_Photon::Set_Model_Parameters(Parameter& par){
     return false;
 }
 
-
 void Axion_Dark_Photon::Report(std::ostream& out){
     out << mass_axion << " " << mass_dp << " " << epsilon << " " << Gagg << " " << Gagpg << " " << Gagpgp << " ";
 }
@@ -146,25 +162,32 @@ void Axion_Dark_Photon::Report_Model(){
 
 bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
 
+    Particle photon(0);
+    photon.name = "Photon";
+
+    Particle axion(mass_axion);
+    axion.name="Axion";
+
+    
+    Particle dark_photon(mass_dp);
+    dark_photon.name="Dark_Photon";
+
+    string sig_choice = par.Signal_Channel();
+    
     if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){
         double lifetime;
-
-        Particle photon(0);
-        photon.name = "Photon";
-        
-        Particle axion(mass_axion);
-        axion.name="Axion";
-        sig_part_vec.push_back(axion.name);
-        
-        Particle dark_photon(mass_dp);
-        dark_photon.name="Dark_Photon";
-        sig_part_vec.push_back(dark_photon.name);
         
         Particle meson(0);
         
         std::function<double(double, double, double, double, double, double)> func;
 
         if(prodchoice=="pi0_decay"){
+            if(MASS_PION_NEUTRAL<mass_axion+mass_dp){
+                Vnum=0;
+                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen());
+                return true;
+            }
+
             meson.name = "Pi0";
             meson.m = MASS_PION_NEUTRAL;
             meson.width=WIDTH_PION_NEUTRAL;
@@ -173,6 +196,11 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
             func = std::bind(&Axion_Dark_Photon::pi0_decay_amplitude2_c,this,_1,_2,_3,_4,_5,_6);
         }
         else if(prodchoice=="eta_decay"){
+            if(MASS_ETA<mass_axion+mass_dp){
+                Vnum=0;
+                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen());
+                return true;
+            }
             meson.name = "eta";
             meson.m = MASS_ETA;
             meson.width=WIDTH_ETA;
@@ -188,9 +216,9 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
         std::shared_ptr<Three_Body_Decay_Gen> tmp_gen(new Three_Body_Decay_Gen(meson,photon,axion,dark_photon,prodchoice,lifetime,func));
         tmp_gen->d1=false;
 
-        //Activate the decay of the DP
+        //Activate the decay of the DP unless we are looking for the decay of the DP
         
-        if(A_width(mass_axion, mass_dp)>0){
+        if(sig_choice!="DP_Signal_Decay"&&A_width(mass_axion, mass_dp)>0){
             cout << "Turning on decay of the Dark Photon with lifetime of " << hbar/A_width(mass_axion, mass_dp) << " seconds\n";
             std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(A_to_a_gamma_width(mass_axion, mass_dp)/A_width(mass_axion, mass_dp),mass_dp,string("Dark_Photon"),photon,axion,hbar/A_width(mass_axion, mass_dp)));
             //Do not care about photons!
@@ -207,6 +235,32 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
         DMGen = tmp_gen;
         return true;
     }
+    else if(prodchoice=="brem_dp"||prodchoice=="brem_axion"){
+        double part_mass;
+        
+        if(prodchoice=="brem_dp"){
+            part_mass=mass_dp;
+            if(sig_choice!="DP_Signal_Decay"&&A_width(mass_axion, mass_dp)>0){
+                cout << "Turning on decay of the Dark Photon with lifetime of " << hbar/A_width(mass_axion, mass_dp) << " seconds\n";
+                std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(A_to_a_gamma_width(mass_axion, mass_dp)/A_width(mass_axion, mass_dp),mass_dp,string("Dark_Photon"),photon,axion,hbar/A_width(mass_axion, mass_dp)));
+                invis_dec->record_parent=false;
+                DMGen = invis_dec;
+            }
+            else{
+                std::shared_ptr<Do_Nothing_Gen> do_not(new Do_Nothing_Gen(string("Dark_Bremsstrahlung"),string("Dark_Photon")));
+                DMGen = do_not;
+            }
+        }
+        else if(prodchoice=="brem_axion"){
+            part_mass=mass_axion;
+            std::shared_ptr<Do_Nothing_Gen> do_not(new Do_Nothing_Gen(string("Dark_Bremsstrahlung"),string("Axion")));
+            DMGen = do_not;
+        }
+
+        Dist->set_mass(part_mass);
+        Vnum=par.Protons_on_Target()*prodchan.Num_per_pot();
+        return true;
+    }
     return false;
 }
 
@@ -214,6 +268,9 @@ bool Axion_Dark_Photon::Prepare_Signal_Channel(Parameter& par){
     string sig_choice = par.Signal_Channel();
     if(sig_choice=="Electron_Scatter"){
         
+        sig_part_vec.push_back(string("Axion"));
+        sig_part_vec.push_back(string("Dark_Photon"));
+
         std::shared_ptr<Two_to_Two_Scatter> ttts(new Two_to_Two_Scatter());
 
         ttts->set_energy_limits(par.Min_Scatter_Energy(),par.Max_Scatter_Energy());
@@ -225,6 +282,16 @@ bool Axion_Dark_Photon::Prepare_Signal_Channel(Parameter& par){
         axion_r.name = "Recoil_Axion";
         Particle dark_photon_r(mass_dp);
         dark_photon_r.name = "Recoil_Dark_Photon";
+        
+        if(A_width(mass_axion, mass_dp)>0){
+            Particle axion_f(mass_axion);
+            axion_f.name="Decay_Axion";
+            Particle photon_f(0);
+            photon_f.name = "Decay_Photon";
+            std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(A_to_a_gamma_width(mass_axion, mass_dp)/A_width(mass_axion, mass_dp),mass_dp,string("Recoil_Dark_Photon"),photon_f,axion_f,hbar/A_width(mass_axion, mass_dp)));
+            invis_dec->record_parent=false;
+            ttts->add_decay(string("Recoil_Dark_Photon"),invis_dec);
+        }
 
         //axion+e->dp+e
         std::shared_ptr<Linear_Interpolation> axion_cross;
@@ -238,13 +305,11 @@ bool Axion_Dark_Photon::Prepare_Signal_Channel(Parameter& par){
 
         //cout << "disgma=" << dsigma_a_to_DP(0.07, 0.0318287, mass_dp, MASS_ELECTRON) << endl;
 
-
         std::function<double(double,double)> f_a_to_dp = std::bind(&Axion_Dark_Photon::dsigma_a_to_DP,this,_1,_2,mass_dp,MASS_ELECTRON);
         std::function<double(double)> ER_min_ax = std::bind(&Two_to_Two_Scatter::scatmin,*ttts,_1,mass_axion,MASS_ELECTRON,mass_dp,MASS_ELECTRON);
         std::function<double(double)> ER_max_ax = std::bind(&Two_to_Two_Scatter::scatmax,*ttts,_1,mass_axion,MASS_ELECTRON,mass_dp,MASS_ELECTRON);
         
         Prepare_Cross_Section(f_a_to_dp, ER_min_ax, ER_max_ax, axion_cross,axion_cross_max, mass_axion, par.Max_DM_Energy(),par.EDM_RES());
-
         
         function<double(double)> axion_cross_func = bind(&Linear_Interpolation::Interpolate,axion_cross,_1);
         function<double(double)> axion_cross_max_func = bind(&Linear_Interpolation::Interpolate,axion_cross_max,_1);
@@ -269,6 +334,60 @@ bool Axion_Dark_Photon::Prepare_Signal_Channel(Parameter& par){
 
         Sig_list.push_back(ttts);
 
+        return true;
+    }//Searching for DP in signal decays
+    else if(sig_choice=="DP_e_ep_a_Decay"){
+
+        sig_part_vec.push_back(string("Dark_Photon"));
+
+        Particle dark_photon(mass_dp);
+        dark_photon.name = "Dark_Photon";
+        dark_photon.width = A_width(mass_axion,mass_dp);
+        Particle electron(MASS_ELECTRON);
+        electron.name = "Decay_Electron";
+        Particle positron(MASS_ELECTRON);
+        positron.name = "Decay_Positron";
+        Particle axion(mass_axion);
+        axion.name = "Decay_Axion";
+
+        std::function<double(double,double,double,double,double,double)> func = std::bind(&Axion_Dark_Photon::A_to_a_elec_pos_amplitude,this,_1,_2,_3,_4,_5,_6);
+
+        std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen(new Three_Body_Decay_Gen(dark_photon,electron,positron,axion,string("Decay_Electron_Positron_Axion"),0,func));
+
+        dp_3decay_gen->record_parent = false;
+
+        vector<std::shared_ptr<DMGenerator> > dec_vec;
+        dec_vec.push_back(dp_3decay_gen);
+
+        double lifetime = hbar/A_width(mass_axion, mass_dp);
+
+        std::shared_ptr<SignalDecay_2> sig_dec(new SignalDecay_2(lifetime, dec_vec));
+        Sig_list.push_back(sig_dec);
+        return true;
+    }
+    else if(sig_choice=="DP_gamma_a_Decay"){
+
+        sig_part_vec.push_back(string("Dark_Photon"));
+
+        Particle dark_photon(mass_dp);
+        dark_photon.name = "Dark_Photon";
+        dark_photon.width = A_width(mass_axion,mass_dp);
+        Particle photon(0);
+        photon.name = "Decay_Photon";
+        Particle axion(mass_axion);
+        axion.name = "Decay_Axion";
+
+        std::shared_ptr<Two_Body_Decay_Gen> dp_2decay_gen(new Two_Body_Decay_Gen(A_to_a_gamma_width(mass_axion, mass_dp)/A_width(mass_axion, mass_dp),mass_dp, string("Dark_Photon"), photon, axion,0));//Set lifetime to zero to force immediate decay!
+
+        dp_2decay_gen->record_parent = false;
+
+        vector<std::shared_ptr<DMGenerator> > dec_vec;
+        dec_vec.push_back(dp_2decay_gen);
+
+        double lifetime = hbar/A_width(mass_axion, mass_dp);
+
+        std::shared_ptr<SignalDecay_2> sig_dec(new SignalDecay_2(lifetime, dec_vec));
+        Sig_list.push_back(sig_dec);
         return true;
     }
     return false;
