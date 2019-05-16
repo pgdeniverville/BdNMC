@@ -14,6 +14,7 @@ class BMPT : public Distribution{
 		void sample_particle(Particle &);
 		double Invariant_Cross_Section(double p, double theta);//E \times d^3\sigma/dp^3
         double Invariant_Cross_Section_pi_minus(double p, double theta);//E \times d^3\sigma/dp^3
+        void set_pmax(double p){p_max=p;}
     private:
         double Beam_Energy, Mass_Number, Meson_Mass;
         double sBMPT, Beta_CM;

@@ -81,6 +81,10 @@ bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string 
         cout << "Energy = " << par.Beam_Energy() << endl;
         cout << "Mass Number = " << par.Target_P_Num()+par.Target_N_Num() << endl;
         std::shared_ptr<BMPT> bmpt(new BMPT(par.Beam_Energy(),par.Target_P_Num()+par.Target_N_Num()));
+        cout << "Setting maximum meson momentum = " << prodchan.Maximum_Meson_Momentum() << endl;
+        if(prodchan.Maximum_Meson_Momentum()>0){
+            bmpt->set_pmax(prodchan.Maximum_Meson_Momentum());
+        }
         cout << "BMPT burn-in complete\n";
         Dist = bmpt;
     }

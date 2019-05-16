@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <list>
@@ -300,7 +301,8 @@ int main(int argc, char* argv[]){
 	        
 	        //Signal_Decay HANDLING
 	        if((par->Model_Name()=="Dark_Photon"&&sigchoice=="Signal_Decay")){
-	            if(proddist=="proton_brem"){
+	            sig_part_name="Dark_Photon";
+                if(proddist=="proton_brem"){
 					string dark_axion_signal_string = "Dark_Photon";//This thing is getting killed as soon as possible.
 	                DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", dark_axion_signal_string));
 	                cout << DMGen->Channel_Name() << endl;
@@ -454,6 +456,7 @@ int main(int argc, char* argv[]){
 			if(outmode=="particle_list"){
 				Particle part(0);
 				std::ofstream parstream(proditer->Part_List_File(),std::ios::out);
+                parstream << std::setprecision(10) << endl;
 				cout << "--------------------" << endl;
 				cout << "Run parameters:" << endl;
 				cout << "--------------------" << endl;	
@@ -524,26 +527,25 @@ int main(int argc, char* argv[]){
 	    else if(sigchoice=="Signal_Decay"){
 	        double lifetime;
 	        vector<double> Branching_Ratios;
-	        vector<vector<Particle> > Final_States;/*
-	        if(par->Model_Name()=="Axion_Dark_Photon"){
-	            lifetime=adp.Lifetime();
-	            adp.Branching_Ratios(Branching_Ratios);
-	            adp.Final_States(Final_States);
-	            sig_part_name = dark_axion_signal_string;
-	            SigGen = std::unique_ptr<Scatter>(new SignalDecay(lifetime, Branching_Ratios, Final_States));
-	        }*/
+	        vector<vector<Particle> > Final_States;
 	        //More temporary stuff ugh
 	        if(par->Model_Name()=="Dark_Photon"){
-	            cout << "Setting up signal decay!"  << endl;
-	            
+	           
+                cout << "Setting up signal decay!"  << endl;
 	            Particle electron(MASS_ELECTRON);
 	            electron.name = "Electron";
-	            
+	           
+                Particle positron(MASS_ELECTRON);
+	            positron.name = "Positron";
+
 	            Particle DM(mdm);
 	            DM.name="DM";
 
 	            Particle muon(MASS_MUON);
 	            muon.name = "Muon";
+
+	            Particle anti_muon(MASS_MUON);
+	            anti_muon.name = "Anti-muon";
 
 	            Particle hadronic(0);
 	            hadronic.name = "Hadronic Stuff";
@@ -557,7 +559,7 @@ int main(int argc, char* argv[]){
 	                cout << "BR(V->e e) = " << br << endl;
 	                vector<Particle> vec;
 	                vec.push_back(electron);
-	                vec.push_back(electron);
+	                vec.push_back(positron);
 	                Final_States.push_back(vec);
 	            }
 	            
@@ -566,7 +568,7 @@ int main(int argc, char* argv[]){
 	                cout << "BR(V->mu mu) = " << br << endl;
 	                vector<Particle> vec;
 	                vec.push_back(muon);
-	                vec.push_back(muon);
+	                vec.push_back(anti_muon);
 	                Final_States.push_back(vec);
 	            }
 
@@ -650,27 +652,6 @@ int main(int argc, char* argv[]){
 	//START OF BURN-IN//
 	////////////////////
         
-/*
-    //TESTING DETECTOR
-    cout << "TESTING DETECTOR" << endl;
-    Particle test_0(0.01);
-    test_0.ThreeMomentum(0.0,0.0,1);
-    Particle test_1(0.01);
-    test_1.ThreeMomentum(0.04,0.04,1);
-    Particle test_2(0.01);
-    test_2.ThreeMomentum(0.07,0.07,1);
-    Particle test_3(0.01);
-    test_3.ThreeMomentum(0.1,0.04,1);
-
-    det_int(test_0);
-    cout << "TEST_1\n";
-    det_int(test_1);
-    cout << "TEST 2\n";
-    det_int(test_2);
-    cout << "TEST_3\n";
-    det_int(test_3);
-    //END DETECTOR TEST
-*/
     double BURN_MAX = par->Burn_In();
 	if(BURN_MAX<0){
         cout << "burn_max < 0 specified. Assuming default value burn_max=1000\n";
@@ -686,12 +667,11 @@ int main(int argc, char* argv[]){
 	}
 
     double BURN_OVERRIDE = par->Burn_Timeout();
-
     if(Vnumtot< par->Min_Event()){
     	cout << "Fewer than " << par->Min_Event() << " events possible, skipping BURN_IN and setting pMax=0 to skip run.\n";
     	BURN_MAX=0;
     }
-
+    
 	for(int i=0;BURN_MAX!=0&&i<chan_count; i++){
         int nburn = 0;
 		if(Vnum_list[i]==0){
@@ -858,12 +838,11 @@ int main(int argc, char* argv[]){
  	}
 
 
-    if(outmode=="dm_detector_distribution"){
+    /*if(outmode=="dm_detector_distribution"){
         *comprehensive_out << "Total " << trials << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
-    }
+    }*/
 
-	if(outmode=="summary"||outmode=="dm_detector_distribution"||
-            outmode=="comprehensive"){
+	if(outmode=="summary"||outmode=="comprehensive"){
 		if(par->Model_Name()!="Dark_Photon"){
 			*summary_out << "Total ";
 			model->Report(*summary_out);
@@ -893,12 +872,7 @@ int main(int argc, char* argv[]){
     	}
     }
 
-
     summary_out->close();
-	
-    if(outmode =="comprehensive"){
-        *comprehensive_out << endl <<  "Summary " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
-    }
 
   	if(outmode=="dm_detector_distribution"||outmode=="comprehensive")
 		comprehensive_out->close();

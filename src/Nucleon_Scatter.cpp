@@ -203,10 +203,9 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, 
             std::bind(dsig_cohp,DM.E,_1,DM.m,MDP,alD,
                 kap,det->PN(i)+det->NN(i),
                 det->PN(i));
-            
             Nucleon.Set_Mass(det->M(i));
             Nucleon.name = det->matname(i);
-
+            
             if(scatmax(DM.E)<scatmin(DM.E, DM.m,Nucleon.m))
                 return false;
             scatterevent(DM,Nucleon,Xsec,atom_maxima[i]);
@@ -256,6 +255,7 @@ void Nucleon_Scatter::scatterevent (Particle &DM, Particle &Nucleon, std::functi
             thetaN = Ef_to_N_Theta(DM.E,xe,DM.m,Nucleon.m);
             phiN = Random::Flat(0,1)*2*pi;
             pN = sqrt(pow(DM.E+Nucleon.m-xe,2)-pow(Nucleon.m,2));
+            //cout << DM.E << " " << Nucleon.m << " " << xe << " " << DM.E - xe << " " << pN << endl;
             Nucleon.ThreeMomentum(pN*sin(thetaN)*cos(phiN),pN*sin(thetaN)*sin(phiN),cos(thetaN)*pN);
             Nucleon.Rotate_y(DM.Theta());
             Nucleon.Rotate_z(DM.Phi());

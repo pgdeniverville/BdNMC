@@ -37,7 +37,7 @@ public:
     void     Rotate_z(double);
     void     Rotate(Particle&);
     void     report(std::ostream&) const;
-    void     report(){report(std::cout);}
+    void     report() const {report(std::cout);}
     //void    Generate_4Vector(double s);
 	void 	Set_Origin(double x, double y, double z);
 //    void    Set_Position(double x, double y, double z);
@@ -47,7 +47,7 @@ public:
     void    Increment_Time(double t){END_SET=true; Set_Time(t+origin_coords[3]+end_coords[3]);} 
     double Momentum();
     double Speed();
-    double Kinetic_Energy(){return E-m;}
+    double Kinetic_Energy() const {return E-m;}
     void Generate_Position();//Generates an end_coords position between crossing[0] and crossing[1].
     void Generate_Position(double);//Generates an end_coords position
     //I should design custom 4 vector objects. Also 3 vector objects which 4-vectors hold.

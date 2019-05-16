@@ -25,6 +25,7 @@ const string neutron_pdf_file_key = "neutron_pdf_file_path";
 const string sanford_wang_key = "sanfordwang_file";
 const string distribution_parameter_key = "distribution_parameter_file";
 const string Num_per_POT_key = "num_per_pot";
+const string max_meson_mom_key="max_meson_momentum";
 
 const string ptmax_key = "ptmax";
 const string ptmin_key = "ptmin";

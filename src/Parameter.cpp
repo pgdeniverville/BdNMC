@@ -158,6 +158,7 @@ production_channel::production_channel(){
     tolerance=5e-2;
     energy_bins=100;
     QMIN=1.3;
+    max_meson_mom=-1;
     num_per_pot=0;
 	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
 }
@@ -238,6 +239,9 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				instream.seekg(last_pos);
                 continue;
 			}
+            else if(key==max_meson_mom_key){
+                tmpprod.max_meson_mom=stod(val);
+            }
 			else{
 				line_num--;
 				break;

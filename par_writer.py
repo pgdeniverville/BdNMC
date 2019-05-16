@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 from multiprocessing import Pool
+import copy
 
 import Parsing_inelastic
 import math
@@ -34,11 +35,15 @@ meson_per_pi0_coherent = {'pi0_decay' : 1.0, 'piminus_capture' : '0.63'}
 
 meson_per_pi0_lanl = {'pi0_decay' : 1.0, 'piminus_capture' : '0.63'}
 
-meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+meson_per_pi0_numi = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+
+meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.105), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
 Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneutron_number 8\nelectron_number 8\nmass 0.94578\nmaterial Hydrogen\nnumber_density 6.68368e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
+
+BEBC_string = "material Neon\nnumber_density 2.02e22\nproton_number 10\nneutron_number 10\nelectron_number 10\nmass 20.1797\nmaterial Hydrogen\nnumber_density 7.11231e21\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
 Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
 
@@ -63,10 +68,13 @@ Cesium_Iodide_string = "material Cesium\nnumber_density 1.04e22\nproton_number 5
 #Don't know what the atomic makeup of the MINOS detector is. Not using this for event generation, so it should be okay.
 MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0\n"
 
+#Adjusted for fiducial mass
+MINERVA_string = "material Carbon\nnumber_density 4.42356e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\nmaterial Hydrogen\nnumber_density 4.42356e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
+
 NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
 
 defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan" : ["pi0_decay"], "signal_chan" : "NCE_nucleon", "outfile" : "parameter_run.dat", "proddist" : [""], "partlistfile" : ["Source/particle_list.dat"], "sumlog" : "Events/miniboone.dat", "outlog" : "Events/miniboone_events.dat", "output_mode" :"summary", "samplesize" : 5000, "min_scatter_energy" : 0.035, "max_scatter_energy" : 1.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 8.9, "n_num_target" :
-        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon_DM", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0}
+        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0, "min_event" : -1}
 
 def write_experiment(write_detector,user):
     context = defaults.copy()
@@ -83,6 +91,7 @@ def write_experiment(write_detector,user):
     max_scatter_angle=context["max_scatter_angle"]; repeat = context["repeat"]; timing = context["timing"]; burn_max = context["burn_max"];
     inelastic_dist = context["inelastic_dist"]; coherent = context["coherent"]; model = context["model"]; gagg= context["gagg"]; gagpg = context["gagpg"];
     gagpgp = context["gagpgp"]; POT = context["POT"]
+    min_event=context["min_event"]
     with open(context["outfile"],'w') as f:
         if run>=0:
             f.write('run {}\n'.format(context["run"]))
@@ -143,6 +152,7 @@ def write_experiment(write_detector,user):
         f.write('output_mode {}\n'.format(output_mode))
         f.write('samplesize {}\n'.format(str(samplesize)))
         f.write('coherent {}\n'.format(coherent))
+        f.write('min_event {}\n'.format(str(min_event)))
         f.write('pi0_per_POT {}\n\n'.format(str(pi0_per_POT)))
         write_detector(f)
         f.close()
@@ -237,6 +247,14 @@ def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=1040,radius=2,length=16.6,theta=0,ph
     f.write('\n')
     f.write(MINOS_string)
 
+#I'm going to need to adjust this.
+
+def minerva_detector(f,xpos=0.0,ypos=0.0,zpos=952,radius=0.925,length=2.53,theta=0,phi=0.05):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(MINERVA_string)
+
 def NOvA_absorber_detector(f):
     NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_Absorber_Angle),zpos=NOvA_absorber_d*math.cos(NOvA_Absorber_Angle))
 '''
@@ -269,6 +287,29 @@ def ship_detector(f,xpos=0.0,ypos=0,zpos=56,width=1.87,length=2,height=0.69,phi=
     f.write('\n')
     #Need to figure out what it's made of!
     f.write(SHiP_string)
+
+CHARM2_string="material Carbon\nnumber_density 7.00652e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
+
+#Assuming this is made of carbon.
+def CHARM2_detector(f,xpos=0.0,ypos=0,zpos=870.8,width=3.7,length=36,height=3.7,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(CHARM2_string)
+
+#Using the CHARM2_string, don't use for scattering
+def CHARM_decay_detector(f,xpos=5,ypos=0,zpos=480,width=3,length=35,height=3,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(CHARM2_string)
+
+def bebc_detector(f,xpos=0.0,ypos=0,zpos=404,radius=1.582):
+    #def ship_detector(f,xpos=0.0,ypos=0,zpos=30.0,radius=0.655,length=2.645,theta=0,phi=0):
+    f.write("\ndetector sphere\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}".format(str(xpos),str(ypos),str(zpos),str(radius)))
+    f.write('\n')
+    f.write(BEBC_string)
 
 #temp detector until I implement proper geometry handling
 #This is actually the P0D, with only the proper number of neutrons and protons. NO ATOMS IMPLEMENTED
@@ -305,7 +346,18 @@ def lsnd_detector_test(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,lengt
     f.write('\n')
     f.write(Hydrogen_string)
 
-def coherent_detector_LAr(f,xpos=16.8,ypos=0.0,zpos=-23.6,radius=0.44,length=0.88,theta=pi/2.0,phi=pi/2.0):
+def nucal(f,xpos=0.0,ypos=0.0,zpos=75.5,radius=1.3,length=23,theta=0,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+   #Need to replace this with Aluminum, Iron, Liquid Scintilator if using for scattering
+    f.write('\n')
+    f.write(Carbon_string)
+
+#From Rex e-mail
+coherent_angle=0.174533
+coherent_dist=30
+
+def coherent_detector_LAr(f,xpos=math.sin(coherent_angle)*coherent_dist,ypos=0.0,zpos=math.cos(coherent_angle)*coherent_dist,radius=0.963,length=1.927,theta=pi/2.0,phi=pi/2.0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
@@ -353,6 +405,31 @@ def lanl_detector_far(f,xpos=40.0,ypos=0.0,zpos=0.0,radius=1.056,length=1.227,th
     f.write('\n')
     f.write(Argon_string)
 
+def DUNE_HPgTPC(f,xpos=0.0,ypos=0.0,zpos=574.0,radius=2.6,length=5,theta=pi/2,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+#def YuDai_cylinder_abs(f,xpos=0.0,ypos=0.0,zpos=240.0,radius=1,length=5,theta=0.0,phi=0.0):
+def YuDai_cylinder_abs(f,xpos=0.0,ypos=0.0,zpos=240.0,radius=2.1,length=4.2,theta=0.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+def YuDai_cylinder(f,xpos=0.0,ypos=0.0,zpos=1040,radius=2.1,length=4.2,theta=0.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
+def YuDai_cylinder_2(f,xpos=0.0,ypos=0.0,zpos=574,radius=2.1,length=4.2,theta=0.0,phi=0.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_string)
+
 #############
 #EXPERIMENTS#
 #############
@@ -373,10 +450,41 @@ def write_t2k(d={}, det=t2k_ND280):
 
 SHIP_Energy = 400
 
-ship_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_ship.dat"], "sumlog" : "Events/ship.dat", "outlog" : "Events/ship_events.dat", "beam_energy" : SHIP_Energy, "n_num_target" : 54, "p_num_target" : 42, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 1, "max_scatter_energy" : 20, "min_scatter_angle" : 0.01, "max_scatter_angle" : 0.02, "samplesize" : 1000, "efficiency" : 0.5, "POT" : 2e20, "pi0_per_POT" : 1.8, "p_cross" : 11*mb, "meson_per_pi0" : meson_per_pi0_ship}
+ship_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_ship.dat"], "sumlog" : "Events/ship.dat", "outlog" : "Events/ship_events.dat", "beam_energy" : SHIP_Energy, "n_num_target" : 54, "p_num_target" : 42, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 1, "max_scatter_energy" : 20, "min_scatter_angle" : 0.01, "max_scatter_angle" : 0.02, "samplesize" : 1000, "efficiency" : 0.5, "POT" : 2e20, "pi0_per_POT" : 2.4, "p_cross" : 11*mb, "meson_per_pi0" : meson_per_pi0_ship}
 
 def write_ship(d={}, det=ship_detector):
     context = ship_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+CHARM2_Energy=450
+
+#No idea what the target is made of.
+charm2_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_charm2.dat"], "sumlog" : "Events/charm2.dat", "outlog" : "Events/charm2_events.dat", "beam_energy" : CHARM2_Energy, "n_num_target" : 34, "p_num_target" : 29, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 3, "max_scatter_energy" : 24, "min_scatter_angle" : 0, "max_scatter_angle" : pi, "samplesize" : 1000, "efficiency" : 1, "POT" : 2.5e19, "pi0_per_POT" : 2.4, "p_cross" : 11*mb, "meson_per_pi0" : meson_per_pi0_ship}
+
+def write_charm2(d={}, det=CHARM2_detector):
+    context = charm2_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+CHARM_Energy=400
+
+charm_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_charm.dat"], "sumlog" : "Events/charm.dat", "outlog" : "Events/charm_events.dat", "beam_energy" : CHARM_Energy, "n_num_target" : 34, "p_num_target" : 29, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "Signal_Decay", "min_scatter_energy" : 1, "max_scatter_energy" : 400, "min_scatter_angle" : 0, "max_scatter_angle" : pi, "samplesize" : 1000, "efficiency" : 1, "POT" : 2.4e18, "pi0_per_POT" : 2.4, "p_cross" : 30*mb, "meson_per_pi0" : meson_per_pi0_ship}
+
+def write_charm_decay(d={}, det=CHARM_decay_detector):
+    context = charm_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+
+
+bebc_energy=400
+
+bebc_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_bebc.dat"], "sumlog" : "Events/bebc.dat", "outlog" : "Events/bebc_events.dat", "beam_energy" : bebc_energy, "n_num_target" : 34, "p_num_target" : 29, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 1, "max_scatter_energy" : 400, "min_scatter_angle" : 0, "max_scatter_angle" : pi, "samplesize" : 1000, "efficiency" : 0.8, "POT" : 2.72e18, "pi0_per_POT" : 2.4, "p_cross" : 11*mb, "meson_per_pi0" : meson_per_pi0_ship}
+
+
+def write_bebc(d={}, det=bebc_detector):
+    context = bebc_default.copy()
     context.update(d)
     write_experiment(det,context)
 
@@ -386,8 +494,8 @@ def write_lsnd(d={}, det=lsnd_detector):
     context = lsnd_default.copy()
     context.update(d)
     write_experiment(det,context)
-
-coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 15e-6, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.5, "beam_energy" : 1.0, "p_num_target" : 80, "n_num_target" : 0, "POT" : 1e23, "pi0_per_POT" : 0.06, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" :
+#Updated for 5 year run. 15.6E22 POT/yr, efficiency 90%
+coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 20e-6, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.9, "beam_energy" : 1.01, "p_num_target" : 80, "n_num_target" : 0, "POT" : 5*15.6e22, "pi0_per_POT" : 0.09, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" :
         meson_per_pi0_coherent, "outlog" : "Events/coherent_events.dat"}
 
 def write_coherent(d={}, det=coherent_detector_LAr):
@@ -403,13 +511,31 @@ def write_lanl(d={}, det=lanl_detector):
     context.update(d)
     write_experiment(det,context)
 
+nucal_energy=70
+#How many pi0/POT? 38 mb pp cross from pdg, 78 mb pp->pi^0 X from https://arxiv.org/pdf/1104.2747.pdf
+nucal_default = {"proddist" : ["bmpt"], "meson_per_pi0" : meson_per_pi0_numi, "partlistfile" : ["data/particle_list_nucal.dat"], "sumlog" : "Events/nucal.dat", "outlog" : "Events/nucal_events.dat", "output_mode" : "summary", "samplesize" : 100000, "min_scatter_energy" : 3, "max_scatter_energy" : 70, "dm_energy_resolution" : 0.01, "efficiency" : 1, "beam_energy" : 70, "n_num_target" : 30, "p_num_target" : 26, "ptmax" : 2, "zmin" : 0.1, "zmax" : 0.9, "POT" : 1.7e18, "pi0_per_POT" : 74/38, "p_cross" : 38*mb, 'max_scatter_angle' : 0.05}
+
+def write_nucal(d={}, det=nucal):
+    context = nucal_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
 numi_energy = 120
 
-numi_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_numi.dat"], "sumlog" : "Events/nova.dat", "outlog" : "Events/nova_events.dat", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 3.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 120, "n_num_target" : 8, "p_num_target" : 8, "ptmax" : 2, "zmin" : 0.1, "zmax" : 0.9, "POT" : 1e21,
+numi_default = {"proddist" : ["bmpt"], "meson_per_pi0" : meson_per_pi0_numi , "partlistfile" : ["data/particle_list_numi.dat"], "sumlog" : "Events/nova.dat", "outlog" : "Events/nova_events.dat", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 3.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 120, "n_num_target" : 8, "p_num_target" : 8, "ptmax" : 2, "zmin" : 0.1, "zmax" : 0.9, "POT" : 1e21,
         "pi0_per_POT" : 1.0, "p_cross" : 15*mb}
 
 def write_numi(d={}, det=NOvA_detector):
     context = numi_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+numi_absorber_default = copy.deepcopy(numi_default)
+numi_absorber_default["n_num_target"] = 14
+numi_absorber_default["p_num_target"] = 13
+
+def write_numi_absorber(d={}, det=YuDai_cylinder_abs):
+    context = numi_absorber_default.copy()
     context.update(d)
     write_experiment(det,context)
 

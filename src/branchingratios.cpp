@@ -135,7 +135,7 @@ double Gamma_V_to_hadrons(double mv, double kappa){
         rratio_loaded=true;
     }
     if(mv>MASS_MUON)
-        return Gamma_V_to_leptons(mv,kappa,MASS_MUON)*rratio->Interpolate(mv*mv);   
+        return Gamma_V_to_leptons(mv,kappa,MASS_MUON)*rratio->Interpolate(mv);   
     return 0;
 }
 
@@ -379,7 +379,7 @@ namespace Ax_DP{
             Load_2D_Interpolation(rratio_filename,rratio);
             rratio_loaded=true;
         }
-        return Gamma_dp_to_lepton(mA, MASS_MUON, eps)*rratio->Interpolate(mA*mA); 
+        return Gamma_dp_to_lepton(mA, MASS_MUON, eps)*rratio->Interpolate(mA); 
     }
 
     //From https://arxiv.org/abs/0807.3279
