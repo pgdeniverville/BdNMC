@@ -193,8 +193,8 @@ int main(int argc, char* argv[]){
 	double Vnumtot=0;//This is a scaling that takes into account number of originator mesons produced.
 
 	double beam_energy = par->Beam_Energy();
-	double target_n = par->Target_N_Num();
 	double target_p = par->Target_P_Num();
+	double target_n = par->Target_N_Num();
     double target_p_cross = par->P_Cross();
 	
 	std::shared_ptr<Model> model;
@@ -219,6 +219,10 @@ int main(int argc, char* argv[]){
 		}
 		else if(par->Model_Name()=="Axion_Dark_Photon"){
 			std::shared_ptr<Axion_Dark_Photon> mod(new Axion_Dark_Photon(*par));
+			model = mod;
+		}
+		else if(par->Model_Name()=="Inelastic_Dark_Matter"){
+			std::shared_ptr<Inelastic_Dark_Matter> mod(new Inelastic_Dark_Matter(*par));
 			model = mod;
 		}
 		model->Prepare_Model(*par);

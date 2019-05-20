@@ -150,6 +150,7 @@ class Do_Nothing_Gen: public DMGenerator{
 };
 
 //Defined in V_decay_gen.cpp
+//Need to add unstable daughter particles
 class Two_Body_Decay_Gen: public DMGenerator{
     public:
         Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0);
@@ -159,6 +160,10 @@ class Two_Body_Decay_Gen: public DMGenerator{
         bool d2 = true;
     private:
         void Evaluate_Branching(){return;}
+        bool d1_unstable = false;
+        bool d2_unstable = false;
+        std::shared_ptr<DMGenerator> d1_decay;
+        std::shared_ptr<DMGenerator> d2_decay;
         Particle daughter1, daughter2;
         std::string Part_Name;
         double tau;

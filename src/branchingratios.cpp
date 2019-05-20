@@ -437,3 +437,5 @@ double brem_split_pseudoscalar(double z, double pt2, double ma, double g){
 double Gamma_pseudoscalar_to_2fermion(double g, double m_parent, double m_daughter){
     return 3*g*g/8.0*m_parent*sqrt(1-pow(4*m_daughter/m_parent,2));
 }
+
+//Add Vector to two fermions, vector to two scalars.

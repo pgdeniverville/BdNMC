@@ -69,6 +69,20 @@ class Model{
         double scat_max, scat_min,Vnumtot;
 };
 
+class Inelastic_Dark_Matter : public Model{
+    public:
+        Axion_Dark_Photon(Parameter& par) : Model(par){};
+        bool Prepare_Signal_Channel(Parameter& par);
+        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
+        bool Set_Model_Parameters(Parameter& par);
+        void Report_Model();
+        void Report(std::ostream& out);
+        void Branching_Ratios(){};
+    private:
+        //mass_dm2 is assumed to be heavier.
+        double mass_dp, mass_dm1, mass_dm2, epsilon, g12;
+}
+
 class Axion_Dark_Photon : public Model{
     public:
         //Might not be enough, we'll see.

@@ -97,6 +97,21 @@ Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mas
     tau = lifetime;
 }
 
+void Two_Body_Decay_Gen::Toggle_Daughter_Decay(int index, std::shared_ptr<DMGenerator> daughter_decay_gen){
+    if(index==1){
+        d1_unstable=true;
+        d1_decay=daughter_decay_gen;
+    }
+    else if(index==2){
+        d2_unstable=true;
+        d2_decay=daughter_decay_gen;
+    }
+    else{
+        std::cerr << "Toggle_Daughter_Decay index must be 1 or 2. Index supplied was " << index << endl;
+        throw -1;
+    }
+}
+
 bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& parent){
     parent.name = Part_Name;
 
@@ -111,6 +126,16 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
 
     if(record_parent)
         vec.push_back(Particle(parent));
+
+    std::list<Particle>::iterator bookmark = vec.end();
+    if(d1_unstable&&(d1_decay->GenDM(vec, det_int, daughter1))){
+        vec.insert(bookmark,daughter1);
+        bookmark = vec.end();
+    }
+    if(d2_unstable&&(d2_decay->GenDM(vec, det_int, daughter2))){
+        vec.insert(bookmark,daughter2);
+        bookmark = vec.end();
+    }
 
     TwoBodyDecay(parent, daughter1, daughter2);
     bool intersect=false;
