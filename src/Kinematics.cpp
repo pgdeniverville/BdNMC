@@ -4,6 +4,12 @@
 
 using std::cout; using std::endl;
 
+namespace one_to_two_decay{
+    double two_body_momentum(double m0, double m1, double m2){
+        return TriangleFunc(m0,m1,m2);
+    }
+}
+
 namespace elastic_scattering{
     //This namespace deals with 2->2 elastic scattering
     
@@ -228,7 +234,7 @@ double invariantmass (double px, double py, double pz, double p0) {
 double lambda (double a, double b, double c) {
 	return fabs(a*a+b*b+c*c-2*a*b-2*a*c-2*b*c);
 }
-//
+//This is the momentum of particles 2 and 3 in a 1->2+3 process.
 double TriangleFunc(double m1, double m2, double m3){
     return 1/(2*m1)*sqrt(pow(m1,4)+pow(m2,4)+pow(m3,4)-2*pow(m1*m2,2)-2*pow(m1*m3,2)-2*pow(m2*m3,2));
 }

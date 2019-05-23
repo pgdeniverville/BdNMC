@@ -78,9 +78,12 @@ class Inelastic_Dark_Matter : public Model{
         void Report_Model();
         void Report(std::ostream& out);
         void Branching_Ratios(){};
+
+        double pi0_decay_amplitude2(double m12s, double m23s, double m0, double m1, double m2, double m3);
+        double dm2_to_lepton_lepton_dm1(double)
     private:
         //mass_dm2 is assumed to be heavier.
-        double mass_dp, mass_dm1, mass_dm2, epsilon, g12;
+        double mass_dp, mass_dm1, mass_dm2, epsilon, alpha_D;
 }
 
 class Axion_Dark_Photon : public Model{

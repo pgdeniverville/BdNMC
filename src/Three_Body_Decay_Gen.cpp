@@ -16,7 +16,6 @@ using namespace std::placeholders;
 using namespace Three_Body_Decay_Space;
 // std::shared_ptr<DMGenerator> decaygen1, std::shared_ptr<DMGenerator> decaygen2, std::shared_ptr<DMGenerator> decaygen3
 
-
 Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1, Particle& Daughter2, Particle& Daughter3, std::string prodstring, double lifetime, function<double(double, double, double, double, double, double)> &amplitude){
     if(Parent.m < Daughter1.m+Daughter2.m+Daughter3.m){
         std::cerr << "Parent_Mass is smaller than combined daughter masses, invalid decay!\n";

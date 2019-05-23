@@ -64,8 +64,6 @@ void parse_parameter_file(const string &filename, map<string, string> &parammap)
 
 }//end of parse_parameter_file
 
-
-
 bool production_channel::query_dist_param(const string &key, double &var){
     try{
         if(dist_param_map.count(key)==1){
@@ -384,6 +382,7 @@ Parameter::Parameter(std::ifstream &instream){
             integrity=-1;
         }
         Set_Bool(coherent_key, coherent, keymap, false); 
+        Set_Bool(weighted_key, weighted, keymap, false); 
 		Set_String(output_mode_key, output_mode, keymap, out_mode_def);	
 		Set_String(run_key, run_name, keymap, std::to_string(time(NULL)));	
 		for(list<production_channel>::iterator iter = prodlist->begin(); iter!=prodlist->end(); iter++)

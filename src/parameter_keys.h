@@ -49,6 +49,7 @@ const string epskey = "epsilon";
 const string alkey = "alpha_D";
 const string signalkey = "signal_channel";
 const string coherent_key = "coherent";
+const string weighted_key = "weighted";
 const string outkey = "output_file";
 const string sumkey = "summary_file";
 const string output_mode_key = "output_mode"; const string out_mode_def = "comprehensive";

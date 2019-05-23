@@ -665,6 +665,11 @@ int main(int argc, char* argv[]){
         BURN_MAX = 0;
         cout << "Detector_Mode selected.\nSkipping Burn-In.\n";
     }
+    if(par->Weighted_Events()==true){	
+    	BURN_MAX = 0;
+    	cout << "Weighted Events selected.\nSkipping Burn-In.\n";
+    }
+    total_weight=0;
     //This bit should be deprecated once everything moves over to model classes.
     if(sig_part_vec.empty()){
 	    sig_part_vec.push_back(sig_part_name);
@@ -721,10 +726,10 @@ int main(int argc, char* argv[]){
 
     int trials = 0;
     vector<long> trials_list(chan_count,0);
-	vector<int> scat_list(chan_count,0);
+	vector<long double> scat_list(chan_count,0.0);
     int nevent=0;
     vector<int> NDM_list(chan_count,0);
-    vector<double> timing_efficiency(chan_count,0.0);
+//    vector<double> timing_efficiency(chan_count,0.0);
 	
 	//int escat=0;lso thought it could have used Leatherhead, or some of the other mutanimals. He probably would have fit right in with the Scale tail clan.
     bool scatter_switch;
@@ -732,7 +737,7 @@ int main(int argc, char* argv[]){
 
     cout << "Maximum Trials set to " << trials_max << endl;
 
-    if((SigGen->get_pMax()<=0 || SigGen->get_pMax()*Vnumtot<=par->Min_Event()) && outmode!="dm_detector_distribution"){
+    if((SigGen->get_pMax()<=0 || SigGen->get_pMax()*Vnumtot<=par->Min_Event()) && outmode!="dm_detector_distribution" && !par->Weight_Events()){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
@@ -774,14 +779,26 @@ int main(int argc, char* argv[]){
                         }
                         //may need to replace this with a list<Particle> later
                         //cout << SigGen->get_pMax() << endl;
+                        //If pMax=0, all events are accepted.
+                        if(par->Weight_Events()){
+                        	SigGen->set_pMax(0);
+                        }
                         if(SigGen->probscatter(det, vec, iter)){
                             //cout << "Scatter?\n"; 
-                            scat_list[i]++;
-                            if(timing_cut>0){
-                                timing_efficiency[i]+=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
+                            
+                            double timing_prob_factor;
+							if(timing_cut>0){
+                                timing_prob_factor=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
                             }
                             else{
-                                timing_efficiency[i]+=1;
+                            	timing_prob_factor=1;
+                            }
+
+                            if(par->Weight_Events()){
+                            	scat_list[i]+=SigGen->get_pMax()*timing_prob_factor;
+                            }
+                            else{
+                            	scat_list[i]+=timing_prob_factor;
                             }
                             scatter_switch = true;	
                         }
@@ -790,10 +807,13 @@ int main(int argc, char* argv[]){
                         }
                     }    
                 }
-                
             }
             if(scatter_switch&&outmode=="comprehensive"){
-                *comprehensive_out << "event " << ++nevent << endl;
+                *comprehensive_out << "event " << ++nevent 
+                if(par->Weighted_Events()){
+                	<< " " << Sigen->get_pMax();
+                }
+                *comprehensive_out << endl;
                 Record_Particles(*comprehensive_out, vec);
                 *comprehensive_out << "endevent " << nevent << endl << endl;    
             }
@@ -816,15 +836,25 @@ int main(int argc, char* argv[]){
 	int scattot = 0;
 	int NDM = 0;    
 
+	//In the weighted events case, we set pMax=1;
+	if(par->Weight_Events()){
+		SigGen->set_pMax(1);
+	}
+
 	for(int i=0; i<chan_count; i++){
 		if(scat_list[i]==0)
 			signal_list[i]=0;
 		else
-			signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
+			signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency();
 		scattot+=scat_list[i];
-  		cout << DMGen_list[i]->Channel_Name() << ": " << (double)scat_list[i]/(double)trials_list[i]*Vnum_list[i]*SigGen->get_pMax()/repeat*par->Efficiency()*timing_efficiency[i]/scat_list[i];
-		cout << " Timing_Efficiency: " << timing_efficiency[i]/scat_list[i] << " ";
-		cout << "Events: " <<scat_list[i] << " Trials: " << trials_list[i] << " V_num: " << Vnum_list[i] << " pMax: " << SigGen->get_pMax() << " repeat: " << repeat << " efficiency: "  << par->Efficiency() << endl;;
+  		cout << DMGen_list[i]->Channel_Name() << ": " << signal_list[i];
+		if(par->Weighted_Events()){
+			cout << "Weight: " << scat_list[i] << " V_num: " << Vnum_list[i] << endl;
+		}
+		else{
+			cout << "Events: " << scat_list[i] << " V_num: " << Vnum_list[i] << endl;			
+		}
+	
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||
                 outmode=="comprehensive"){
 			if(par->Model_Name()!="Dark_Photon"){

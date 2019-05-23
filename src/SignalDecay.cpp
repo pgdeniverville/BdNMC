@@ -170,13 +170,13 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
         //cout << "Momentum " << Parentit->Momentum() << " speed " << Parentit->Speed() << " crossing1 " << Parentit->crossing[0] << " crossing2 " << Parentit->crossing[1] << " pos1 " << Parentit->crossing[0]*(Parentit->Momentum()) << endl;
         //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl;
-        if(prob>pMax){
+/*        if(prob>pMax){
             cout << "pMax revision\n";
             Parentit->report();
             cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
             cout << prob << " " << pMax << " " << u*pMax << endl;
             pMax=prob;
-        }
+        }*/
     
         double timegen = generate_decay_time(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E)); 
         Parentit->Set_Time(timegen);

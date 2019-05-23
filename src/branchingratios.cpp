@@ -350,6 +350,19 @@ double brphi_to_Vb(double mv, double mx, double kappa, double alphaD){
         (pow(pow(mphi,2)-pow(mv,2),2)+1e-4*pow(mphi,4))*pow(1-4*pow(mx/mv,2),1.5);
 }
 
+namespace Inelastic_DM{
+    double Gamma_A_to_dm1_dm2(double mass_dp,double mass_dm1,double mass_dm2,double alpha_D){
+        if(mass_dp<mass_dm1+mass_dm2){
+            return 0;
+        }
+        else{//Needs testing
+            return -1/(8*pi)*one_to_two_decay::two_body_momentum(mass_dp,mass_dm1,mass_dm2)/pow(mass_dp,2)*\
+            2/3*pow(alpha_D,2)*(mass_dm1-mass_dm2-mass_dp)*(mass_dm1-mass_dm2+mass_dp)*(pow(mass_dm1+mass_dm2,2)+2*pow(mass_dp,2))/pow(mass_dp,2);
+        }
+    }
+    
+}
+
 /*
  * DARK AXION WITH DARK PHOTON
  */
