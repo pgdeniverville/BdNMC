@@ -3,11 +3,13 @@
 #include <iostream>
 #include <fstream>
 #include "Kinematics.h"
-
+#include "Integrator.h"
 
 //std::ofstream datalog_decay("decaylog.dat",std::ios::out);
 
 using std::cout; using std::endl;
+
+using namespace std::placeholders;
 
 // two body decay of parent ->  daughter + X (e.g. Pi0 -> gamma + V)
 // output momentum of daughter particle in the lab frame
@@ -218,6 +220,26 @@ namespace Three_Body_Decay_Space{
         }
         //cout << endl << "d_decay_width_2 test " << amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3),m0,m1,m2,m3) << " " << m12*m12 << " " << Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3) << " " << p2p3(m12*m12,cos_t,m0,m1,m2,m3) << " " << p1star(m12,m1,m2) << " " << p3rest(m12,m0,m3) << " " << 1/(pow(2*pi,5)*16*m0*m0) << endl;
         return amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3),m0,m1,m2,m3)/(pow(2*pi,5)*16*m0*m0)*p1star(m12,m1,m2)*p3rest(m12,m0,m3);
+    }
+
+    double d_decay_width_3(std::function<double(double,double)> amp, double m12, double cos_t, double m0, double m1, double m2, double m3){
+        if(m12<=m1+m2){
+            return 0;
+        }
+        //cout << endl << "d_decay_width_2 test " << amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3),m0,m1,m2,m3) << " " << m12*m12 << " " << Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3) << " " << p2p3(m12*m12,cos_t,m0,m1,m2,m3) << " " << p1star(m12,m1,m2) << " " << p3rest(m12,m0,m3) << " " << 1/(pow(2*pi,5)*16*m0*m0) << endl;
+        return amp(m12*m12,Cos_Theta_to_m23s(m12*m12, cos_t, m0, m1, m2, m3))/(pow(2*pi,5)*16*m0*m0)*p1star(m12,m1,m2)*p3rest(m12,m0,m3);
+    }
+
+    //Need to test this, may just want to do a random sample instead.
+    double integrate_decay_width(std::function<double(double,double)> amp, double m0, double m1, double m2, double m3){
+        if(m0<m1+m2+m3){
+            return 0;
+        }
+
+        std::function<double(double, double)> d2amp = bind(d_decay_width_3,amp,_1,_2,m0,m1,m2,m3);
+
+        //return RandomIntegrate2(d2amp,m1+m2,m0-m3,-1,1,100*100)
+        return 8*pi*pi*SimpsonCubature(d2amp,m1+m2,m0-m3,100,-1,1,100);
     }
 
     void Three_Body_Decay(Particle &parent, Particle &daughter1, Particle &daughter2, Particle &daughter3, double &d_width_max, std::function<double(double, double, double, double, double, double)> &amp){

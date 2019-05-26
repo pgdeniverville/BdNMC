@@ -15,6 +15,7 @@ double DoubleExponential_adapt(std::function<double(double)> f, double min, doub
 //From "Numerical Algorithms with C"
 //Format is SimpsonCubature(function, xmin, xmax, x_steps/2, ymin, ymax, y_steps/2)
 double SimpsonCubature(std::function<double(double, double)> f, double a, double b, int P, double c, double d, int Q);
+double RandomIntegrate2(std::function<double(double,double)> f, double xmin, double xmax, double ymin, double ymax, int n);
 
 class Interpolation1D{
     public:

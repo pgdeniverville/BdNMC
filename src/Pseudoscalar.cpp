@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "constants.h"
 #include "Kinematics.h"
-#include "Drell_Yan_Gen.h"
+//#include "Drell_Yan_Gen.h"
 #include "branchingratios.h"
 #include "DMgenerator.h"
 #include "Proton_Brem.h"
@@ -60,7 +60,7 @@ bool Pseudoscalar::Prepare_Signal_Channel(Parameter& par){
 
 //Production channel comes from Parameter.h!
 bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
-    if(prodchoice=="Drell_Yan"){
+/*    if(prodchoice=="Drell_Yan"){
 //        cout << "ma=" << ma << " mx=" << mchi << endl;
 //        cout << dsigma_dEk_qq_to_chichi(2,8.9,0.3,0.15,1,MASS_PROTON) << endl;
         //cout <<  "Test sigma for EA=20, x=0.3, y=0.15, MASS=0.938 : " << dsigma_hat_dt_qq_to_chi_chi(20, 0, 0.3, 0.15, 1, 0.938) << endl;
@@ -73,9 +73,9 @@ bool Pseudoscalar::Prepare_Production_Channel(std::string prodchoice, std::strin
         cout << "Note overestimate due to 1.75 interaction lengths of material.\n";
         DMGen = tmp_gen;
         return true;
-    }
+    }*/
     //This might need to be proddist?
-    else if(prodchoice=="Proton_Bremsstrahlung"){
+    if(prodchoice=="Proton_Bremsstrahlung"){
         //Not sure if this is the right coupling.
         function<double(double, double)> dsig_dpt2dz = std::bind(brem_split_pseudoscalar,_1,_2,ma,gq*proton_form_factor(ma*ma));
         

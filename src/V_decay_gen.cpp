@@ -85,6 +85,10 @@ bool Do_Nothing_Gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
 
 //A general isotropic two body decay. Only cares about the kinematics!
 
+Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string part_name, Particle Daughter1, Particle Daughter2){
+    Two_Body_Decay_Gen(branching_ratio, parent_mass, part_name,  Daughter1, Daughter2, 0);
+}
+
 Two_Body_Decay_Gen::Two_Body_Decay_Gen(double branching_ratio, double parent_mass, std::string part_name, Particle Daughter1, Particle Daughter2, double lifetime){
     if(parent_mass < Daughter1.m+Daughter2.m){
         std::cerr << "Parent_Mass is smaller than daughter masses, invalid decay!\n";

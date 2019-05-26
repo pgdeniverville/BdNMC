@@ -45,7 +45,7 @@ namespace Three_Body_Decay_Space{
     double Cos_Theta_to_m23s(double m12s, double CosTheta, double m0, double m1, double m2, double m3);
 
     //Eq 47.22 in the PDG.
-    //Function expects amp(m12s, s, m0, m1, m2, m3)
+    //Function expects amp(m12^2, m23^2, m0, m1, m2, m3)
     double d_decay_width(std::function<double(double,double,double,double,double,double)> amp, double m12s, double m23s, double m0, double m1, double m2, double m3);
 
     //This includes the angular dependence
@@ -53,6 +53,11 @@ namespace Three_Body_Decay_Space{
     //amp(m12s,cos_t,m0, m1,m2,m3), where cos_t is the angle between p1 and p3 in the p1-p2 rest frame.
     //Remember to multiply by 8 pi^2 when integrating to account for d\phi_1 dcos\theta_3 d\phi_3!
     double d_decay_width_2(std::function<double(double,double,double,double,double,double)> amp, double m12, double cos_t, double m0, double m1, double m2, double m3);
+
+    double d_decay_width_3(std::function<double(double,double)> amp, double m12, double cos_t, double m0, double m1, double m2, double m3);
+
+    double integrate_decay_width(std::function<double(double,double)> amp, double m0, double m1, double m2, double m3);
+
 }
 
 #endif

@@ -2,6 +2,7 @@
 #define GUARD_branchingratios_h
 
 
+double RRATIO(double sqrt_s);
 
 //KINETIC MIXING
 double bretatoVgamma(double mv, double mx, double kappa, double alphaD);
@@ -13,7 +14,6 @@ double Gamma_V(double mv, double mx, double kappa, double alphaD);
 double Gamma_V_to_leptons(double mv, double kappa, double ml);
 double Gamma_V_to_hadrons(double mv, double kappa);
 double Gamma_V_to_visible(double mv, double kappa);
-
 
 double GammaV_to_dm_dm(double mv, double mx, double kappa, double alphaD);
 double brrho_to_V(double mv, double mx, double kappa, double alphaD);
@@ -57,6 +57,9 @@ double breta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double 
 double bromega_to_Vb(double mv, double mx, double kappa, double alphaD);
 double brphi_to_Vb(double mv, double mx, double kappa, double alphaD);
 
+namespace Inelastic_DM{
+    double Gamma_A_to_dm1_dm2(double mass_dp,double mass_dm1,double mass_dm2, double alpha_D);
+}
 
 /*
  * This namespace is for dark photon coupled to axion. It has a lot of

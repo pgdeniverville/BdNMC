@@ -1,5 +1,6 @@
 #include "Integrator.h"
 #include "minimization.h"
+#include "Random.h"
 
 #include <cmath>
 #include <stdexcept>
@@ -37,6 +38,15 @@ double func_check(std::function<double(double)> f, double abscissa, double min, 
 		fm=0;
 	return fm+fp;
 }
+
+double RandomIntegrate2(std::function<double(double,double)> f, double xmin, double xmax, double ymin, double ymax, int n){
+    double tot=0;
+    for(int i = 0; i < n; i++){
+        tot+=f(Random::Flat(xmin,xmax),Random::Flat(ymin,ymax));
+    }
+    return tot/(double)n;
+}
+
 //From "Numerical Algorithms with C"
 //Format is SimpsonCubature(function, xmin, xmax, x_steps/2, ymin, ymax, y_steps/2)
 double SimpsonCubature(std::function<double(double, double)> f, double a, double b, int P, double c, double d, int Q){

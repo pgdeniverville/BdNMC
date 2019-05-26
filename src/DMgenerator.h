@@ -153,8 +153,10 @@ class Do_Nothing_Gen: public DMGenerator{
 //Need to add unstable daughter particles
 class Two_Body_Decay_Gen: public DMGenerator{
     public:
-        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime=0);
+        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime);
+        Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2);
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
+        void Toggle_Daughter_Decay(int index, std::shared_ptr<DMGenerator> daughter_decay_gen);
         //If true, then this daughter is checked for intersection with the detector.
         bool d1 = true;
         bool d2 = true;
@@ -175,9 +177,9 @@ class Three_Body_Decay_Gen: public DMGenerator{
     public:
         //std::shared_ptr<DMGenerator> decaygen1, std::shared_ptr<DMGenerator> decaygen2, std::shared_ptr<DMGenerator> decaygen3, will be added in when I add decays of component particles.
         Three_Body_Decay_Gen(Particle& parent, Particle& daughter1, Particle& daughter2, Particle& daughter3, std::string prodchoice,  double lifetime, std::function<double(double, double, double, double, double, double)> &amp);
+        Three_Body_Decay_Gen(Particle& parent, Particle& daughter1, Particle& daughter2, Particle& daughter3, std::string prodchoice,  double lifetime, double partial_width, std::function<double(double, double, double, double, double, double)> &amp);
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
         //Turns on decays for daughter 1, 2 or 3.
-        //Do I want this to be a reference? Probably, yeah.
         void Toggle_Daughter_Decay(int index, std::shared_ptr<DMGenerator> daughter_decay_gen);
         //Are these particles checked for intersection with the detector?
         bool d1 = true;

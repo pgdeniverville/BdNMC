@@ -71,7 +71,7 @@ class Model{
 
 class Inelastic_Dark_Matter : public Model{
     public:
-        Axion_Dark_Photon(Parameter& par) : Model(par){};
+        Inelastic_Dark_Matter(Parameter& par) : Model(par){};
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);
@@ -79,12 +79,21 @@ class Inelastic_Dark_Matter : public Model{
         void Report(std::ostream& out);
         void Branching_Ratios(){};
 
-        double pi0_decay_amplitude2(double m12s, double m23s, double m0, double m1, double m2, double m3);
-        double dm2_to_lepton_lepton_dm1(double)
+        double meson_decay_amplitude2(double m12s, double m23s, double m0, double m1, double m2, double m3);
+        double Amplitude2_dm2_to_lepton_lepton_dm1(double m12s, double m23s, double m0, double m1, double m2, double m3);
+        //m1=m2=MASS_MUON
+        double Amplitude2_dm2_to_hadrons_dm1(double m12s, double m23s, double m0, double m3);
+        double A_width();
+        double dm2_width();
     private:
+        void Evaluate_Widths();
         //mass_dm2 is assumed to be heavier.
+        double Awidth, dm2width;
+        double width_dm2_to_elec_elec_dm1;
+        double width_dm2_to_muon_muon_dm1;
+        double width_dm2_to_dm1_hadrons;
         double mass_dp, mass_dm1, mass_dm2, epsilon, alpha_D;
-}
+};
 
 class Axion_Dark_Photon : public Model{
     public:

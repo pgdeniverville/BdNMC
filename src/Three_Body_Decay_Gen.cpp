@@ -16,6 +16,34 @@ using namespace std::placeholders;
 using namespace Three_Body_Decay_Space;
 // std::shared_ptr<DMGenerator> decaygen1, std::shared_ptr<DMGenerator> decaygen2, std::shared_ptr<DMGenerator> decaygen3
 
+Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1, Particle& Daughter2, Particle& Daughter3, std::string prodstring, double lifetime, double partial_width, function<double(double, double, double, double, double, double)> &amplitude){
+    if(Parent.m < Daughter1.m+Daughter2.m+Daughter3.m){
+        std::cerr << "Parent_Mass is smaller than combined daughter masses, invalid decay!\n";
+        throw -30;
+    }
+    mother = Particle(Parent);
+    daughter1 = Particle(Daughter1);
+    daughter2 = Particle(Daughter2);
+    daughter3 = Particle(Daughter3);
+    
+//  cout << tot*resx*resy*8*pi*pi << endl;
+    //commented temporarily until I can determine the issue.
+    //branchingratio=8*pi*pi*SimpsonCubature(d2width,daughter1.m+daughter2.m,mother.m-daughter3.m,100,-1,1,100)/mother.width;
+    branchingratio=partial_width/mother.width;
+    std::cout << "Branching Ratio calculated to be " << branchingratio << endl;
+    tau = lifetime;
+    //amp = function<double(double,double,double,double,double,double)>(amplitude);
+    //This might not work, I may need a pointer to store this. Memory allocation etcetc.
+    amp = amplitude;
+    prodchoice=prodstring;
+    pmax=0;
+
+    //burn-in
+    for(int i=0; i<1000; i++){
+        Three_Body_Decay(mother, daughter1, daughter2, daughter3, pmax, amplitude);
+    }
+}
+
 Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1, Particle& Daughter2, Particle& Daughter3, std::string prodstring, double lifetime, function<double(double, double, double, double, double, double)> &amplitude){
     if(Parent.m < Daughter1.m+Daughter2.m+Daughter3.m){
         std::cerr << "Parent_Mass is smaller than combined daughter masses, invalid decay!\n";

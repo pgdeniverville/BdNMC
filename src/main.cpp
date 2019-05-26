@@ -669,7 +669,7 @@ int main(int argc, char* argv[]){
     	BURN_MAX = 0;
     	cout << "Weighted Events selected.\nSkipping Burn-In.\n";
     }
-    total_weight=0;
+
     //This bit should be deprecated once everything moves over to model classes.
     if(sig_part_vec.empty()){
 	    sig_part_vec.push_back(sig_part_name);
@@ -737,7 +737,7 @@ int main(int argc, char* argv[]){
 
     cout << "Maximum Trials set to " << trials_max << endl;
 
-    if((SigGen->get_pMax()<=0 || SigGen->get_pMax()*Vnumtot<=par->Min_Event()) && outmode!="dm_detector_distribution" && !par->Weight_Events()){
+    if((SigGen->get_pMax()<=0 || SigGen->get_pMax()*Vnumtot<=par->Min_Event()) && outmode!="dm_detector_distribution" && !par->Weighted_Events()){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
@@ -780,7 +780,7 @@ int main(int argc, char* argv[]){
                         //may need to replace this with a list<Particle> later
                         //cout << SigGen->get_pMax() << endl;
                         //If pMax=0, all events are accepted.
-                        if(par->Weight_Events()){
+                        if(par->Weighted_Events()){
                         	SigGen->set_pMax(0);
                         }
                         if(SigGen->probscatter(det, vec, iter)){
@@ -794,7 +794,7 @@ int main(int argc, char* argv[]){
                             	timing_prob_factor=1;
                             }
 
-                            if(par->Weight_Events()){
+                            if(par->Weighted_Events()){
                             	scat_list[i]+=SigGen->get_pMax()*timing_prob_factor;
                             }
                             else{
@@ -809,9 +809,9 @@ int main(int argc, char* argv[]){
                 }
             }
             if(scatter_switch&&outmode=="comprehensive"){
-                *comprehensive_out << "event " << ++nevent 
+                *comprehensive_out << "event " << ++nevent;
                 if(par->Weighted_Events()){
-                	<< " " << Sigen->get_pMax();
+                	*comprehensive_out << " " << SigGen->get_pMax();
                 }
                 *comprehensive_out << endl;
                 Record_Particles(*comprehensive_out, vec);
@@ -837,7 +837,7 @@ int main(int argc, char* argv[]){
 	int NDM = 0;    
 
 	//In the weighted events case, we set pMax=1;
-	if(par->Weight_Events()){
+	if(par->Weighted_Events()){
 		SigGen->set_pMax(1);
 	}
 
