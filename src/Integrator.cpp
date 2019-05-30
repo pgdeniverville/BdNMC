@@ -39,12 +39,58 @@ double func_check(std::function<double(double)> f, double abscissa, double min, 
 	return fm+fp;
 }
 
+const int _N_MAX = 1e9;
+
+double RandomIntegrate2_adapt(std::function<double(double,double)> f, double xmin, double xmax, double ymin, double ymax, int n_start, double r_accuracy_goal){
+    int n = n_start;
+    double estimate = RandomIntegrate2(f, xmin, xmax, ymin, ymax, n);
+    double estimate_2;
+    while(n<_N_MAX){
+        n*=2;
+        estimate_2 = RandomIntegrate2(f, xmin, xmax, ymin, ymax, n);
+        //cout << n << " " << estimate << " " << estimate_2 << endl;
+        if((abs(estimate-estimate_2))/(0.5*(estimate+estimate_2))<r_accuracy_goal){
+            return (estimate+2*estimate_2)/3.0;
+        }
+        else{
+            estimate = (estimate+2*estimate_2)/3.0;
+            n*=1.5;
+        }
+    }
+    cerr << "RandomIntegrate2_adapt reached max steps without achieving accuracy goal\n";
+    cerr << "Estimate = " << estimate << " next step = " << estimate_2 << endl;
+    return estimate_2;
+}
+
+//Unfortunately this retraces its steps.
+double SimpsonCubature_adapt(std::function<double(double,double)> f, double xmin, double xmax, int xsteps_start, double ymin, double ymax, int ysteps_start, double r_accuracy_goal){
+    int xsteps = xsteps_start;
+    int ysteps = ysteps_start;
+    double estimate = SimpsonCubature(f, xmin, xmax, xsteps, ymin, ymax, ysteps);
+    double estimate_2;
+    while(xsteps < _N_MAX && ysteps < _N_MAX){
+        xsteps*=2;
+        ysteps*=2;
+        estimate_2=SimpsonCubature(f, xmin, xmax, xsteps, ymin, ymax, ysteps);
+        cout << estimate << " " << estimate_2 << endl;
+        if((abs(estimate-estimate_2))/(0.5*(estimate+estimate_2))<r_accuracy_goal){
+            return estimate_2;
+        }
+        else{
+            estimate = estimate_2;
+        }
+    }
+    cerr << "SimpsonCubature_adapt reached max steps without achieving accuracy goal\n";
+    cerr << "Estimate = " << estimate << " next step = " << estimate_2 << endl;
+    return estimate_2;
+}
+
 double RandomIntegrate2(std::function<double(double,double)> f, double xmin, double xmax, double ymin, double ymax, int n){
     double tot=0;
     for(int i = 0; i < n; i++){
         tot+=f(Random::Flat(xmin,xmax),Random::Flat(ymin,ymax));
     }
-    return tot/(double)n;
+    return tot/(double)n*(xmax-xmin)*(ymax-ymin);
 }
 
 //From "Numerical Algorithms with C"

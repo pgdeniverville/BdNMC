@@ -177,11 +177,12 @@ class Three_Body_Decay_Gen: public DMGenerator{
     public:
         //std::shared_ptr<DMGenerator> decaygen1, std::shared_ptr<DMGenerator> decaygen2, std::shared_ptr<DMGenerator> decaygen3, will be added in when I add decays of component particles.
         Three_Body_Decay_Gen(Particle& parent, Particle& daughter1, Particle& daughter2, Particle& daughter3, std::string prodchoice,  double lifetime, std::function<double(double, double, double, double, double, double)> &amp);
-        Three_Body_Decay_Gen(Particle& parent, Particle& daughter1, Particle& daughter2, Particle& daughter3, std::string prodchoice,  double lifetime, double partial_width, std::function<double(double, double, double, double, double, double)> &amp);
+        Three_Body_Decay_Gen(Particle& parent, Particle& daughter1, Particle& daughter2, Particle& daughter3, std::string prodchoice,  double lifetime, double partial_width, std::function<double(double, double, double, double, double, double)> &amp, int burn=1000);
         bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
         //Turns on decays for daughter 1, 2 or 3.
         void Toggle_Daughter_Decay(int index, std::shared_ptr<DMGenerator> daughter_decay_gen);
         //Are these particles checked for intersection with the detector?
+        void Burn_In(int i);
         bool d1 = true;
         bool d2 = true;
         bool d3 = true;

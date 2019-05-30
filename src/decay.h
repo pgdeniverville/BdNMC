@@ -56,7 +56,7 @@ namespace Three_Body_Decay_Space{
 
     double d_decay_width_3(std::function<double(double,double)> amp, double m12, double cos_t, double m0, double m1, double m2, double m3);
 
-    double integrate_decay_width(std::function<double(double,double)> amp, double m0, double m1, double m2, double m3);
+    double integrate_decay_width(std::function<double(double,double)> amp, double m0, double m1, double m2, double m3, double r_acuracy_goal = 0.01);
 
 }
 

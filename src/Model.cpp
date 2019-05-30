@@ -44,7 +44,7 @@ void Model::Prepare_Model(Parameter& par){
             throw -1;
         }
         //Specific model handles the production channel
-        if(!this->Prepare_Production_Channel(prodchoice, proddist, *proditer, DMGen,PartDist, Vnum, par)){
+        if(!this->Prepare_Production_Channel(prodchoice, proddist, *proditer, DMGen, PartDist, Vnum, par)){
             cerr << "Something wrong with prod_chan!" << endl;
             throw -1;
         };

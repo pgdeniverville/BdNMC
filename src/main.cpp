@@ -639,6 +639,7 @@ int main(int argc, char* argv[]){
 	}
     cout << "Signal Channel = " << sigchoice << endl;
  	cout << "Beam Energy = " << beam_energy << " GeV" << endl;
+
 	cout << "Maximum Scattering Energy = " << max_scatter_energy << " GeV" << endl;
 	cout << "Minimum Scattering Energy = " << min_scatter_energy << " GeV" <<  endl;
 	cout << "Timing Cut = " << timing_cut << " s\n";
@@ -849,10 +850,10 @@ int main(int argc, char* argv[]){
 		scattot+=scat_list[i];
   		cout << DMGen_list[i]->Channel_Name() << ": " << signal_list[i];
 		if(par->Weighted_Events()){
-			cout << "Weight: " << scat_list[i] << " V_num: " << Vnum_list[i] << endl;
+			cout << " Weight: " << scat_list[i] << " V_num: " << Vnum_list[i] << endl;
 		}
 		else{
-			cout << "Events: " << scat_list[i] << " V_num: " << Vnum_list[i] << endl;			
+			cout << " Events: " << scat_list[i] << " V_num: " << Vnum_list[i] << endl;			
 		}
 	
 		if(outmode=="summary"||outmode=="dm_detector_distribution"||
@@ -918,8 +919,13 @@ int main(int argc, char* argv[]){
 		cout << "Number of scatterings from channel " << i+1 << " " << DMGen_list[i]->Channel_Name() << " = " << scat_list[i] << " in " << trials_list[i] << " trials." << endl;  
 	cout << "Number of sample events generated = " << nevent << endl;
 	cout << "Acceptance = " << (double)NDM/(2*trials) << endl;	
-	cout << "Maximum event probability = "  << SigGen->get_pMax() << endl;
-	cout << "Average event probability = "  << (double)scattot/NDM*SigGen->get_pMax() << endl;
+ 	if(!par->Weighted_Events()){
+		cout << "Maximum event probability = "  << SigGen->get_pMax() << endl;
+		cout << "Average event probability = "  << (double)scattot/NDM*SigGen->get_pMax() << endl;
+	}
+	else{
+		cout << "Average event probability = " << scattot/(double)NDM << endl;
+	}
 	cout << "Predicted number of signal events = "  << signal << endl;
 	for(int i=0; i<chan_count;i++)
 		cout << "Predicted number of signal events from channel " << i+1 << " " << DMGen_list[i]->Channel_Name()  <<  " = "  << signal_list[i] << endl;

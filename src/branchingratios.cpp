@@ -360,8 +360,8 @@ namespace Inelastic_DM{
             return 0;
         }
         else{//Needs testing
-            return -1/(8*pi)*one_to_two_decay::two_body_momentum(mass_dp,mass_dm1,mass_dm2)/pow(mass_dp,2)*\
-            2/3*pow(alpha_D,2)*(mass_dm1-mass_dm2-mass_dp)*(mass_dm1-mass_dm2+mass_dp)*(pow(mass_dm1+mass_dm2,2)+2*pow(mass_dp,2))/pow(mass_dp,2);
+            return -alpha_D*one_to_two_decay::two_body_momentum(mass_dp,mass_dm1,mass_dm2)/(3*pow(mass_dp,4))*\
+            (mass_dm1-mass_dm2-mass_dp)*(mass_dm1-mass_dm2+mass_dp)*(pow(mass_dm1+mass_dm2,2)+2*pow(mass_dp,2));
         }
     }
     

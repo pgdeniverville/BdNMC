@@ -12,9 +12,13 @@ double SimpsonsRule(std::function<double(double)>, double min, double max, int s
 double DoubleExponential(std::function<double(double)>, double min, double max, int N, double stepsize);
 double DoubleExponential_adapt(std::function<double(double)> f, double min, double max, int N, double h, double precision);
 
+
+double SimpsonCubature_adapt(std::function<double(double,double)> f, double xmin, double xmax, int xsteps_start, double ymin, double ymax, int ysteps_start, double r_accuracy_goal=0.01);
 //From "Numerical Algorithms with C"
 //Format is SimpsonCubature(function, xmin, xmax, x_steps/2, ymin, ymax, y_steps/2)
 double SimpsonCubature(std::function<double(double, double)> f, double a, double b, int P, double c, double d, int Q);
+
+double RandomIntegrate2_adapt(std::function<double(double,double)> f, double xmin, double xmax, double ymin, double ymax, int n_start, double r_accuracy_goal=0.01);
 double RandomIntegrate2(std::function<double(double,double)> f, double xmin, double xmax, double ymin, double ymax, int n);
 
 class Interpolation1D{

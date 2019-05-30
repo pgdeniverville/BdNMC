@@ -147,7 +147,7 @@ production_channel::production_channel(){
    	sanfordwang_file="";
    	parton_V_n_file=""; 
 	parton_V_p_file="";
-	meson_per_pi0=-1; 
+	meson_per_pi0=1; 
 	PTMAX=-1; 
 	PTMIN=0;
     ZMIN=-1;
@@ -362,7 +362,7 @@ Parameter::Parameter(std::ifstream &instream){
         for(vector<_material>::iterator it = mat_vec.begin(); it != mat_vec.end(); ++it){
             det->add_material(it->n_density, it->p_num, it->n_num, it->e_num,it->mass,it->name);
         }
-        Set_String(modelkey,model_name,keymap,"Hidden_Sector_DM");
+        Set_String(modelkey,model_name,keymap,"Dark_Photon");
         Set_Model_Parameters(keymap);    
         Set_Double(POTkey, POT, keymap);
         Set_Double(min_event_key,min_event,keymap,-1.0);

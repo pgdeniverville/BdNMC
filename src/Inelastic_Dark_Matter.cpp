@@ -19,11 +19,9 @@ using std::function;
 using namespace std::placeholders;
 
 //The ratio at which off-shell mode is activated.
-const double off_shell_ratio=1.1;
+const double off_shell_ratio=1.3;
 
 bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
-    //mass_dp = par.MassDP();
-    cout << "Setting DP mass, check that it worked properly!\n";
     if(!par.Query_Map("dark_photon_mass",mass_dp)){
         std::cerr << par.Model_Name() << " requires dark_photon_mass to be defined.\n";
         return false;
@@ -32,9 +30,9 @@ bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
         std::cerr << par.Model_Name() << " requires epsilon to be defined.\n";
         return false;
     }
-    if(!par.Query_Map("dm_mass",mass_dm1)){
-        if(!par.Query_Map("dm1_mass", mass_dm1)||!par.Query_Map("dm2_mass", mass_dm2)){
-            std::cerr << par.Model_Name() << " requires dm_mass or dm1_mass and dm2_mass to be defined.\n";
+    if(!par.Query_Map("dark_matter_mass",mass_dm1)){
+        if(!par.Query_Map("dark_matter_1_mass", mass_dm1)||!par.Query_Map("dark_matter_2_mass", mass_dm2)){
+            std::cerr << par.Model_Name() << " requires dark_matter_mass or dark_matter_1_mass and dark_matter_2_mass to be defined.\n";
             return false;
         }
     }
@@ -42,7 +40,7 @@ bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
         mass_dm2 = mass_dm1;
     }
     if(mass_dm2<mass_dm1){
-        cout << "dm2 is assumed to be heavier than dm1, swapping masses.\n";
+        cout << "dark_matter_2_mass is assumed to be heavier than dark_matter_1_mass, swapping masses.\n";
         double tmp = mass_dm2;
         mass_dm2 = mass_dm1;
         mass_dm1 = tmp;
@@ -71,21 +69,28 @@ void Inelastic_Dark_Matter::Report_Model(){
 void Inelastic_Dark_Matter::Evaluate_Widths(){
     Awidth=Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D)+Gamma_V_to_visible(mass_dp,epsilon);
 
+    cout << "Gamma(A->DM1+DM2) = " << Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D) << endl;
+
     dm2width=0;
 
     std::function<double(double, double)> d2widthe = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,mass_dm2,MASS_ELECTRON,MASS_ELECTRON,mass_dm1);
 
     width_dm2_to_elec_elec_dm1=Three_Body_Decay_Space::integrate_decay_width(d2widthe,mass_dm2,MASS_ELECTRON,MASS_ELECTRON,mass_dm1);
 
+    cout << "Gamma(dm2->e^+ e^- dm1) = " << width_dm2_to_elec_elec_dm1 << endl;
+
     std::function<double(double, double)> d2widthmu = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,mass_dm2,MASS_MUON,MASS_MUON,mass_dm1);
 
     width_dm2_to_muon_muon_dm1=Three_Body_Decay_Space::integrate_decay_width(d2widthmu,mass_dm2,MASS_MUON,MASS_MUON,mass_dm1);
+
+    cout << "Gamma(dm2->mu^+ mu^- dm1) = " << width_dm2_to_muon_muon_dm1 << endl;
 
     // std::function<double(double, double)> d2width_hadrons = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_hadrons_dm1,this,_1,_2,mass_dm2,mass_dm1);
  
     // width_dm2_to_dm1_hadrons=Three_Body_Decay_Space::integrate_decay_width(d2width_hadrons,mass_dm2,MASS_MUON,MASS_MUON,mass_dm1);;
     
     dm2width = width_dm2_to_muon_muon_dm1+width_dm2_to_elec_elec_dm1;
+
 }
 
 //This should just be a function from branchingratios.cpp
@@ -97,6 +102,7 @@ double Inelastic_Dark_Matter::dm2_width(){
     return dm2width;
 }
 
+//p1 -> dm1, p2 -> dm2, p3 -> photon
 double Inelastic_Dark_Matter::meson_decay_amplitude2(double m12s, double m23s, double m0, double m1, double m2, double m3){
     return (4*(m12s*(pow(m12s,2) - m12s*(pow(m2,2) - 2*m23s) + 2*m23s*(-pow(m2,2) + m23s)) -2*(m12s + pow(m2,2))*(m12s - pow(m2,2) + m23s)*pow(m0,2) + 
        (m12s + pow(m2,2))*pow(m0,4) + 2*m1*m2*pow(m12s - pow(m0,2),2) - 
@@ -184,13 +190,18 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
             std::cerr << "Invalid production channel" << prodchoice << "\n" << endl;
             throw -1;
         }
-        std::shared_ptr<Three_Body_Decay_Gen> tmp_gen(new Three_Body_Decay_Gen(meson,photon,dm1,dm2,prodchoice,lifetime,func));
+        std::function<double(double,double)> func_width = std::bind(func,_1,_2,meson.m,mass_dm1,mass_dm2,0);
+ 
+        //Only calculates width to 2% accuracy.
+        double Gamma_meson_3body=Three_Body_Decay_Space::integrate_decay_width(func_width,meson.m,mass_dm1,mass_dm2,0,0.02);
+ 
+        std::shared_ptr<Three_Body_Decay_Gen> tmp_gen(new Three_Body_Decay_Gen(meson,dm1,dm2,photon,prodchoice,lifetime,Gamma_meson_3body,func,0));
         tmp_gen->d1=false;
 
         if(sig_choice!="DP_Signal_Decay"){
             //Switch to off-shell behavior
             if(tmp_gen->BranchingRatio()>off_shell_ratio*on_shell_br){
-
+                tmp_gen->Burn_In(1000);
                 DMGen = tmp_gen;
 
                 if(sig_choice!="DM2_Signal_Decay"){
@@ -218,14 +229,14 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
                 DMGen = meson_decay_gen;
             }       
         }
-        
-        Vnum=tmp_gen->BranchingRatio()*par.Protons_on_Target()*prodchan.Meson_Per_Pi0()*par.Pi0_per_POT();
+
+        Vnum=DMGen->BranchingRatio()*par.Protons_on_Target()*prodchan.Meson_Per_Pi0()*par.Pi0_per_POT();
 
         if(DMGen->Channel_Name()==""){
             DMGen->Set_Channel_Name(prodchoice);
         }
         
-
+        return true;
     }
     else if(prodchoice=="proton_brem"){
         double part_mass;
@@ -270,23 +281,35 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         Particle antimuon(MASS_MUON);
         positron.name = "Decay_Antimuon";
 
-
-        std::function<double(double,double,double,double,double,double)> func = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
-
-        //Set lifetime to zero, Signal_Decay handles the lifetime.
-        std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen(new Three_Body_Decay_Gen(dm2,electron,positron,dm1,string("Decay_Electron_Positron_DM1"),0,width_dm2_to_elec_elec_dm1,func));
-
-        dp_3decay_gen->record_parent = false;
-
-        std::function<double(double,double,double,double,double,double)> func2 = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
-
-        std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen_2(new Three_Body_Decay_Gen(dm2,muon,antimuon,dm1,string("Decay_Muon_Antimuon_DM1"),0,width_dm2_to_muon_muon_dm1,func2));
-
-        dp_3decay_gen_2->record_parent = false;
-
         vector<std::shared_ptr<DMGenerator> > dec_vec;
-        dec_vec.push_back(dp_3decay_gen);
-        dec_vec.push_back(dp_3decay_gen_2);
+
+        if(mass_dm2>mass_dm1+2*MASS_ELECTRON){
+            std::function<double(double,double,double,double,double,double)> func = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
+
+            //Set lifetime to zero, Signal_Decay handles the lifetime.
+            std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen(new Three_Body_Decay_Gen(dm2,electron,positron,dm1,string("Decay_Electron_Positron_DM1"),0,width_dm2_to_elec_elec_dm1,func));
+
+            dp_3decay_gen->record_parent = false;            
+
+            dec_vec.push_back(dp_3decay_gen);
+        }
+        
+        if(mass_dm2>mass_dm1+2*MASS_MUON){
+
+            std::function<double(double,double,double,double,double,double)> func2 = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
+
+            std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen_2(new Three_Body_Decay_Gen(dm2,muon,antimuon,dm1,string("Decay_Muon_Antimuon_DM1"),0,width_dm2_to_muon_muon_dm1,func2));
+
+            dp_3decay_gen_2->record_parent = false;
+
+            dec_vec.push_back(dp_3decay_gen_2);
+
+        }
+
+        if(dec_vec.size()==0){
+            cout << "No valid decay channels for DM2!\n";
+            return false;
+        }
 
         double lifetime = hbar/dm2_width();
 

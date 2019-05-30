@@ -231,15 +231,17 @@ namespace Three_Body_Decay_Space{
     }
 
     //Need to test this, may just want to do a random sample instead.
-    double integrate_decay_width(std::function<double(double,double)> amp, double m0, double m1, double m2, double m3){
+    double integrate_decay_width(std::function<double(double,double)> amp, double m0, double m1, double m2, double m3, double r_accuracy_goal){
         if(m0<m1+m2+m3){
             return 0;
         }
 
         std::function<double(double, double)> d2amp = bind(d_decay_width_3,amp,_1,_2,m0,m1,m2,m3);
 
-        //return RandomIntegrate2(d2amp,m1+m2,m0-m3,-1,1,100*100)
-        return 8*pi*pi*SimpsonCubature(d2amp,m1+m2,m0-m3,100,-1,1,100);
+        //return 8*pi*pi*RandomIntegrate2(d2amp,m1+m2,m0-m3,-1,1,1e6);
+        //return 8*pi*pi*SimpsonCubature(d2amp,m1+m2,m0-m3,100,-1,1,100);
+        //return 8*pi*pi*SimpsonCubature_adapt(d2amp,m1+m2,m0-m3,100,-1,1,100);
+        return 8*pi*pi*RandomIntegrate2_adapt(d2amp,m1+m2,m0-m3,-1,1,1e5,r_accuracy_goal);
     }
 
     void Three_Body_Decay(Particle &parent, Particle &daughter1, Particle &daughter2, Particle &daughter3, double &d_width_max, std::function<double(double, double, double, double, double, double)> &amp){
