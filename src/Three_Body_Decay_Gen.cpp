@@ -25,6 +25,8 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     daughter1 = Particle(Daughter1);
     daughter2 = Particle(Daughter2);
     daughter3 = Particle(Daughter3);
+
+    Set_Channel_Name(prodstring);
     
 //  cout << tot*resx*resy*8*pi*pi << endl;
     //commented temporarily until I can determine the issue.
@@ -35,8 +37,8 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     tau = lifetime;
     //amp = function<double(double,double,double,double,double,double)>(amplitude);
     //This might not work, I may need a pointer to store this. Memory allocation etcetc.
-    amp = amplitude;
-    prodchoice=prodstring;
+    amp = amplitude; 
+   prodchoice=prodstring;
     pmax=0;
 
     //burn-in
@@ -61,6 +63,8 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     //Should probably make this adaptive in the future, at least increase the resolution once to check for accuracy.
     int n=100;
     double resx = ((mother.m-daughter3.m) - (daughter1.m+daughter2.m))/n;
+
+    Set_Channel_Name(prodstring);
 
     double resy=2.0/n;
     double tot=0.0;
@@ -124,6 +128,7 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
 
     parent.report(cout);
 */
+    cout << "GenDM start!\n" << endl;
 
     if(tau>0){
         double decay_time=tau*log(1/(1-Random::Flat()));

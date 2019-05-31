@@ -193,8 +193,10 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
         std::function<double(double,double)> func_width = std::bind(func,_1,_2,meson.m,mass_dm1,mass_dm2,0);
  
         //Only calculates width to 2% accuracy.
-        double Gamma_meson_3body=Three_Body_Decay_Space::integrate_decay_width(func_width,meson.m,mass_dm1,mass_dm2,0,0.02);
+        double Gamma_meson_3body=Three_Body_Decay_Space::integrate_decay_width(func_width,meson.m,mass_dm1,mass_dm2,0);
  
+        cout << "Three Body Decay Width = " << Gamma_meson_3body << endl;
+
         std::shared_ptr<Three_Body_Decay_Gen> tmp_gen(new Three_Body_Decay_Gen(meson,dm1,dm2,photon,prodchoice,lifetime,Gamma_meson_3body,func,0));
         tmp_gen->d1=false;
 

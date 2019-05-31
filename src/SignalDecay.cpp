@@ -45,6 +45,7 @@ SignalDecay::SignalDecay(double lifetime, std::vector<double> branching_ratios, 
 
 
 bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
+
     double time1 = (*Parentit).Momentum()*(Parentit->crossing[0])/(*Parentit).Speed()/speed_of_light;
     double time2 = (*Parentit).Momentum()*(Parentit->crossing[1])/(*Parentit).Speed()/speed_of_light;
     if(time1>time2){
@@ -139,6 +140,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, Particle &Parent){
 SignalDecay_2::SignalDecay_2(double lifetime, std::vector<std::shared_ptr<DMGenerator> > dmgens){
     Lifetime = lifetime;
     Channels = dmgens;
+    cout << dmgens[0]->Channel_Name() << endl;
     pMax=0;
     for(unsigned i = 0; i< Channels.size();i++){
         br_total+=(Channels[i])->BranchingRatio();
@@ -147,6 +149,7 @@ SignalDecay_2::SignalDecay_2(double lifetime, std::vector<std::shared_ptr<DMGene
 }
 
 bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
+
     if(Parentit->E<Escatmin)
         return false;
 
@@ -160,27 +163,24 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
 
     //Parentit->report();
     //cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
-
     double prob = decay_probability(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E));
+    cout << "prob=" << prob << endl;
+    cout << "get_prob()=" << get_pMax() << endl;
     double u = Random::Flat(0,1);
     //cout << prob << " " << pMax << " " << u*pMax << endl;
 
+
     if(prob>u*pMax){
         Parentit->EVENT_SET=true;
-        //cout << "u=" << u << " pMax*u=" << u*pMax << endl; 
-        //cout << "Momentum " << Parentit->Momentum() << " speed " << Parentit->Speed() << " crossing1 " << Parentit->crossing[0] << " crossing2 " << Parentit->crossing[1] << " pos1 " << Parentit->crossing[0]*(Parentit->Momentum()) << endl;
-        //cout << "Lifetime=" << Lifetime*1.0/sqrt(1-pow(Parentit->Speed(),2)) << " t1=" << time1 << " t2=" << time2 << " prob " << prob << endl;
-/*        if(prob>pMax){
-            cout << "pMax revision\n";
-            Parentit->report();
-            cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
-            cout << prob << " " << pMax << " " << u*pMax << endl;
+ 
+        if(prob>pMax){
             pMax=prob;
-        }*/
-    
+        }
+
         double timegen = generate_decay_time(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E)); 
         Parentit->Set_Time(timegen);
         Parentit->EVENT_SET=true;
+
 /*
         cout << "Decay!\n";
         cout << "decay timegen=" << timegen << endl;
@@ -199,6 +199,7 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
 
         Channels[i]->GenDM(partlist, det_int, *Parentit);
+
         //No cuts yet. Not sure how to implement them. I'll do post-processing for now.
 /*
         if(Final_States[i].size() == 2){

@@ -481,10 +481,7 @@ int main(int argc, char* argv[]){
 			Vnum_list.push_back(Vnum);
 			Vnumtot+=Vnum;
 		}//End of Production distribution loop. 
-		if(Vnumtot==0){
-			cout << "No DM production expected. Terminating run.\n";
-			return 0;
-		}
+		
 	//return 0;
 
 		cout << "Preparing signal channel " << sigchoice << endl;
@@ -607,6 +604,11 @@ int main(int argc, char* argv[]){
 		}
 	    
 	}//End of setup.
+
+	if(Vnumtot<=0){
+		cout << "No DM production expected. Terminating run.\n";
+		return 0;
+	}
 
 	SigGen->set_angle_limits(min_angle, max_angle);
 	SigGen->set_energy_limits(min_scatter_energy, max_scatter_energy);
@@ -736,12 +738,15 @@ int main(int argc, char* argv[]){
     bool scatter_switch;
     int trials_max = par->Max_Trials();
 
-    cout << "Maximum Trials set to " << trials_max << endl;
+    if(trials_max>0){
+	    cout << "Maximum Trials set to " << trials_max << endl;
+    }
 
     if((SigGen->get_pMax()<=0 || SigGen->get_pMax()*Vnumtot<=par->Min_Event()) && outmode!="dm_detector_distribution" && !par->Weighted_Events()){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
+    	cout << "Beginning loop\n" << endl;
         for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
             int i;
             scatter_switch = false;
@@ -763,14 +768,18 @@ int main(int argc, char* argv[]){
             list<Particle>::iterator iter;
             list<Particle>::iterator nextit;
 
+            cout << "nevent = " << nevent << endl;
+
             if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
                 //Yes, this list is named vec.
                 iter = vec.begin();
                 for(nextit=next(iter) ; iter != vec.end();iter=nextit++){
                 //The way this is structured means I can't do my usual repeat thing to boost stats.
+                	cout << "looping\n";
                     if(std::find(sig_part_vec.begin(),sig_part_vec.end(), iter->name)!=sig_part_vec.end()){
                     	//keep track of the next spot.
                         //iter->report(logging);
+                    	iter->report();
                         NDM_list[i]++;
                         if(outmode=="dm_detector_distribution"){
                             *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
@@ -786,7 +795,8 @@ int main(int argc, char* argv[]){
                         }
                         if(SigGen->probscatter(det, vec, iter)){
                             //cout << "Scatter?\n"; 
-                            
+                            cout << "Made it inside the probscatter if\n";
+                            cout << "prob = " << SigGen->get_pMax() << endl;
                             double timing_prob_factor;
 							if(timing_cut>0){
                                 timing_prob_factor=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());

@@ -186,12 +186,12 @@ class Three_Body_Decay_Gen: public DMGenerator{
         bool d1 = true;
         bool d2 = true;
         bool d3 = true;
+        std::string prodchoice;
     private:
         void Evaluate_Branching(){return;}
         Particle mother, daughter1, daughter2, daughter3;
         //Lifetime of particle, not yet implemented.
         double tau;
-        std::string prodchoice;
         std::function<double(double, double, double, double, double, double)> amp;
         bool d1_unstable = false;
         bool d2_unstable = false;
