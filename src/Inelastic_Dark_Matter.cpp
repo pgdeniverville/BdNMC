@@ -305,9 +305,7 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
             dp_3decay_gen_2->record_parent = false;
 
             dec_vec.push_back(dp_3decay_gen_2);
-
         }
-
         if(dec_vec.size()==0){
             cout << "No valid decay channels for DM2!\n";
             return false;
@@ -318,6 +316,9 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         std::shared_ptr<SignalDecay_2> sig_dec(new SignalDecay_2(lifetime, dec_vec));
         Sig_list.push_back(sig_dec);
         return true;
+    }
+    else if(sig_choice="NCE_electron"){
+        
     }
     return false;
 }
