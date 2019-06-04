@@ -44,6 +44,7 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<P
         //recoil2 handled by probscatter, which passes it off to scatterevent!
         Link_Particles(*partit, recoil2);
         partlist.insert(std::next(partit),recoil2);
+        //Not obvious that this handles multiple possible decay channels from one particle?
         if(parent_name_vec.size()>0){
             std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
             for(unsigned int i = 0; i!=parent_name_vec.size(); i++){
