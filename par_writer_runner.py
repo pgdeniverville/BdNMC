@@ -108,7 +108,7 @@ def miniboone_eval(d_user):
             proddist.append("proton_brem_baryonic")
             prodchan.append("V_decay_baryonic")
             partlistfile.append("")
-    elif model == "Dark_Photon" or model == "Axion_Dark_Photon":
+    else:
         if ((MX/1000.0<mpi0/2.0) or (signal_channel=="Signal_Decay" and MV/1000.0<mpi0)) and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
@@ -1013,12 +1013,12 @@ def execute_miniboone_parallel(genlist = True):
         write_miniboone(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     channs={_brem,_pion_decay,_eta_decay}
-    vmarr={5,50,100,200,300,400}
+    #vmarr={5,50,100,200,300,400}
     #epsarr={1e-6,3e-7,1e-7,3e-7,1e-8}
     #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #vmarr = [1,3,4,5,7,9,10,12,15,17,19,21,23,59,61,199,201]+[x for x in range(25,135,5)]+[131,132,133,134,135,136,137,139]+[x for x in range(140,200,10)]+[x for x in range(200,1010,25)]+[765,770,771,772,773,774,776,777,778,779,780,785]
     #dmarr = [10]
-    #vmarr=[30]
+    vmarr=[30]
     #vmarr=[x for x in range(700,1010,25)]
     #vmarr = [1,5,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150]
     massarr=[[mv,mv/3.0,1e-3] for mv in vmarr]
@@ -1032,7 +1032,7 @@ def execute_miniboone_parallel(genlist = True):
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : [_pion_decay], 'efficiency' : 0.5, 'POT' : 6e20, 'sumlog' : "Claudia/SBND_Distribution.dat", 'samplesize' : 1000, 'max_scatter_energy' : 2, 'samplesize' : 10000}
         #miniboone_eval(d)
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.5, "channels" : channs, 'max_scatter_energy' : 2}
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2],"samplesize" : 100000, "signal_chan" : "NCE_electron", 'max_scatter_energy' : 10, 'min_scatter_energy' : 0.01, 'max_scatter_angle' : 6*pi, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'sumlog' : "Events/sbnd_elec_angle.dat", 'outlog' : "Events/sbnd_electron_{}_{}.dat".format(marr[0],marr[1]),'efficiency' : 0.6, "POT" : 6e20}
+        d={"model" : "Inelastic_Dark_Matter", "mv" : marr[0],"mdm" : marr[1], "eps" : marr[2],"samplesize" : 100000, "signal_chan" : "NCE_electron", 'max_scatter_energy' : 10, 'min_scatter_energy' : 0.01, 'max_scatter_angle' : 6*pi, "output_mode" : "comprehensive", "det_switch" : "sbnd", "alpha_D" : 0.5, "channels" : channs, 'sumlog' : "IDM_Events/sbnd_elec_angle.dat", 'outlog' : "IDM_Events/sbnd_electron_{}_{}.dat".format(marr[0],marr[1]),'efficiency' : 0.6, "POT" : 6e20}
         miniboone_eval(d)
 
 

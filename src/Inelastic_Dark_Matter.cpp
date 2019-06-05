@@ -278,7 +278,7 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
 
 bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
     string sig_choice = par.Signal_Channel();
-    if(sig_choice=="Electron_Scatter"){
+    if(sig_choice=="Electron_Scatter" || sig_choice=="NCE_electron"){
         
         sig_part_vec.push_back(string("Dark_Matter_1"));
         sig_part_vec.push_back(string("Dark_Matter_2"));
