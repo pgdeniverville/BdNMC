@@ -253,20 +253,19 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
         
         return true;
     }
-    else if(prodchoice=="proton_brem"){
+    else if(prodchoice=="V_decay"){
+        cout << "Got here?\n";
         double part_mass;
-        if(prodchoice=="proton_brem"){
-            part_mass=mass_dp;
-            if(sig_choice!="DP_Signal_Decay"&&A_width()>0){
-                cout << "Turning on decay of the Dark Photon with lifetime of " << hbar/A_width() << " seconds\n";
-                std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D)/A_width(),mass_dp,string("Dark_Photon"),dm1,dm2,hbar/A_width()));
-                invis_dec->record_parent=false;
-                DMGen = invis_dec;
-            }
-            else{
-                std::shared_ptr<Do_Nothing_Gen> do_not(new Do_Nothing_Gen(string("Dark_Bremsstrahlung"),string("Dark_Photon")));
-                DMGen = do_not;
-            }
+        part_mass=mass_dp;        
+        if(sig_choice!="DP_Signal_Decay"&&A_width()>0){
+            cout << "Turning on decay of the Dark Photon with lifetime of " << hbar/A_width() << " seconds\n";
+            std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D)/A_width(),mass_dp,string("Dark_Photon"),dm1,dm2,hbar/A_width()));
+            invis_dec->record_parent=false;
+            DMGen = invis_dec;
+        }
+        else{
+            std::shared_ptr<Do_Nothing_Gen> do_not(new Do_Nothing_Gen(string("Dark_Bremsstrahlung"),string("Dark_Photon")));
+            DMGen = do_not;
         }
 
         Dist->set_mass(part_mass);

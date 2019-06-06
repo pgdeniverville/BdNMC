@@ -74,7 +74,7 @@ MINERVA_string = "material Carbon\nnumber_density 4.42356e22\nproton_number 6\nn
 NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
 
 defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan" : ["pi0_decay"], "signal_chan" : "NCE_nucleon", "outfile" : "parameter_run.dat", "proddist" : [""], "partlistfile" : ["Source/particle_list.dat"], "sumlog" : "Events/miniboone.dat", "outlog" : "Events/miniboone_events.dat", "output_mode" :"summary", "samplesize" : 5000, "min_scatter_energy" : 0.035, "max_scatter_energy" : 1.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 8.9, "n_num_target" :
-        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0, "min_event" : -1}
+        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0, "min_event" : -1,"mdm1" : 0.03, "mdm2" : 0.04}
 
 def write_experiment(write_detector,user):
     context = defaults.copy()
@@ -82,7 +82,7 @@ def write_experiment(write_detector,user):
     print("Writing this!")
     print(context)
     prod_chan = context["prod_chan"]; signal_chan = context["signal_chan"]; proddist = context["proddist"]; partlistfile = context["partlistfile"]
-    eps = context["eps"]; mdm = context["mdm"]; mv = context["mv"]; alpha_D = context["alpha_D"]; outfile = context["outfile"];
+    eps = context["eps"]; mdm = context["mdm"]; mdm1 = context["mdm1"]; mdm2 = context["mdm2"]; mv = context["mv"]; alpha_D = context["alpha_D"]; outfile = context["outfile"];
     sumlog = context["sumlog"]; outlog = context["outlog"]; output_mode = context["output_mode"]; samplesize = context["samplesize"];
     min_scatter_energy = context["min_scatter_energy"]; max_scatter_energy=context["max_scatter_energy"]; dm_energy_resolution = context["dm_energy_resolution"];
     efficiency = context["efficiency"]; beam_energy = context["beam_energy"]; n_num_target = context["n_num_target"]; p_num_target = context["p_num_target"];
@@ -134,7 +134,11 @@ def write_experiment(write_detector,user):
         f.write('n_num_target {}\n'.format(str(n_num_target)))
         f.write('p_num_target {}\n'.format(str(p_num_target)))
         f.write('beam_energy {}\n'.format(str(beam_energy)))
-        f.write('dark_matter_mass {}\n'.format(str(mdm)))
+        if(model=="Inelastic_Dark_Matter"):
+            f.write('dark_matter_1_mass {}\n'.format(str(mdm1)))
+            f.write('dark_matter_2_mass {}\n'.format(str(mdm2)))
+        else:
+            f.write('dark_matter_mass {}\n'.format(str(mdm)))
         f.write('dark_photon_mass {}\n'.format(str(mv)))
         f.write('alpha_D {}\n'.format(str(alpha_D)))
         if(model=="Axion_Dark_Photon"):

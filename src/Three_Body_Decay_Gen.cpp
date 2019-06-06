@@ -32,7 +32,7 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     //commented temporarily until I can determine the issue.
     //branchingratio=8*pi*pi*SimpsonCubature(d2width,daughter1.m+daughter2.m,mother.m-daughter3.m,100,-1,1,100)/mother.width;
     branchingratio=partial_width/mother.width;
-    cout << partial_width << " " << mother.width << endl;
+    //cout << partial_width << " " << mother.width << endl;
     std::cout << "Branching Ratio for " << prodstring << " calculated to be " << branchingratio << endl;
     tau = lifetime;
     //amp = function<double(double,double,double,double,double,double)>(amplitude);
@@ -128,7 +128,6 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
 
     parent.report(cout);
 */
-    cout << "GenDM start!\n" << endl;
 
     if(tau>0){
         double decay_time=tau*log(1/(1-Random::Flat()));

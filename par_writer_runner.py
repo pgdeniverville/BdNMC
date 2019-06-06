@@ -326,13 +326,15 @@ def bebc_eval(d_user):
     t0 = time.time()
     subp.call(["rm", outfile])
 
-charm_defaults = {"mv" : 30, "mdm" : 10, 'channels' : {_brem,_pion_decay,_eta_decay}, 'det_switch' : 'charm'}
+charm_defaults = {"mv" : 30, "mdm" : 10, "mdm1" : 10, "mdm2" : 15, 'channels' : {_brem,_pion_decay,_eta_decay}, 'det_switch' : 'charm'}
 
 def charm_eval(d_user):
     d = charm_defaults.copy()
     d.update(d_user)
     MV=d["mv"]
     MX=d["mdm"]
+    MX1=d["mdm1"]
+    MX2=d["mdm2"]
     channels = d["channels"]
     det_switch=d["det_switch"]
     if "alpha_D" in d:
@@ -357,12 +359,12 @@ def charm_eval(d_user):
     if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" or signal_channel=="Baryonic_Test":
         print("Need to implement Baryonic!")
     else:
-        if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
+        if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (MV/1000.0<mpi0 and (signal_channel=="Signal_Decay"))) and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             partlistfile.append("data/particle_list_charm.dat")
             executing=True
-        if ((MX/1000.0<meta/2.0 and MV<900.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
+        if ((MX/1000.0<meta/2.0 and MV<900.0) or ((signal_channel=="Signal_Decay") and MV/1000.0<meta)) and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay")
             partlistfile.append("data/particle_list_charm.dat")
@@ -388,7 +390,7 @@ def charm_eval(d_user):
         return
 
 
-    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "mdm1" : MX1/1000.0, "mdm2" : MX2/1000.0,"zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "charm":
         write_charm_decay(d=d)
     subp.call(["./build/main", outfile])
@@ -1044,14 +1046,14 @@ def execute_charm(genlist=True):
     #vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000]
     #massarr=[[mv,mv,1e-7] for mv in vmarr]
     #vmarr=[30]
-    vmarr=[300,350]
-    epsarr=[2e-7]
+    vmarr=[100]
     #massarr=[[mv,mv,1e-7] for mv in vmarr]
-    massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
+    massarr=[[mv,mv/3.0,1.05*mv/3.0] for mv in vmarr]
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 1, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_events.dat"});
-    d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_decay_events.dat"});
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_decay_events.dat"});
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_decay_events.dat", "eps" : 1e-7, "model" : "Inelastic_Dark_Matter"});
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
+        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2]})
         d.update({"outlog" : "YuDai_project/charm/charm_decays_{}_{}.dat".format(marr[0],marr[2])})
         charm_eval(d)
 

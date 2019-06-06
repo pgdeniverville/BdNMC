@@ -105,7 +105,7 @@ double Axion_Dark_Photon::dsigma_DP_to_a(double E1lab, double E4, double mA, dou
     if(s<pow(mR,2)){
         return 0;
     }
-    return 2*MASS_ELECTRON*1.0/3.0/64.0/pi/pow(mR,2)/(pow(E1lab,2)-mA*mA)*Axion_DP_electron_Amp(s,two_to_two_scattering::t_lab(E4,mR,mR),mA,mR);
+    return 2*mR*1.0/3.0/64.0/pi/s/(pow(E1lab,2)-mA*mA)*Axion_DP_electron_Amp(s,two_to_two_scattering::t_lab(E4,mR,mR),mA,mR);
 }
 
 //Decay of the DP
