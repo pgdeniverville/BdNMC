@@ -131,18 +131,24 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
     if(record_parent)
         vec.push_back(Particle(parent));
 
+    //parent.report();
+
     std::list<Particle>::iterator bookmark = vec.end();
+
+    TwoBodyDecay(parent, daughter1, daughter2);
+    bool intersect=false;
+
     if(d1_unstable&&(d1_decay->GenDM(vec, det_int, daughter1))){
         vec.insert(bookmark,daughter1);
         bookmark = vec.end();
+        intersect=true;
     }
     if(d2_unstable&&(d2_decay->GenDM(vec, det_int, daughter2))){
         vec.insert(bookmark,daughter2);
         bookmark = vec.end();
+        intersect=true;
     }
 
-    TwoBodyDecay(parent, daughter1, daughter2);
-    bool intersect=false;
     if(d1&&det_int(daughter1)>0){
         intersect=true;
         vec.push_back(daughter1);

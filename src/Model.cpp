@@ -64,7 +64,7 @@ bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string 
     //Eventually all of the main distributions will be handled here.
     //Remember that proditer->func() becomes prodchan.func()!
 
-    if(proddist=="proton_beam"){
+    if(proddist=="proton_beam" || proddist=="proton_brem"){
         Dist = std::shared_ptr<Distribution>(new BeamDistribution(par.Beam_Energy(),MASS_PROTON));
     }
     else if(proddist=="burmansmith"){

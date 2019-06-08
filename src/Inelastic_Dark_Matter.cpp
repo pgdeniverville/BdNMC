@@ -8,6 +8,7 @@
 #include "Kinematics.h"
 #include "SignalDecay.h"
 #include "constants.h"
+#include "Proton_Brem_Distribution.h"
 
 using std::string;
 using std::vector;
@@ -55,7 +56,7 @@ bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
 }
 
 void Inelastic_Dark_Matter::Report(std::ostream& out){
-    out << " " << mass_dp << " " << mass_dm1 << " " << mass_dm2 << " " << epsilon << " " << alpha_D << " ";
+    out << mass_dp << " " << mass_dm1 << " " << mass_dm2 << " " << epsilon << " " << alpha_D << " " << dm2_width() << " " << A_width() << " ";
 }
 
 void Inelastic_Dark_Matter::Report_Model(){
@@ -217,6 +218,7 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
             //Switch to off-shell behavior
             if(tmp_gen->BranchingRatio()>off_shell_ratio*on_shell_br){
                 tmp_gen->Burn_In(1000);
+                tmp_gen->set_Off_Shell(true);
                 DMGen = tmp_gen;
 
                 if(sig_choice!="DM2_Signal_Decay"){
@@ -230,11 +232,12 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
                 std::shared_ptr<Two_Body_Decay_Gen> meson_decay_gen(new Two_Body_Decay_Gen(tmp_gen->BranchingRatio(),meson.m,meson.name,photon,dark_photon,hbar/meson.width));
  
                 meson_decay_gen->d1=false;
+                meson_decay_gen->d2=false;
 
                 std::shared_ptr<Two_Body_Decay_Gen> tmp_gen2(new Two_Body_Decay_Gen(Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp, mass_dm1, mass_dm2,alpha_D)/A_width(),mass_dp,string("Dark_Photon"),dm1,dm2,hbar/A_width()));
 
                 tmp_gen2->d1=false;//Don't care about DM1
-                tmp_gen2->record_parent=false;
+                tmp_gen2->record_parent=true;
                 meson_decay_gen->Toggle_Daughter_Decay(2,tmp_gen2);
 
                 if(sig_choice!="DM2_Signal_Decay"){
@@ -252,23 +255,36 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
         }
         
         return true;
-    }
+    }//Need to add proton beam handling eventually.
     else if(prodchoice=="V_decay"){
-        cout << "Got here?\n";
-        double part_mass;
-        part_mass=mass_dp;        
+//        double part_mass;
+//        part_mass=mass_dp;        
         if(sig_choice!="DP_Signal_Decay"&&A_width()>0){
             cout << "Turning on decay of the Dark Photon with lifetime of " << hbar/A_width() << " seconds\n";
             std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D)/A_width(),mass_dp,string("Dark_Photon"),dm1,dm2,hbar/A_width()));
-            invis_dec->record_parent=false;
+            invis_dec->record_parent=true   ;
             DMGen = invis_dec;
+            if(sig_choice=="DM2_Signal_Decay"){
+                invis_dec->d1=false;
+            }
+            //Option for decaying dm2 needs to be included for electron scatter.
         }
         else{
             std::shared_ptr<Do_Nothing_Gen> do_not(new Do_Nothing_Gen(string("Dark_Bremsstrahlung"),string("Dark_Photon")));
             DMGen = do_not;
         }
+        if(proddist=="proton_brem"){
+            if(prodchan.ptmax()<prodchan.ptmin() || prodchan.zmax() < 0 || prodchan.zmax()<prodchan.zmin() || prodchan.zmin() < 0){
+                    std::cerr << "Invalid properties for production_distribution proton_brem." << endl;
+                    return -1;
+            }   
+            std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(par.Beam_Energy(),epsilon,mass_dp,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),alpha_D,proddist,prodchan.ptmin()));
+            Vnum = pbd->V_prod_rate()*par.Protons_on_Target();//V_decay should return a branching ratio for this. If it doesn't, I will have to change it in the future. prodchan.Num_per_pot()
+            Dist->Add_Dist(pbd);
+            return true;
+        }
 
-        Dist->set_mass(part_mass);
+        //Dist->set_mass(part_mass);
         Vnum=par.Protons_on_Target()*prodchan.Num_per_pot();
         return true;
     }
@@ -362,9 +378,9 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         dm1.name = "Decay_Dark_Matter_1";
 
         Particle muon(MASS_MUON);
-        electron.name = "Decay_Muon";
+        muon.name = "Decay_Muon";
         Particle antimuon(MASS_MUON);
-        positron.name = "Decay_Antimuon";
+        antimuon.name = "Decay_Antimuon";
 
         vector<std::shared_ptr<DMGenerator> > dec_vec;
 
@@ -377,10 +393,8 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
             dp_3decay_gen->record_parent = false;            
 
             dec_vec.push_back(dp_3decay_gen);
-        }
-        
+        } 
         if(mass_dm2>mass_dm1+2*MASS_MUON){
-
             std::function<double(double,double,double,double,double,double)> func2 = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
 
             std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen_2(new Three_Body_Decay_Gen(dm2,muon,antimuon,dm1,string("Decay_Muon_Antimuon_DM1"),0,width_dm2_to_muon_muon_dm1,func2));

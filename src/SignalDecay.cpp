@@ -68,7 +68,7 @@ bool SignalDecay::probscatter(std::shared_ptr<detector>& det, list<Particle>& pa
         }
     
         double timegen = generate_decay_time(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E)); 
-        Parentit->Set_Time(timegen);
+        Parentit->Increment_Time(timegen);
         
         double br_chan = Random::Flat(0,1);
         unsigned i;
@@ -164,8 +164,8 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
     //Parentit->report();
     //cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
     double prob = decay_probability(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E));
-    cout << "prob=" << prob << endl;
-    cout << "get_prob()=" << get_pMax() << endl;
+    //cout << "prob=" << prob << endl;
+    //cout << "get_prob()=" << get_pMax() << endl;
     double u = Random::Flat(0,1);
     //cout << prob << " " << pMax << " " << u*pMax << endl;
 
@@ -178,7 +178,7 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         }
 
         double timegen = generate_decay_time(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E)); 
-        Parentit->Set_Time(timegen);
+        Parentit->Increment_Time(timegen);
         Parentit->EVENT_SET=true;
 
 /*

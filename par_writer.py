@@ -74,7 +74,8 @@ MINERVA_string = "material Carbon\nnumber_density 4.42356e22\nproton_number 6\nn
 NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
 
 defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan" : ["pi0_decay"], "signal_chan" : "NCE_nucleon", "outfile" : "parameter_run.dat", "proddist" : [""], "partlistfile" : ["Source/particle_list.dat"], "sumlog" : "Events/miniboone.dat", "outlog" : "Events/miniboone_events.dat", "output_mode" :"summary", "samplesize" : 5000, "min_scatter_energy" : 0.035, "max_scatter_energy" : 1.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 8.9, "n_num_target" :
-        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0, "min_event" : -1,"mdm1" : 0.03, "mdm2" : 0.04}
+        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0, "min_event" : -1,"mdm1" : 0.03, "mdm2" :
+        0.04, "weighted" : 'false'}
 
 def write_experiment(write_detector,user):
     context = defaults.copy()
@@ -131,6 +132,7 @@ def write_experiment(write_detector,user):
         f.write('max_scatter_angle {}\n'.format(str(max_scatter_angle)))
         f.write('dm_energy_resolution {}\n'.format(str(dm_energy_resolution)))
         f.write('epsilon {}\n'.format(str(eps)))
+        f.write('weighted {}\n'.format(context['weighted']))
         f.write('n_num_target {}\n'.format(str(n_num_target)))
         f.write('p_num_target {}\n'.format(str(p_num_target)))
         f.write('beam_energy {}\n'.format(str(beam_energy)))

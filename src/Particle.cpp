@@ -186,66 +186,7 @@ void Particle::Lorentz(Particle& parent){
         return;
     Lorentz(beta, parent.px/parent.E, parent.py/parent.E, parent.pz/parent.E);
 }
-/*
-void Particle::Lorentz(Particle& parent){
-	
-	double M1 = parent.m;
-	double E1 = parent.E;
-	double p1x = parent.px;
-	double p1y = parent.py;
-	double p1z = parent.pz;
-	double E2 = E;
-	double p2x = px;
-	double p2y = py;
-	double p2z = pz;
-	double E3, p3x, p3y, p3z;		
-	double gamma, v;
-	double vx, vy, vz;	
-	double Lam11, Lam12, Lam13, Lam14;	
-	double Lam21, Lam22, Lam23, Lam24;	
-	double Lam31, Lam32, Lam33, Lam34;
-	double Lam41, Lam42, Lam43, Lam44;	
-    gamma = E1/M1;
-    v = sqrt(1.0-1.0/gamma/gamma);
-	if(v==0.0)
-        return;
-    vx = p1x/E1;
-	vy = p1y/E1;
-	vz = p1z/E1;
-    cout << "gamma=" << gamma << endl;
-    cout << v << " " << vx << " " << vy << " " << vz << endl;
 
-//    cout << "gamma = " << gamma << " v = " << v << " vx = " << vx << " vy = " << vy << " vz = " << vz << endl;
-
-	Lam11 = gamma;
-	Lam12 = gamma*vx;
-	Lam13 = gamma*vy;
-	Lam14 = gamma*vz;
-	Lam21 = gamma*vx;
-	Lam22 = 1+(gamma-1)*vx*vx/v/v;
-	Lam23 = (gamma-1)*vx*vy/v/v;
-	Lam24 = (gamma-1)*vx*vz/v/v;
-	Lam31 = gamma*vy;
-	Lam32 = (gamma-1)*vy*vx/v/v;
-	Lam33 = 1+(gamma-1)*vy*vy/v/v;
-	Lam34 = (gamma-1)*vy*vz/v/v;
-	Lam41 = gamma*vz;
-	Lam42 = (gamma-1)*vz*vx/v/v;
-	Lam43 = (gamma-1)*vz*vy/v/v;
-	Lam44 = 1+(gamma-1)*vz*vz/v/v;
-	E3   = Lam11*E2+Lam12*p2x+Lam13*p2y+Lam14*p2z;	
-	p3x  = Lam21*E2+Lam22*p2x+Lam23*p2y+Lam24*p2z;	
-	p3y  = Lam31*E2+Lam32*p2x+Lam33*p2y+Lam34*p2z;	
-	p3z  = Lam41*E2+Lam42*p2x+Lam43*p2y+Lam44*p2z;
-
-    cout << Lam11 << " " << Lam12 << " " << Lam13 << " " << Lam14 << endl;
-    cout << Lam21 << " " << Lam22 << " " << Lam23 << " " << Lam24 << endl;
-    cout << Lam31 << " " << Lam32 << " " << Lam33 << " " << Lam34 << endl;
-    cout << Lam41 << " " << Lam42 << " " << Lam43 << " " << Lam44 << endl;
-		
-	FourMomentum(p3x, p3y, p3z, E3);
-}
-*/
 void Particle::Rotate_x(double psi){
     double zr = pz*cos(psi)+py*sin(psi);
     double yr = py*cos(psi)-pz*sin(psi);

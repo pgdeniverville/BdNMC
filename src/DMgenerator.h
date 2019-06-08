@@ -18,6 +18,7 @@ class DMGenerator{
         std::string Channel_Name(){return chan_name;}
         void set_model_params(double MV, double MX, double kap, double alp){mv=MV; mx=MX; kappa=kap; alphaD=alp; Evaluate_Branching_Ratio();}
         bool query_off_shell(){return OFF_SHELL;}
+        void set_Off_Shell(bool u){OFF_SHELL=u;}
         virtual ~DMGenerator(){};
         bool record_parent = true;
     protected:

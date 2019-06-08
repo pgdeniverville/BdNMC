@@ -182,8 +182,42 @@ int main(int argc, char* argv[]){
 	//Detector setup
     std::shared_ptr<detector> det = std::shared_ptr<detector>(par->Get_Detector());
     function<double(Particle&)> det_int = bind(&detector::Ldet,det,_1);//should get rid of this eventually, just pass detector object references.
-	//function<double(Particle)> det_int = [](Particle x){return 1.0;};
 
+    //  Particle DM2(0.035);
+    //  DM2.name = "Dark_Matter_2";
+
+    // DM2.Set_Origin(0.005494169051, 0.001275913216, 0.9104787783);
+    // DM2.Set_Creation_Time(3.03712401e-09);
+    // DM2.FourMomentum(0.02170990555, -0.002250706851, 3.064703787, 3.064981352);
+    //3.497450445 -0.3607417793   493.8565027 1.647476989e-06
+
+ //    Particle electron(MASS_ELECTRON);
+ //    electron.name="Decay_Electron";
+
+ //    electron.Set_Origin(6.489871429,1.234210485,461.7843898);
+ //    electron.FourMomentum(0.00200047, 0.000657013, 0.139983, 0.14);
+ //    electron.Set_Creation_Time(1.540522358e-06);
+
+ //    Particle pos(MASS_ELECTRON);
+ //    pos.name = "Decay_Positron";
+
+	// pos.Set_Origin(6.489871429,1.234210485,461.7843898);
+ //    pos.FourMomentum(0.001828902022, 0.001135680633, 0.1718823602,0.1718966013);
+ //    electron.Set_Creation_Time(1.540522358e-06);
+     // cout << "DM2\n" << det->Ldet(DM2) << endl;
+
+     // cout << "Timing test\n" << endl;
+
+     // double time1 = DM2.Momentum()*DM2.crossing[0]/DM2.Speed()/speed_of_light+DM2.origin_coords[3];
+     // double time2 = DM2.Momentum()*DM2.crossing[1]/DM2.Speed()/speed_of_light+DM2.origin_coords[3];
+
+     // cout << "time1=" << time1 << " time2=" << time2 << endl;
+
+ //    cout << "Positron\n" << det->Ldet(pos) << endl;
+ //    cout << "Electron\n" << det->Ldet(electron) << endl;
+
+
+    // return 0;
 	//Production Mode
 	vector<std::shared_ptr<DMGenerator> > DMGen_list;//Should be a unique_ptr
 	vector<std::shared_ptr<Distribution> > PartDist_list;//This is an abstract class from which all distributions inherit.
@@ -746,7 +780,7 @@ int main(int argc, char* argv[]){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
-    	cout << "Beginning loop\n" << endl;
+    	//cout << "Beginning loop\n" << endl;
         for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
             int i;
             scatter_switch = false;
@@ -768,18 +802,14 @@ int main(int argc, char* argv[]){
             list<Particle>::iterator iter;
             list<Particle>::iterator nextit;
 
-            cout << "nevent = " << nevent << endl;
+            //cout << "nevent = " << nevent << endl;
 
             if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
                 //Yes, this list is named vec.
                 iter = vec.begin();
                 for(nextit=next(iter) ; iter != vec.end();iter=nextit++){
                 //The way this is structured means I can't do my usual repeat thing to boost stats.
-                	cout << "looping\n";
                     if(std::find(sig_part_vec.begin(),sig_part_vec.end(), iter->name)!=sig_part_vec.end()){
-                    	//keep track of the next spot.
-                        //iter->report(logging);
-                    	iter->report();
                         NDM_list[i]++;
                         if(outmode=="dm_detector_distribution"){
                             *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
@@ -795,8 +825,8 @@ int main(int argc, char* argv[]){
                         }
                         if(SigGen->probscatter(det, vec, iter)){
                             //cout << "Scatter?\n"; 
-                            cout << "Made it inside the probscatter if\n";
-                            cout << "prob = " << SigGen->get_pMax() << endl;
+                            //cout << "Made it inside the probscatter if\n";
+                            //cout << "prob = " << SigGen->get_pMax() << endl;
                             double timing_prob_factor;
 							if(timing_cut>0){
                                 timing_prob_factor=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());

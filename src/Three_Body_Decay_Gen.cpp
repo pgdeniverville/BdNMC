@@ -151,19 +151,22 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
     }
 
     Three_Body_Decay(parent, daughter1, daughter2, daughter3, pmax, amp);
-
+    bool intersect=false;
     std::list<Particle>::iterator bookmark = vec.end();
     if(d1_unstable&&(d1_decay->GenDM(vec, det_int, daughter1))){
         vec.insert(bookmark,daughter1);
         bookmark = vec.end();
+        intersect=true;
     }
     if(d2_unstable&&(d2_decay->GenDM(vec, det_int, daughter2))){
         vec.insert(bookmark,daughter2);
         bookmark = vec.end();
+        intersect=true;
     }
     if(d3_unstable&&(d3_decay->GenDM(vec, det_int, daughter3))){
         vec.insert(bookmark,daughter3);
         bookmark = vec.end();
+        intersect=true;
     }
 /*
     if(parent.name=="Dark_Photon"){
@@ -174,7 +177,6 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
         daughter3.report(cout);
     }
 */
-    bool intersect=false;
     //Need to decay these daughter particles!
     if(d1&&(det_int(daughter1)>0)){
         //cout << "daughter1 hit!\n";

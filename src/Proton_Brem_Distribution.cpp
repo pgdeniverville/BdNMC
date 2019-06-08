@@ -113,7 +113,8 @@ void Proton_Brem_Distribution::calc_V_prod_rate(){
 void Proton_Brem_Distribution::sample_particle(Particle &part){
 	double mom, theta, phi;
 	sample_momentum(mom, theta, phi);
-	part.ThreeMomentumPolar(mom, theta, phi);
+	part.Set_Mass(MA);
+	part.ThreeMomentumPolar(mom, theta, phi);//Rotate based on parts previous trajectory?
 }
 
 void Proton_Brem_Distribution::sample_momentum(double &pmom, double &theta, double &phi){
