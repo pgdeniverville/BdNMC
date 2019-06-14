@@ -68,6 +68,7 @@ void Inelastic_Dark_Matter::Report_Model(){
 }
 
 void Inelastic_Dark_Matter::Evaluate_Widths(){
+
     Awidth=Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D)+Gamma_V_to_visible(mass_dp,epsilon);
 
     cout << "Gamma(A->DM1+DM2) = " << Inelastic_DM::Gamma_A_to_dm1_dm2(mass_dp,mass_dm1,mass_dm2,alpha_D) << endl;
@@ -128,7 +129,7 @@ double Inelastic_Dark_Matter::Amplitude2_dm2_to_hadrons_dm1(double m12s, double 
 
 //This amplitude is averaged over initial spins (1/4)
 double Inelastic_Dark_Matter::dm_e_to_dm_e_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR){
-    return -64*pi*pi*alpha_D*alphaEM*pow(epsilon,2)*(2*mR*mR+t)*(pow(mass_dm_in,2)-4*mass_dm_in*mass_dm_out+pow(mass_dm_out,2)-t)/pow(pow(mass_dp,2)-t,2);
+    return 1/pow(pow(mass_dp,2)-t,2)*32*pi*pi*alpha_D*alphaEM*pow(epsilon,2)*(2*(pow(mass_dm_in*mass_dm_out + pow(mR,2), 2) - (pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + pow(s,2)) - (pow(mass_dm_in - mass_dm_out,2) - 2*s)*t + pow(t,2));
 }
 
 double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double mR){
@@ -136,7 +137,12 @@ double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e(double E1lab, double E4, doubl
     if(s<pow(mR+mass_dm_out,2)){
         return 0;
     }
-    return 2*mR/64.0/pi/s/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_e_to_dm_e_amp(s,two_to_two_scattering::t_lab(E4,mR,mR),mass_dm_in,mass_dm_out,mR);
+    return 2*mR*1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_e_to_dm_e_amp(s,two_to_two_scattering::t_lab(E4,mR,mR),mass_dm_in,mass_dm_out,mR);
+}
+
+double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in, double mass_dm_out, double mR){
+    double s = two_to_two_scattering::s_lab(E1lab, mass_dm_in, mR);
+    return 1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_e_to_dm_e_amp(s,t,mass_dm_in,mass_dm_out,mR);
 }
 
 bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
@@ -221,11 +227,10 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
                 tmp_gen->set_Off_Shell(true);
                 DMGen = tmp_gen;
 
-                if(sig_choice!="DM2_Signal_Decay"){
-                    std::cerr << sig_choice << " not yet implemented\n";
+                if(sig_choice!="DM2_Signal_Decay"&&dm2width>0){
+                    std::cerr << "Need to add DM2 decay! Check Model file.\n";
                     throw -1;
                 }
-
             }
             else{
                 cout << "Turning on the on-shell decay of the Dark Photon with lifetime of " << hbar/A_width() << " seconds\n";
@@ -240,8 +245,8 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
                 tmp_gen2->record_parent=true;
                 meson_decay_gen->Toggle_Daughter_Decay(2,tmp_gen2);
 
-                if(sig_choice!="DM2_Signal_Decay"){
-                    std::cerr << sig_choice << " not yet implemented\n";
+                if(sig_choice!="DM2_Signal_Decay"&&dm2width>0){
+                    std::cerr << "Need to add DM2 decay! Check Model file.\n";
                     throw -1;
                 }
                 DMGen = meson_decay_gen;
@@ -288,13 +293,25 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
         Vnum=par.Protons_on_Target()*prodchan.Num_per_pot();
         return true;
     }
+    else if(prodchoice==""){
+    
+    }
     return false;
 }
 
 bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
     string sig_choice = par.Signal_Channel();
     if(sig_choice=="Electron_Scatter" || sig_choice=="NCE_electron"){
-        
+ 
+        // cout << "Beginning diagnostic\n";
+
+        // double E1lab=1;
+        // double s = pow(mass_dm1,2)+pow(MASS_ELECTRON,2)+2*E1lab*MASS_ELECTRON;
+
+        // cout << "s=" << s << endl; 
+
+        // cout << dm_e_to_dm_e_amp(s,-1e-6,mass_dm1,mass_dm2,MASS_ELECTRON) << endl;
+
         sig_part_vec.push_back(string("Dark_Matter_1"));
         sig_part_vec.push_back(string("Dark_Matter_2"));
 
@@ -325,18 +342,20 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         std::shared_ptr<Linear_Interpolation> dm1_cross;
         std::shared_ptr<Linear_Interpolation> dm1_cross_max;
         
-        //double s_test = two_to_two_scattering::s_lab(0.07,0,MASS_ELECTRON);
-        //double t_test = two_to_two_scattering::t_lab(0.0318287,MASS_ELECTRON,MASS_ELECTRON);
-        //cout << "s=" << s_test << " t=" << t_test << " ";
-
-        //cout << "Amplitude = " << Axion_DP_electron_Amp(two_to_two_scattering::s_lab(0.07,0,MASS_ELECTRON),t_test, mass_dp, MASS_ELECTRON) << endl;
-
-        //cout << "disgma=" << dsigma_a_to_DP(0.07, 0.0318287, mass_dp, MASS_ELECTRON) << endl;
 
         std::function<double(double,double)> f_dm1_to_dm2 = std::bind(&Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e,this,_1,_2,mass_dm1,mass_dm2,MASS_ELECTRON);
+        
         std::function<double(double)> ER_min_dm1 = std::bind(&Two_to_Two_Scatter::scatmin,*ttts,_1,mass_dm1,MASS_ELECTRON,mass_dm2,MASS_ELECTRON);
         std::function<double(double)> ER_max_dm1 = std::bind(&Two_to_Two_Scatter::scatmax,*ttts,_1,mass_dm1,MASS_ELECTRON,mass_dm2,MASS_ELECTRON);
+
+        //DEBUG
+
+        //std::function<double(double)> testfunc = std::bind(&Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e,this,1,_1, mass_dm1, mass_dm2, MASS_ELECTRON);
+
+        //cout << SimpsonsRule(testfunc,ER_min_dm1(1),ER_max_dm1(1),10000) << endl;
         
+        //DEBUG
+
         Prepare_Cross_Section(f_dm1_to_dm2, ER_min_dm1, ER_max_dm1, dm1_cross,dm1_cross_max, mass_dm1, par.Max_DM_Energy(),par.EDM_RES());
         
         function<double(double)> dm1_cross_func = bind(&Linear_Interpolation::Interpolate,dm1_cross,_1);
@@ -347,6 +366,7 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         std::shared_ptr<Linear_Interpolation> dm2_cross_max;
 
         std::function<double(double,double)> f_dm2_to_dm1 = std::bind(&Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e,this,_1,_2,mass_dm2,mass_dm1,MASS_ELECTRON);
+
         std::function<double(double)> ER_min_dm2 = std::bind(&Two_to_Two_Scatter::scatmin,*ttts,_1,mass_dm2,MASS_ELECTRON,mass_dm1,MASS_ELECTRON);
         std::function<double(double)> ER_max_dm2 = std::bind(&Two_to_Two_Scatter::scatmax,*ttts,_1,mass_dm2,MASS_ELECTRON,mass_dm1,MASS_ELECTRON);
 

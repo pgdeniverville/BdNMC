@@ -86,8 +86,9 @@ class Inelastic_Dark_Matter : public Model{
         double A_width();
         double dm2_width();
     private:
-        double dsigma_dm_e_to_dm_e(double E1lab, double E4, double mass_dm1,double mass_dm2, double mR);
+        double dsigma_dm_e_to_dm_e(double E1lab, double E4, double mass_dm_in,double mass_dm_out, double mR);
         double dm_e_to_dm_e_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR);
+        double dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in,double mass_dm_out, double mR);
         void Evaluate_Widths();
         //mass_dm2 is assumed to be heavier.
         double Awidth, dm2width;

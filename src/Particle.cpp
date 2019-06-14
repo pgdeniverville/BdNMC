@@ -205,7 +205,7 @@ void Particle::Rotate_z(double phi){
     px=xr; py=yr;
 }
 
-double Particle::Momentum(){
+double Particle::Momentum() const  {
     return sqrt(px*px+py*py+pz*pz);
 }
 //Speed is in units of c
@@ -229,5 +229,5 @@ void Particle::Generate_Position(double rngpoint){
 }
 
 void Particle::report(std::ostream& ostr) const{
-    ostr << std::setprecision(10) << name << " " << E << " " << px << " " << py << " " << pz << " " << m << " " << origin_coords[0] << " " << origin_coords[1] << " " << origin_coords[2] << " " << origin_coords[3] << " " << end_coords[0] << " " << end_coords[1] << " " << end_coords[2] << " " << end_coords[3] << " " << Kinetic_Energy() << std::endl;
+    ostr << std::setprecision(10) << name << " " << E << " " << px << " " << py << " " << pz << " " << m << " " << origin_coords[0] << " " << origin_coords[1] << " " << origin_coords[2] << " " << origin_coords[3] << " " << end_coords[0] << " " << end_coords[1] << " " << end_coords[2] << " " << end_coords[3] << " " << Kinetic_Energy() << " " << Momentum()*crossing[0] << " " << Momentum()*crossing[1] << std::endl;
 } 
