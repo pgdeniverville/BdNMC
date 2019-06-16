@@ -586,6 +586,8 @@ def nucal_eval(d_user):
     d.update(d_user)
     MV=d["mv"]
     MX=d["mdm"]
+    MX1=d["mdm1"]
+    MX2=d["mdm2"]
     channels = d["channels"]
     det_switch=d["det_switch"]
     if "alpha_D" in d:
@@ -594,6 +596,7 @@ def nucal_eval(d_user):
         eps=d['eps']
     sumlog=d["sumlog"]
     signal_channel = d["signal_chan"]
+    model=d["model"]
 
     t0 = time.time()
     outfile="parameter_run_{0}_{1}_{2}.dat".format(str(MV),str(MX),str(eps))
@@ -635,6 +638,22 @@ def nucal_eval(d_user):
             prodchan.append("parton_production_baryonic")
             partlistfile.append("")
             executing=True
+    elif model=="Inelastic_Dark_Matter":
+        if MX1+MX2<mpi0*1000 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/particle_list_nucal.dat")
+            executing=True
+        if MX1+MX2<meta*1000 and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay")
+            partlistfile.append("data/particle_list_nucal.dat")
+            executing=True
+        if (MV>MX1+MX2) and _brem in channels:
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
+            executing=True
     else:
         if ((MX/1000.0<mpi0/2.0 and MV<600.0 and signal_channel!="Signal_Decay") or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
             proddist.append("particle_list")
@@ -668,7 +687,7 @@ def nucal_eval(d_user):
     if not executing:
         return
     d.update(d_user)
-    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "mdm1" : MX1/1000.0, "mdm2" : MX2/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "nucal":
         write_nucal(d=d)
     subp.call(["./build/main", outfile])
@@ -1077,10 +1096,11 @@ def execute_charm(genlist=True):
         write_charm_decay(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,60,70,75,80,85,90,95,100,115,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000]+[x for x in range(4100,6000,100)]
-    vmarr=[x/2.0 for x in range(11,20,1)]+[x for x in range(2275,2500,25)]
+    vmarr=[x for x in range(4310,4400,10)]+[x for x in range(31,40)]
+    #vmarr=[x/2.0 for x in range(11,20,1)]+[x for x in range(2275,2500,25)]
     #vmarr=[x for x in range(61,70)]
     #vmarr=[100]
-    massarr=[[mv,mv/3.0,1.4*mv/3.0] for mv in vmarr]
+    massarr=[[mv,mv/3.0,1.1*mv/3.0] for mv in vmarr]
     #massarr=[[mv,mv/3.0,1.1*mv/3.0] for mv in vmarr]
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 1, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_events.dat"});
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_decay_events.dat"});
@@ -1088,7 +1108,7 @@ def execute_charm(genlist=True):
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "DM2_Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "IDM_Events/charm_decay_events.dat", "eps" : 1e-3, "model" : "Inelastic_Dark_Matter", "weighted" : 'true'});
     for marr in massarr:
         d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2]})
-        d.update({"outlog" : "IDM_Events/charm_aD0.1_Delta0.4/charm_decays_{}_{}.dat".format(marr[0],marr[2])})
+        d.update({"outlog" : "IDM_Events/charm_aD0.1_Delta0.1/charm_decays_{}_{}.dat".format(marr[0],marr[2])})
         #d.update({"outlog" : "IDM_Events/charm_aD0.5_Delta0.1/charm_decays_{}_{}.dat".format(marr[0],marr[2])})
         charm_eval(d)
 
@@ -1178,14 +1198,21 @@ def execute_nucal(genlist=True):
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_nucal.dat"]}
         write_nucal(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000]
-    #vmarr=[1.1,1.075,1.05,1.04,1.03,1.15,1.2,1.3,1.4,1.5,1.7,1.9,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,175,200,225,250,275,300,325,350,375,400,405,410,415,420,700,770,800,405,410,415,420,700,770,800,725,750,760,765,767,772,775,790,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960,970,980,990,1000]
-    vmarr=[460,470,480,490]
-    massarr=[[mv,mv,1e-7] for mv in vmarr]
-    d=({"signal_chan" : "Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 100000,  "sumlog" : "YuDai_project/nucal/nucal_decay.dat", "model" : "Dark_Photon", "min_scatter_energy" : 10, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal"});
+    #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    vmarr=[60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500]
+    #vmarr=[x for x in range(2775,3000,25)]+[x/2.0 for x in range(11,20,1)]
+    #vmarr+=[x for x in range(4550,5000,50)]+[]
+    vmarr=[66,67,68,69]
+    massarr=[[mv,mv/3.0,1.05*mv/3.0] for mv in vmarr]
+    #massarr=[[mv,mv,1e-7] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-3, "weighted" : 'true'});
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "YuDai_project/nucal/nucal_intersect_{}_{}.dat".format(marr[0],marr[2])})
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal_aD0.5_Delta_0.05/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.5})
         nucal_eval(d)
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.1, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.1/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1})
+        #nucal_eval(d)
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.4, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.4/nucal_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})
+        #nucal_eval(d)
 
 def execute_numi(genlist=True):
     d_list=[]
