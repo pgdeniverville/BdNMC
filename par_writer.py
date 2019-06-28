@@ -41,6 +41,8 @@ meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.105), 'rho_decay'
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
+Empty_string = "material Vacuum\nnumber_density 0\nproton_number 0\nneutron_number 0\nelectron_number 0\nmass 0.945778\n"
+
 Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneutron_number 8\nelectron_number 8\nmass 0.94578\nmaterial Hydrogen\nnumber_density 6.68368e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
 BEBC_string = "material Neon\nnumber_density 2.02e22\nproton_number 10\nneutron_number 10\nelectron_number 10\nmass 20.1797\nmaterial Hydrogen\nnumber_density 7.11231e21\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
@@ -185,6 +187,29 @@ def miniboone_detector_numi(f,xpos=mini_numi_distance*math.sin(mini_numi_angle),
     f.write('\n')
     f.write(Carbon_string)
 
+sbnd_numi_distance=112
+sbnd_numi_angle=0.5
+
+def SBND_detector_numi(f,xpos=sbnd_numi_distance*math.sin(sbnd_numi_angle),ypos=0.0,zpos=sbnd_numi_distance*math.cos(sbnd_numi_angle),width=4,height=4,length=5,theta=sbnd_numi_angle,phi=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Argon_string_SBND)
+
+microboone_numi_distance=684
+microboone_numi_angle=0.13
+
+#def microboone_det_numi(f,xpos=microboone_numi_distance*math.sin(microboone_numi_angle),ypos=0.0,zpos=microboone_numi_distance*math.cos(microboone_numi_angle),radius=,length=,theta=microboone_numi_angle,phi=0):
+#    Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi)
+#    f.write('\n')
+#    f.write(Argon_string)
+
+icarus_numi_distance=789
+icarus_numi_angle=0.1
+
+#def icarus_det_numi(f,xpos=icarus_numi_distance*math.sin(icarus_numi_angle),ypos=0.0,zpos=icarus_numi_distance*math.cos(icarus_numi_angle),):
+
+
 def miniboone_detector_full(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=6.106):
     f.write("\ndetector sphere\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
@@ -239,6 +264,23 @@ NOvA_target_d=990
 NOvA_Target_Angle=0.0122
 NOvA_Absorber_Angle=0.024
 
+def Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+
+def Seaquest1(f,xpos=0.0,ypos=0.0,zpos=7,length=4,width=2,height=2,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Empty_string)
+
+def Seaquest2(f,xpos=0.0,ypos=0.0,zpos=8.5,length=7,width=2,height=2,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Empty_string)
+
+
 def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_Target_Angle),zpos=NOvA_target_d*math.cos(NOvA_Target_Angle),height=4.2,length=14.3,width=2.9,theta=-NOvA_Target_Angle,phi=0,psi=0):
     print("This NOvA detector is prelimary!")
     #print("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
@@ -263,14 +305,6 @@ def minerva_detector(f,xpos=0.0,ypos=0.0,zpos=952,radius=0.925,length=2.53,theta
 
 def NOvA_absorber_detector(f):
     NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_Absorber_Angle),zpos=NOvA_absorber_d*math.cos(NOvA_Absorber_Angle))
-'''
-def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,radius=2.38,length=4.76,theta=0,phi=0):
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
-    f.write()
-    f.write('\n')
-    f.write(Argon_string)
-'''
 
 def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,width=4,height=4,length=5,theta=0,phi=0,psi=0):
     f.write("\ndetector cuboid\n");
@@ -293,6 +327,11 @@ def ship_detector(f,xpos=0.0,ypos=0,zpos=56,width=1.87,length=2,height=0.69,phi=
     f.write('\n')
     #Need to figure out what it's made of!
     f.write(SHiP_string)
+
+def NA62_decay_vol(f,xpos=0.0,ypos=0.0,zpos=149.5,radius=1,length=135,theta=0,phi=0):
+    Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi)
+    f.write('\n')
+    f.write(Empty_string)
 
 CHARM2_string="material Carbon\nnumber_density 7.00652e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
 
@@ -533,6 +572,17 @@ numi_default = {"proddist" : ["bmpt"], "meson_per_pi0" : meson_per_pi0_numi , "p
 
 def write_numi(d={}, det=NOvA_detector):
     context = numi_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+
+meson_per_pi0_seaquest = {'pi0_decay' : '1.0', 'eta_decay' : '0.107'}
+
+seaquest_default = {"proddist" : ["bmpt"], "meson_per_pi0" : meson_per_pi0_seaquest, "partlistfile" : ["data/particle_list_seaquest.dat"], "sumlog" : "Events/seaquest.dat", "outlog" : "Events/seaquest_events.dat", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 2, "max_scatter_energy" : 120, "dm_energy_resolution" : 0.01, "efficiency" : 1, "beam_energy" : 120, "n_num_target" : 110, "p_num_target" : 74, "ptmax" : 2, "zmin" : 0.1, "zmax" : 0.9, "POT" : 1e20,
+        "pi0_per_POT" : 3.075, "p_cross" : 15*mb}
+
+def write_seaquest(d={}, det=Seaquest1):
+    context = seaquest_default.copy()
     context.update(d)
     write_experiment(det,context)
 

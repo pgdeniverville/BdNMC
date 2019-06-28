@@ -363,7 +363,7 @@ int main(int argc, char* argv[]){
 	                    }
 	                    DMGen = std::shared_ptr<DMGenerator>(new 
 	                            Two_Body_Decay_Gen(brpi0toVgamma(mv,mdm,kappa,alD),
-	                            MASS_PION_NEUTRAL,"Pion",dp,gamma));
+	                            MASS_PION_NEUTRAL,"Pion",dp,gamma,0.0));
 	                    PartDist->set_mass(MASS_PION_NEUTRAL);
 	                }
 	                else if (prodchoice=="eta_decay"){
@@ -373,7 +373,7 @@ int main(int argc, char* argv[]){
 	                    }
 	                    DMGen = std::shared_ptr<DMGenerator>(new 
 	                            Two_Body_Decay_Gen(bretatoVgamma(mv,mdm,kappa,alD),
-	                            MASS_ETA,"Eta",dp,gamma));
+	                            MASS_ETA,"Eta",dp,gamma,0.0));
 	                    PartDist->set_mass(MASS_ETA);
 	                }
 	                if(proditer->Meson_Per_Pi0()<=0){
@@ -583,7 +583,7 @@ int main(int argc, char* argv[]){
 	            anti_muon.name = "Anti-muon";
 
 	            Particle hadronic(0);
-	            hadronic.name = "Hadronic Stuff";
+	            hadronic.name = "Hadronic_Stuff";
 	            
 	            double GV = Gamma_V(mv,mdm,kappa,alD);
 	            lifetime=hbar/GV;

@@ -11,7 +11,7 @@
 class DMGenerator{
     public:
         DMGenerator(){}
-        virtual bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part) {return false;}
+        virtual bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part) { return false;}
         double BranchingRatio(){return branchingratio;}
         void set_BranchingRatio(double br){branchingratio=br;}
         void Set_Channel_Name(std::string ch_na){chan_name=ch_na;}

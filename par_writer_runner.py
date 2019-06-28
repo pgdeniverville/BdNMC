@@ -32,6 +32,11 @@ def ship_detector_modular(f,radius=0.8268,length=3.34,theta=0,phi=0):
     f.write('\n')
     f.write(Argon_string)
 
+def shuffle_file(f):
+    l=np.loadtxt(f)
+    np.random.shuffle(l)
+    np.savetxt(f,l)
+
 def OPERA_detector(f,xpos=0.0,ypos=0.0,zpos=7.3e6,radius=56.4,length=1,theta=0,phi=0):
     print("Don't use this for event generation!")
     f.write("\ndetector cylinder\n");
@@ -500,12 +505,14 @@ def charm2_eval(d_user):
     subp.call(["rm", outfile])
 
 
-ship_defaults = {"mv" : 30, "mdm" : 10, 'channels' : {_parton,_brem,_pion_decay,_eta_decay,_phi_decay}, "signal_chan" : "NCE_electron", 'det_switch' : 'ship', 'sumlog' : "Events/ship.dat"}
+ship_defaults = {"mv" : 30, "mdm" : 10, "mdm1" : 10, "mdm2" : 10, 'channels' : {_parton,_brem,_pion_decay,_eta_decay,_phi_decay}, "signal_chan" : "NCE_electron", 'det_switch' : 'ship', 'sumlog' : "Events/ship.dat"}
 
 def ship_eval(d_user):
     d = ship_defaults.copy()
     d.update(d_user)
     MV=d["mv"]
+    MX1=d["mdm1"]
+    MX2=d["mdm2"]
     MX=d["mdm"]
     channels = d["channels"]
     det_switch=d["det_switch"]
@@ -515,6 +522,7 @@ def ship_eval(d_user):
         eps=d['eps']
     sumlog=d["sumlog"]
     signal_channel = d["signal_chan"]
+    model=d["model"]
 
     t0 = time.time()
     outfile="parameter_run_{0}_{1}.dat".format(str(MV),str(MX))
@@ -528,8 +536,22 @@ def ship_eval(d_user):
     partlistfile = []
     executing=False
 
-    if signal_channel=="Inelastic_Nucleon_Scattering_Baryonic" or signal_channel=="Baryonic_Test":
-        print("Need to implement Baryonic!")
+    if model=="Inelastic_Dark_Matter":
+        if MX1+MX2<mpi0*1000 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/particle_list_ship.dat")
+            executing=True
+        if MX1+MX2<meta*1000 and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay")
+            partlistfile.append("data/particle_list_ship.dat")
+            executing=True
+        if (MV>MX1+MX2) and _brem in channels:
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
+            executing=True
     else:
         if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
             proddist.append("particle_list")
@@ -556,12 +578,11 @@ def ship_eval(d_user):
             prodchan.append("phi_decay")
             partlistfile.append("data/particle_list_ship.dat")
             executing=True
-
     if not executing:
         print("No valid channels, skipping!")
         return
 
-    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "mdm1" : MX1/1000.0, "mdm2" : MX2/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "ship":
         write_ship(d=d)
     elif det_switch == "test_sphere":
@@ -572,6 +593,8 @@ def ship_eval(d_user):
         write_ship(d=d,det=test_cuboid)
     elif det_switch == "charm2":
         write_charm2(d=d)
+    elif det_switch == "na62":
+        write_ship(d=d,det=NA62_decay_vol)
     subp.call(["./build/main", outfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -600,7 +623,7 @@ def nucal_eval(d_user):
 
     t0 = time.time()
     outfile="parameter_run_{0}_{1}_{2}.dat".format(str(MV),str(MX),str(eps))
-    BEAM_ENERGY=120
+    BEAM_ENERGY=70
     zmin=max(3*MV/1000.0/BEAM_ENERGY,0.1)
     zmax=1-zmin
 
@@ -690,6 +713,71 @@ def nucal_eval(d_user):
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "mdm1" : MX1/1000.0, "mdm2" : MX2/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "nucal":
         write_nucal(d=d)
+    subp.call(["./build/main", outfile])
+    t1 = time.time()
+    print("\ntime={}\n".format(t1-t0))
+    t0 = time.time()
+    subp.call(["rm", outfile])
+
+seaquest_defaults = {"mv" : 30, "mdm" : 10, 'channels' : {_brem,_pion_decay,_eta_decay}, "signal_chan" : "Signal_Decay", 'det_switch' : 'seaquest1', 'sumlog' : "Events/seaquest_decay.dat", "alpha_D" : 0.5}
+
+def seaquest_eval(d_user):
+    d = seaquest_defaults.copy()
+    d.update(d_user)
+    MV=d["mv"]
+    MX1=d["mdm1"]
+    MX2=d["mdm2"]
+    MX=d["mdm"]
+    channels = d["channels"]
+    det_switch=d["det_switch"]
+    if "alpha_D" in d:
+        alD=d["alpha_D"]
+    if 'eps' in d:
+        eps=d['eps']
+    sumlog=d["sumlog"]
+    signal_channel = d["signal_chan"]
+    model=d["model"]
+
+    t0 = time.time()
+    outfile="parameter_run_{0}_{1}_{2}.dat".format(str(MV),str(MX),str(eps))
+    BEAM_ENERGY=120
+    zmin=max(3*MV/1000.0/BEAM_ENERGY,0.1)
+    zmax=1-zmin
+
+    proddist = []
+    prodchan = []
+    partlistfile = [    ]
+    executing=False
+
+    if model=="Inelastic_Dark_Matter":
+        if MX1+MX2<mpi0*1000 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/epos_pi0_120gev.dat")
+            #partlistfile.append("data/particle_list_seaquest.dat")
+            executing=True
+        if MX1+MX2<meta*1000 and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay")
+            #partlistfile.append("data/particle_list_seaquest.dat")
+            partlistfile.append("data/epos_eta_120gev.dat")
+            executing=True
+        if (MV>MX1+MX2) and _brem in channels:
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
+            executing=True
+
+    print(executing)
+
+    if not executing:
+        return
+    d.update(d_user)
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "mdm1" : MX1/1000.0, "mdm2" : MX2/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    if det_switch == "seaquest1":
+        write_seaquest(d=d)
+    elif det_switch == "seaquest2":
+        write_seaquest(d=d,det=Seaquest2)
     subp.call(["./build/main", outfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -827,6 +915,8 @@ def numi_eval(d_user):
         elif det_switch == "DUNE_HPgTPC":
             user2["outlog"] = "Decay_Events/DUNE_HPg_decay_Events_{}_{}.dat".format(str(MV),str(eps))
             user2["sumlog"] = "Decay_Events/DUNE_HPg.dat"
+        elif det_switch == "seaquest1" or det_switch=="seaquest2":
+            user2["POT"] = "1e20"
         d.update(user2)
     d.update(d_user)
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
@@ -1135,17 +1225,24 @@ def execute_ship(genlist=True):
         write_ship(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
-    vmarr = [30]
-    #vmarr = [1,5,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150]
-    massarr=[[mv,mv/3.0,1e-3] for mv in vmarr]
+    #vmarr=[7.5,7.6,7.7,7.8,7.9,8,9,10,15,20,30,40,60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500]
+    #vmarr=[1.2,1.3,1.5,1.7,2,2.5,3,3.5,4,5,7,10,15,20]+[x for x in range(30,150,10)]+[x for x in range(200,1400,50)]+[134,541,760,765,767,770,772,775,780,790]
+    vmarr=[x/10.0 for x in range (26,30)]
+    #vmarr+=[x for x in range(4600,7500,100)]
+    #vmarr=[51,52,53,54]
+    massarr=[[mv,mv,1e-6] for mv in vmarr]
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
-    d=({"channels" : [_pion_decay,_eta_decay,_brem,_parton] ,"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "alpha_D" : 0.5, "sumlog" : "Claudia/ship.dat", "model" : "Dark_Photon"})
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem,_parton] ,"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 10000, "alpha_D" : 0.5, "sumlog" : "Claudia/ship.dat", "model" : "Dark_Photon"})
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 20000,  "sumlog" : "IDM_Events/na62_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 400, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "eps" : 1e-3, "weighted" : 'true', 'model' : 'Inelastic_Dark_Matter', 'efficiency' : 1, 'det_switch' : "na62", 'POT' : 1e18});
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 100000,  "sumlog" : "Visible_Dark_Photon/na62_decay.dat", "model" : "Dark_Photon", "min_scatter_energy" : 3, "max_scatter_energy" : 400, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "eps" : 1e-3, "weighted" : 'true', 'efficiency' : 1, 'det_switch' : "na62", 'POT' : 1e18});
     #d=({"channels" : [_pion_decay,_eta_decay,_brem,_parton], "signal_chan" : "NCE_electron", "det_switch" : "charm2", "output_mode" : "comprehensive", "samplesize" : 10000, "alpha_D" : 0.5, "sumlog" : "Claudia/charm2.dat", "efficiency" : 1, "model" : "Dark_Photon"})
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        #d.update({"outlog" : "Claudia/charm2_{}_{}.dat".format(marr[0],round(marr[1],3))})
-        d.update({"outlog" : "Claudia/ship_{}_{}.dat".format(marr[0],round(marr[1],3))})
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.05, "outlog" : "IDM_Events/na62_aD0.5_Delta0.05/na62_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.5})
+        #ship_eval(d)
+        d.update({"mv" : marr[0],"mdm" : marr[0], "eps" : marr[2], "outlog" : "Visible_Dark_Photon/NA62/na62_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0})
         ship_eval(d)
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.4, "outlog" : "IDM_Events/na62_aD0.1_Delta0.4/na62_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})
+        #ship_eval(d)
 
 def execute_bebc(genlist=True):
     if genlist:
@@ -1192,6 +1289,31 @@ def execute_numi_abs(genlist=True):
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "YuDai_project/YuDai_abs_{}_{}.dat".format(marr[0],marr[2])})
         numi_eval(d)
 
+def execute_seaquest(genlist=True):
+    d_list=[]
+    external_list=True
+    if genlist:
+        if external_list:
+            shuffle_file("data/epos_eta_120gev.dat")
+            shuffle_file("data/epos_pi0_120gev.dat")
+        else:
+            d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_seaquest.dat"]}
+            write_seaquest(d=d)
+            subp.call(["./build/main", "parameter_run.dat"])
+    #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    #vmarr=[7.5,7.6,7.7,7.8,7.9,8,9,10,15,20,30,40,60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    #vmarr+=[x for x in range(5500,7500,100)]
+    vmarr=[4100,4200,4300,4400]
+    massarr=[[mv,mv/3.0,1.4*mv/3.0] for mv in vmarr]
+    #massarr=[[mv,mv,1e-7] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 30000,  "sumlog" : "IDM_Events/seaquest_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 2, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-3, "weighted" : 'true', 'model' : 'Inelastic_Dark_Matter', 'efficiency' : 1,"external_list" : external_list});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest3/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1, "det_switch" : "seaquest2"})
+        seaquest_eval(d)
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest2/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1, "det_switch" : "seaquest2"})
+        #seaquest_eval(d)
+
+
 def execute_nucal(genlist=True):
     d_list=[]
     if genlist:
@@ -1199,20 +1321,21 @@ def execute_nucal(genlist=True):
         write_nucal(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
-    vmarr=[60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500]
+    #vmarr=[60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500]
+    #vmarr=[x for x in range(2550,2750,50)]
     #vmarr=[x for x in range(2775,3000,25)]+[x/2.0 for x in range(11,20,1)]
     #vmarr+=[x for x in range(4550,5000,50)]+[]
-    vmarr=[66,67,68,69]
+    vmarr=[2575]
     massarr=[[mv,mv/3.0,1.05*mv/3.0] for mv in vmarr]
     #massarr=[[mv,mv,1e-7] for mv in vmarr]
     d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-3, "weighted" : 'true'});
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal_aD0.5_Delta_0.05/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.5})
-        nucal_eval(d)
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal_aD0.5_Delta_0.05/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.5})
+        #nucal_eval(d)
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.1, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.1/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1})
         #nucal_eval(d)
-        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.4, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.4/nucal_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})
-        #nucal_eval(d)
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.4, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.4/nucal_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})
+        nucal_eval(d)
 
 def execute_numi(genlist=True):
     d_list=[]
