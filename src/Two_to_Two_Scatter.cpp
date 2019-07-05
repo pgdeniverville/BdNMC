@@ -164,6 +164,7 @@ void Two_to_Two_Scatter::scatterevent (Particle &part, double targ_mass, Particl
     }
 }
 
+//Note that these return E4min and E4max.
 //I'm going to need to break these down by channel eventually.
 double Two_to_Two_Scatter::scatmax(double E1, double m1, double m2, double m3, double m4){
     return(std::min(Escatmax,E4max(E1,m1,m2,m3,m4)));
@@ -172,4 +173,23 @@ double Two_to_Two_Scatter::scatmax(double E1, double m1, double m2, double m3, d
 double Two_to_Two_Scatter::scatmin(double E1, double m1, double m2, double m3, double m4){
     //cout << "Escatmin = " << Escatmin << endl; 
     return(std::max(Escatmin,E4min(E1,m1,m2,m3,m4)));
+}
+
+
+//A specialized version of add_channel
+void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state, double in_mass, double targ_mass, std::function<double(double,double)> &dsig, double num_density, const std::string in_state, double Max_Energy, double EDM_RES){
+        
+        std::shared_ptr<Linear_Interpolation> cross;
+        std::shared_ptr<Linear_Interpolation> cross_max;
+
+        std::function<double(double)> ER_min = std::bind(&Two_to_Two_Scatter::scatmin,*this,_1,in_mass,targ_mass,out_state.m, end_state.m);
+        std::function<double(double)> ER_max = std::bind(&Two_to_Two_Scatter::scatmax,*this,_1,in_mass,targ_mass,out_state.m, end_state.m);
+
+        Prepare_Cross_Section(dsig, ER_min, ER_max, cross, cross_max, in_mass,Max_Energy,EDM_RES);
+
+        function<double(double)> cross_func = bind(&Linear_Interpolation::Interpolate,cross,_1);
+        function<double(double)> cross_max_func = bind(&Linear_Interpolation::Interpolate,cross_max,_1);
+
+        add_channel(out_state, end_state, targ_mass, cross_func, cross_max_func, dsig, num_density, in_state);
+
 }

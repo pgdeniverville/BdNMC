@@ -12,6 +12,29 @@ using std::string; using std::list;
 using std::vector; using std::cout;
 using std::endl; using std::cerr;
 
+double load_form_factor(const string& filename, std::shared_ptr<Linear_Interpolation>& ff){
+    std::ifstream instream(filename);
+    if(!instream.is_open()){
+        std::cerr << "load_form_factor cannot open " << filename << " needed for magnetic dipole moment form factor." << std::endl;
+        throw -1;
+    }
+    double q2_min,q2_max;
+    std::vector<double> q2_dist;
+    double in;
+    instream >> q2_min;
+    instream >> in;
+    q2_dist.push_back(in);
+    while(instream >> q2_max){
+        instream >> in;
+        q2_dist.push_back(in);
+    }
+
+    ff = std::shared_ptr<Linear_Interpolation>( new Linear_Interpolation(q2_dist, q2_min, q2_max));
+
+    return q2_max;
+
+}
+
 void Model::Prepare_Model(Parameter& par){
     if(!this->Set_Model_Parameters(par)){
         std::cerr << "Model " << Model_Name << " is missing required model parameters\n";

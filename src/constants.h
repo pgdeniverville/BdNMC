@@ -43,6 +43,7 @@ const double mphi = 1.019461;
 const double brpi0to2gamma = 0.98823;
 const double bretato2gamma = 0.3941;
 
+
 const double WIDTH_PION_NEUTRAL=7.4692633e-9;//GeV^-1
 const double WIDTH_ETA=1.31e-6;
 
@@ -51,5 +52,9 @@ const double MASS_PHOTON=0.0;
 
 //Branching Ratios
 const double br_eta_to_gamma_gamma=0.3941;
+
+const double Delta_to_pi0 = 2.0/3.0;
+const double Delta_to_pion_charged = 1.0/3.0;
+const double Delta_to_gamma=0.006;
 
 #endif

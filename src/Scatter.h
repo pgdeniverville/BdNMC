@@ -88,6 +88,7 @@ class Two_to_Two_Scatter : public Scatter{
         Two_to_Two_Scatter();
         ~Two_to_Two_Scatter(){};
         void add_channel(Particle& out_state, Particle& end_state, double targ_mass, std::function<double(double)>& cross_total, std::function<double(double)>& cross_max, std::function<double(double, double)>& dsig, double num_density, const std::string in_state);
+        void Build_Channel(Particle& out_state, Particle& end_state, double in_mass, double targ_mass, std::function<double(double,double)> &dsig, double num_density, const std::string in_state, double Max_Energy, double EDM_RES);
         bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator& partit);
         bool probscatter(std::shared_ptr<detector>& det, Particle& part);
         bool probscatter(std::shared_ptr<detector>& det, Particle &part, Particle &recoil, Particle &recoil2);

@@ -26,6 +26,8 @@ struct Decay_Channels{
     std::vector<std::vector<Particle> > end_states;
 };
 
+double load_form_factor(const std::string& filename, std::shared_ptr<Linear_Interpolation>& ff);
+
 class Model{
     public:
         Model(Parameter& par){Model_Name=par.Model_Name(); Vnumtot=0;}
@@ -78,7 +80,6 @@ class Inelastic_Dark_Matter : public Model{
         void Report_Model();
         void Report(std::ostream& out);
         void Branching_Ratios(){};
-
         double meson_decay_amplitude2(double m12s, double m23s, double m0, double m1, double m2, double m3);
         double Amplitude2_dm2_to_lepton_lepton_dm1(double m12s, double m23s, double m0, double m1, double m2, double m3);
         //m1=m2=MASS_MUON
@@ -89,8 +90,14 @@ class Inelastic_Dark_Matter : public Model{
         double dsigma_dm_e_to_dm_e(double E1lab, double E4, double mass_dm_in,double mass_dm_out, double mR);
         double dm_e_to_dm_e_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR);
         double dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in,double mass_dm_out, double mR);
+        double dsigma_dm_N_to_dm_Delta(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double mN, double delta);
+        double amp_dm_N_to_dm_Delta(double s, double t, double m1, double m2, double mN, double mD);
         void Evaluate_Widths();
+        double GM(double q2);
         //mass_dm2 is assumed to be heavier.
+        std::shared_ptr<Linear_Interpolation> GM_form_factor;
+        bool MAX_Q2_WARNING = false;
+        double MAX_Q2=0;
         double Awidth, dm2width;
         double width_dm2_to_elec_elec_dm1;
         double width_dm2_to_muon_muon_dm1;
