@@ -265,7 +265,6 @@ int main(int argc, char* argv[]){
 		PartDist_list=model->get_Distribution();
 		//This will be a list eventually, but SigGen is still a pointer to a single Signal Gen.
 		model->get_first_SigGen(SigGen);
-
 		model->get_Vnum(Vnum_list);
 		Vnumtot=model->get_Vnumtot();
 		sig_part_vec = model->get_sig_part_vec();

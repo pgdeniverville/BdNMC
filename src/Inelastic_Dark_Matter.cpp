@@ -150,7 +150,7 @@ double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e_2(double E1lab, double t, doub
 //m1, m2 can be either dm1 or dm2, whichever is inbound.
 double Inelastic_Dark_Matter::amp_dm_N_to_dm_Delta(double s, double t, double m1, double m2, double mN, double mD){
     //1/4 is to average over initial spins.
-    return 1/4*(8*pow(mD + mN,2)*pow(pi,2)*(2*(pow(mD,2) + pow(mN,2)) - t)*t*
+    return 1/4.0*(8*pow(mD + mN,2)*pow(pi,2)*(2*(pow(mD,2) + pow(mN,2)) - t)*t*
      (pow(m1,4)*(-16*pow(mass_dp,2)*pow(mD,2) + pow(mD,4) - 2*pow(mD,2)*(pow(mN,2) - 5*t) + 
           pow(pow(mN,2) - t,2)) + 2*m1*m2*
         (36*pow(mass_dp,4)*pow(mD,2) - 2*pow(mass_dp,2)*
@@ -188,7 +188,7 @@ double Inelastic_Dark_Matter::dsigma_dm_N_to_dm_Delta(double E1lab, double E4, d
     if(s<pow(mDelta+mass_dm_out,2)){
         return 0;
     }
-    return 2*mN*1/64.0/pi/pow(mN,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*amp_dm_N_to_dm_Delta(s,two_to_two_scattering::t_lab(E4,mN,mDelta),mass_dm_in,mass_dm_out,mN,mDelta);
+    return -2*mN*1/64.0/pi/pow(mN,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*amp_dm_N_to_dm_Delta(s,two_to_two_scattering::t_lab(E4,mN,mDelta),mass_dm_in,mass_dm_out,mN,mDelta);
 }
 
 bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>& Dist, double& Vnum, Parameter& par){
@@ -331,6 +331,7 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
             }   
             std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(par.Beam_Energy(),epsilon,mass_dp,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),alpha_D,proddist,prodchan.ptmin()));
             Vnum = pbd->V_prod_rate()*par.Protons_on_Target();//V_decay should return a branching ratio for this. If it doesn't, I will have to change it in the future. prodchan.Num_per_pot()
+            DMGen->Set_Channel_Name("Dark_Bremsstrahlung");
             Dist->Add_Dist(pbd);
             return true;
         }
@@ -373,7 +374,6 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
 
             double PNtot =(par.Get_Detector())->PNtot();
             double NNtot =(par.Get_Detector())->NNtot();
-
 
             Particle dm1_r(mass_dm1);
             dm1_r.name = "Recoil_Dark_Matter_1";
@@ -420,6 +420,7 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
                 std::shared_ptr<Two_Body_Decay_Gen> photondec(new Two_Body_Decay_Gen(Delta_to_gamma, MASS_DELTA, "Recoil_Delta", photon, decay_nucleon));
                 ttts->add_decay("Recoil_Delta", photondec);
             }
+            Sig_list.push_back(ttts);
             return true;
         }
         else if(sig_choice=="Electron_Scatter" || sig_choice=="NCE_electron"){

@@ -17,13 +17,13 @@ void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::fun
 //    cout << "E_in_res=" << E_in_res << endl;
     for(double iter=E_in_min+E_in_res; iter<=E_in_max; iter+=E_in_res){
 
-        //cout << "E=" << iter << endl;
-
+//        cout << "E=" << iter << endl;
         double E_r_min=ER_Min(iter);
         double E_r_max=ER_Max(iter);
-//        cout << iter << " " << E_r_min << " " << E_r_max << " " << 2*pow(MASS_ELECTRON,2)-2*MASS_ELECTRON*E_r_min << " " << 2*pow(MASS_ELECTRON,2)-2*MASS_ELECTRON*E_r_max << endl;
+//        cout << iter << " " << E_r_min << " " << E_r_max << endl;
+        
         if(E_r_min>=E_r_max){
- //           cout << "cross = 0\n";
+//            cout << "E_r_min > E_r_max? cross = 0\n";
             vec_cross.push_back(0);
             vec_maxima.push_back(0);
             continue;

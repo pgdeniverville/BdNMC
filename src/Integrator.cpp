@@ -203,12 +203,13 @@ double DoubleExponential_adapt(std::function<double(double)> f, double min, doub
     //cout << "N=" << N << " h=" << h << " dd0=" << dd0 << endl;
     for(attempts=0; attempts<DDMAX; attempts++){
 	   	//cout << "attempts=" << attempts << endl;	
-        if(fabs(dd0-(dd1 = dd0+DoubleExponential_Nout(f, min, max, N*2.0, N, h)))>dd0*precision){
+        if(fabs(dd0-(dd1 = dd0+DoubleExponential_Nout(f, min, max, N*2.0, N, h)))>fabs(dd0*precision)){
+            //cout << fabs(dd0-(dd1 = dd0+DoubleExponential_Nout(f, min, max, N*2.0, N, h))) << endl;
             dd0=dd1;
             N*=2.0;
             //cout << "N=" << N << " h=" << h << " dd1=" << dd0 << endl;
         }
-        else if(fabs(dd0-(dd2 = 0.5*dd0+DoubleExponential_hdub(f, min, max, 2*N, h/2.0)))>dd0*precision){
+        else if(fabs(dd0-(dd2 = 0.5*dd0+DoubleExponential_hdub(f, min, max, 2*N, h/2.0)))>fabs(dd0*precision)){
             dd0=dd2;
             h*=0.5; N*=2.0;
             //cout << "N=" << N << " h=" << h << " dd2=" << dd0 << endl;
@@ -220,7 +221,8 @@ double DoubleExponential_adapt(std::function<double(double)> f, double min, doub
             break;
     }
     if(attempts==DDMAX){
-        std::cerr << "Integrator reached max number of iterations=" << DDMAX << endl;	
+        std::cerr << "Integrator DoubleExponential_adapt reached max number of iterations=" << DDMAX << endl;
+        std::cerr << "Estimate=" << dd0 << " " << dd1 << " " << dd2 << endl; 
 	}
     return dd0;
 }

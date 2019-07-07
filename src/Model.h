@@ -51,7 +51,8 @@ class Model{
         void get_Distribution(std::vector<std::shared_ptr<Distribution> >& PartDist_list){PartDist_list = Dist_list;}
         std::vector<std::shared_ptr<Distribution> > get_Distribution(){return Dist_list;}
         void get_SigGen(std::vector<std::shared_ptr<Scatter> >& Signal_list){Signal_list = Sig_list;}
-        void get_first_SigGen(std::shared_ptr<Scatter>& Signal){Signal = Sig_list.front();}
+        void get_first_SigGen(std::shared_ptr<Scatter>& Signal){if(Sig_list.size()==0){std::cerr << "Sig_list is empty, get_first_SigGen will fail\n";}
+            Signal = Sig_list.front();}
         std::shared_ptr<Scatter> get_SigGen(int i){return Sig_list[i];}
         void get_Vnum(std::vector<double>& vnum){vnum = Vnum_list;}
         std::vector<double> get_Vnum(){return Vnum_list;}
