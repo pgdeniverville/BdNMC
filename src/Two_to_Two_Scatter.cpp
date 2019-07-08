@@ -188,9 +188,9 @@ void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state,
 
         std::function<double(double)> f = std::bind(dsig,1.8,_1);
 
-//       cout << DoubleExponential_adapt(f, ER_min(1.8), ER_max(1.8), 200, 0.1, 1e-4) << endl;;
-
-//       throw -1;
+//        cout << f(1.4) << endl;
+//        cout << DoubleExponential_adapt(f, ER_min(1.8), ER_max(1.8), 200, 0.1, 1e-4) << endl;;
+//        throw -1;
 
         Prepare_Cross_Section(dsig, ER_min, ER_max, cross, cross_max, in_mass,Max_Energy,EDM_RES);
 

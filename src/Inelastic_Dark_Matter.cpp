@@ -150,7 +150,7 @@ double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e_2(double E1lab, double t, doub
 //m1, m2 can be either dm1 or dm2, whichever is inbound.
 double Inelastic_Dark_Matter::amp_dm_N_to_dm_Delta(double s, double t, double m1, double m2, double mN, double mD){
     //1/4 is to average over initial spins.
-    return 1/4.0*(8*pow(mD + mN,2)*pow(pi,2)*(2*(pow(mD,2) + pow(mN,2)) - t)*t*
+/*    return 1/4.0*(8*pow(mD + mN,2)*pow(pi,2)*(2*(pow(mD,2) + pow(mN,2)) - t)*t*
      (pow(m1,4)*(-16*pow(mass_dp,2)*pow(mD,2) + pow(mD,4) - 2*pow(mD,2)*(pow(mN,2) - 5*t) + 
           pow(pow(mN,2) - t,2)) + 2*m1*m2*
         (36*pow(mass_dp,4)*pow(mD,2) - 2*pow(mass_dp,2)*
@@ -169,6 +169,15 @@ double Inelastic_Dark_Matter::amp_dm_N_to_dm_Delta(double s, double t, double m1
           4*pow(mass_dp,2)*((pow(mN,2) - t)*(pow(mN,2) - s - t) + 
              pow(mD,2)*(-pow(mN,2) + s + 5*t))))*alpha_D*alphaEM*pow(epsilon,2)*pow(GM(-t),2))/
    (pow(mass_dp,4)*pow(mD,2)*pow(mN,2)*pow(pow(mass_dp,2) - t,2)*(pow(mD + mN,2) - t));
+*/
+    return (8.0*alpha_D*alphaEM*pow(epsilon,2)*pow(mD + mN,2)*pow(pi,2)*
+     (2*pow(m1,4)*pow(mD,2) + 2*pow(m2,4)*pow(mN,2) - 
+       pow(m2,2)*(pow(mD,2) - pow(mN,2) - t)*(pow(mD,2) + pow(mN,2) - 2*s - t) + 
+       pow(m1,2)*(-2*pow(m2,2)*(pow(mD,2) + pow(mN,2) - t) + 
+          (pow(mD,2) + pow(mN,2) - 2*s - t)*(pow(mD,2) - pow(mN,2) + t)) + 
+       2*m1*m2*(pow(mD,4) + pow(pow(mN,2) - t,2) - 2*pow(mD,2)*(pow(mN,2) + t)) + 
+       t*(pow(mD,4) + pow(mN,4) + 2*pow(s,2) + 2*s*t + pow(t,2) - 2*pow(mD,2)*(s + t) - 2*pow(mN,2)*(s + t)))*
+     pow(GM(-t),2))/(pow(mN,2)*pow(pow(mass_dp,2) - t,2)*(pow(mD + mN,2) - t));
 }
 
 double Inelastic_Dark_Matter::GM(double q2){
