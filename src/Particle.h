@@ -44,7 +44,7 @@ public:
 	void 	Set_Creation_Time(double t);
     //If END_SET=true, this also updates dec_time.
     void    Set_Time(double t);
-    void    Increment_Time(double t){END_SET=true; Set_Time(t+origin_coords[3]+end_coords[3]);} 
+    void    Increment_Time(double t){END_SET=true; Set_Time(t+origin_coords[3]);} 
     double Momentum() const;
     double Speed();
     double Kinetic_Energy() const {return E-m;}

@@ -38,7 +38,7 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     //amp = function<double(double,double,double,double,double,double)>(amplitude);
     //This might not work, I may need a pointer to store this. Memory allocation etcetc.
     amp = amplitude; 
-   prodchoice=prodstring;
+    prodchoice=prodstring;
     pmax=0;
 
     //burn-in
@@ -79,7 +79,7 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     //commented temporarily until I can determine the issue.
     //branchingratio=8*pi*pi*SimpsonCubature(d2width,daughter1.m+daughter2.m,mother.m-daughter3.m,100,-1,1,100)/mother.width;
     branchingratio=tot*resx*resy*8*pi*pi/mother.width;
-    std::cout << "Branching Ratio calculated to be " << branchingratio << endl;
+    std::cout << "Branching Ratio for " << prodstring << " calculated to be " << branchingratio << endl;
     tau = lifetime;
     //amp = function<double(double,double,double,double,double,double)>(amplitude);
     //This might not work, I may need a pointer to store this. Memory allocation etcetc.
@@ -123,73 +123,84 @@ void Three_Body_Decay_Gen::Toggle_Daughter_Decay(int index, std::shared_ptr<DMGe
 bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& parent){
     parent.name = mother.name;
 
-/*
-    cout << "Beginning GenDM debug\n";
-
-    parent.report(cout);
-*/
-
     if(tau>0){
-        double decay_time=tau*log(1/(1-Random::Flat()));
+        double decay_time=tau*log(1.0/(1.0-Random::Flat()));
         double boost = parent.E/parent.m;
         parent.Increment_Time(decay_time*boost);
     }
 /*
-    cout << "decay_time = " << decay_time << endl;
+    if(parent.name=="Dark_Photon"){
+
+    cout << "Beginning GenDM debug\n";
+
+    parent.report(cout);
+
     cout << "parent.Speed() = " << parent.Speed() << endl;
     cout << "parent.Momentum() = " << parent.Momentum() << endl;
     cout << "parent.E = " << parent.E << endl;
     cout << "parent.m = " << parent.m << endl; 
-    cout << "boost = " << boost << endl;
-
-    //cout << decay_time << " " << boost << endl;
- */
-
+    }*/
 
     if(record_parent){
         vec.push_back(Particle(parent));
     }
 
     Three_Body_Decay(parent, daughter1, daughter2, daughter3, pmax, amp);
+/*
+    cout << "preReport on THREE_BODY_DECAY " << Channel_Name() << "\n";
+    parent.report();
+    daughter1.report(cout);
+    cout << det_int(daughter1) << endl;
+    daughter2.report(cout);
+    cout << det_int(daughter2) << endl;
+    daughter3.report(cout);
+    cout << det_int(daughter3) << endl;
+    cout << "\n\n";
+*/
     bool intersect=false;
     std::list<Particle>::iterator bookmark = vec.end();
     if(d1_unstable&&(d1_decay->GenDM(vec, det_int, daughter1))){
+//        cout << "d1 unstable\n";
         vec.insert(bookmark,daughter1);
         bookmark = vec.end();
         intersect=true;
     }
     if(d2_unstable&&(d2_decay->GenDM(vec, det_int, daughter2))){
+//        cout << "d2 unstable\n";
         vec.insert(bookmark,daughter2);
         bookmark = vec.end();
         intersect=true;
     }
     if(d3_unstable&&(d3_decay->GenDM(vec, det_int, daughter3))){
+//        cout << "d3 unstable\n";
         vec.insert(bookmark,daughter3);
         bookmark = vec.end();
         intersect=true;
     }
 /*
-    if(parent.name=="Dark_Photon"){
-        cout << "Report on THREE_BODY_DECAY\n";
-        parent.report();
-        daughter1.report(cout);
-        daughter2.report(cout);
-        daughter3.report(cout);
-    }
+    cout << "Report on THREE_BODY_DECAY " << Channel_Name() << "\n";
+    parent.report();
+    daughter1.report(cout);
+    cout << det_int(daughter1) << endl;
+    daughter2.report(cout);
+    cout << det_int(daughter2) << endl;
+    daughter3.report(cout);
+    cout << det_int(daughter3) << endl;
+    cout << "\n\n";
 */
     //Need to decay these daughter particles!
     if(d1&&(det_int(daughter1)>0)){
-        //cout << "daughter1 hit!\n";
+    //    cout << "daughter1 hit!\n";
         intersect=true;
         vec.push_back(daughter1);
     }
     if(d2&&(det_int(daughter2)>0)){
-        //cout << "daughter2 hit!\n";
+    //    cout << "daughter2 hit!\n";
         intersect=true;
         vec.push_back(daughter2);
     }
     if(d3&&(det_int(daughter3)>0)){
-        //cout << "daughter3 hit!\n";
+    //    cout << "daughter3 hit!\n";
         intersect=true;
         vec.push_back(daughter3);    
     }

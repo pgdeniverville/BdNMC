@@ -247,7 +247,7 @@ namespace Three_Body_Decay_Space{
     void Three_Body_Decay(Particle &parent, Particle &daughter1, Particle &daughter2, Particle &daughter3, double &d_width_max, std::function<double(double, double, double, double, double, double)> &amp){
         
         double d_width = 0;
-        double m12, cos_t;    
+        double m12, cos_t;
         double m0=parent.m;
         double m1=daughter1.m;
         double m2=daughter2.m;

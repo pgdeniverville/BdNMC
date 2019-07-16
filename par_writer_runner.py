@@ -32,6 +32,16 @@ def ship_detector_modular(f,radius=0.8268,length=3.34,theta=0,phi=0):
     f.write('\n')
     f.write(Argon_string)
 
+DUNE_DIST=543
+DUNE_ANGLE=0
+DUNE_RADIUS=0.554576
+
+def DUNE_ND(f):
+    f.write("\ndetector sphere\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(DUNE_DIST*math.sin(DUNE_ANGLE)),str(0),str(DUNE_DIST*math.cos(DUNE_ANGLE)),str(DUNE_RADIUS)))
+    f.write('\n')
+    f.write(Argon_string)
+
 def shuffle_file(f):
     l=np.loadtxt(f)
     np.random.shuffle(l)
@@ -583,6 +593,7 @@ def ship_eval(d_user):
         return
 
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "mdm1" : MX1/1000.0, "mdm2" : MX2/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+
     if det_switch == "ship":
         write_ship(d=d)
     elif det_switch == "test_sphere":
@@ -719,7 +730,7 @@ def nucal_eval(d_user):
     t0 = time.time()
     subp.call(["rm", outfile])
 
-seaquest_defaults = {"mv" : 30, "mdm" : 10, 'channels' : {_brem,_pion_decay,_eta_decay}, "signal_chan" : "Signal_Decay", 'det_switch' : 'seaquest1', 'sumlog' : "Events/seaquest_decay.dat", "alpha_D" : 0.5}
+seaquest_defaults = {"mv" : 30, "mdm" : 10, "mdm1" : 10, "mdm2" : 10, 'channels' : {_brem,_pion_decay,_eta_decay}, "signal_chan" : "Signal_Decay", 'det_switch' : 'seaquest1', 'sumlog' : "Events/seaquest_decay.dat", "alpha_D" : 0.5}
 
 def seaquest_eval(d_user):
     d = seaquest_defaults.copy()
@@ -767,8 +778,32 @@ def seaquest_eval(d_user):
             prodchan.append("V_decay")
             partlistfile.append("")
             executing=True
-
-    print(executing)
+    else:
+        if ((MX/1000.0<mpi0/2.0 and MV<600.0 and signal_channel!="Signal_Decay") or (MV/1000.0<mpi0 and signal_channel=="Signal_Decay")) and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            partlistfile.append("data/epos_pi0_120gev.dat")
+            executing=True
+        if ((signal_channel!="Signal_Decay" and MX/1000.0<meta/2.0 and MV<900.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("eta_decay")
+            partlistfile.append("data/epos_eta_120gev.dat")
+            executing=True
+        if MV/1000.0>=mrho and _parton in channels:
+            proddist.append("parton_V")
+            prodchan.append("parton_production")
+            partlistfile.append("")
+            executing=True
+        if (MV/2.0>MX or signal_channel=="Signal_Decay") and _brem in channels:
+            proddist.append("proton_brem")
+            prodchan.append("V_decay")
+            partlistfile.append("")
+            executing=True
+        #if MV/1000.0>=mrho and MV<=1250 and _phi_decay in channels:
+        #    proddist.append("particle_list")
+        #    prodchan.append("phi_decay")
+        #    partlistfile.append("data/particle_list_numi.dat")
+        #    executing=True
 
     if not executing:
         return
@@ -778,6 +813,8 @@ def seaquest_eval(d_user):
         write_seaquest(d=d)
     elif det_switch == "seaquest2":
         write_seaquest(d=d,det=Seaquest2)
+    elif det_switch == "seaquest_extended":
+        write_seaquest(d=d,det=Seaquest_extended)
     subp.call(["./build/main", outfile])
     t1 = time.time()
     print("\ntime={}\n".format(t1-t0))
@@ -915,7 +952,7 @@ def numi_eval(d_user):
         elif det_switch == "DUNE_HPgTPC":
             user2["outlog"] = "Decay_Events/DUNE_HPg_decay_Events_{}_{}.dat".format(str(MV),str(eps))
             user2["sumlog"] = "Decay_Events/DUNE_HPg.dat"
-        elif det_switch == "seaquest1" or det_switch=="seaquest2":
+        elif det_switch == "seaquest1" or det_switch=="seaquest2" or det_switch=="seaquest_extended":
             user2["POT"] = "1e20"
         d.update(user2)
     d.update(d_user)
@@ -931,12 +968,6 @@ def numi_eval(d_user):
         write_numi(d=d,det=MINOS_absorber_detector)
     elif det_switch == "miniboone_numi":
         write_numi(d=d,det=miniboone_detector_numi)
-    elif det_switch == "test_sphere":
-        write_numi(d=d,det=test_sphere)
-    elif det_switch == "test_cylinder":
-        write_numi(d=d,det=test_cylinder)
-    elif det_switch == "test_cuboid":
-        write_numi(d=d,det=test_cuboid)
     elif det_switch == "YuDai_cylinder":
         write_numi(d=d,det=YuDai_cylinder)
     elif det_switch == "YuDai_cylinder_2":
@@ -945,6 +976,8 @@ def numi_eval(d_user):
         write_numi_absorber(d=d,det=YuDai_cylinder_abs)
     elif det_switch == "DUNE_HPgTPC":
         write_numi(d=d,det=DUNE_HPgTPC)
+    elif det_switch == "DUNE_ND_TEST":
+        write_numi(d=d,det=DUNE_ND)
     elif det_switch == "minerva":
         write_numi(d=d,det=minerva_detector)
     subp.call(["./build/main", outfile])
@@ -1188,13 +1221,14 @@ def execute_charm(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,60,70,75,80,85,90,95,100,115,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000]+[x for x in range(4100,6000,100)]
     #vmarr=[2,3,4,5,7,9,10,15,20,30,40,60,80,100,130,140,150,200,250,300,350,400,450,500,540,550,560,600,650,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000]
-    vmarr=[1.2,1.3,1.5,1.75]
-    epsarr=[2e-7]
+    #vmarr=[1.2,1.3,1.5,1.75]
+    vmarr=[350]
+    epsarr=[5e-7]
     massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[mv,mv/3.0,1.1*mv/3.0] for mv in vmarr]
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 1, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_events.dat"});
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "YuDai_project/charm/charm_decay_events.dat"});
-    d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm",       "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" :    50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1,     "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "Visible_Dark_Photon/charm_decay_events.dat", "weighted" : "true"});
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm",       "signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" :    50000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1,     "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "Visible_Dark_Photon/charm_decay_events.dat", "weighted" : "true"});
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 20000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.1, "POT" : 2.4e18, "sumlog" : "IDM_Events/charm_decay_events.dat", "eps" : 1e-3, "model" : "Inelastic_Dark_Matter", "weighted" : 'true'});
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm", "signal_chan" : "DM2_Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "min_scatter_energy" : 3, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 2.4e18, "sumlog" : "IDM_Events/charm_decay_events.dat", "eps" : 1e-3, "model" : "Inelastic_Dark_Matter", "weighted" : 'true'});
     for marr in massarr:
@@ -1265,18 +1299,6 @@ def execute_bebc(genlist=True):
         d.update({"outlog" : "Claudia/bebc_{}_{}.dat".format(marr[0],round(marr[1],3))})
         bebc_eval(d)
 
-def execute_numi_test(genlist=True):
-    if genlist:
-        d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_numi.dat"]}
-        write_numi(d=d)
-        subp.call(["./build/main", "parameter_run.dat"])
-    massarr=[[600,200,1e-3]]
-    d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
-    for marr in massarr:
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
-        d.update({"det_switch" : "test_sphere"})
-        numi_eval(d)
-
 def execute_numi_abs(genlist=True):
     d_list=[]
     if genlist:
@@ -1303,15 +1325,16 @@ def execute_seaquest(genlist=True):
             d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_seaquest.dat"]}
             write_seaquest(d=d)
             subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
-    #vmarr=[7.5,7.6,7.7,7.8,7.9,8,9,10,15,20,30,40,60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    #vmarr=[7.5,7.6,7.7,7.8,7.9,8,9,10,15,20,30,40,60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5100,5200,5300,5400]
     #vmarr+=[x for x in range(5500,7500,100)]
-    vmarr=[4100,4200,4300,4400]
-    massarr=[[mv,mv/3.0,1.4*mv/3.0] for mv in vmarr]
-    #massarr=[[mv,mv,1e-7] for mv in vmarr]
-    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 30000,  "sumlog" : "IDM_Events/seaquest_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 2, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-3, "weighted" : 'true', 'model' : 'Inelastic_Dark_Matter', 'efficiency' : 1,"external_list" : external_list});
+    #massarr=[[mv,mv/3.0,1.4*mv/3.0] for mv in vmarr]
+    massarr=[[mv,mv,1e-7] for mv in vmarr]
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 60000,  "sumlog" : "IDM_Events/seaquest_extended_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-3, "weighted" : 'true', 'model' : 'Inelastic_Dark_Matter', 'efficiency' : 1,"external_list" : external_list, "POT" : 1e20});
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 60000,  "sumlog" : "Visible_Dark_Photon/seaquest_extended_decay.dat", "model" : "Dark_Photon", "min_scatter_energy" : 3, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-3, "weighted" : 'true', 'efficiency' : 1,"external_list" : external_list, "POT" : 1e20});
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest3/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1, "det_switch" : "seaquest2"})
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest_extended/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1, "det_switch" : "seaquest_extended"})
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Visible_Dark_Photon/seaquest_extended/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0, "det_switch" : "seaquest_extended"})
         seaquest_eval(d)
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest2/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1, "det_switch" : "seaquest2"})
         #seaquest_eval(d)
@@ -1349,22 +1372,31 @@ def execute_numi(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1,5,10,15,20,30,40,50,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000]
     #vmarr=[1,5,10,15,20,30,40,50,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,800,900,1000]
-    vmarr=[50,200,500]
+    vmarr=[10,50,200,500]
+    #vmarr=[10]
     #epsarr=[10**n for n in range(-8,-3)]+[3*10**n for n in range(-9,-4)]
     #epsarr=[1e-6,3e-7,1e-7]
     epsarr=[1e-3]
-    massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
+    angle_arr=[0,0.01045,0.0209,0.03136,0.04181,0.05226,0.06272,0.10415]
+    #massarr=[[mv,mv/3.0,eps] for mv in vmarr for eps in epsarr]
+    massarr=[[mv,mv/3.0,ang] for mv in vmarr for ang in angle_arr]
     #massarr=[[mv,10,eps] for mv in vmarr for eps in epsarr]
     #massarr=[[90,30,1e-3],[600,200,1e-3]]
     #d=({"signal_chan" : "Signal_Decay", "alpha_D" : 0, "pi0_per_POT" : 1, "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon", "ptmax" : 1, "det_switch" : "DUNE_HPgTPC", "channels" : [_pion_decay,_eta_decay,_brem], "min_scatter_energy" : 0});
     #d=({"signal_chan" : "Signal_Decay", "POT" : 1e21 , "pi0_per_POT" : 1, "output_mode" : "dm_detector_distribution", "samplesize" : 10000, "sumlog" : "YuDai_project/YuDai.dat", "model" : "Dark_Photon", "ptmax" : 1, "det_switch" : "YuDai_cylinder_2", "channels" : [_pion_decay,_eta_decay,_brem]});
     #d=({"signal_chan" : "Signal_Decay", "pi0_per_POT" : 1, "output_mode" : "comprehensive", "samplesize" : 10000, "model" : "Dark_Photon", "ptmax" : 1, "det_switch" : "YuDai_cylinder", "channels" : [_pion_decay,_eta_decay,_brem]});
-    d=({"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", "samplesize" : 100000,  "sumlog" : "Claudia_MB_Numi/mini_numi_scatter.dat", "model" : "Dark_Photon","min_scatter_energy" : 0, "max_scatter_energy" : 20, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "ptmax" : 2, "efficiency" : 1, "POT" : 6e20, "det_switch" : "miniboone_numi"});
-    #d=({"channels" : [_pion_decay, _eta_decay],"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 100000,  "sumlog" : "Claudia_MB_Numi/mini_numi_scatter.dat", "model" : "Dark_Photon","min_scatter_energy" : 0, "max_scatter_energy" : 2, "min_scatter_angle" : 0, "max_scatter_angle" : "0.24", "ptmax" : 2, "efficiency" : 1, "POT" : 6e20, "det_switch" : "miniboone_numi" });
+    #d=({"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", "samplesize" : 100000,  "sumlog" : "Claudia_MB_Numi/mini_numi_scatter.dat", "model" : "Dark_Photon","min_scatter_energy" : 0, "max_scatter_energy" : 20, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "ptmax" : 2, "efficiency" : 1, "POT" : 6e20, "det_switch" : "miniboone_numi"});
+    d=({"channels" : [_pion_decay, _eta_decay,_brem],"signal_chan" : "NCE_electron", "output_mode" : "comprehensive", "samplesize" : 200000,  "sumlog" : "DUNE_TEST/DUNE_test.dat", "model" : "Dark_Photon", "min_scatter_energy" : 0, "max_scatter_energy" : 2, "min_scatter_angle" : 0, "max_scatter_angle" : 2*pi, "ptmax" : 2, "efficiency" : 1, "POT" : 1e21, "det_switch" : "DUNE_ND_TEST" });
     print(massarr)
+    global DUNE_ANGLE
     for marr in massarr:
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "YuDai_project/YuDai_{}_{}.dat".format(marr[0],marr[2])})
-        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Claudia_MB_Numi/MB_Numi_Intersect_{}_{}.dat".format(marr[0],marr[1])})
+        DUNE_ANGLE=marr[2]
+        if DUNE_ANGLE>0.02:
+            d.update({"channels" : [_pion_decay, _eta_decay]})
+        else:
+            d.update({"channels" : [_pion_decay, _eta_decay,_brem]})
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : 1e-3, "outlog" : "DUNE_TEST/DUNE_EVENTS_{}_{}.dat".format(marr[0],marr[2])})
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Claudia_MB_Numi/MB_Numi_elec_{}_{}.dat".format(marr[0],marr[1])})
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "YuDai_project/YuDai_2_{}_{}.dat".format(marr[0],marr[2])})
         numi_eval(d)

@@ -147,7 +147,7 @@ bool Axion_Dark_Photon::Set_Model_Parameters(Parameter& par){
 }
 
 void Axion_Dark_Photon::Report(std::ostream& out){
-    out << mass_axion << " " << mass_dp << " " << epsilon << " " << Gagg << " " << Gagpg << " " << Gagpgp << " ";
+    out << mass_axion << " " << mass_dp << " " << epsilon << " " << Gagg << " " << Gagpg << " " << Gagpgp << " " << hbar/A_width(mass_axion, mass_dp) << " ";
 }
 
 void Axion_Dark_Photon::Report_Model(){
@@ -167,7 +167,6 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
 
     Particle axion(mass_axion);
     axion.name="Axion";
-
     
     Particle dark_photon(mass_dp);
     dark_photon.name="Dark_Photon";
@@ -218,7 +217,7 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
 
         //Activate the decay of the DP unless we are looking for the decay of the DP
         
-        if(sig_choice!="DP_Signal_Decay"&&A_width(mass_axion, mass_dp)>0){
+        if((sig_choice!="DP_Signal_Decay" and sig_choice!="DP_e_ep_a_Decay" and sig_choice!="DP_gamma_a_Decay")&&A_width(mass_axion, mass_dp)>0){
             cout << "Turning on decay of the Dark Photon with lifetime of " << hbar/A_width(mass_axion, mass_dp) << " seconds\n";
             std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(A_to_a_gamma_width(mass_axion, mass_dp)/A_width(mass_axion, mass_dp),mass_dp,string("Dark_Photon"),photon,axion,hbar/A_width(mass_axion, mass_dp)));
             //Do not care about photons!
