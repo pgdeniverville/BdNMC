@@ -1325,16 +1325,16 @@ def execute_seaquest(genlist=True):
             d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_seaquest.dat"]}
             write_seaquest(d=d)
             subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr=[1.15,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
-    vmarr=[7.5,7.6,7.7,7.8,7.9,8,9,10,15,20,30,40,60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5100,5200,5300,5400]
+    vmarr=[1.15,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    #vmarr=[7.5,7.6,7.7,7.8,7.9,8,9,10,15,20,30,40,60,65,70,75,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5100,5200,5300,5400]
     #vmarr+=[x for x in range(5500,7500,100)]
-    massarr=[[mv,mv/3.0,1.4*mv/3.0] for mv in vmarr]
-    #massarr=[[mv,mv,1e-7] for mv in vmarr]
-    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 60000,  "sumlog" : "IDM_Events/seaquest3.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 0, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "seaquest2", "eps" : 1e-3, "weighted" : 'true', 'model' : 'Inelastic_Dark_Matter', 'efficiency' : 1,"external_list" : external_list, "POT" : 1e20});
-    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 60000,  "sumlog" : "Visible_Dark_Photon/seaquest_extended_decay.dat", "model" : "Dark_Photon", "min_scatter_energy" : 0, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "seaquest2", "eps" : 1e-3, "weighted" : 'true', 'efficiency' : 1,"external_list" : external_list, "POT" : 1e20});
+    #massarr=[[mv,mv/3.0,1.4*mv/3.0] for mv in vmarr]
+    massarr=[[mv,mv,1e-7] for mv in vmarr]
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 60000,  "sumlog" : "IDM_Events/seaquest3.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 0, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "seaquest2", "eps" : 1e-3, "weighted" : 'true', 'model' : 'Inelastic_Dark_Matter', 'efficiency' : 1,"external_list" : external_list, "POT" : 1e20});
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 60000,  "sumlog" : "Visible_Dark_Photon/seaquest_extended_decay.dat", "model" : "Dark_Photon", "min_scatter_energy" : 0, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "seaquest2", "weighted" : 'true', 'efficiency' : 1,"external_list" : external_list, "POT" : 1e20});
     for marr in massarr:
-        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest3/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1})
-        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Visible_Dark_Photon/seaquest_extended/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0, "det_switch" : "seaquest_extended"})
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest3/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1})
+        d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Visible_Dark_Photon/seaquest_extended/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0, "det_switch" : "seaquest_extended"})
         seaquest_eval(d)
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/seaquest2/seaquest_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1, "det_switch" : "seaquest2"})
         #seaquest_eval(d)
