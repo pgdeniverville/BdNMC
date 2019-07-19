@@ -199,16 +199,19 @@ def SBND_detector_numi(f,xpos=sbnd_numi_distance*math.sin(sbnd_numi_angle),ypos=
 microboone_numi_distance=684
 microboone_numi_angle=0.13
 
-#def microboone_det_numi(f,xpos=microboone_numi_distance*math.sin(microboone_numi_angle),ypos=0.0,zpos=microboone_numi_distance*math.cos(microboone_numi_angle),radius=,length=,theta=microboone_numi_angle,phi=0):
-#    Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi)
-#    f.write('\n')
-#    f.write(Argon_string)
+def microboone_det_numi(f,xpos=microboone_numi_distance*math.sin(microboone_numi_angle),ypos=0.0,zpos=microboone_numi_distance*math.cos(microboone_numi_angle),radius=2.16234,length=4.32468,theta=microboone_numi_angle,phi=0):
+    Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi)
+    f.write('\n')
+    f.write(Argon_string)
 
 icarus_numi_distance=789
 icarus_numi_angle=0.1
 
-#def icarus_det_numi(f,xpos=icarus_numi_distance*math.sin(icarus_numi_angle),ypos=0.0,zpos=icarus_numi_distance*math.cos(icarus_numi_angle),):
-
+def icarus_det_numi(f,xpos=icarus_numi_distance*math.sin(icarus_numi_angle),ypos=0.0,zpos=icarus_numi_distance*math.cos(icarus_numi_angle),radius=6.33982):
+    f.write("\ndetector sphere\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
+    f.write('\n')
+    f.write(Argon_string)
 
 def miniboone_detector_full(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=6.106):
     f.write("\ndetector sphere\n")
