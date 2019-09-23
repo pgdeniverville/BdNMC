@@ -72,6 +72,10 @@ void Model::Prepare_Model(Parameter& par){
             throw -1;
         };
 
+        if(par.Output_Mode()=="particle_list"){
+            return;
+        }
+
         cout << "Production Channel prepared successfully." << endl;
         Gen_list.push_back(DMGen);
         Dist_list.push_back(PartDist);
@@ -156,7 +160,8 @@ bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string 
             parstream << part.px << " " << part.py << " " << part.pz << " " << part.E << " " << part.end_coords[0] << " " << part.end_coords[1] << " " << part.end_coords[2] << " " << part.end_coords[3] << endl;
         }
         parstream.close();
-        return 0;
+        cout << "Done.\n";
+        return true;
     }
 
     return true;
