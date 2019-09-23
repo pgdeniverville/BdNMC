@@ -180,15 +180,16 @@ double detector_cylinder::Ldet (Particle &DM){
             }
         }
     }
-    //DM.report(cout); 
-    //cout << "B1 " << B1 << " B2 " << B2 << " B3 " << B3 << " B4 " << B4 << endl;
-    //cout << "b1 " << b[0] << " b2 " << b[1] << " b3 " << b[2] << endl;
-    //cout << "o1 " << o[0] << " o2 " << o[1] << " o3 " << o[2] << endl;
-    //cout << "l1 " << l[0] << " l2 " << l[1] << " l3 " << l[2] << endl;
-    //cout << "ip(b,b) " << sqrt(ip(b,b)) << endl; 
+/*
+    DM.report(cout); 
+    cout << "B1 " << B1 << " B2 " << B2 << " B3 " << B3 << " B4 " << B4 << endl;
+    cout << "b1 " << b[0] << " b2 " << b[1] << " b3 " << b[2] << endl;
+    cout << "o1 " << o[0] << " o2 " << o[1] << " o3 " << o[2] << endl;
+    cout << "l1 " << l[0] << " l2 " << l[1] << " l3 " << l[2] << endl;
+    cout << "ip(b,b) " << sqrt(ip(b,b)) << endl; 
     
-    //cout << crossings.size() << endl;
-
+    cout << crossings.size() << endl;
+*/
     if(crossings.size()==0)
         return 0.0;
     else if(crossings.size()==2){

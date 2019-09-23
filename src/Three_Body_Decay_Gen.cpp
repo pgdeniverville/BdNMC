@@ -133,14 +133,20 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
 
     cout << "Beginning GenDM debug\n";
 
+    parent.ThreeMomentum(-0.1287791041,-0.03339097651,637.5895807);
+
+    cout << det_int(parent) << endl;
+
+    parent.Set_Time(1.598622681e-06);
+
     parent.report(cout);
 
-    cout << "parent.Speed() = " << parent.Speed() << endl;
-    cout << "parent.Momentum() = " << parent.Momentum() << endl;
-    cout << "parent.E = " << parent.E << endl;
-    cout << "parent.m = " << parent.m << endl; 
-    }*/
-
+    //cout << "parent.Speed() = " << parent.Speed() << endl;
+    //cout << "parent.Momentum() = " << parent.Momentum() << endl;
+    //cout << "parent.E = " << parent.E << endl;
+    //cout << "parent.m = " << parent.m << endl; 
+    }
+*/
     if(record_parent){
         vec.push_back(Particle(parent));
     }
@@ -177,9 +183,10 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
         bookmark = vec.end();
         intersect=true;
     }
-/*
+/*    if(parent.name=="Dark_Photon"){
     cout << "Report on THREE_BODY_DECAY " << Channel_Name() << "\n";
     parent.report();
+    cout << det_int(parent) << endl;
     daughter1.report(cout);
     cout << det_int(daughter1) << endl;
     daughter2.report(cout);
@@ -187,6 +194,8 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
     daughter3.report(cout);
     cout << det_int(daughter3) << endl;
     cout << "\n\n";
+    throw -1;
+    }
 */
     //Need to decay these daughter particles!
     if(d1&&(det_int(daughter1)>0)){

@@ -186,7 +186,7 @@ class Kinetic_Mixing : public Model{
         void Branching_Ratios(){};
     private:
         //model parameters
-        double alpha_D, mv, mx, eps;
+        double alpha_D, mass_dp, mass_dm, epsilon;
 };
 
 #endif

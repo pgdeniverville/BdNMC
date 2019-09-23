@@ -1,3 +1,6 @@
+#ifndef Guard_pk
+#define Guard_pk
+
 #include <vector>
 #include <string>
 
@@ -69,3 +72,5 @@ vector<string> spherearr = {"radius","x-position","y-position","z-position"};
 vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};
 vector<string> cuboidarr = {"length","width","height","x-position","y-position","z-position","det-phi","det-theta","det-psi"};
 const string run_key = "run";
+
+#endif

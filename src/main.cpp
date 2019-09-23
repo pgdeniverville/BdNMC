@@ -172,7 +172,6 @@ int main(int argc, char* argv[]){
     double POT = par->Protons_on_Target();
     double num_pi0 = par->Pi0_per_POT()*POT;//ratio should be set in parameter
 
-	
 	//Model parameters
     double kappa = par->Epsilon();
     double alD = par->alD();
@@ -248,16 +247,17 @@ int main(int argc, char* argv[]){
 	if((par->Model_Name())!="Dark_Photon"&&par->Model_Name()!="Dark_Photon_DM"){
 		cout << "Setting up model " << par->Model_Name() << endl;
 		if(par->Model_Name()=="Pseudoscalar_Mediator"){
-			std::shared_ptr<Pseudoscalar> mod(new Pseudoscalar(*par));
-			model = mod;
+			model=std::shared_ptr<Pseudoscalar>(new Pseudoscalar(*par));
 		}
 		else if(par->Model_Name()=="Axion_Dark_Photon"){
-			std::shared_ptr<Axion_Dark_Photon> mod(new Axion_Dark_Photon(*par));
-			model = mod;
+			model = std::shared_ptr<Axion_Dark_Photon>(new Axion_Dark_Photon(*par));
 		}
 		else if(par->Model_Name()=="Inelastic_Dark_Matter"){
-			std::shared_ptr<Inelastic_Dark_Matter> mod(new Inelastic_Dark_Matter(*par));
-			model = mod;
+			model = std::shared_ptr<Inelastic_Dark_Matter>(new Inelastic_Dark_Matter(*par));
+		}
+		//This will eventually replace Dark Photon
+		else if(par->Model_Name()=="Dark_Photon2"){
+			model = std::shared_ptr<Kinetic_Mixing>(new Kinetic_Mixing(*par));
 		}
 		model->Prepare_Model(*par);
 		//This will eventually get moved to the bottom, once the big else statement is moved into models.
@@ -876,16 +876,19 @@ int main(int argc, char* argv[]){
 	int scattot = 0;
 	int NDM = 0;    
 
-	//In the weighted events case, we set pMax=1;
-	if(par->Weighted_Events()){
-		SigGen->set_pMax(1);
-	}
-
 	for(int i=0; i<chan_count; i++){
 		if(scat_list[i]==0)
 			signal_list[i]=0;
-		else
-			signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency();
+		else{
+			//cout << "Quick Diagnostic ";
+			//cout << scat_list[i] << " " << trials << " " << Vnumtot << " " << SigGen->get_pMax() << " " << repeat << " " << par->Efficiency() << endl;
+            if(par->Weighted_Events()){
+                signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot/repeat*par->Efficiency();
+            }
+            else{
+                signal_list[i] = (double)scat_list[i]/(double)trials*Vnumtot*SigGen->get_pMax()/repeat*par->Efficiency();
+            }
+		}
 		scattot+=scat_list[i];
   		cout << DMGen_list[i]->Channel_Name() << ": " << signal_list[i];
 		if(par->Weighted_Events()){

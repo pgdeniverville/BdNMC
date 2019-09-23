@@ -147,7 +147,7 @@ bool Axion_Dark_Photon::Set_Model_Parameters(Parameter& par){
 }
 
 void Axion_Dark_Photon::Report(std::ostream& out){
-    out << mass_axion << " " << mass_dp << " " << epsilon << " " << Gagg << " " << Gagpg << " " << Gagpgp << " " << hbar/A_width(mass_axion, mass_dp) << " ";
+    out << mass_axion << " " << mass_dp << " " << epsilon << " " << Gagg << " " << Gagpg << " " << Gagpgp << " " << A_width(mass_axion, mass_dp) << " ";
 }
 
 void Axion_Dark_Photon::Report_Model(){
