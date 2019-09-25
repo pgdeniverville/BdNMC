@@ -43,6 +43,18 @@ Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nne
 Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
+#1.78 g/cm^3
+Argon_STP_string = "material Argon\nnumber_density 2.68e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
+
+Argon_string_SBND = "material Argon\nnumber_density 2.24e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
+#Temporary!
+Steel_string = Carbon_string
+
+#Satisfies 3.72 g/cm^3
+SHiP_string = "material ship_stuff\nnumber_density 1.11e24\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 1.89\n"
+
+ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 1.89\n"
+>>>>>>> dev
 
 Sodium_Iodide_string = "material Sodium\nnumber_density 1.58e22\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
 
@@ -232,13 +244,13 @@ def SBND_detector_old(f,xpos=0.0,ypos=0,zpos=62.0,width=2.38,length=4.76,theta=0
 
 SHIP_Side=1.92856
 
-def ship_detector(f,xpos=0.0,ypos=0,zpos=100.0,width=SHIP_Side,length=SHIP_Side,height=SHIP_Side,phi=0,theta=0,psi=0):
+def ship_detector(f,xpos=0.0,ypos=0,zpos=56,width=1.87,length=2,height=0.69,phi=0,theta=0,psi=0):
     #def ship_detector(f,xpos=0.0,ypos=0,zpos=30.0,radius=0.655,length=2.645,theta=0,phi=0):
     f.write("\ndetector cuboid\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')
     #Need to figure out what it's made of!
-    f.write(Argon_string)
+    f.write(SHiP_string)
 
 #temp detector until I implement proper geometry handling
 #This is actually the P0D, with only the proper number of neutrons and protons. NO ATOMS IMPLEMENTED
@@ -271,7 +283,17 @@ def coherent_detector_LAr(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.48,length=0.96,
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
-    f.write(Argon_string)
+    f.write(Argon_STP_string)
+
+def lsnd_detector_test(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3,theta=0,phi=0):
+    f.write("\ndetector sphere\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
+    f.write('\n')
+    f.write(Carbon_string)
+    f.write('\n')
+    f.write(Hydrogen_string)
+
+#def coherent_detector_LAr(f,xpos=16.8,ypos=0.0,zpos=-23.6,radius=0.44,length=0.88,theta=pi/2.0,phi=pi/2.0):
 
 def coherent_detector_NaI(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.601,length=2*0.601,theta=pi/2.0,phi=pi/2.0):
     f.write("\ndetector cylinder\n");
@@ -323,8 +345,7 @@ def write_t2k(d={}, det=t2k_ND280):
 
 SHIP_Energy = 400
 
-ship_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_ship.dat"], "sumlog" : "Events/ship.dat", "outlog" : "Events/ship_events.dat", "beam_energy" : SHIP_Energy, "n_num_target" : 54, "p_num_target" : 42, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 2, "max_scatter_energy" : 20, "min_scatter_angle" : 0.01, "max_scatter_angle" : 0.02, "samplesize" : 1000, "efficiency" : 0.5, "POT" : 2e20, "pi0_per_POT" : 1.8, "p_cross" :
-        11*mb, "meson_per_pi0" : meson_per_pi0_ship}
+ship_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_ship.dat"], "sumlog" : "Events/ship.dat", "outlog" : "Events/ship_events.dat", "beam_energy" : SHIP_Energy, "n_num_target" : 54, "p_num_target" : 42, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 1, "max_scatter_energy" : 20, "min_scatter_angle" : 0.01, "max_scatter_angle" : 0.02, "samplesize" : 1000, "efficiency" : 0.5, "POT" : 2e20, "pi0_per_POT" : 1.8, "p_cross" : 11*mb, "meson_per_pi0" : meson_per_pi0_ship}
 
 def write_ship(d={}, det=ship_detector):
     context = ship_default.copy()
@@ -338,7 +359,7 @@ def write_lsnd(d={}, det=lsnd_detector):
     context.update(d)
     write_experiment(det,context)
 
-coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 0.018, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.5, "beam_energy" : 1.0, "p_num_target" : 80, "n_num_target" : 0, "POT" : 1e23, "pi0_per_POT" : 0.1, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" :
+coherent_default = {"coherent" : "true", "proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_coherent.dat"], "sumlog" : "Events/coherent.dat", "outlog" : "Events/coherent_events.dat", "min_scatter_energy" : 15e-6, "max_scatter_energy" : 0.05, "dm_energy_resolution" : 0.001, "efficiency" : 0.5, "beam_energy" : 1.0, "p_num_target" : 80, "n_num_target" : 0, "POT" : 1e23, "pi0_per_POT" : 0.06, "p_cross" : 30*mb, "burn_max" : 100, "meson_per_pi0" :
         meson_per_pi0_coherent, "outlog" : "Events/coherent_events.dat"}
 
 def write_coherent(d={}, det=coherent_detector_LAr):

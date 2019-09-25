@@ -9,6 +9,7 @@
 #include <exception>
 #include <numeric>
 #include <memory>
+#include <climits>
 
 #include "record.h"
 
@@ -235,6 +236,7 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
+
 	SigGen->set_angle_limits(min_angle, max_angle);
 	SigGen->set_energy_limits(min_scatter_energy, max_scatter_energy);
 	
@@ -244,7 +246,9 @@ int main(int argc, char* argv[]){
     cout << "--------------------" << endl;
     cout << "Number of events to be generated = " << samplesize  << endl;
     //This will eventually be default.
+    cout << "Model Name = " << par->Model_Name() << endl;
     model->Report_Model();
+
 	for(int i = 0; i<chan_count; i++){
         cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();
 		if(DMGen_list[i]->query_off_shell()){
@@ -344,7 +348,7 @@ int main(int argc, char* argv[]){
 		*comprehensive_out << "Run " << par->Run_Name() << endl;
     }	
 
-    int trials = 0;
+    long long int trials = 0;
     vector<long> trials_list(chan_count,0);
 	vector<long double> scat_list(chan_count,0.0);
     int nevent=0;
@@ -460,6 +464,8 @@ int main(int argc, char* argv[]){
 	int scattot = 0;
 	int NDM = 0;    
 
+    cout << chan_count << endl;
+
 	for(int i=0; i<chan_count; i++){
 		if(scat_list[i]==0)
 			signal_list[i]=0;
@@ -487,7 +493,6 @@ int main(int argc, char* argv[]){
 			*summary_out << DMGen_list[i]->Channel_Name() << " ";
 			model->Report(*summary_out);
 			*summary_out << signal_list[i] << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << Vnum_list[i] << " " << Vnumtot << endl;
-    		
         }
         NDM+=NDM_list[i]; 
 		signal+=signal_list[i];
