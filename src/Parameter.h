@@ -132,7 +132,7 @@ class Parameter{
 		int repeat;
 		int seed;
 		int sample_gen;
-		int max_trials;
+		long long int max_trials;
         std::string output_file;
         std::string summary_file;
 		std::string output_mode;

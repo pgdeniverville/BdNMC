@@ -205,15 +205,7 @@ bool Nucleon_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &DM, 
                 det->PN(i));
             Nucleon.Set_Mass(det->M(i));
             Nucleon.name = det->matname(i);
-<<<<<<< HEAD
-            
-=======
 
-            //debug
-            //cout << "debug\n";
-            //cout << DM.E << " " << Nucleon.m << " " << scatmax(DM.E) << " " << scatmin(DM.E, DM.m,Nucleon.m) << endl;
-
->>>>>>> dev
             if(scatmax(DM.E)<scatmin(DM.E, DM.m,Nucleon.m))
                 return false;
             scatterevent(DM,Nucleon,Xsec,atom_maxima[i]);
