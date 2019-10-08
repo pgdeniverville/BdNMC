@@ -52,7 +52,7 @@ bool Kinetic_Mixing::Set_Model_Parameters(Parameter& par){
 }
 
 void Kinetic_Mixing::Report(std::ostream& out){
-	out << mass_dp << " " << mass_dm << " " << epsilon << " " << alpha_D;
+	out << mass_dp << " " << mass_dm << " " << epsilon << " " << alpha_D << " ";
 }
 
 void Kinetic_Mixing::Report_Model(){

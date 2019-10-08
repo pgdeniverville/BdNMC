@@ -110,12 +110,18 @@ def miniboone_eval(d_user):
         if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (signal_channel=="Signal_Decay" and MV/1000.0<mpi0)) and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
-            partlistfile.append("data/particle_list.dat")
+            if use_miniboone_sample:
+                partlistfile.append("data/offTarget_pi0Avg.txt")
+            else:
+                partlistfile.append("data/particle_list.dat")
             executing=True
         if ((MX/1000.0<meta/2.0 and MV<900.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay")
-            partlistfile.append("data/particle_list_k0.dat")
+            if use_miniboone_sample:
+                partlistfile.append("data/offTarget_etaAvg.txt")
+            else:
+                partlistfile.append("data/particle_list_k0.dat")
             executing=True
         if MV/1000.0>=mrho and MV>2*MX and _parton in channels:
 	    proddist.append("parton_V")
@@ -464,12 +470,14 @@ def coherent_eval(d_user):
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "outfile" : outfile})
     if det_switch == "csi":
         write_coherent(d=d,det=coherent_detector_CsI)
-    if det_switch == 'csi1T':
+    elif det_switch == 'csi1T':
         write_coherent(d=d,det=coherent_detector_CsI_1T)
-    if det_switch == "captain":
+    elif det_switch == "captain":
         write_coherent(d=d,det=captain_detector)
-    if det_switch == "captain_off_axis":
+    elif det_switch == "captain_off_axis":
         write_coherent(d=d,det=captain_detector_off)
+    elif det_switch == "LAr29":
+        write_coherent(d=d,det=coherent_detector_LAr_29kg)
     else:
         write_coherent(d=d)
 
@@ -479,7 +487,6 @@ def coherent_eval(d_user):
     t0 = time.time()
     subp.call(["rm", outfile])
 #END OF coherent_eval
-
 
 def execute_miniboone_parallel(genlist = True):
     if genlist:
@@ -496,10 +503,10 @@ def execute_miniboone_parallel(genlist = True):
     massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
-        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs, "model" : "Dark_Photon"}
-        miniboone_eval(d)
-        #d.update({"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", 'sumlog' : "Claudia/sbnd.dat", 'outlog' : "Claudia/sbnd_dm_{}_{}.dat".format(marr[0],marr[1])})
+        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs, "model" : "Dark_Photon"}
         #miniboone_eval(d)
+        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : 1e-3, "alpha_D" : 0.1, ,"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", 'sumlog' : "Claudia/sbnd.dat", 'outlog' : "miniboone_dm_{}_{}.dat".format(marr[0],marr[1])})
+        miniboone_eval(d)
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])})
         #miniboone_eval(d)
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_no_cut_{}_{}.dat".format(marr[0],marr[1])})
@@ -605,12 +612,12 @@ def execute_coherent(genlist=True):
         write_coherent(d=d)
         subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
-    vmassarr=[9,30]
+    vmassarr=[1,2,5,10,15,20,30,40,50,60,70,80,90,100,110,120,130,134,135,140,150,160,180,200,205]
     #vmassarr=[10]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay, _piminus_cap], "signal_chan" : "NCE_nucleon", "det_switch" : "Ar", "samplesize" : 200000, "max_trials" : -1, "sumlog" : "Events_coherent/coherent_Ar_1T.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "output_mode" : "comprehensive", "coherent" : "true", "POT" : 1e22, "model" : "Dark_Photon"}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 1000, "max_trials" : -1, "sumlog" : "Events/coherent_Ar_29kg.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Dark_Photon"}
         coherent_eval(d)
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)

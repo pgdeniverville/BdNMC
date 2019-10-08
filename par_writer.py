@@ -41,6 +41,7 @@ Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneu
 Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
 
 Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
+Argon_LAr_string = "material Argon\nnumber_density 2.23725e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
 #1.78 g/cm^3
@@ -54,7 +55,6 @@ Steel_string = Carbon_string
 SHiP_string = "material ship_stuff\nnumber_density 1.11e24\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 1.89\n"
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 1.89\n"
->>>>>>> dev
 
 Sodium_Iodide_string = "material Sodium\nnumber_density 1.58e22\nproton_number 11\n neutron_number 23\nelectron_number 11\nmass 21.61\nmaterial Iodine\nnumber_density 1.58e22\nproton_number 53\nneutron_number 72\nelectron_number 53\nmass 119.03\n"
 
@@ -284,6 +284,13 @@ def coherent_detector_LAr(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.48,length=0.96,
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
     f.write(Argon_STP_string)
+
+
+def coherent_detector_LAr_29kg(f,xpos=19.3,ypos=0.0,zpos=-20.83,radius=0.124,length=0.425,theta=pi/2.0,phi=pi/2.0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(Argon_LAr_string)
 
 def lsnd_detector_test(f,xpos=0.0,ypos=-4.65,zpos=29.8,radius=5.7/2.0-0.35,length=8.3,theta=0,phi=0):
     f.write("\ndetector sphere\n");
