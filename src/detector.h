@@ -1,3 +1,4 @@
+
 #ifndef GUARD_detector_h
 #define GUARD_detector_h
 
@@ -8,7 +9,7 @@
 class Material {
     public:
         Material(double nd, double np, double nn, double ne, double m, std::string name) {nDensity=nd; Proton_Number=np; Neutron_Number=nn; Electron_Number=ne; matname=name; mass=m;}
-       double get_Density() {return nDensity;}
+        double get_Density() {return nDensity;}
         double PN() {return Proton_Number;}
         double NN() {return Neutron_Number;}
         double EN() {return Electron_Number;}

@@ -14,14 +14,14 @@ void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::fun
     double a,b,c,xmin;
     std::vector<double> vec_cross;
     std::vector<double> vec_maxima;
-//    cout << "E_in_res=" << E_in_res << endl;
+    //cout << "E_in_res=" << E_in_res << endl;
     for(double iter=E_in_min+E_in_res; iter<=E_in_max; iter+=E_in_res){
 
 //        cout << "E=" << iter << endl;
         double E_r_min=ER_Min(iter);
         double E_r_max=ER_Max(iter);
-//        cout << iter << " " << E_r_min << " " << E_r_max << endl;
-        
+ //       cout << iter << " " << E_r_min << " " << E_r_max << endl;
+      
         if(E_r_min>=E_r_max){
 //            cout << "E_r_min > E_r_max? cross = 0\n";
             vec_cross.push_back(0);
@@ -43,6 +43,14 @@ void Prepare_Cross_Section(std::function<double(double,double)> f_init, std::fun
         xmin=0;
         vec_maxima.push_back(-1.0*golden(a,b,c,flim,tol_frac,tol_abs,xmin));
     }
+
+/*    cout << "vec_cross report\n";
+    for(std::vector<double>::iterator it = vec_cross.begin(); it != vec_cross.end(); ++it){
+        cout << *it << endl;
+    }*/
     cross=std::shared_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_cross,E_in_min,E_in_max));
 	maxima=std::shared_ptr<Linear_Interpolation>(new Linear_Interpolation(vec_maxima,E_in_min,E_in_max));
+
+/*    cout << "cross test "; 
+    cout << (*cross)(0.7) << endl;*/
 }

@@ -316,14 +316,16 @@ int main(int argc, char* argv[]){
 		}
 		list<Particle>::iterator burniter;
 		list<Particle>::iterator nextit;
-		for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
+        for(int burnattempt=0; (nburn < BURN_MAX)&&(burnattempt<BURN_MAX*BURN_OVERRIDE); burnattempt++){
             list<Particle> vecburn;
 			Particle dist_part (0);
 			PartDist_list[i]->Sample_Particle(dist_part);
 			//cout << "det_int " << i << " = " << det_int(dist_part) << endl;
 			if(DMGen_list[i]->GenDM(vecburn, det_int, dist_part)){
-				burniter = vecburn.begin();
+				//cout << "Got a hit!\n";
+                burniter = vecburn.begin();
 				for(nextit=next(burniter); burniter != vecburn.end(); burniter=nextit++){
+//                    burniter->report();
                     if(std::find(sig_part_vec.begin(),sig_part_vec.end(), burniter->name)!=sig_part_vec.end()){
                         SigGen->probscatter(det, *burniter);
 						nburn++;
@@ -332,6 +334,8 @@ int main(int argc, char* argv[]){
 				}
 			}
 		}
+
+
 		if(nburn < BURN_MAX){
 			cout << "Burn-In timed out, scattering number=" << nburn << " scattering goal=" << BURN_MAX << endl;
 		}

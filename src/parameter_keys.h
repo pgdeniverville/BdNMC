@@ -67,6 +67,8 @@ const string seed_key = "seed";
 const string p_cross_key = "proton_target_cross_section";
 const string min_event_key = "min_event";
 
+const string kinetic_energy_cut_key = "kinetic_energy_cut";
+
 
 vector<string> spherearr = {"radius","x-position","y-position","z-position"};
 vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};

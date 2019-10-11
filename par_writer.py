@@ -82,7 +82,7 @@ def write_experiment(write_detector,user):
     pi0_per_POT=context["pi0_per_POT"]; p_cross = context["p_cross"]; meson_per_pi0 = context["meson_per_pi0"]; min_scatter_angle=context["min_scatter_angle"];
     max_scatter_angle=context["max_scatter_angle"]; repeat = context["repeat"]; timing = context["timing"]; burn_max = context["burn_max"];
     inelastic_dist = context["inelastic_dist"]; coherent = context["coherent"]; model = context["model"]; gagg= context["gagg"]; gagpg = context["gagpg"];
-    gagpgp = context["gagpgp"]; POT = context["POT"]
+    gagpgp = context["gagpgp"]; POT = context["POT"];
     with open(context["outfile"],'w') as f:
         if run>=0:
             f.write('run {}\n'.format(context["run"]))
@@ -144,6 +144,8 @@ def write_experiment(write_detector,user):
         f.write('samplesize {}\n'.format(str(samplesize)))
         f.write('coherent {}\n'.format(coherent))
         f.write('pi0_per_POT {}\n\n'.format(str(pi0_per_POT)))
+        if "kinetic_energy_cut" in context:
+            f.write('kinetic_energy_cut {}'.format(context["kinetic_energy_cut"]))
         write_detector(f)
         f.close()
 

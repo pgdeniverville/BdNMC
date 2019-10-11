@@ -1,3 +1,4 @@
+
 #include "Parameter.h"
 #include <vector>
 #include <map>
@@ -381,7 +382,8 @@ Parameter::Parameter(std::ifstream &instream){
             cerr << "No signal channel selected\n";
             integrity=-1;
         }
-        Set_Bool(coherent_key, coherent, keymap, false); 
+        Set_Bool(coherent_key, coherent, keymap, false);
+        Set_Bool(kinetic_energy_cut_key,kinetic_energy_cut,keymap,false);
         Set_Bool(weighted_key, weighted, keymap, false); 
 		Set_String(output_mode_key, output_mode, keymap, out_mode_def);	
 		Set_String(run_key, run_name, keymap, std::to_string(time(NULL)));	

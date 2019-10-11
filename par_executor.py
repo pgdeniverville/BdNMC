@@ -9,6 +9,6 @@ from par_writer_runner import *
 #execute_charm(genlist=False)
 #execute_miniboone_parallel(genlist=True)
 #execute_t2k(genlist=False)
-execute_coherent(genlist=True)
+execute_coherent(genlist=False)
 #execute_nucal(genlist=False)
 #execute_seaquest(genlist=False)

@@ -438,7 +438,7 @@ def coherent_eval(d_user):
             partlistfile.append("data/particle_list_coherent.dat")
             executing = True
     else:
-        if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
+        if MX/1000.0<mpi0/2.0 and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             partlistfile.append("data/particle_list_coherent.dat")
@@ -612,12 +612,13 @@ def execute_coherent(genlist=True):
         write_coherent(d=d)
         subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
-    vmassarr=[1,2,5,10,15,20,30,40,50,60,70,80,90,100,110,120,130,134,135,140,150,160,180,200,205]
+    vmassarr=[1,2,5,10,15,17,19,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
     #vmassarr=[10]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
-    massarr=[[MV,MV/3.0] for MV in vmassarr]
+    massarr=[[MV,10] for MV in vmassarr]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 1000, "max_trials" : -1, "sumlog" : "Events/coherent_Ar_29kg.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Dark_Photon"}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 1000, "sumlog" : "IDM_Events/coherent_Ar_29kg_10mev.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 100, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Inelastic_Dark_Matter", "kinetic_energy_cut" : "true"}
+        #d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 100, "sumlog" : "IDM_Events/coherent_Ar_29kg.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 100, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Dark_Photon"}
         coherent_eval(d)
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)

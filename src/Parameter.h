@@ -104,6 +104,7 @@ class Parameter{
 		//Indicates if any custom sanfordwang parameters have been declared.
 		std::string Signal_Channel(){return sig_channel;}
         bool Coherent(){return coherent;}
+        bool Kinetic_Energy_Cut(){return kinetic_energy_cut;}
         bool Weighted_Events(){return weighted;}
         std::string Output_File(){return output_file;}
 		std::string Output_Mode(){return output_mode;}
@@ -136,7 +137,8 @@ class Parameter{
         std::string output_file;
         std::string summary_file;
 		std::string output_mode;
-        bool coherent;
+		bool kinetic_energy_cut=false;
+        bool coherent=false;
         bool weighted=false;
 
         double min_event=-1;

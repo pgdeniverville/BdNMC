@@ -63,31 +63,34 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<P
 //This samples the scattering cross-section, useful for burn-in, where
 //we do not care what the final state particles are.
 bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& part){
- //   cout << "Hi there!" << endl;
+//    cout << "Hi there!" << endl;
 
     double LXDet = m_to_cm*(det->Ldet(part));
     double total=0; vector<double> prob;
-    //part.report(cout);
-    //cout << "LXDet = " << LXDet << endl;
+//    part.report(cout);
+//    cout << "LXDet = " << LXDet << endl;
+//    cout << chan_number << endl;
     for(int i = 0; i < chan_number; i++){
         //Check if this particle is a valid target for this channel!
-    //    cout << "i = " << i << " in_name[i] = " << in_name[i] << endl;
+//        cout << "i = " << i << " in_name[i] = " << in_name[i] << endl;
         if(part.name==in_name[i]){
-/*
-            cout << "pushing back probability\n";
-            cout << number_density[i] << endl;
-            cout << part.E << endl;
-            cout << cross_tot[i](part.E) << endl;
-*/
+
+//            cout << "pushing back probability\n";
+//            cout << number_density[i] << endl;
+ //           cout << part.E << endl;
+ //           cout << cross_tot[i](part.E) << endl;
+
             prob.push_back(LXDet*convGeV2cm2*(cross_tot[i](part.E))*number_density[i]);
         }//If not a valid target, the cross section is zero.
         else{
             prob.push_back(0);
         }
-        //cout << "cross_section =" << cross_tot[i](part.E) << " num_dens=" << number_density[i] << endl;
-        //cout << prob.back() << endl;
+//        cout << "cross_section =" << cross_tot[i](part.E) << " num_dens=" << number_density[i] << endl;
+//        cout << prob.back() << endl;
         total+=prob.back();
+ //       cout << "total\n" << endl;
     }
+//    cout << pMax << " " << total << endl;
     if(total > pMax*Random::Flat(0,1)){
         if(total > pMax){
             pMax = total;
@@ -127,6 +130,7 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
                 //This is where we set the outgoing particles!
                 recoil = recoil_particle[i];
                 recoil2 = out_particle[i];
+                //cout << scatmax(part.E, part.m, target_mass[i], recoil2.m, recoil.m) << " " << scatmin(part.E, part.m, target_mass[i], recoil2.m, recoil.m) << endl;
                 if(scatmax(part.E, part.m, target_mass[i], recoil2.m, recoil.m) < scatmin(part.E, part.m, target_mass[i], recoil2.m, recoil.m)){
                     return false;
                 }
@@ -168,12 +172,22 @@ void Two_to_Two_Scatter::scatterevent (Particle &part, double targ_mass, Particl
 //Note that these return E4min and E4max.
 //I'm going to need to break these down by channel eventually.
 double Two_to_Two_Scatter::scatmax(double E1, double m1, double m2, double m3, double m4){
-    return(std::min(Escatmax,E4max(E1,m1,m2,m3,m4)));
+    if(kinetic_energy_cut){
+        return(std::min(Escatmax+m4,E4max(E1,m1,m2,m3,m4)));
+    }
+    else{
+        return(std::min(Escatmax,E4max(E1,m1,m2,m3,m4)));
+    }
 }
 
 double Two_to_Two_Scatter::scatmin(double E1, double m1, double m2, double m3, double m4){
     //cout << "Escatmin = " << Escatmin << endl; 
-    return(std::max(Escatmin,E4min(E1,m1,m2,m3,m4)));
+    if(kinetic_energy_cut){
+        return(std::max(Escatmin+m4,E4min(E1,m1,m2,m3,m4)));
+    }
+    else{
+        return(std::max(Escatmin,E4min(E1,m1,m2,m3,m4)));        
+    }
 }
 
 

@@ -36,6 +36,7 @@ class Scatter{
 		void set_pMax(double pm){pMax=pm;}
 		void set_angle_limits(double min, double max){min_angle=min;max_angle=max;}
 		void set_energy_limits(double min, double max){Escatmin=min; Escatmax=max;}
+		void set_kinetic_energy_cut(bool q){kinetic_energy_cut = q;}
         //void report(std::ostreami& out) const{out << pMax << std::endl;}
         //void set_scattering_energy(double emin, double emax){Escatmin=emin; Escatemax=emax;}
 		//double get_MDP(){return kap;}
@@ -44,6 +45,8 @@ class Scatter{
 	protected:	
         //If true, then one of the recoil particles can be expected to decay.
         bool decay;
+        //If true, energy cuts are in terms of kinetic energy. Not yet in use.
+        bool kinetic_energy_cut;
 		double pMax, MDP, mdm, alD, kap;
 		double Escatmax, Escatmin,min_angle,max_angle;
 		//bool _End_state_with_DM_parallel_to_z=false;

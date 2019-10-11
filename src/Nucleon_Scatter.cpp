@@ -76,7 +76,6 @@ void Nucleon_Scatter::cross_gen_handler(std::function<double(double)> fp, std::f
     }
 }
 
-
 void Nucleon_Scatter::generate_cross_sections(){
 	std::vector<double> vec_proton_maxima;
 	std::vector<double> vec_neutron_maxima;
