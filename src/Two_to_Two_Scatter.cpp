@@ -67,28 +67,28 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& p
 
     double LXDet = m_to_cm*(det->Ldet(part));
     double total=0; vector<double> prob;
-//    part.report(cout);
-//    cout << "LXDet = " << LXDet << endl;
-//    cout << chan_number << endl;
+    part.report(cout);
+    //cout << "LXDet = " << LXDet << endl;
+    //cout << chan_number << endl;
     for(int i = 0; i < chan_number; i++){
         //Check if this particle is a valid target for this channel!
-//        cout << "i = " << i << " in_name[i] = " << in_name[i] << endl;
+        //cout << "i = " << i << " in_name[i] = " << in_name[i] << endl;
         if(part.name==in_name[i]){
 
-//            cout << "pushing back probability\n";
-//            cout << number_density[i] << endl;
- //           cout << part.E << endl;
- //           cout << cross_tot[i](part.E) << endl;
+            //cout << "pushing back probability\n";
+            //cout << number_density[i] << endl;
+            //cout << part.E << endl;
+            //cout << cross_tot[i](part.E) << endl;
 
             prob.push_back(LXDet*convGeV2cm2*(cross_tot[i](part.E))*number_density[i]);
         }//If not a valid target, the cross section is zero.
         else{
             prob.push_back(0);
         }
-//        cout << "cross_section =" << cross_tot[i](part.E) << " num_dens=" << number_density[i] << endl;
-//        cout << prob.back() << endl;
+        //cout << "cross_section =" << cross_tot[i](part.E) << " num_dens=" << number_density[i] << endl;
+        cout << prob.back() << endl;
         total+=prob.back();
- //       cout << "total\n" << endl;
+        //cout << "total\n" << endl;
     }
 //    cout << pMax << " " << total << endl;
     if(total > pMax*Random::Flat(0,1)){
