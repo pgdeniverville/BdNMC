@@ -67,7 +67,7 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& p
 
     double LXDet = m_to_cm*(det->Ldet(part));
     double total=0; vector<double> prob;
-    part.report(cout);
+    //part.report(cout);
     //cout << "LXDet = " << LXDet << endl;
     //cout << chan_number << endl;
     for(int i = 0; i < chan_number; i++){
@@ -86,7 +86,7 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& p
             prob.push_back(0);
         }
         //cout << "cross_section =" << cross_tot[i](part.E) << " num_dens=" << number_density[i] << endl;
-        cout << prob.back() << endl;
+        //cout << prob.back() << endl;
         total+=prob.back();
         //cout << "total\n" << endl;
     }

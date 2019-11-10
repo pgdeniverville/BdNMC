@@ -176,7 +176,7 @@ def miniboone_eval(d_user):
             prodchan.append("V_decay_baryonic")
             partlistfile.append("")
     elif model == "Dark_Photon" or model == "Dark_Photon2" or model == "Axion_Dark_Photon":
-        if ((MX/1000.0<mpi0/2.0 and MV<600.0) or (signal_channel=="Signal_Decay" and MV/1000.0<mpi0)) and _pion_decay in channels:
+        if ((MX/1000.0<mpi0/2.0) or (signal_channel=="Signal_Decay" and MV/1000.0<mpi0)) and _pion_decay in channels:
             proddist.append("particle_list")
             prodchan.append("pi0_decay")
             if use_miniboone_sample:
@@ -184,7 +184,7 @@ def miniboone_eval(d_user):
             else:
                 partlistfile.append("data/particle_list.dat")
             executing=True
-        if ((MX/1000.0<meta/2.0 and MV<900.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
+        if ((MX/1000.0<meta/2.0) or (signal_channel=="Signal_Decay" and MV/1000.0<meta)) and _eta_decay in channels:
             proddist.append("particle_list")
             prodchan.append("eta_decay")
             if use_miniboone_sample:
@@ -226,7 +226,7 @@ def miniboone_eval(d_user):
     d.update(d_user)
     d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile,"mv" : MV/1000.0, "mdm" : MX/1000.0, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
     if det_switch == "sbnd":
-        write_sbnd(d=d)
+        write_miniboone(d=d,det=SBND_detector)
     elif det_switch == "miniboone_full":
         write_miniboone(d=d,det=miniboone_detector_full)
     else:
@@ -556,7 +556,7 @@ def coherent_eval(d_user):
     t0 = time.time()
     subp.call(["rm", outfile])
 #END OF coherent_eval
-
+use_miniboone_sample=False
 def execute_miniboone_parallel(genlist = True):
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["pi0_sanfordwang"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list.dat"]}
@@ -566,15 +566,21 @@ def execute_miniboone_parallel(genlist = True):
         write_miniboone(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     channs={_brem,_pion_decay,_eta_decay}
+    vmassarr=[2,2.5,3,4,5,10,15,17,19,19.5,20.5,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,530,540,550,700,760,770,773,777,779,790,800,900,1000,1500,2000,3000,5000,7500,10000]
     #vmarr={10,100,300,500,770}
     #epsarr={1e-6,3e-7,1e-7,3e-7,1e-8}
-    #massarr=[[mv,mv,eps] for mv in vmarr for eps in epsarr]
-    massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
+    epsarr=[1e-3]
+    massarr=[[mv,10,eps] for mv in vmassarr for eps in epsarr]
+    #massarr = [[80,10,0.0005],[300,10,0.001],[600,10,0.009],[800,10,0.006],[800,10,0.001]]
     for marr in massarr:
         #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "det_switch" : "miniboone_full", "sumlog" : "Decay_Events/miniboone_decay.dat", "samplesize" : 1000}
-        #d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", "output_mode" : "summary", "det_switch" : "miniboone", "alpha_D" : 0.1, "channels" : channs, "model" : "Dark_Photon"}
-        #miniboone_eval(d)
-        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : 1e-3, "alpha_D" : 0.1, ,"signal_chan" : "NCE_electron", "output_mode" : "dm_detector_distribution", 'sumlog' : "Claudia/sbnd.dat", 'outlog' : "miniboone_dm_{}_{}.dat".format(marr[0],marr[1])})
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_electron", "output_mode" : "summary", "det_switch" : "sbnd", "alpha_D" : 0.1, "channels" : channs, "model" : "Dark_Photon", "sumlog" : "Events/sbnd_elec.dat","POT" : 1e21, "samplesize" : 2000}
+        miniboone_eval(d)
+        d.update({"alpha_D" : 0.5})
+        miniboone_eval(d)
+        d={"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "Pion_Inelastic", "output_mode" : "summary", "det_switch" : "sbnd", "alpha_D" : 0.1, "channels" : channs, "model" : "Dark_Photon", "sumlog" : "Events/sbnd_pi0.dat", "min_scatter_energy" : 0, "max_scatter_energy" : 100, "min_scatter_angle" : 0, "max_scatter_angle" : 10, "POT" : 1e21, "samplesize" : 2000}
+        miniboone_eval(d)
+        d.update({"alpha_D" : 0.5})
         miniboone_eval(d)
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "signal_chan" : "NCE_nucleon", 'min_scatter_energy' : 0.035, "output_mode" : "comprehensive", 'sumlog' : "Claudia/sbnd.dat", 'outlog' :  "Claudia/sbnd_nucleon_{}_{}.dat".format(marr[0],marr[1])})
         #miniboone_eval(d)
@@ -592,8 +598,8 @@ def execute_ship(genlist=True):
     mvarr = [100]
     massarr=[[mv,mv/3.0,0.0033] for mv in mvarr]
     #d=({"signal_chan" : "NCE_nucleon", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 0.5, "alpha_D" : 0.5, "POT" : 6e20});
-    #d=({"channels" : [_pion_decay, _eta_decay] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angler" : 0.02})
-    d=({"channels" : [_pion_decay, _eta_decay,_brem] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angler" : 0.02})
+    #d=({"channels" : [_pion_decay, _eta_decay] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angle" : 0.02})
+    d=({"channels" : [_pion_decay, _eta_decay,_brem] ,"signal_chan" : "NCE_electron", "output_mode" : "summary", "samplesize" : 1000, "alpha_D" : 0.5, "sumlog" : "Events/ship_electron.dat", "model" : "Dark_Photon", "max_scatter_energy" : 20, "min_scatter_energy" : 1, "min_scatter_angle" : 0.01, "max_scatter_angle" : 0.02})
     for marr in massarr:
         d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2]})
         d.update({"det_switch" : "ship"})
@@ -680,15 +686,17 @@ def execute_coherent(genlist=True):
         d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 1e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_coherent.dat"], "p_num_target" : 80}
         write_coherent(d=d)
         subp.call(["./build/main","parameter_run.dat"])
-    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
+    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    #vmassarr=[9]
     vmassarr=[1,2,5,10,15,17,19,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
     #vmassarr=[10]
-    #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,10] for MV in vmassarr]
+    #massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
-        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 1000, "sumlog" : "IDM_Events/coherent_Ar_29kg_10mev.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 100, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Inelastic_Dark_Matter", "kinetic_energy_cut" : "true"}
-        #d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 100, "sumlog" : "IDM_Events/coherent_Ar_29kg.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 100, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Dark_Photon"}
+        #d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 1000, "sumlog" : "IDM_Events/coherent_Ar_29kg_10mev.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 100, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Inelastic_Dark_Matter", "kinetic_energy_cut" : "true"}
+        d={"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "LAr29", "samplesize" : 2000, "sumlog" : "Events/coherent_Ar_29kg.dat", "outlog" : "Events_coherent/coherent_Ar_{}_{}.dat".format(str(marr[0]),str(marr[1])), "efficiency" : 1, "min_scatter_energy" : 8e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "output_mode" : "summary", "coherent" : "true", "POT" : 4.2e22, "model" : "Dark_Photon"}
         coherent_eval(d)
+        d.update({"model" : "Inelastic_Dark_Matter", "sumlog" : "IDM_Events/coherent_Ar_29kg.dat"})
         #d={"mv" : marr[0],  "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon_baryonic", "det_switch" : "csi1T", "samplesize" : 500, "sumlog" : "Events/coherent_CsI_1T.dat"}
         #coherent_eval(d)
 
@@ -730,16 +738,20 @@ def execute_lanl(genlist=True):
         write_lanl(d=d)
         subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
-    vmassarr=[2,2.5,3,4,5,10,15,17,19,19.5,20.5,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
+    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    #vmassarr=[2,2.5,3,4,5,10,15,17,19,19.5,20.5,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
+    #chimassarr=[10]
     #vmassarr=[170,180,190,200,225,250]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
-    massarr=[[MV,10] for MV in vmassarr]
+    vmassarr=[15,30,45]
+    massarr=[[MV,MV/3.0] for MV in vmassarr]
     channel="NCE_nucleon"
     for marr in massarr:
-        d={"POT" : 1e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "IDM_Events/CCM.dat","model" : "Inelastic_Dark_Matter","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, }
+        #d={"POT" : 1e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "IDM_Events/CCM.dat","model" : "Inelastic_Dark_Matter","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, }
+        d={"POT" : 1e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 50000, "sumlog" : "Events/CCM_mx10mev.dat","outlog" : "Events/CCM_{}mev.dat".format(str(marr[0])),"model" : "Dark_Photon","output_mode" : "comprehensive", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 0.1e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "max_trials" : -1}
         lanl_eval(d)
-        d.update({"alpha_D" : 0.1})
-        lanl_eval(d)
+        #d.update({"alpha_D" : 0.1})
+        #lanl_eval(d)
         #d={"mv" : marr[0], "alpha_D" : 1e-3, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channelb, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/lanl20_b.dat"}
         #lanl_eval(d)
         #d={"mv" : marr[0], "alpha_D" : 1e-3, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channelb, "det_switch" : "lanl_far", "samplesize" : 2000, "sumlog" : "Events/lanl40_b.dat"}

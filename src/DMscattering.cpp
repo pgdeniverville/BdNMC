@@ -68,7 +68,7 @@ double dsigmadEe_scaled (double Ee, double EDM, double MDM, double MDP, double k
 // Total DM - electron scattering cross section equals
 // sigma =  4*Pi*kappa*kappa*alpha*alphaD*( F2(EeMax)- F2(EeMin) ) 
 double F2 (double Ee, double EDM, double MDM, double MDP) {
-	return( -((4*EDM*EDM*Me*Me+2*EDM*Me*MDP*MDP+MDP*MDP*MDM*MDM)/(2*Me*(Ee-Me)+MDP*MDP)+(2*EDM*Me+MDM*MDM)*log(2*Me*(Ee-Me)+MDP*MDP))/(Me*Me*(EDM-MDM)*(EDM+MDM)) );
+	return( -((4*EDM*EDM*Me*Me+2*EDM*Me*MDP*MDP+MDP*MDP*MDM*MDM)/(2*Me*(Ee-Me)+MDP*MDP)+(2*EDM*Me+MDM*MDM)*log(2*Me*(Ee-Me)+MDP*MDP))/(Me*Me*(EDM-MDM)*(EDM+MDM)));
 }
 // DM - electron scattering total cross section sigma
 double sigma (double EDM, double MDM, double MDP, double kappa, double alphaD) {
@@ -78,7 +78,7 @@ double sigma (double EDM, double MDM, double MDP, double kappa, double alphaD) {
 	double EeMaxA, EeMinA;
 	EeMaxA = EeTMax(EDM,MDM);
 	EeMinA = EeTMin(EDM,MDM);
-    cout << coef*F2(EeMaxA,EDM,MDM,MDP) << " " << coef*F2(EeMinA,EDM,MDM,MDP) << endl;
+    //cout << coef*F2(EeMaxA,EDM,MDM,MDP) << " " << coef*F2(EeMinA,EDM,MDM,MDP) << endl;
     rsig = coef*(F2(EeMaxA,EDM,MDM,MDP)-F2(EeMinA,EDM,MDM,MDP));
 	return(rsig);
 }
