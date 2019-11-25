@@ -215,6 +215,17 @@ def MINOS_detector(f,xpos=0.0,ypos=0.0,zpos=MINOS_target_z,radius=2.2,length=1.7
 def MINOS_absorber_detector(f):
     MINOS_detector(f,zpos=MINOS_absorber_z)
 
+def ICARUS_detector(f,xpos=0,ypos=0,zpos=600,height=3.16,length=17.95,width=6,theta=0,phi=0,psi=0):
+    f.write("\ndetector cuboid\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Argon_LAr_string)
+
+ICARUS_NuMI_angle=0.1
+ICARUS_NuMI_distance=789
+def ICARUS_detector_NuMI(f,xpos=ICARUS_NuMI_distance*math.sin(ICARUS_NuMI_angle),ypos=0,zpos=ICARUS_NuMI_distance*math.cos(ICARUS_NuMI_angle),theta=ICARUS_NuMI_angle):
+    ICARUS_detector(f,xpos=xpos,ypos=ypos,zpos=zpos,theta=theta)
+
 #NOvA_absorber_d=240
 #NOvA_target_d=920
 NOvA_absorber_d=447
