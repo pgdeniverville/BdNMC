@@ -226,6 +226,22 @@ ICARUS_NuMI_distance=789
 def ICARUS_detector_NuMI(f,xpos=ICARUS_NuMI_distance*math.sin(ICARUS_NuMI_angle),ypos=0,zpos=ICARUS_NuMI_distance*math.cos(ICARUS_NuMI_angle),theta=ICARUS_NuMI_angle):
     ICARUS_detector(f,xpos=xpos,ypos=ypos,zpos=zpos,theta=theta)
 
+CHARM2_string="material Carbon\nnumber_density 7.00652e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
+
+#Assuming this is made of carbon.
+def CHARM2_detector(f,xpos=0.0,ypos=0,zpos=870.8,width=3.7,length=36,height=3.7,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(CHARM2_string)
+
+#Using the CHARM2_string, don't use for scattering
+def CHARM_decay_detector(f,xpos=5,ypos=0,zpos=480,width=3,length=35,height=3,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(CHARM2_string)
+
 #NOvA_absorber_d=240
 #NOvA_target_d=920
 NOvA_absorber_d=447
@@ -353,6 +369,10 @@ def lanl_detector(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=1.056,length=1.227,theta=
     f.write('\n')
     f.write(Argon_string)
 
+def NA62_decay_vol(f,xpos=0.0,ypos=0.0,zpos=149.5,radius=1,length=135,theta=0,phi=0):
+    Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi)
+    f.write('\n')
+    f.write(Empty_string)
 
 #############
 #EXPERIMENTS#
@@ -411,6 +431,34 @@ numi_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_num
 
 def write_numi(d={}, det=NOvA_detector):
     context = numi_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+CHARM2_Energy=450
+
+#No idea what the target is made of.
+charm2_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_charm2.dat"], "sumlog" : "Events/charm2.dat", "outlog" : "Events/charm2_events.dat", "beam_energy" : CHARM2_Energy, "n_num_target" : 34, "p_num_target" : 29, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "NCE_electron", "min_scatter_energy" : 3, "max_scatter_energy" : 24, "min_scatter_angle" : 0, "max_scatter_angle" : pi, "samplesize" : 1000, "efficiency" : 1, "POT" : 2.5e19, "pi0_per_POT" : 2.4, "p_cross" : 11*mb, "meson_per_pi0" : meson_per_pi0_ship}
+
+def write_charm2(d={}, det=CHARM2_detector):
+    context = charm2_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+CHARM_Energy=400
+
+charm_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_charm.dat"], "sumlog" : "Events/charm.dat", "outlog" : "Events/charm_events.dat", "beam_energy" : CHARM_Energy, "n_num_target" : 34, "p_num_target" : 29, "ptmax" : 1, "zmin" : 0.1, "zmax" : 0.9, "signal_chan" : "Signal_Decay", "min_scatter_energy" : 1, "max_scatter_energy" : 400, "min_scatter_angle" : 0, "max_scatter_angle" : pi, "samplesize" : 1000, "efficiency" : 1, "POT" : 2.4e18, "pi0_per_POT" : 2.4, "p_cross" : 30*mb, "meson_per_pi0" : meson_per_pi0_ship}
+
+def write_charm_decay(d={}, det=CHARM_decay_detector):
+    context = charm_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+nucal_energy=70
+#How many pi0/POT? 38 mb pp cross from pdg, 78 mb pp->pi^0 X from https://arxiv.org/pdf/1104.2747.pdf
+nucal_default = {"proddist" : ["bmpt"], "meson_per_pi0" : meson_per_pi0_numi, "partlistfile" : ["data/particle_list_nucal.dat"], "sumlog" : "Events/nucal.dat", "outlog" : "Events/nucal_events.dat", "output_mode" : "summary", "samplesize" : 100000, "min_scatter_energy" : 3, "max_scatter_energy" : 70, "dm_energy_resolution" : 0.01, "efficiency" : 1, "beam_energy" : 70, "n_num_target" : 30, "p_num_target" : 26, "ptmax" : 2, "zmin" : 0.1, "zmax" : 0.9, "POT" : 1.7e18, "pi0_per_POT" : 74/38, "p_cross" : 38*mb, 'max_scatter_angle' : 0.05}
+
+def write_nucal(d={}, det=nucal):
+    context = nucal_default.copy()
     context.update(d)
     write_experiment(det,context)
 
