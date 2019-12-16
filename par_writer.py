@@ -34,7 +34,15 @@ meson_per_pi0_lsnd = {'pi0_decay' : '1.0'}
 
 meson_per_pi0_coherent = {'pi0_decay' : 1.0, 'piminus_capture' : '0.63'}
 
-meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+meson_per_pi0_numi = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+
+meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.105), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+
+##################
+#Material Presets#
+##################
+
+Empty_string = "material Vacuum\nnumber_density 0\nproton_number 0\nneutron_number 0\nelectron_number 0\nmass 0.945778\n"
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
@@ -68,7 +76,7 @@ MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_nu
 NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
 
 defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan" : ["pi0_decay"], "signal_chan" : "NCE_nucleon", "outfile" : "parameter_run.dat", "proddist" : [""], "partlistfile" : ["Source/particle_list.dat"], "sumlog" : "Events/miniboone.dat", "outlog" : "Events/miniboone_events.dat", "output_mode" :"summary", "samplesize" : 5000, "min_scatter_energy" : 0.035, "max_scatter_energy" : 1.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 8.9, "n_num_target" :
-        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon_DM", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0}
+        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon_DM", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0,'weighted' : "false"}
 
 def write_experiment(write_detector,user):
     context = defaults.copy()
@@ -123,11 +131,16 @@ def write_experiment(write_detector,user):
         f.write('min_scatter_angle {}\n'.format(str(min_scatter_angle)))
         f.write('max_scatter_angle {}\n'.format(str(max_scatter_angle)))
         f.write('dm_energy_resolution {}\n'.format(str(dm_energy_resolution)))
+        f.write('weighted {}\n'.format(context['weighted']))
         f.write('epsilon {}\n'.format(str(eps)))
         f.write('n_num_target {}\n'.format(str(n_num_target)))
         f.write('p_num_target {}\n'.format(str(p_num_target)))
         f.write('beam_energy {}\n'.format(str(beam_energy)))
-        f.write('dark_matter_mass {}\n'.format(str(mdm)))
+        if(model=="Inelastic_Dark_Matter"):
+            f.write('dark_matter_1_mass {}\n'.format(str(context["mdm1"])))
+            f.write('dark_matter_2_mass {}\n'.format(str(context["mdm2"])))
+        else:
+            f.write('dark_matter_mass {}\n'.format(str(mdm)))
         f.write('dark_photon_mass {}\n'.format(str(mv)))
         f.write('alpha_D {}\n'.format(str(alpha_D)))
         if(model=="Axion_Dark_Photon"):
@@ -154,6 +167,11 @@ def write_experiment(write_detector,user):
 ##################
 #DETECTOR PRESETS#
 ##################
+def Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+
+
 def miniboone_detector(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=5.0):
     f.write("\ndetector sphere\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
@@ -374,6 +392,27 @@ def NA62_decay_vol(f,xpos=0.0,ypos=0.0,zpos=149.5,radius=1,length=135,theta=0,ph
     f.write('\n')
     f.write(Empty_string)
 
+def nucal(f,xpos=0.0,ypos=0.0,zpos=75.5,radius=1.3,length=23,theta=0,phi=0):
+    f.write("\ndetector cylinder\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+   #Need to replace this with Aluminum, Iron, Liquid Scintilator if using for scattering
+    f.write('\n')
+    f.write(Carbon_string)
+
+pip2_distance=20
+
+def pip2_coherent_det(f,pip2_angle=0):
+    print("pip2_angle={}".format(pip2_angle))
+    Cylinder(f,math.sin(pip2_angle)*pip2_distance,0,math.cos(pip2_angle)*pip2_distance,1.75,10,pip2_angle,0)
+    f.write('\n')
+    f.write(Argon_LAr_string)
+
+def pip2_30(f,pip2_angle=30.0/180.0*math.pi):
+    pip2_coherent_det(f,pip2_angle=pip2_angle)
+
+def pip2_90(f,pip2_angle=90.0/180.0*math.pi):
+    pip2_coherent_det(f,pip2_angle=pip2_angle)
+
 #############
 #EXPERIMENTS#
 #############
@@ -450,6 +489,14 @@ charm_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_ch
 
 def write_charm_decay(d={}, det=CHARM_decay_detector):
     context = charm_default.copy()
+    context.update(d)
+    write_experiment(det,context)
+
+
+pip2_default = {"proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_pip3.dat"], "signal_chan" : "NCE_nucleon", "sumlog" : "Events/pip2.dat", "outlog" : "Events/pip2_events.dat", "samplesize" : 5000, "min_scatter_energy" : 10e-6, "max_scatter_energy" : 0.05, "efficiency" : 0.8, "beam_energy" : 0.8, "n_num_target" : 0, "p_num_target" : 1, "POT" : 2e22, "pi0_per_POT" : 0.0425, "p_cross" : 30*mb, "kinetic_energy_cut" : "true"}
+
+def write_pip2(d={}, det = pip2_coherent_det):
+    context = pip2_default.copy()
     context.update(d)
     write_experiment(det,context)
 
