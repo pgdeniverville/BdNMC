@@ -1149,11 +1149,12 @@ def execute_pip2(genlist=True):
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
         pip2_angle=0
-        d={"POT" : 2e22, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "max_trials" : -1}
+        #d={"POT" : 2e22, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "max_trials" : -1}
+        d={"POT" : 2e22, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "Pion_Inelastic", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0_pi0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "max_trials" : -1}
         pip2_eval(d)
-        d.update({"sumlog" : "Events/pip2_30.dat", "det_switch" : "pip2_30"})
+        d.update({"sumlog" : "Events/pip2_30_pi0.dat", "det_switch" : "pip2_30"})
         pip2_eval(d)
-        d.update({"sumlog" : "Events/pip2_90.dat","det_switch" : "pip2_90"})
+        d.update({"sumlog" : "Events/pip2_90_pi0.dat","det_switch" : "pip2_90"})
         pip2_eval(d)
 
 def execute_lanl(genlist=True):
