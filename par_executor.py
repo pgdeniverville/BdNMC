@@ -1,7 +1,7 @@
 from par_writer_runner import *
 
-execute_pip2(genlist=False)
-#execute_lanl(genlist=False)
+#execute_pip2(genlist=False)
+execute_lanl(genlist=False)
 #execute_lsnd(genlist=True)
 #execute_numi(genlist=False)
 #execute_ship(genlist=False)

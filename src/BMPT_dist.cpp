@@ -8,7 +8,11 @@
 const double mp = MASS_PROTON;
 const double mn = MASS_NEUTRON;
 
+const int pi0_choice=0;
+const int k0_choice=1;
+
 //BMPT fit parameters
+
 const double A = 62.3;
 const double B = 1.57;
 const double alpha = 3.45;
@@ -20,6 +24,17 @@ const double r0 = 1.05;
 const double r1 = 2.65;
 const double MXBAR = 1.88;//GeV
 
+namespace Kaon{
+    const double A = 7.74;
+    const double B = 0;
+    const double alpha = 2.45;
+    const double beta = 0.444;
+    const double a = 5.04;
+    const double gammafit = 0.121;
+    const double deltafit = 2*gammafit;
+    const double r0 = 1.15;
+    const double r1 = -3.17;
+}
 
 //Should be moved into constants.h?
 const double Be_Mass_Number = 8; //This distribution is calibrated for Beryllium, but can be scaled to other materials.
@@ -27,10 +42,21 @@ const double Be_Mass_Number = 8; //This distribution is calibrated for Beryllium
 using std::cout;
 using std::endl;
 
-BMPT::BMPT(double beamE, int mass_number){
+BMPT::BMPT(double beamE, int mass_number, int choice){
     Beam_Energy = beamE;
     Mass_Number = mass_number;
-	Meson_Mass =  0.139;//not really sure about this, but I think it's the safest way to do it.
+    particle_choice=choice;
+
+    if(choice==pi0_choice){
+        Meson_Mass =  MASS_PION_CHARGED;//not really sure about this, but I think it's the safest way to do it.
+    }
+    else if(choice==k0_choice){
+        Meson_Mass = MASS_KAON_CHARGED;
+    }
+    else{
+        std::cerr << "BMPT supplied a non-existent particle_choice number " << choice << endl;
+        throw -1;
+    }
     sBMPT = 2*(mp*mp+mp*Beam_Energy);
     Beta_CM = sqrt(pow(Beam_Energy,2)-mp*mp)/(Beam_Energy+mp);
     prob_max = 0.0;
@@ -65,6 +91,14 @@ double bprime(double x){
     return a*a/(2*pow(x,deltafit));
 }
 
+double aprime_Kaon(double x){
+    return Kaon::a/pow(x,Kaon::gammafit);
+}
+
+double bprime_Kaon(double x){
+    return pow(Kaon::a,2)/(2*pow(x,Kaon::deltafit));
+}
+
 double alphafunc(double _xF, double pT){
     return (0.74-0.55*_xF+0.26*pow(_xF,2))*(0.98+0.21*pT);
 }
@@ -75,12 +109,26 @@ double BMPT::Invariant_Cross_Section(double p, double theta){
     return A*pow(1.0-xRhold,alpha)*(1.0+B*xRhold)*pow(xRhold,-1.0*beta)*(1+aprime(xRhold)*pT+bprime(xRhold)*pT*pT)*exp(-aprime(xRhold)*pT)*pow(Mass_Number/Be_Mass_Number,alphafunc(xF(p, theta), pT));
 }
 
+double BMPT::Invariant_Cross_Section_Kaon(double p, double theta){
+    double xRhold = xR(p,theta);
+    double pT = p*sin(theta);
+    return A*pow(1.0-xRhold,Kaon::alpha)*(1.0+Kaon::B*xRhold)*pow(xRhold,-1.0*Kaon::beta)*(1+aprime_Kaon(xRhold)*pT+bprime_Kaon(xRhold)*pT*pT)*exp(-aprime_Kaon(xRhold)*pT)*pow(Mass_Number/Be_Mass_Number,alphafunc(xF(p, theta), pT));
+}
+
 double BMPT::pratio(double p, double theta){
     return r0*pow(1+xR(p,theta),r1); 
 }
 
+double BMPT::pratio_Kaon(double p, double theta){
+    return Kaon::r0*pow(1+xR(p,theta),Kaon::r1); 
+}
+
 double BMPT::Invariant_Cross_Section_pi_minus(double p, double theta){
     return Invariant_Cross_Section(p, theta)/r0/pow(1+xR(p,theta),r1);
+}
+
+double BMPT::Invariant_Cross_Section_K_minus(double p, double theta){
+    return Invariant_Cross_Section_Kaon(p, theta)/Kaon::r0/pow(1+xR(p,theta),Kaon::r1);
 }
 
 void BMPT::sample_particle(Particle &part){
@@ -99,7 +147,16 @@ void BMPT::sample_momentum(double &p, double &theta, double &phi){
                 break;
             theta = (theta*Random::Flat(0,1));
         }
-        prob = 2*pi*sin(theta)*pow(p,2)/sqrt(p*p+pow(Meson_Mass,2))*Invariant_Cross_Section(p, theta)*(1.0+1.0/pratio(p, theta));
+        if(particle_choice==pi0_choice){
+            prob = 2*pi*sin(theta)*pow(p,2)/sqrt(p*p+pow(Meson_Mass,2))*Invariant_Cross_Section(p, theta)*(1.0+1.0/pratio(p, theta));
+        }
+        else if(particle_choice==k0_choice){
+            prob = 2*pi*sin(theta)*pow(p,2)/sqrt(p*p+pow(Meson_Mass,2))*Invariant_Cross_Section_Kaon(p, theta)*(1.0+3.0/pratio(p, theta))/2;
+        }
+        else{
+            std::cerr << "sample_momentum supplied an invalid particle_choice " << particle_choice << endl;
+            throw -1;
+        }
         double u = Random::Flat(0,1);
         if(prob>(u*prob_max)){
             if(prob>prob_max)

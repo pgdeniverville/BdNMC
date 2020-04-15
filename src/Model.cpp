@@ -59,7 +59,7 @@ void Model::Prepare_Model(Parameter& par){
         string proddist = proditer->Prod_Dist();
         std::shared_ptr<DMGenerator> DMGen;
         std::shared_ptr<Distribution> PartDist;
-        double Vnum;
+        double Vnum=0;
         cout << "Setting up distribution " << proddist << " for channel " << prodchoice << endl;
         //Model will handle some general production distribution stuff here.
         if(!Prepare_Production_Distribution(prodchoice,proddist,*proditer,PartDist,par)){
@@ -104,11 +104,18 @@ bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string 
         sw->set_fit_parameters(prodchan);//This does nothing if no fit parameters have been set.
         Dist = sw;
     }
-    else if(proddist=="bmpt"){
+    else if(proddist=="bmpt" or proddist =="bpmt_k0"){
+        double meson_choice;
+        if(proddist=="bmpt"){
+            meson_choice=PDG::PI0;
+        }
+        else if(proddist=="bpmt_k0"){
+            meson_choice=PDG::K0;
+        }
         cout << "Energy = " << par.Beam_Energy() << endl;
         cout << "Mass Number = " << par.Target_P_Num()+par.Target_N_Num() << endl;
-        std::shared_ptr<BMPT> bmpt(new BMPT(par.Beam_Energy(),par.Target_P_Num()+par.Target_N_Num()));
         cout << "Setting maximum meson momentum = " << prodchan.Maximum_Meson_Momentum() << endl;
+        std::shared_ptr<BMPT> bmpt(new BMPT(par.Beam_Energy(),par.Target_P_Num()+par.Target_N_Num(),meson_choice));
         if(prodchan.Maximum_Meson_Momentum()>0){
             bmpt->set_pmax(prodchan.Maximum_Meson_Momentum());
         }

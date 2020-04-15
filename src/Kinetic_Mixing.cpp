@@ -88,6 +88,10 @@ bool Kinetic_Mixing::Prepare_Production_Channel(std::string prodchoice, std::str
 			string signal_string = "Dark_Photon";//This thing is getting killed as soon as possible.
             DMGen = std::shared_ptr<DMGenerator>(new Do_Nothing_Gen("Dark_Photon_Bremsstrahlung", signal_string));
             cout << DMGen->Channel_Name() << endl;
+            std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(par.Beam_Energy(),epsilon,mass_dp,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),alpha_D,proddist,prodchan.ptmin()));
+            Vnum = pbd->V_prod_rate()*par.Protons_on_Target();//V_decay should return a branching ratio for this. If it doesn't, I will have to change it in the future. prodchan.Num_per_pot()
+            Dist->set_mass(mass_dp);
+            Dist->Add_Dist(pbd);
             return true;
         }
         else if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){
@@ -101,7 +105,6 @@ bool Kinetic_Mixing::Prepare_Production_Channel(std::string prodchoice, std::str
                         Two_Body_Decay_Gen(brpi0toVgamma(mass_dp,mass_dm,epsilon,alpha_D),
                         MASS_PION_NEUTRAL,"Pion",dark_photon,photon,0.0));
                 Dist->set_mass(MASS_PION_NEUTRAL);
-                return true;
             }
             else if (prodchoice=="eta_decay"){
                 if(mass_dp>MASS_ETA){

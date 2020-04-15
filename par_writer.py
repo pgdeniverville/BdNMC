@@ -34,7 +34,9 @@ meson_per_pi0_lsnd = {'pi0_decay' : '1.0'}
 
 meson_per_pi0_coherent = {'pi0_decay' : 1.0, 'piminus_capture' : '0.63'}
 
-meson_per_pi0_numi = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+#meson_per_pi0_numi = {'pi0_decay' : '1.0', 'eta_decay' : str(0.078), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
+
+meson_per_pi0_numi = {'pi0_decay' : '1.0', 'eta_decay' : '0.114', 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
 
 meson_per_pi0_ship = {'pi0_decay' : '1.0', 'eta_decay' : str(0.105), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
 
@@ -51,6 +53,8 @@ Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneu
 Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
 
 Argon_string = "material Argon\nnumber_density 2.11e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
+
+#Density = 1400 kg/m^3
 Argon_LAr_string = "material Argon\nnumber_density 2.23725e22\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
 
 ND280_string = "material nd280stuff\nnumber_density 3.7e23\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.945778\n"
@@ -75,8 +79,10 @@ MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_nu
 
 NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
 
+High_pressure_argon_string="material Argon\nnumber_density 1.48e20\nproton_number 18\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
+
 defaults = {"eps" : 1e-3, "mdm" : 0.03, "mv" : 0.1, "alpha_D" : 0.1, "prod_chan" : ["pi0_decay"], "signal_chan" : "NCE_nucleon", "outfile" : "parameter_run.dat", "proddist" : [""], "partlistfile" : ["Source/particle_list.dat"], "sumlog" : "Events/miniboone.dat", "outlog" : "Events/miniboone_events.dat", "output_mode" :"summary", "samplesize" : 5000, "min_scatter_energy" : 0.035, "max_scatter_energy" : 1.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 8.9, "n_num_target" :
-        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon_DM", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0,'weighted' : "false"}
+        4, "p_num_target" : 4, "max_trials" : 80e6, "ptmax" : 0.2, "zmin" : 0.3, "zmax" : 0.7, "run" : -1, "POT" : 2e20, "pi0_per_POT" : 0.9, "p_cross" : 25*mb, "meson_per_pi0" : meson_per_pi0_miniboone, "min_scatter_angle" : 0.0, "max_scatter_angle" : 2.1*pi, "repeat" : 1, "timing" : 0.0, "burn_max" : -1,"inelastic_dist" : "data/DIS.dat", "coherent" : 'false', "model" : "Dark_Photon_DM", "gagg" : 0, "gagpg" : 0, "gagpgp" : 0,'weighted' : "false", "particle_list_position" : ["false"]}
 
 def write_experiment(write_detector,user):
     context = defaults.copy()
@@ -93,6 +99,7 @@ def write_experiment(write_detector,user):
     max_scatter_angle=context["max_scatter_angle"]; repeat = context["repeat"]; timing = context["timing"]; burn_max = context["burn_max"];
     inelastic_dist = context["inelastic_dist"]; coherent = context["coherent"]; model = context["model"]; gagg= context["gagg"]; gagpg = context["gagpg"];
     gagpgp = context["gagpgp"]; POT = context["POT"];
+    particle_list_position = context["particle_list_position"]
     with open(context["outfile"],'w') as f:
         if run>=0:
             f.write('run {}\n'.format(context["run"]))
@@ -109,7 +116,9 @@ def write_experiment(write_detector,user):
             if(proddist[i]!=""):
             	f.write("production_distribution {}\n".format(proddist[i]))
 	    if(partlistfile[i]!=""):
-		f.write("particle_list_file {}\n".format(partlistfile[i]))
+            f.write("particle_list_file {}\n".format(partlistfile[i]))
+            if len(particle_list_position) >= i:
+                f.write("particle_list_position {}\n".format(particle_list_position))
 	    if prod_chan[i] in meson_per_pi0:
                 f.write('meson_per_pi0 {}\n'.format(str(meson_per_pi0[prod_chan[i]])))
 	    if proddist[i]=='proton_brem' or proddist[i]=='proton_brem_baryonic':
@@ -195,6 +204,12 @@ def miniboone_detector_full(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=6.106):
     f.write(Hydrogen_string)
     f.write('\n')
     f.write(Carbon_string)
+
+def dune_mpd_detector(f,xpos=0.0,ypos=0.0,zpos=581.0,radius=2.5, length=5, theta=0, phi=math.pi/2.0):
+    f.write("\ndetector cylinder\n")
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+    f.write('\n')
+    f.write(High_pressure_argon_string)
 
 def test_sphere(f,xpos=0.0,ypos=0.0,zpos=0.0,radius=1.0):
     f.write("\ndetector sphere\n")
@@ -381,11 +396,12 @@ def captain_detector_off(f,xpos=30.0,ypos=0.0,zpos=0.0,radius=1,length=1.15,thet
     f.write('\n')
     f.write(Argon_string)
 
-def lanl_detector(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=1.056,length=1.227,theta=pi/2.0,phi=0.0):
+#4500 kg -> 5 tons
+def lanl_detector(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.909967,length=1.227,theta=pi/2.0,phi=0.0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
-    f.write(Argon_string)
+    f.write(Argon_LAr_string)
 
 def NA62_decay_vol(f,xpos=0.0,ypos=0.0,zpos=149.5,radius=1,length=135,theta=0,phi=0):
     Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi)
@@ -466,7 +482,7 @@ def write_coherent(d={}, det=coherent_detector_LAr):
 numi_energy = 120
 
 numi_default = {"proddist" : ["bmpt"], "partlistfile" : ["data/particle_list_numi.dat"], "sumlog" : "Events/nova.dat", "outlog" : "Events/nova_events.dat", "output_mode" : "summary", "samplesize" : 5000, "min_scatter_energy" : 0.05, "max_scatter_energy" : 3.0, "dm_energy_resolution" : 0.01, "efficiency" : 0.35, "beam_energy" : 120, "n_num_target" : 8, "p_num_target" : 8, "ptmax" : 2, "zmin" : 0.1, "zmax" : 0.9, "POT" : 1e21,
-        "pi0_per_POT" : 1.0, "p_cross" : 15*mb}
+        "pi0_per_POT" : 2.9, "p_cross" : 15*mb, "meson_per_pi0" : meson_per_pi0_numi}
 
 def write_numi(d={}, det=NOvA_detector):
     context = numi_default.copy()
