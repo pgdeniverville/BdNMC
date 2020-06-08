@@ -104,24 +104,24 @@ def write_experiment(write_detector,user):
         if run>=0:
             f.write('run {}\n'.format(context["run"]))
         for i in range(len(prod_chan)):
-	    f.write('production_channel {}\n'.format(prod_chan[i]))
-	    if(prod_chan[i]=="parton_production"):
-            	prepare_parton(mA=mv,energy=beam_energy,file_path=v_parton_kinetic)
+            f.write('production_channel {}\n'.format(prod_chan[i]))
+            if(prod_chan[i]=="parton_production"):
+                prepare_parton(mA=mv,energy=beam_energy,file_path=v_parton_kinetic)
                 f.write('parton_V_neutron_file {}\n'.format("data/parton_V_n.dat"))
                 f.write('parton_V_proton_file {}\n'.format("data/parton_V_p.dat"))
             elif(prod_chan[i]=="parton_production_baryonic"):
-            	prepare_parton(mA=mv,energy=beam_energy,file_path=v_parton_baryonic)
+                prepare_parton(mA=mv,energy=beam_energy,file_path=v_parton_baryonic)
                 f.write('parton_V_neutron_file {}\n'.format("data/parton_V_n.dat"))
                 f.write('parton_V_proton_file {}\n'.format("data/parton_V_p.dat"))
             if(proddist[i]!=""):
             	f.write("production_distribution {}\n".format(proddist[i]))
-	    if(partlistfile[i]!=""):
-            f.write("particle_list_file {}\n".format(partlistfile[i]))
+            if(partlistfile[i]!=""):
+                f.write("particle_list_file {}\n".format(partlistfile[i]))
             if len(particle_list_position) >= i:
                 f.write("particle_list_position {}\n".format(particle_list_position))
-	    if prod_chan[i] in meson_per_pi0:
+            if prod_chan[i] in meson_per_pi0:
                 f.write('meson_per_pi0 {}\n'.format(str(meson_per_pi0[prod_chan[i]])))
-	    if proddist[i]=='proton_brem' or proddist[i]=='proton_brem_baryonic':
+            if proddist[i]=='proton_brem' or proddist[i]=='proton_brem_baryonic':
                 f.write('zmax {}\n'.format(str(zmax)))
                 f.write('zmin {}\n'.format(str(zmin)))
                 f.write('ptmax {}\n'.format(str(ptmax)))

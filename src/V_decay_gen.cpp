@@ -127,12 +127,14 @@ void Two_Body_Decay_Gen::Toggle_Daughter_Decay(int index, std::shared_ptr<DMGene
 bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& parent){
     parent.name = Part_Name;
 
-    double decay_time=tau*log(1/(1-Random::Flat()));
-    double boost = 1/sqrt(1-pow(parent.Speed(),2));
-    //cout << decay_time << " " << boost << endl;
-    //Need to turn on END_SET;
-    parent.END_SET=true;
-    parent.Increment_Time(decay_time*boost);
+    if(tau>0){
+        double decay_time=tau*log(1/(1-Random::Flat()));
+        double boost = 1/sqrt(1-pow(parent.Speed(),2));
+        
+        //Need to turn on END_SET;
+        parent.END_SET=true;
+        parent.Increment_Time(decay_time*boost);
+    }
 
 //    cout << "decay distance = " << decay_time*boost*parent.Speed()*speed_of_light << endl;
 
@@ -155,7 +157,7 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
         vec.insert(bookmark,daughter2);
         bookmark = vec.end();
         intersect=true;
-    }
+    }    
 
     if(d1&&det_int(daughter1)>0){
         intersect=true;

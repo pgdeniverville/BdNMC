@@ -541,7 +541,7 @@ int main(int argc, char* argv[]){
 	cout << "Number of candidates intersecting detector = " << NDM << endl;	
 	cout << "Number of " << sigchoice <<  " = " << scattot << endl;
 	for(int i=0; i<chan_count;i++)
-		cout << "Number of scatterings from channel " << i+1 << " " << DMGen_list[i]->Channel_Name() << " = " << scat_list[i] << " in " << trials_list[i] << " trials." << endl;  
+		cout << "Number of events from channel " << i+1 << " " << DMGen_list[i]->Channel_Name() << " = " << scat_list[i] << " in " << trials_list[i] << " trials." << endl;  
 	cout << "Number of sample events generated = " << nevent << endl;
 	cout << "Acceptance = " << (double)NDM/(2*trials) << endl;	
  	if(!par->Weighted_Events()){

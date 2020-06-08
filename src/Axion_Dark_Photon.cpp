@@ -234,7 +234,7 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
         DMGen = tmp_gen;
         return true;
     }
-    else if(prodchoice=="brem_dp"||prodchoice=="brem_axion"){
+    else if(prodchoice=="brem_dp" or prodchoice=="brem_axion"){
         double part_mass;
         
         if(prodchoice=="brem_dp"){
@@ -259,6 +259,16 @@ bool Axion_Dark_Photon::Prepare_Production_Channel(std::string prodchoice, std::
         Dist->set_mass(part_mass);
         Vnum=par.Protons_on_Target()*prodchan.Num_per_pot();
         return true;
+    }
+    //Currently Reactor Production considers POT to be the number of V's produced.
+    else if(prodchoice=="Reactor_Production"){
+        if(sig_choice=="DP_gamma_a_Decay" or sig_choice=="DP_e_ep_a_Decay" or sig_choice=="DP_Signal_Decay"){
+            std::shared_ptr<Do_Nothing_Gen> do_not(new Do_Nothing_Gen(string("Reactor_Production"),string("Dark_Photon")));
+            DMGen = do_not;
+            Dist->set_mass(mass_dp);
+            Vnum=par.Protons_on_Target();
+            return true;
+        }
     }
     return false;
 }
@@ -383,7 +393,7 @@ bool Axion_Dark_Photon::Prepare_Signal_Channel(Parameter& par){
         vector<std::shared_ptr<DMGenerator> > dec_vec;
         dec_vec.push_back(dp_2decay_gen);
 
-        double lifetime = hbar/A_width(mass_axion, mass_dp);
+        double lifetime = hbar/dark_photon.width;
 
         std::shared_ptr<SignalDecay_2> sig_dec(new SignalDecay_2(lifetime, dec_vec));
         Sig_list.push_back(sig_dec);

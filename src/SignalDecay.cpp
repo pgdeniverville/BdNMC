@@ -149,7 +149,7 @@ SignalDecay_2::SignalDecay_2(double lifetime, std::vector<std::shared_ptr<DMGene
 }
 
 bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
-
+   
     if(Parentit->E<Escatmin)
         return false;
 
@@ -162,14 +162,18 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         time1 = time2;
         time2 = ttmp;
     }
-
-//    Parentit->report();
-//    cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
+/*
+    Parentit->report();
+    cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
+*/
     double prob = decay_probability(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E));
-//    cout << "prob=" << prob << endl;
-//    cout << "get_prob()=" << get_pMax() << endl;
+
+  //  cout << "prob=" << prob << endl;
+  //  cout << "get_prob()=" << get_pMax() << endl;
+
     double u = Random::Flat(0,1);
-//    cout << prob << " " << pMax << " " << u*pMax << endl;
+
+  //  cout << prob << " " << pMax << " " << u*pMax << endl;
 
 
     if(prob>u*pMax){
@@ -200,39 +204,20 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         }
 
         std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
+/*
+        cout << "parent before submission to GenDM\n";
+        Parentit->report();
+*/
 
         Channels[i]->GenDM(partlist, det_int, *Parentit);
-/*
-        cout << "Reporting partlist" << endl;
+
+/*        cout << "Reporting partlist" << endl;
         for(list<Particle>::iterator it = partlist.begin(); it != partlist.end(); it++){
             it->report();
         }
         cout << "End partlist\n\n";
 */
         //No cuts yet. Not sure how to implement them. I'll do post-processing for now.
-/*
-        if(Final_States[i].size() == 2){
-            Particle daughter1(Final_States[i][0]);
-            Particle daughter2(Final_States[i][1]);
-            daughter1.EVENT_SET=true; 
-            daughter2.EVENT_SET=true;
-            //Parentit->Generate_Position();
-            TwoBodyDecay(*Parentit, daughter1, daughter2);
-            double angular_spread = Angle_Spread(daughter1.px,daughter1.py,daughter1.pz,daughter2.px,daughter2.py,daughter2.pz);  
-            if(angular_spread<min_angle||angular_spread>max_angle||daughter1.E<Escatmin||daughter2.E<Escatmin){
-                return false;
-            }
-            partlist.insert(std::next(Parentit),daughter1);
-            partlist.insert(std::next(Parentit),daughter2);
-        }
-        else{
-            Particle product(*Parentit);
-            product.EVENT_SET=true;
-            product.name = Channel_Name[i];
-            
-            partlist.insert(std::next(Parentit),product);
-        }
-*/
         return true;
     }
 

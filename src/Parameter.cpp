@@ -226,8 +226,9 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
             else if(key==Num_per_POT_key)
                 tmpprod.num_per_pot=stod(val);
             else if(key==part_list_pos_key){
-				if(lowercase(val)=="true")
+				if(lowercase(val)=="true"){
 					tmpprod.particle_list_position=true;
+                }
 			}
 			else if(key == sanford_wang_key || key == distribution_parameter_key){
 				parse_parameter_file(val, tmpprod.dist_param_map);

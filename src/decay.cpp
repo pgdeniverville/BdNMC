@@ -93,8 +93,10 @@ void TwoBodyDecay(Particle &parent, Particle &daughter1, Particle &daughter2){
     daughter2.ThreeMomentum(-mom*sin(thetad)*cos(phid),-mom*sin(thetad)*sin(phid),-mom*cos(thetad));
     daughter1.Lorentz(parent);
     daughter2.Lorentz(parent);
-	Link_Particles(parent,daughter1);
+
+    Link_Particles(parent,daughter1);
 	Link_Particles(parent,daughter2);
+
 }
 
 //Non-isotropic decay for parent -> daughter1 + daughter2.

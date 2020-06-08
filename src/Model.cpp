@@ -66,11 +66,15 @@ void Model::Prepare_Model(Parameter& par){
             cerr << "Something wrong with distribution!" << endl;
             throw -1;
         }
+
+        cout << "Handled Distribution\n";
         //Specific model handles the production channel
         if(!this->Prepare_Production_Channel(prodchoice, proddist, *proditer, DMGen, PartDist, Vnum, par)){
             cerr << "Something wrong with prod_chan " << prodchoice << "!" << endl;
             throw -1;
         };
+
+        cout << "Model handled the production channel successfully\n";
 
         if(par.Output_Mode()=="particle_list"){
             return;

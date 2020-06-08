@@ -39,7 +39,7 @@ const double momega=0.78265;
 const double mrho = 0.77527;
 const double mphi = 1.019461;
 const double MASS_KAON_CHARGED = 0.493677;
-
+const double MASS_JPSI = 3.096916;
 
 const double brpi0to2gamma = 0.98823;
 const double bretato2gamma = 0.3941;
