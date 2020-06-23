@@ -126,7 +126,7 @@ void Two_Body_Decay_Gen::Toggle_Daughter_Decay(int index, std::shared_ptr<DMGene
 
 bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& parent){
     parent.name = Part_Name;
-
+    //cout << "tau=" << tau << endl;
     if(tau>0){
         double decay_time=tau*log(1/(1-Random::Flat()));
         double boost = 1/sqrt(1-pow(parent.Speed(),2));
@@ -134,13 +134,14 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
         //Need to turn on END_SET;
         parent.END_SET=true;
         parent.Increment_Time(decay_time*boost);
-    }
+        //cout << "decay distance = " << decay_time*boost*parent.Speed()*speed_of_light << endl;
 
-//    cout << "decay distance = " << decay_time*boost*parent.Speed()*speed_of_light << endl;
+    }
 
     if(record_parent)
         vec.push_back(Particle(parent));
 
+    //DEBUG
     //parent.report();
 
     std::list<Particle>::iterator bookmark = vec.end();
@@ -159,6 +160,7 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
         intersect=true;
     }    
 
+//    cout << "Checking Daughter Crossings\n" << endl;
     if(d1&&det_int(daughter1)>0){
         intersect=true;
         vec.push_back(daughter1);
@@ -170,7 +172,11 @@ bool Two_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(Pa
 
     //cout << "EVENT GEN\n";
     //parent.report(cout);
-    //daughter1.report(cout);
-    //daughter2.report(cout);
+    //cout << det_int(parent) << endl;
+  //  daughter1.report(cout);
+    //cout << det_int(daughter1) << endl;
+  //  daughter2.report(cout);
+    //cout << det_int(daughter2) << endl;
+    //cout << "veclen=" << vec.size() << endl;
     return intersect;
 }

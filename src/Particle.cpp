@@ -136,6 +136,10 @@ void Particle::Set_Time(double t){
         dec_time = t*Speed()*speed_of_light/Momentum();
     }
 
+//    cout << "Testing Set_Time" << endl;
+//    cout << "Time to be set=" << t << endl;
+//    cout << "origin coords = " << origin_coords[0] << " " << origin_coords[1] << " " << origin_coords[2] << " "  <<  origin_coords[3] << endl;
+
     end_coords[0]=(t-origin_coords[3])*Speed()*speed_of_light*px/Momentum()+origin_coords[0];
     end_coords[1]=(t-origin_coords[3])*Speed()*speed_of_light*py/Momentum()+origin_coords[1];
     end_coords[2]=(t-origin_coords[3])*Speed()*speed_of_light*pz/Momentum()+origin_coords[2];

@@ -227,13 +227,16 @@ double detector_cylinder::Ldet (Particle &DM){
         //cout << DM.crossing[0] << endl;
         //DM.report(cout); 
         //cout << "crossing0 " << crossings[0]*sqrt(ip(b,b))  <<  " L " << (crossings[1]-crossings[0])*sqrt(ip(b,b)) << endl;
-
+        //DM.report();
+        //cout << "det_int=" << abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b))) << endl;
         return abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b)));
     }
     else if(crossings.size()==1){
         if(DM.END_SET&&DM.dec_time<crossings[0])
             crossings[0]=DM.dec_time;
         DM.crossing[1] = crossings[0];
+        //DM.report();
+        //cout << "det_int=" << crossings[0]*sqrt(ip(b,b)) << endl;
         return crossings[0]*sqrt(ip(b,b));
     }
     else

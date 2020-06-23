@@ -1298,7 +1298,7 @@ def execute_charm2(genlist=True):
         subp.call(["./build/main", "parameter_run.dat"])
     vmarr=[1,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500]
     #massarr=[[mv,mv,1e-7] for mv in vmarr]
-    #vmarr=[30]
+    vmarr=[30]
     massarr=[[mv,mv/3.0,1e-3] for mv in vmarr]
     #d=({"channels" : [_pion_decay,_eta_decay,_brem], "det_switch" : "charm2", "signal_chan" : "Signal_Decay", "output_mode" : "dm_detector_distribution", "samplesize" : 50000, "min_scatter_energy" : 0, "max_scatter_energy" : 1e5, "efficiency" : 1, "alpha_D" : 0.5, "POT" : 0.25e20, "sumlog" : "YuDai_project/charm2/charm2events.dat"});
     d=({"channels" : [_pion_decay,_eta_decay,_brem,_parton], "signal_chan" : "NCE_electron", "det_switch" : "charm2", "output_mode" : "comprehensive", "samplesize" : 20000, "alpha_D" : 0.5, "sumlog" : "Claudia/charm2.dat", "efficiency" : 1, "model" : "Dark_Photon"})

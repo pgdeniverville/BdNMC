@@ -17,7 +17,12 @@ double decay_probability(double t1, double t2, double lifetime){
 }
 
 double generate_decay_time(double t1, double t2, double lifetime){
-    return -log(exp(-t1/lifetime)-Random::Flat(0,1)*(exp(-t1/lifetime)-exp(-t2/lifetime)))*lifetime;
+    double u = Random::Flat(0,1);
+    //cout << "Random_Time=" << u << endl;
+    //Prone to machine precision errors.
+    return -log(exp(-t1/lifetime)-u*(exp(-t1/lifetime)-exp(-t2/lifetime)))*lifetime;
+    //Alternate form suggested by Mathematica.
+    //return lifetime*log(-exp(t1/lifetime+t2/lifetime)/(-exp(t2/lifetime)-u*exp(t1/lifetime)+u*exp(t2/lifetime)));
 }
 
 //Need to create local copies of the input vectors
@@ -153,7 +158,7 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
     if(Parentit->E<Escatmin)
         return false;
 
-//    cout << "Begin probscatter for " << Parentit->name << endl;
+  //  cout << "Begin probscatter for " << Parentit->name << endl;
 
     double time1 = (*Parentit).Momentum()*(Parentit->crossing[0])/(*Parentit).Speed()/speed_of_light;
     double time2 = (*Parentit).Momentum()*(Parentit->crossing[1])/(*Parentit).Speed()/speed_of_light;
@@ -165,11 +170,10 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
 /*
     Parentit->report();
     cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
+
+    cout << "z1=" << time1*Parentit->Speed()*speed_of_light*Parentit->pz/Parentit->Momentum() << " z2=" << time2*Parentit->Speed()*speed_of_light*Parentit->pz/Parentit->Momentum() <<endl;
 */
     double prob = decay_probability(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E));
-
-  //  cout << "prob=" << prob << endl;
-  //  cout << "get_prob()=" << get_pMax() << endl;
 
     double u = Random::Flat(0,1);
 
@@ -182,17 +186,30 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         if(prob>pMax){
             pMax=prob;
         }
+        //Checking for machine precision errors.
+        double timegen;
+        int attempt=0;
+        while(true){
+            timegen = generate_decay_time(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E));
+            if(timegen<time2 and timegen>time1){
+                break;
+            } 
+            if(++attempt>500){
+                std::cerr << "Attempt to generate a decay time for particle\n";
+                Parentit->report(std::cerr);
+                std::cerr << "with lifetime " << Lifetime << " and probability " << prob << " has failed 500 times due to numerical errors. It may be necessary to choose parameters. Terminating run.";
+                throw -1;
+            }
 
-        double timegen = generate_decay_time(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E)); 
-
+        }
         Parentit->Increment_Time(timegen);
         Parentit->EVENT_SET=true;
 
-/*
+        /*
         cout << "Decay!\n";
         cout << "decay timegen=" << timegen << endl;
         Parentit->report();
-*/
+        */
         double br_chan = Random::Flat(0,br_total);
         unsigned i;
 
@@ -203,7 +220,7 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
             br_chan -= (Channels[i])->BranchingRatio();
         }
 
-        std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
+        std::function<double(Particle&)> det_int = bind(&detector::Ldet,det,_1);
 /*
         cout << "parent before submission to GenDM\n";
         Parentit->report();
