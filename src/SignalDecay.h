@@ -75,7 +75,6 @@ class SignalDecay_2: public Scatter{
         //REMEMBER: Set the lifetime of DMGenerator objects to 0, so they decay immediately. The decay time was already calculated by SignalDecay_2!
         SignalDecay_2(double lifetime, std::vector<std::shared_ptr<DMGenerator> >);
         ~SignalDecay_2(){};
-
         bool probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator&);
         bool probscatter(std::shared_ptr<detector>& det, Particle &Parent);
 

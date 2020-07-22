@@ -9,15 +9,16 @@ const double pi = M_PI;
 //Physical Constants
 const double alphaEM = 1.0/137.035999074;
 const double G_ELEC = sqrt(4*M_PI*alphaEM);
-const double speed_of_light = 299792458;
+const double speed_of_light = 299792458; //m/s
 const double hbar = 6.5875*pow(10,-25);
+const double Vacuum_Expectation_Value = 246.22; //GeV
 
 //Units
 const double microbarn = 1e-34;//In m^2
 const double femtobarn = 1e-43;//In m^2
 const double RADIANS_PER_DEGREE = pi/180.0; 
 const double convGeV2cm2 = 3.89e-28;
-const double GeVtofm=0.197;
+const double GeVtofm = 0.197;
 const double m_to_cm = 100;
 
 //Particle Masses in GeV
@@ -25,8 +26,19 @@ const double MASS_PROTON = 0.938272;
 const double MASS_NEUTRON = 0.939565;
 const double MASS_ELECTRON = 0.0005109989461;
 const double MASS_MUON = 0.10576583745;
+const double MASS_TAU = 1.777;
+const double MASS_W = 80.38;
+
 const double MASS_DEUTERON = 1.875612859;
 const double MASS_DELTA = 1.232;
+
+//Quarks
+const double MASS_UP = 2.15e-3;
+const double MASS_DOWN = 4.7e-3;
+const double MASS_STRANGE = 0.094;
+const double MASS_CHARM = 1.28;
+const double MASS_BOTTOM = 4.18;
+const double MASS_TOP = 173.21;
 
 //Mesons
 const double MASS_PION_NEUTRAL=0.1349766;

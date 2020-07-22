@@ -67,14 +67,11 @@ void Model::Prepare_Model(Parameter& par){
             throw -1;
         }
 
-        cout << "Handled Distribution\n";
         //Specific model handles the production channel
         if(!this->Prepare_Production_Channel(prodchoice, proddist, *proditer, DMGen, PartDist, Vnum, par)){
             cerr << "Something wrong with prod_chan " << prodchoice << "!" << endl;
             throw -1;
         };
-
-        cout << "Model handled the production channel successfully\n";
 
         if(par.Output_Mode()=="particle_list"){
             return;
@@ -85,7 +82,7 @@ void Model::Prepare_Model(Parameter& par){
         Dist_list.push_back(PartDist);
         Vnum_list.push_back(Vnum);
         Vnumtot+=Vnum;
-        cout << "Vnumtot= " << Vnum << endl;
+        cout << "Number of initial dark sector particles = " << Vnum << endl;
     };
     //cout << "Gen_list size = " << Gen_list.size() << endl;
     //cout << Gen_list[0]->Channel_Name() << endl;

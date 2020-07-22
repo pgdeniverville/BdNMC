@@ -197,7 +197,7 @@ int main(int argc, char* argv[]){
 	double min_scatter_energy = par->Min_Scatter_Energy();
 	double min_angle = par->Min_Angle();
 	double max_angle = par->Max_Angle();
-//	if((par->Model_Name())!="Dark_Photon"&&par->Model_Name()!="Dark_Photon_DM"){
+    //	if((par->Model_Name())!="Dark_Photon"&&par->Model_Name()!="Dark_Photon_DM"){
 	cout << "Setting up model " << par->Model_Name() << endl;
 	if(par->Model_Name()=="Pseudoscalar_Mediator"){
 		model=std::shared_ptr<Pseudoscalar>(new Pseudoscalar(*par));
@@ -212,9 +212,11 @@ int main(int argc, char* argv[]){
 	else if(par->Model_Name()=="Dark_Photon" or par->Model_Name()=="Dark_Photon_DM"){
 		model = std::shared_ptr<Kinetic_Mixing>(new Kinetic_Mixing(*par));
 	}
-	model->Prepare_Model(*par);
-	//This will eventually get moved to the bottom, once the big else statement is moved into models.
-
+    else if(par->Model_Name()=="Dark_Scalar"){
+        model = std::shared_ptr<Scalar_Mediator>(new Scalar_Mediator(*par));
+    }	
+    model->Prepare_Model(*par);
+	
 	if(par->Output_Mode()=="particle_list"){
 		return 0;
 	}
@@ -248,6 +250,8 @@ int main(int argc, char* argv[]){
     //This will eventually be default.
     cout << "Model Name = " << par->Model_Name() << endl;
     model->Report_Model();
+
+    cout << DMGen_list[0]->Channel_Name() << endl;
 
 	for(int i = 0; i<chan_count; i++){
         cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();

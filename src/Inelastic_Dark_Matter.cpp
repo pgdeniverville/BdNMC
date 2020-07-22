@@ -400,7 +400,7 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
         if(proddist=="proton_brem"){
             if(prodchan.ptmax()<prodchan.ptmin() || prodchan.zmax() < 0 || prodchan.zmax()<prodchan.zmin() || prodchan.zmin() < 0){
                     std::cerr << "Invalid properties for production_distribution proton_brem." << endl;
-                    return -1;
+                    throw -1;
             }   
             std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(par.Beam_Energy(),epsilon,mass_dp,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),alpha_D,proddist,prodchan.ptmin()));
             Vnum = pbd->V_prod_rate()*par.Protons_on_Target();//V_decay should return a branching ratio for this. If it doesn't, I will have to change it in the future. prodchan.Num_per_pot()

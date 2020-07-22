@@ -25,39 +25,6 @@ _DET_ZPOS = 100
 
 mass_delta = 1.1
 
-def ship_detector_modular(f,radius=0.8268,length=3.34,theta=0,phi=0):
-    #def ship_detector(f,xpos=0.0,ypos=0,zpos=30.0,radius=0.655,length=2.645,theta=0,phi=0):
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
-    f.write('\n')
-    f.write(Argon_string)
-
-def OPERA_detector(f,xpos=0.0,ypos=0.0,zpos=7.3e6,radius=56.4,length=1,theta=0,phi=0):
-    print("Don't use this for event generation!")
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
-    f.write('\n')
-    f.write(Argon_string)
-
-def MINOS_detector_modular(f,xpos=0.0,radius=2,length=1.7,theta=0,phi=0):
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
-    f.write('\n')
-    f.write(MINOS_string)
-'''
-def NOvA_detector_modular(f,xpos=0.0,radius=2,length=14,theta=-NOvA_angle,phi=0):
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius),str(length),str(theta),str(phi)))
-    f.write('\n')
-    f.write(MINOS_string)
-'''
-def miniboone_detector_modular(f,radius=5.0):
-    f.write("\ndetector sphere\n")
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(_DET_XPOS),str(_DET_YPOS),str(_DET_ZPOS),str(radius)))
-    f.write('\n')
-    f.write(Hydrogen_string)
-    f.write('\n')
-    f.write(Carbon_string)
 
 pep2_defaults = {}
 
@@ -428,7 +395,50 @@ def charm2_eval(d_user):
     t0 = time.time()
     subp.call(["rm", outfile])
 
-nucal_defaults = {"mv" : 30, "mdm" : 10, 'channels' : { _brem, _pion_decay, _eta_decay}, "signal_chan" : "Signal_Decay", "det_switch" : 'nucal', "alpha_D" : 0.5, "mdm1" : 10, "mdm2" : 10}
+nucal_defaults = {"mv" : 30, "mdm" : 10, 'channels' : { _brem, _pion_decay, _eta_decay}, "signal_chan" : "Signal_Decay", "det_switch" : 'nucal', "alpha_D" : 0.5, "mdm1" : 10, "mdm2" : 10, "BEAM_ENERGY" : 70}
+
+def general_eval(d_user,defaults):
+    d = defaults.copy()
+    d.update(d_user)
+
+    t0 = time.time()
+
+    BEAM_ENERGY=d["BEAM_ENERGY"]
+
+    proddist = []
+    prodchan = []
+    partlistfile = [    ]
+    executing=False
+
+    model = d["model"]
+    signal_channel = d["signal_chan"]    
+    channels = d["channels"]
+    det_switch=d["det_switch"]
+
+    if model == "Dark_Scalar":
+        outfile="parameter_run_{}.dat".format(str(d["dark_scalar_mass"]))
+        if _brem in channels:
+            proddist.append("proton_beam")
+            prodchan.append("proton_brem")
+            partlistfile.append("")
+            zmin=max(3*d["dark_scalar_mass"]/BEAM_ENERGY,0.1)
+            zmax=1-zmin
+
+            executing=True
+
+
+    if not executing:
+        return
+
+    d.update(d_user)
+    d.update({"proddist" : proddist, "prod_chan" : prodchan, "partlistfile" : partlistfile, "zmin" : zmin, "zmax" : zmax, "outfile" : outfile})
+    if det_switch == "nucal":
+        write_nucal(d=d)
+    subp.call(["./build/main", outfile])
+    t1 = time.time()
+    print("\ntime={}\n".format(t1-t0))
+    t0 = time.time()
+    subp.call(["rm", outfile])
 
 def nucal_eval(d_user):
     d = nucal_defaults.copy()
@@ -501,6 +511,12 @@ def nucal_eval(d_user):
         if (MV>MX1+MX2) and _brem in channels:
             proddist.append("proton_brem")
             prodchan.append("V_decay")
+            partlistfile.append("")
+            executing=True
+    elif model=="Dark_Scalar":
+        if _brem in channels:
+            proddist.append("proton_beam")
+            prodchan.append("proton_brem")
             partlistfile.append("")
             executing=True
     else:
@@ -1242,25 +1258,26 @@ def execute_nucal(genlist=True):
         write_nucal(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
     #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
-    vmarr=[10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,90,100,115,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2100,2250,2400,2500]
+    #vmarr=[10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,90,100,115,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2100,2250,2400,2500]
     #,2750,3000,3500,4000,4500,5000,5500,6000]
-    #vmarr=[1712,1714,1716,1718]
+    massarr=[0.100]
     #vmarr=[71,72,73,74,4550,4600,4650,4700,4750,4800,4850,4900,4950]
     #vmarr=[4500+x for x in range(50,500,50)]
     #vmarr=[1.1,1.075,1.05,1.04,1.03,1.15,1.2,1.3,1.4,1.5,1.7,1.9,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150, 175,200,225,250,275,300,325,350,375,400,405,410,415,420,700,770,800,405,410,415,420,460,470,480,490,500,550,600, 650,700,770,800,725,750,760,765,767,772,775,790,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960, 970,980,990,1000]
     #massarr=[[mv,mv/3.0,1.05*mv/3.0] for mv in vmarr]
-    massarr=[[mv,mv/2.5,1.4*mv/2.5] for mv in vmarr]
+    #massarr=[[mv,mv/2.5,1.4*mv/2.5] for mv in vmarr]
     #massarr=[[mv,mv,1e-7] for mv in vmarr]
     #d=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "sumlog" : "Visible_Dark_Photon/nucal_events.dat", "model" : "Dark_Photon", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "weighted" : "true"});
-    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events2.5/nucal_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
-    for marr in massarr:
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events2.5/nucal_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    d=({"channels" : [_brem], "signal_chan" : "Scalar_Signal_Decay", "samplesize" : 1000, "sumlog" : "Dark_Scalar/nucal_decay.dat", "model" : "Dark_Scalar", "min_scatter_energy" : 10, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "epsilon_l" : 1e-2, "epsilon_q" : 1.2e-2, "epsilon_W" : 1.2e-2, "weighted" : 'true', "efficiency" : 0.7})
+    for ms in massarr:
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal_aD0.5_Delta_0.05/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.5})
         #nucal_eval(d)
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.1, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.1/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1})
         #nucal_eval(d)
-        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events2.5/nucal_aD0.1_Delta0.4/nucal_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})
+        d.update({"dark_scalar_mass" : ms, "outlog" : "Dark_Scalar/nucal/nucal_{}.dat".format(ms)})
         #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Visible_Dark_Photon/nucal/nucal_decays_{}_{}.dat".format(marr[0],marr[2])})
-        nucal_eval(d)
+        general_eval(d,nucal_defaults)
     #massarr=[[mv,mv/2.5,1.4*mv/2.5] for mv in vmarr]
     #for marr in massarr:
     #    d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events2.5/nucal_aD0.1_Delta0.4/nucal_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})

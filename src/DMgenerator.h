@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 //I need DMGenerator to provide methods that can be called by its subclasses to implement commonly used code. I should make a DMGenerator.cpp file to hold it.
+//DMGenerator would be more accurately described as new physics generator.
 class DMGenerator{
     public:
         DMGenerator(){}
@@ -152,6 +153,7 @@ class Do_Nothing_Gen: public DMGenerator{
 
 //Defined in V_decay_gen.cpp
 //Need to add unstable daughter particles
+//Pass lifetime=0 if this is being used by SignalDecay_2.
 class Two_Body_Decay_Gen: public DMGenerator{
     public:
         Two_Body_Decay_Gen(double branching_ratio, double parent_mass, const std::string parent_name, Particle daughter1, Particle daughter2, double lifetime);
@@ -200,6 +202,28 @@ class Three_Body_Decay_Gen: public DMGenerator{
         std::shared_ptr<DMGenerator> d1_decay;
         std::shared_ptr<DMGenerator> d2_decay;
         std::shared_ptr<DMGenerator> d3_decay;
+};
+
+//This is a generic Bremsstrahlung distribuiton. It accepts a function pointer that desribes the bremmed particle's pT and z production distribution.
+
+class Generic_Bremsstrahlung: public DMGenerator{
+    public:
+        Generic_Bremsstrahlung(Particle& product, double beam_energy, double ptmin, double ptmax, double zmin, double zmax, std::string prodchoice, std::function<double(double, double)>);
+        void Toggle_Decay(std::shared_ptr<DMGenerator> decay_gen);
+        bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
+        void calc_prod_rate();
+        void Burn_In(int i);
+        void sample_particle(Particle &part);
+        double Prod_Rate(){return prod_rate;}
+    private:
+        double beam_energy, prod_rate;
+        //This holds a sample version of the particle produced through brem.
+        Particle product;
+        double ZMIN, ZMAX, PTMIN, PTMAX;
+        bool unstable=false;
+        //Use this to store the splitting distribuiton used by Bremsstrahulng! Signature is double split_dist(double Z, double PT)
+        std::function<double(double,double)> split_dist;
+        std::shared_ptr<DMGenerator> decay_gen;
 };
 
 #endif

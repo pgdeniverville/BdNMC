@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 
+
 using std::cout; using std::endl;
 
 const double mp = MASS_PROTON;
@@ -365,6 +366,61 @@ namespace Inelastic_DM{
         }
     }
     
+}
+
+namespace Dark_Scalar{
+    using namespace std::complex_literals;
+
+    double betha(double m_S, double m){
+        return sqrt(1-pow(2*m/m_S,2));
+    }
+
+    double S_to_2leptons(double epsilon, double m_S, double m_lepton){
+        if(m_S <= 2*m_lepton)
+            return 0;
+        return (m_S*pow(epsilon,2)*pow(betha(m_S,m_lepton),3))/(8*pi)*pow(m_lepton/Vacuum_Expectation_Value,2);
+    }
+
+    std::complex<double> form_factor(double x){
+        if (x<=1){
+            return pow(asin(sqrt(x)),2);
+        }
+        else{
+            return -1.0/4.0*pow(log((1+sqrt(1.0-1.0/x))/(1-sqrt(1.0-1.0/x))) -1i*pi,2);
+        }
+    }
+
+    double S_to_2photon(double epsilon_l, double epsilon_q, double epsilon_w, double m_S){
+        double m_quark_uplike[3] = {MASS_UP, MASS_CHARM, MASS_TOP}; 
+        double m_quark_downlike[3] = {MASS_DOWN, MASS_STRANGE, MASS_BOTTOM};
+        double m_lepton[3] = {MASS_ELECTRON, MASS_MUON, MASS_TAU};
+
+        double v = Vacuum_Expectation_Value;
+
+        double x_w = pow(m_S/(2*MASS_W),2);
+        std::complex<double> A_W = -(2*x_w*x_w + 3*x_w + 3*(2*x_w-1)*form_factor(x_w))/pow(x_w,2);
+
+        std::complex<double> A_l = 0;
+        std::complex<double> A_q = 0;
+
+        double x_l,x_q;
+
+        for(int i=0; i!=3; i++){
+            x_l = pow(m_S/(2*m_lepton[i]),2);
+            A_l += 2.0*(x_l + (x_l-1)*form_factor(x_l))/pow(x_l,2);
+        }
+        for(int i=0; i!=3; i++){
+            x_q = pow(m_S/(2*m_quark_uplike[i]),2);
+            A_q += 3.0*pow(2.0/3.0,2)*(2.0*(x_q + (x_q-1.0)*form_factor(x_q))/pow(x_q,2));
+        }
+        for(int i=0; i!=3; i++){
+            x_q = pow(m_S/(2.0*m_quark_downlike[i]),2);
+            A_q += 3.0*pow(1.0/3.0,2)*(2.0*(x_q + (x_q-1)*form_factor(x_q))/pow(x_q,2));
+        }
+        std::complex<double> form_factor_photon = epsilon_q*A_q + epsilon_l*A_l + epsilon_w*A_W;
+        return pow(m_S,3)*pow(alphaEM/(4.0*pi),2)/(16*pi*v*v)*pow(abs(form_factor_photon),2);
+
+    }   
 }
 
 /*

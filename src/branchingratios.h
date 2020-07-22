@@ -1,6 +1,7 @@
 #ifndef GUARD_branchingratios_h
 #define GUARD_branchingratios_h
 
+#include <complex>
 
 double RRATIO(double sqrt_s);
 
@@ -77,6 +78,13 @@ namespace Ax_DP {
     double Br_dp_to_lepton(double mA, double ma, double ml, double Gagpg, double eps, double ep);
     double Br_dp_to_3gamma(double mA, double ma, double Gagpg, double eps, double ep);
     double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep);
+}
+
+namespace Dark_Scalar{
+    double betha(double m_S, double m);
+    double S_to_2leptons(double epsilon, double m_S, double m_lepton);
+    std::complex<double> form_factor(double x);
+    double S_to_2photon(double epsilon_l, double epsilon_q, double epsilon_w, double m_S);
 }
 
 //GENERIC FUNCTIONS

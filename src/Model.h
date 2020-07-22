@@ -48,7 +48,7 @@ class Model{
         //These functions supply the prepared DMGenerator, Distribution and Scatter lists.
         void get_DMGen(std::vector<std::shared_ptr<DMGenerator> >& DMGen_list){DMGen_list = Gen_list;}
         std::vector<std::shared_ptr<DMGenerator> > get_DMGen(){return Gen_list;}
-        void get_Distribution(std::vector<std::shared_ptr<Distribution> >& PartDist_list){PartDist_list = Dist_list;}
+        void get_Distribution(std::vector<std::shared_ptr<Distribution> >& PartDist_list){ PartDist_list = Dist_list;}
         std::vector<std::shared_ptr<Distribution> > get_Distribution(){return Dist_list;}
         void get_SigGen(std::vector<std::shared_ptr<Scatter> >& Signal_list){Signal_list = Sig_list;}
         void get_first_SigGen(std::shared_ptr<Scatter>& Signal){if(Sig_list.size()==0){std::cerr << "Sig_list is empty, get_first_SigGen will fail\n";}
@@ -191,6 +191,26 @@ class Kinetic_Mixing : public Model{
     private:
         //model parameters
         double alpha_D, mass_dp, mass_dm, epsilon;
+};
+
+class Scalar_Mediator : public Model{
+    public:
+        Scalar_Mediator(Parameter &par) : Model(par){};
+        bool Prepare_Signal_Channel(Parameter& par);
+        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Scalar_num, Parameter& par);
+        bool Set_Model_Parameters(Parameter& par);
+        void Report_Model();
+        void Report(std::ostream& out);
+        double S_width();
+        double S_to_2lepton_width(double m_lepton);
+        double differential_splitting_probability(double z, double pT);
+        double sigma_brem_differential(double z, double pT);
+        void Branching_Ratios(){};
+    private:
+        double E_beam, P_beam;
+        double pTmin, pTmax;
+        double zmin,zmax;
+        double m_S, epsilon_l, epsilon_q, epsilon_W;
 };
 
 #endif

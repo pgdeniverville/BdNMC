@@ -100,10 +100,13 @@ double SimpsonCubature(std::function<double(double, double)> f, double a, double
 	double hy = (d-c)/(2.0*Q);
 	double hold = f(a,c)+f(b,c)+f(a,d)+f(b,d);
 	double hold2=0;
-	for(int p = 0; p<=P-1; p++)
+    //cout << f(a,c) << " " << f(b,c) << " " << f(a,d) << " " << f(b,d) << endl;
+    //cout << "d=" << d << endl;
+    for(int p = 0; p<=P-1; p++)
 		hold2+=f(a+(2*p+1)*hx,c)+f(a+(2*p+1)*hx,d);
 	hold+=4*hold2;
 	hold2=0;
+
 	for(int q = 0; q<=Q-1; q++)
 		hold2+=f(a,c+(2*q+1)*hy)+f(b,c+(2*q+1)*hy);
 	hold+=4*hold2;
