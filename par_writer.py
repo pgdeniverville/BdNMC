@@ -123,9 +123,9 @@ def write_model(f,context):
     if(model=="Dark_Photon_DM" or model == "Dark_Photon" or model=="Inelastic_Dark_Matter" or model == "Axion_Dark_Photon"):
         f.write('dark_photon_mass {}\n'.format(str(context["mv"])))
         f.write('epsilon {}\n'.format(str(context["eps"])))
-    if(model=="Dark_Photon_DM" or model=="Inelastic_Dark_Matter"):
+    if(model=="Dark_Photon_DM" or model=="Inelastic_Dark_Matter" or model == "Dark_Photon"):
         f.write('alpha_D {}\n'.format(context["alpha_D"]))
-    if(model == "Dark_Photon_DM" or model == "Axion_Dark_Photon"):
+    if(model == "Dark_Photon_DM" or model == "Axion_Dark_Photon" or model == "Dark_Photon"):
         f.write('dark_matter_mass {}\n'.format(str(context["mdm"])))
     if(model=="Axion_Dark_Photon"):
         f.write('gagg {}\n'.format(str(context["gagg"])))
@@ -212,7 +212,7 @@ def write_charm_decay(d={}, det=CHARM_decay_detector):
     write_experiment(det,context)
 
 
-pip2_default = {"proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_pip3.dat"], "signal_chan" : "NCE_nucleon", "sumlog" : "Events/pip2.dat", "outlog" : "Events/pip2_events.dat", "samplesize" : 5000, "min_scatter_energy" : 10e-6, "max_scatter_energy" : 0.05, "efficiency" : 0.8, "beam_energy" : 0.8, "n_num_target" : 0, "p_num_target" : 1, "POT" : 2e22, "pi0_per_POT" : 0.0425, "p_cross" : 30*mb, "kinetic_energy_cut" : "true"}
+pip2_default = {"proddist" : ["burmansmith"], "partlistfile" : ["data/particle_list_pip3.dat"], "signal_chan" : "NCE_nucleon", "sumlog" : "Events/pip2.dat", "outlog" : "Events/pip2_events.dat", "samplesize" : 5000, "min_scatter_energy" : 20e-6, "max_scatter_energy" : 0.05, "efficiency" : 0.8, "beam_energy" : 0.8, "n_num_target" : 0, "p_num_target" : 1, "POT" : 2e22, "pi0_per_POT" : 0.12, "p_cross" : 30*mb, "kinetic_energy_cut" : "true"}
 
 def write_pip2(d={}, det = pip2_coherent_det):
     context = pip2_default.copy()

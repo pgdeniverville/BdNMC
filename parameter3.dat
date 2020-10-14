@@ -1,4 +1,4 @@
-#Model Paramaters
+#Model Parameters
 epsilon 0.001
 dark_matter_mass 0.2
 dark_photon_mass 0.6
@@ -10,7 +10,7 @@ samplesize 1000
 POT 2e+20
 pi0_per_POT 1.8
 
-
+model Inelastic_Dark_Matter
 production_channel eta_decay
 production_distribution bmpt
 meson_per_pi0 0.078

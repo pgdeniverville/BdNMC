@@ -68,6 +68,7 @@ double SimpsonCubature_adapt(std::function<double(double,double)> f, double xmin
     int ysteps = ysteps_start;
     double estimate = SimpsonCubature(f, xmin, xmax, xsteps, ymin, ymax, ysteps);
     double estimate_2;
+    cout << "Adaptive Simpson's Cubature in progress." << endl;
     while(xsteps < _N_MAX && ysteps < _N_MAX){
         xsteps*=2;
         ysteps*=2;

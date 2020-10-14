@@ -7,6 +7,8 @@
 #include <list>
 #include <functional>
 #include <memory>
+#include <iostream>
+
 //I need DMGenerator to provide methods that can be called by its subclasses to implement commonly used code. I should make a DMGenerator.cpp file to hold it.
 //DMGenerator would be more accurately described as new physics generator.
 class DMGenerator{

@@ -30,6 +30,8 @@ const double off_shell_ratio=1.8;
 const string GM_form_factor_filename = "data/delta_production_form_factor.dat";
 
 bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
+    cout << "Made it here.\n";
+
     if(!par.Query_Map("dark_photon_mass",mass_dp)){
         std::cerr << par.Model_Name() << " requires dark_photon_mass to be defined.\n";
         return false;
@@ -57,6 +59,7 @@ bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
         std::cerr << par.Model_Name() << " requires alpha_D to be defined.\n";
         return false;
     }
+
     Evaluate_Widths();
 
     return true;

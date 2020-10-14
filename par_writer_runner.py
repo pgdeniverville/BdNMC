@@ -4,6 +4,10 @@ import sys
 import math
 import copy
 
+from itertools import product
+
+from scipy.optimize import fsolve
+
 import time
 
 _pion_decay=1
@@ -421,9 +425,12 @@ def general_eval(d_user,defaults):
             proddist.append("proton_beam")
             prodchan.append("proton_brem")
             partlistfile.append("")
-            zmin=max(3*d["dark_scalar_mass"]/BEAM_ENERGY,0.1)
-            zmax=1-zmin
-
+            if "zmax" not in d.keys():
+                zmin=max(3*d["dark_scalar_mass"]/BEAM_ENERGY,0.1)
+                zmax=1-zmin
+            else:
+                zmin = d["zmin"]
+                zmax = d["zmax"]
             executing=True
 
 
@@ -1210,16 +1217,14 @@ def execute_pip2(genlist=True):
         d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 1e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_pip2.dat"], "p_num_target" : 74}
         write_pip2(d=d)
         subp.call(["./build/main","parameter_run.dat"])
-    vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    vmassarr=[10]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
     for marr in massarr:
         pip2_angle=0
-        #d={"POT" : 2e22, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 1e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "max_trials" : -1}
-        d={"POT" : 2e22, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "Pion_Inelastic", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0_pi0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "max_trials" : -1}
-        pip2_eval(d)
-        d.update({"sumlog" : "Events/pip2_30_pi0.dat", "det_switch" : "pip2_30"})
-        pip2_eval(d)
-        d.update({"sumlog" : "Events/pip2_90_pi0.dat","det_switch" : "pip2_90"})
+        d={"POT" : 1.125e24, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_50kev_fermion.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 0.8, "burn_max" : 1000, "max_trials" : -1}
+        #d={"POT" : 1.125e24, "mv" : marr[0], "alpha_D" : 0.5, "mdm1" : marr[1], "mdm2" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_nucleon", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_50kev_fermion.dat", "model" : "Inelastic_Dark_Matter", "output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 0.8, "burn_max" : 1000, "max_trials" : -1}
+        #d={"POT" : 1e24, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "Pion_Inelastic", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0_pi0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "max_trials" : -1}
         pip2_eval(d)
 
 def execute_lanl(genlist=True):
@@ -1228,22 +1233,26 @@ def execute_lanl(genlist=True):
         #write_lanl(d=d)
         #subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
-    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
     #vmassarr=[2,2.5,3,4,5,10,15,17,19,19.5,20.5,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
-    #massarr=[[MV,MV/3.0] for MV in vmassarr]
-    vmassarr=[5,10,20,50]
-    massarr=[[MV,MV] for MV in vmassarr]
+    massarr=[[MV,MV/3.0] for MV in vmassarr]
+    #vmassarr=[5,10,20,50]
+    #massarr=[[MV,MV] for MV in vmassarr]
     channel="NCE_nucleon"
     for marr in massarr:
-        #arr1 = np.loadtxt("data/particle_list_lujan.dat")
-        #np.random.shuffle(arr1)
-        #np.savetxt("data/particle_list_lujan.dat",arr1)
-        #d={"POT" : 2e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM_high.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
+        arr1 = np.loadtxt("data/particle_list_lujan.dat")
+        np.random.shuffle(arr1)
+        np.savetxt("data/particle_list_lujan.dat",arr1)
+        d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM_50kev.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
+        lanl_eval(d)
+        d.update({"min_scatter_energy" : 250e-6, "sumlog" : "Events/CCM_250kev.dat"})
+        lanl_eval(d)
+        d.update({"min_scatter_energy" : 500e-6, "sumlog" : "Events/CCM_500kev.dat"})
+        lanl_eval(d)
         #lanl_eval(d)
         #d={"POT" : 2e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
-        d={"POT" : 1e21,"mv" : marr[0], "alpha_D" : 0, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 100000, "sumlog" : "Events/CCM_DP.dat","outlog" : "Events/CCM_DP_{}mev.dat".format(str(marr[0])),"model" : "Dark_Photon","output_mode" : "dm_detector_distribution", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 10, "burn_max" : 1000, "max_trials" : -1, "signal_chan" : "Signal_Decay", "particle_list_position" : "true"}
-        lanl_eval(d)
+        #d={"POT" : 2.5e22,"mv" : marr[0], "alpha_D" : 0, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 100000, "sumlog" : "Events/CCM_DP.dat","outlog" : "Events/CCM_DP_{}mev.dat".format(str(marr[0])),"model" : "Dark_Photon","output_mode" : "dm_detector_distribution", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 10, "burn_max" : 1000, "max_trials" : -1, "signal_chan" : "Signal_Decay", "particle_list_position" : "true"}
         #d.update({"alpha_D" : 0.1})
         #lanl_eval(d)
         #d={"mv" : marr[0], "alpha_D" : 1e-3, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channelb, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/lanl20_b.dat"}
@@ -1251,38 +1260,118 @@ def execute_lanl(genlist=True):
         #d={"mv" : marr[0], "alpha_D" : 1e-3, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channelb, "det_switch" : "lanl_far", "samplesize" : 2000, "sumlog" : "Events/lanl40_b.dat"}
         #lanl_eval(d)
 
+r1, r2 = 0.1, 0.1 # bremsstrahlung kinematic conditions are satisfied to 10%
+
+m_p=0.9383
+
+def zMax(z,m_S,E_beam,r1):
+    P_p = np.sqrt(E_beam**2 - m_p**2)
+    E_pr = np.sqrt(np.power((1-z)*P_p,2)+m_p**2)
+    E_s = np.sqrt(np.power(P_p*z,2) + m_S**2)
+    return (1-r1)*E_pr + (1+r1)*E_s - (1+r1)*E_beam
+
+def zMax_del(z,m_S,E_beam,r2):
+    P_p = np.sqrt(E_beam**2 - m_p**2)
+    E_pr = np.sqrt(np.power((1-z)*P_p,2)+m_p**2)
+    E_s = np.sqrt(np.power(P_p*z,2) + m_S**2)
+    return (1-r2)*E_pr + E_s - E_beam - r2*m_p
+
+def pTMax(pT,z,m_S,E_beam,r1):
+    P_p = np.sqrt(E_beam**2 - m_p**2)
+    E_pr = np.sqrt(np.power((1-z)*P_p,2)+np.power(pT,2)+m_p**2)
+    E_s = np.sqrt(np.power(z*P_p,2)+np.power(pT,2)+m_S**2)
+    return E_pr*(1-r1) + (1+r1)*E_s - (1+r1)*E_beam
+
+def pTMax_del(pT,z,m_S,E_beam,r2):
+    P_p = np.sqrt(E_beam**2 - m_p**2)
+    E_pr = np.sqrt(np.power((1-z)*P_p,2)+np.power(pT,2)+m_p**2)
+    E_s = np.sqrt(np.power(z*P_p,2)+np.power(pT,2)+m_S**2)
+    return (1-r2)*E_pr + E_s - E_beam - r2*m_p
+
+def bounds_pT(z,m_S,E_beam,r1,r2):
+    P_p = np.sqrt(E_beam**2 - m_p**2)
+    return [0,np.minimum(fsolve(pTMax,5,(z,m_S,E_beam,r1))[0],fsolve(pTMax_del,5,(z,m_S,E_beam,r2))[0])]
+
+def bounds_z(m_S,E_beam,r1,r2):
+    P_p = np.sqrt(E_beam**2 - m_p**2)
+    return [np.maximum(0,np.maximum(fsolve(zMax,0,(m_S,E_beam,r1))[0],fsolve(zMax_del,0,(m_S,E_beam,r2))[0])),np.minimum(fsolve(zMax,0.5,(m_S,E_beam,r1))[0],fsolve(zMax_del,0.5,(m_S,E_beam,r2))[0])]
+
+
 def execute_nucal(genlist=True):
     d_list=[]
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_nucal.dat"]}
         write_nucal(d=d)
         subp.call(["./build/main", "parameter_run.dat"])
-    #vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
-    #vmarr=[10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,90,100,115,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2100,2250,2400,2500]
-    #,2750,3000,3500,4000,4500,5000,5500,6000]
-    massarr=[0.100]
-    #vmarr=[71,72,73,74,4550,4600,4650,4700,4750,4800,4850,4900,4950]
-    #vmarr=[4500+x for x in range(50,500,50)]
-    #vmarr=[1.1,1.075,1.05,1.04,1.03,1.15,1.2,1.3,1.4,1.5,1.7,1.9,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150, 175,200,225,250,275,300,325,350,375,400,405,410,415,420,700,770,800,405,410,415,420,460,470,480,490,500,550,600, 650,700,770,800,725,750,760,765,767,772,775,790,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960, 970,980,990,1000]
-    #massarr=[[mv,mv/3.0,1.05*mv/3.0] for mv in vmarr]
+    vmarr=[1.15,1,1.2,1.3,1.5,2,3,4,5,10,15,20,30,40,60,80,100,130,140,150,200,250,300,400,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000]
+    #vmarr=[425,430,440,450,500,540,550,560,600,700,725,750,760,765,767,770,772,775,780,790,800,900,1000,1100,1200,1300,1400,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000,100000]
+    #vmarr=np.array([3,4,5,10,15,20,30,40,60,80,100,130,140,150, 175,200,225,250,275,300,325,350,375,400,450,500,550,600,650,700,750,800,850,900,950,1000])*1e-3;
+    #vmarr=np.array([1.1,1.2,1.3,1.4,1.5,1.7,1.9,2])*1e-3
+    #vmarr=np.array([225,250,275,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1200,1300,1400,1500])*1e-3
+    #vmarr=np.array([200,205,206,207,208,209,210,211,212,213,214,215,220])*1e-3
+    #,1.075,1.05,1.04,1.03,1.15,
+    #vmarr=np.array([100,150,75])*1e-3
+    #mass_rat=5;
+    #Delta=0.1;
+    #massarr=[[mv,mv/mass_rat,(1+Delta)*mv/mass_rat] for mv in vmarr]
     #massarr=[[mv,mv/2.5,1.4*mv/2.5] for mv in vmarr]
     #massarr=[[mv,mv,1e-7] for mv in vmarr]
     #d=({"signal_chan" : "Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000, "sumlog" : "Visible_Dark_Photon/nucal_events.dat", "model" : "Dark_Photon", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "weighted" : "true"});
-    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events2.5/nucal_decay.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
-    d=({"channels" : [_brem], "signal_chan" : "Scalar_Signal_Decay", "samplesize" : 1000, "sumlog" : "Dark_Scalar/nucal_decay.dat", "model" : "Dark_Scalar", "min_scatter_energy" : 10, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "epsilon_l" : 1e-2, "epsilon_q" : 1.2e-2, "epsilon_W" : 1.2e-2, "weighted" : 'true', "efficiency" : 0.7})
-    for ms in massarr:
+    #d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal{}_{}_decay.dat".format(str(mass_rat),str(Delta)), "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    #d=({"channels" : [_brem], "signal_chan" : "Scalar_Signal_Decay", "samplesize" : 50000, "sumlog" : "Dark_Scalar/nucal_decay.dat", "model" : "Dark_Scalar", "min_scatter_energy" : 10, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "epsilon_l" : 1e-4, "epsilon_q" : 1.2e-2, "epsilon_W" : 1.2e-2, "weighted" : 'true', "efficiency" : 0.7,"output_mode" : "comprehensive"})
+    #for marr in massarr:
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal_aD0.5_Delta_0.05/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.5})
         #nucal_eval(d)
         #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[1]*1.1, "outlog" : "IDM_Events/nucal_aD0.1_Delta_0.1/nucal_{}_{}.dat".format(marr[0],marr[2]), "alpha_D" : 0.1})
+        #d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal{}_aD0.1_Delta{}/nucal_{}_{}.dat".format(str(mass_rat),str(Delta),marr[0],round(marr[2],2)), "alpha_D" : 0.1})
         #nucal_eval(d)
-        d.update({"dark_scalar_mass" : ms, "outlog" : "Dark_Scalar/nucal/nucal_{}.dat".format(ms)})
-        #d.update({"mv" : marr[0],"mdm" : marr[1], "eps" : marr[2], "outlog" : "Visible_Dark_Photon/nucal/nucal_decays_{}_{}.dat".format(marr[0],marr[2])})
-        general_eval(d,nucal_defaults)
-    #massarr=[[mv,mv/2.5,1.4*mv/2.5] for mv in vmarr]
-    #for marr in massarr:
-    #    d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events2.5/nucal_aD0.1_Delta0.4/nucal_{}_{}.dat".format(marr[0],marr[2]),"alpha_D" : 0.1})
-    #    nucal_eval(d)
+    '''
+    d_list=[]
+    for ms in vmarr:
+        d.update({"dark_scalar_mass" : ms, "outlog" : "Dark_Scalar/nucal/nucal_{}.dat".format(ms), "zmin" : bounds_z(ms,70,r1,r2)[0], "zmax" : bounds_z(ms,70,r1,r2)[1], "ptmax" : 3})
+        d_list.append(copy.deepcopy(d))
+    pool = Pool(processes=4)
+    pool.starmap(general_eval,product(d_list,[nucal_defaults]))
 
+    #general_eval(d,nucal_defaults)
+    '''
+    mass_rat=3;
+    Delta=0.05;
+    massarr=[[mv,mv/mass_rat,(1+Delta)*mv/mass_rat] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal{}_{}_decay.dat".format(str(mass_rat),str(Delta)), "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal{}_aD0.1_Delta{}/nucal_{}_{}.dat".format(str(mass_rat),str(Delta),marr[0],round(marr[2],2)), "alpha_D" : 0.1})
+        nucal_eval(d)
+    '''
+    mass_rat=3;
+    Delta=0.1;
+    massarr=[[mv,mv/mass_rat,(1+Delta)*mv/mass_rat] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal{}_{}_decay.dat".format(str(mass_rat),str(Delta)), "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal{}_aD0.1_Delta{}/nucal_{}_{}.dat".format(str(mass_rat),str(Delta),marr[0],round(marr[2],2)), "alpha_D" : 0.1})
+        nucal_eval(d)
+    '''
+    mass_rat=3;
+    Delta=0.2;
+    massarr=[[mv,mv/mass_rat,(1+Delta)*mv/mass_rat] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal{}_{}_decay.dat".format(str(mass_rat),str(Delta)), "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal{}_aD0.1_Delta{}/nucal_{}_{}.dat".format(str(mass_rat),str(Delta),marr[0],round(marr[2],2)), "alpha_D" : 0.1})
+        nucal_eval(d)
+    '''
+    Delta=0.4;
+    massarr=[[mv,mv/mass_rat,(1+Delta)*mv/mass_rat] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal{}_{}_decay.dat".format(str(mass_rat),str(Delta)), "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal{}_aD0.1_Delta{}/nucal_{}_{}.dat".format(str(mass_rat),str(Delta),marr[0],round(marr[2],2)), "alpha_D" : 0.1})
+        nucal_eval(d)
+    Delta=0.1
+    massarr=[[mv,100,(1+Delta)*100] for mv in vmarr]
+    d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nucal_mx100mev_{}_decay.dat".format(str(Delta)), "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 3, "max_scatter_energy" : 70, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nucal", "eps" : 1e-4, "weighted" : 'true'});
+    for marr in massarr:
+        d.update({"mv" : marr[0],"mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nucal_mx100mev_aD0.1_Delta{}/nucal_{}_{}.dat".format(str(Delta),marr[0],round(marr[2],2)), "alpha_D" : 0.1})
+        nucal_eval(d)
+    '''
 def execute_charm(genlist=True):
     if genlist:
         d={"prod_chan" : ["pi0_decay"],"proddist" : ["bmpt"],"samplesize" : 2e6,"output_mode" : "particle_list","partlistfile" : ["data/particle_list_charm.dat"]}

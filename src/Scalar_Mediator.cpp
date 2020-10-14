@@ -30,10 +30,10 @@ double sigma_pp(double s){
 }
 
 //This is actually just the splitting probability, which is all we need if we assume that all protons interact with the target.
+
 double Scalar_Mediator::differential_splitting_probability(double z, double pT){
-	double num = pow(MASS_PROTON*(2-z),2)+pT*pT;
+	double num = z*(pow(MASS_PROTON*(2-z),2)+pT*pT);
 	double den = pow(pow(MASS_PROTON*z,2) + m_S*m_S*(1-z)+pT*pT,2);
-	//cout << pT << " " << z << " " << num << " " << den << endl;
 	return pow(g_SNN*epsilon_q,2)/(8*pi*pi)*(2*pT)*num/den;
 }
 
@@ -76,7 +76,7 @@ bool Scalar_Mediator::Set_Model_Parameters(Parameter& par){
 }
 
 void Scalar_Mediator::Report(std::ostream& out){
-    out << m_S << " " << epsilon_q << " " << epsilon_l << " " << epsilon_W << " " << S_width();
+    out << m_S << " " << epsilon_q << " " << epsilon_l << " " << epsilon_W << " " << S_width() << " ";
 }
 
 void Scalar_Mediator::Report_Model(){

@@ -251,7 +251,6 @@ int main(int argc, char* argv[]){
     cout << "Model Name = " << par->Model_Name() << endl;
     model->Report_Model();
 
-    cout << DMGen_list[0]->Channel_Name() << endl;
 
 	for(int i = 0; i<chan_count; i++){
         cout << "Production-Channel " << i+1 << " = " << DMGen_list[i]->Channel_Name();

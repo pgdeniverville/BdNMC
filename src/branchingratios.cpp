@@ -356,7 +356,7 @@ double brphi_to_Vb(double mv, double mx, double kappa, double alphaD){
 }
 
 namespace Inelastic_DM{
-    double Gamma_A_to_dm1_dm2(double mass_dp,double mass_dm1,double mass_dm2,double alpha_D){
+    double Gamma_A_to_dm1_dm2(double mass_dp, double mass_dm1,double mass_dm2,double alpha_D){
         if(mass_dp<mass_dm1+mass_dm2){
             return 0;
         }
@@ -364,8 +364,7 @@ namespace Inelastic_DM{
             return -alpha_D*one_to_two_decay::two_body_momentum(mass_dp,mass_dm1,mass_dm2)/(3*pow(mass_dp,4))*\
             (mass_dm1-mass_dm2-mass_dp)*(mass_dm1-mass_dm2+mass_dp)*(pow(mass_dm1+mass_dm2,2)+2*pow(mass_dp,2));
         }
-    }
-    
+    }    
 }
 
 namespace Dark_Scalar{

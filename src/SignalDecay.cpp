@@ -197,7 +197,7 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
             if(++attempt>500){
                 std::cerr << "Attempt to generate a decay time for particle\n";
                 Parentit->report(std::cerr);
-                std::cerr << "with lifetime " << Lifetime << " and probability " << prob << " has failed 500 times due to numerical errors. It may be necessary to choose parameters. Terminating run.";
+                std::cerr << "with lifetime " << Lifetime << " and probability " << prob << " has failed 500 times due to numerical errors. It may be necessary to choose different parameters. Terminating run.";
                 throw -1;
             }
 

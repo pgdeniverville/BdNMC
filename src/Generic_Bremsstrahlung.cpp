@@ -29,7 +29,6 @@ void Generic_Bremsstrahlung::Burn_In(int iterations){
 	for(int i =0; i < iterations; i++){
 		sample_particle(product);
 	}
-
 }
 
 void Generic_Bremsstrahlung::Toggle_Decay(std::shared_ptr<DMGenerator> decay){
@@ -44,7 +43,8 @@ void Generic_Bremsstrahlung::calc_prod_rate(){
 		prod_rate=0;
 	}
 	else{
-		prod_rate = SimpsonCubature(split_dist,ZMIN,ZMAX,100,PTMIN,PTMAX,100);
+		prod_rate = SimpsonCubature_adapt(split_dist,ZMIN,ZMAX,100,PTMIN,PTMAX,100,0.01);
+		//prod_rate = RandomIntegrate2(split_dist,ZMIN,ZMAX,PTMIN,PTMAX,1e6);
 	}
 	pmax = split_dist(ZMIN,PTMIN);
 }
