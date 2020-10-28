@@ -117,6 +117,14 @@ def lanl_eval(d_user):
             partlistfile.append("")
             particle_list_position.append("false")
             executing = True
+    elif signal_channel=="NCE_electron":
+        if MX/1000.0<mpi0/2.0 and _pion_decay in channels:
+            proddist.append("particle_list")
+            prodchan.append("pi0_decay")
+            #partlistfile.append("data/particle_list_lanl.dat")
+            partlistfile.append("data/particle_list_lujan.dat")
+            particle_list_position.append("true")
+            executing = True
     elif signal_channel=="NCE_nucleon_baryonic":
         if MX/1000.0<mpi0/2.0 and MV<600.0 and _pion_decay in channels:
             proddist.append("particle_list")
@@ -1227,13 +1235,16 @@ def execute_pip2(genlist=True):
         #d={"POT" : 1e24, "mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "Pion_Inelastic", "det_switch" : "pip2", "samplesize" : 3000, "sumlog" : "Events/pip2_0_pi0.dat", "model" : "Dark_Photon", "output_mode" : "summary", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "max_trials" : -1}
         pip2_eval(d)
 
+CCM_EFFICIENCY=0.8;
+
 def execute_lanl(genlist=True):
     #if genlist:
         #d={"prod_chan" : ["pi0_decay"], "proddist" : ["burmansmith"], "samplesize" : 1e6, "output_mode" : "particle_list", "partlistfile" : ["data/particle_list_lanl.dat"], "p_num_target" : 74}
         #write_lanl(d=d)
         #subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
-    vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
+    vmassarr=[5,10,20,50]
     #vmassarr=[2,2.5,3,4,5,10,15,17,19,19.5,20.5,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
@@ -1241,15 +1252,19 @@ def execute_lanl(genlist=True):
     #massarr=[[MV,MV] for MV in vmassarr]
     channel="NCE_nucleon"
     for marr in massarr:
-        arr1 = np.loadtxt("data/particle_list_lujan.dat")
-        np.random.shuffle(arr1)
-        np.savetxt("data/particle_list_lujan.dat",arr1)
-        d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM_50kev.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
+        print(marr)
+        #print("Shuffling partilce_list")
+        #arr1 = np.loadtxt("data/particle_list_lujan.dat")
+        #np.random.shuffle(arr1)
+        #np.savetxt("data/particle_list_lujan.dat",arr1)
+        #d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM_50kev.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
+        d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "eps" : 1e-3, "efficiency" : CCM_EFFICIENCY, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lanl", "samplesize" : 20000, "sumlog" : "CCM_Events/CCM_electron.dat", "outlog" : "CCM_Events/CCM_electron_{}".format(str(marr[0])),"model" : "Dark_Photon",  "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "comprehensive", "pi0_per_POT" : 0.1145}
+        #d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "Signal_Decay", "det_switch" : "lanl", "samplesize" : 1000, "sumlog" : "CCM_Events/CCM_DP_Decays.dat","model" : "Dark_Photon", "coherent" : "false", "burn_max" : 1000, "output_mode" : "comprehensive", "pi0_per_POT" : 0.1145, "outlog" : "CCM_Events/CCM_DP_{}.dat".format(str(marr[0])),"weighted" : "true","eps" : 1e-4,"min_scatter_energy" : 0, "max_scatter_energy" : 1}
         lanl_eval(d)
-        d.update({"min_scatter_energy" : 250e-6, "sumlog" : "Events/CCM_250kev.dat"})
-        lanl_eval(d)
-        d.update({"min_scatter_energy" : 500e-6, "sumlog" : "Events/CCM_500kev.dat"})
-        lanl_eval(d)
+        #d.update({"min_scatter_energy" : 250e-6, "sumlog" : "Events/CCM_250kev.dat"})
+        #lanl_eval(d)
+        #d.update({"min_scatter_energy" : 500e-6, "sumlog" : "Events/CCM_500kev.dat"})
+        #lanl_eval(d)
         #lanl_eval(d)
         #d={"POT" : 2e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 2e-5, "max_scatter_energy" : 0.05, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
         #d={"POT" : 2.5e22,"mv" : marr[0], "alpha_D" : 0, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 100000, "sumlog" : "Events/CCM_DP.dat","outlog" : "Events/CCM_DP_{}mev.dat".format(str(marr[0])),"model" : "Dark_Photon","output_mode" : "dm_detector_distribution", "kinetic_energy_cut" : "false", "coherent" : "false", "min_scatter_energy" : 0, "max_scatter_energy" : 10, "burn_max" : 1000, "max_trials" : -1, "signal_chan" : "Signal_Decay", "particle_list_position" : "true"}
