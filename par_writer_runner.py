@@ -1244,7 +1244,7 @@ def execute_lanl(genlist=True):
         #subp.call(["./build/main","parameter_run.dat"])
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160]+[3,5,6,9]
     #vmassarr=[i for i in range(11,30,2)]+[i for i in range(30,130,10)]+[129,131,132,134,136,138,140,145,150,155,160,165,170,180,190,195,200]+[3,5,6,9]
-    vmassarr=[5,10,20,50]
+    vmassarr=[60]
     #vmassarr=[2,2.5,3,4,5,10,15,17,19,19.5,20.5,21,23,25,30,40,50,60,70,80,90,95,100,105,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,500,700,900,1000,1500,2000,3000,5000,7500,10000,100000]
     #massarr=[[MV,MX] for MV in vmassarr for MX in chimassarr]
     massarr=[[MV,MV/3.0] for MV in vmassarr]
@@ -1257,8 +1257,8 @@ def execute_lanl(genlist=True):
         #arr1 = np.loadtxt("data/particle_list_lujan.dat")
         #np.random.shuffle(arr1)
         #np.savetxt("data/particle_list_lujan.dat",arr1)
-        #d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM_50kev.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "summary", "pi0_per_POT" : 0.1145}
-        d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "eps" : 1e-3, "efficiency" : CCM_EFFICIENCY, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lanl", "samplesize" : 20000, "sumlog" : "CCM_Events/CCM_electron.dat", "outlog" : "CCM_Events/CCM_electron_{}".format(str(marr[0])),"model" : "Dark_Photon",  "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "comprehensive", "pi0_per_POT" : 0.1145}
+        d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : channel, "det_switch" : "lanl", "samplesize" : 2000, "sumlog" : "Events/CCM_events.dat","model" : "Dark_Photon","output_mode" : "summary", "kinetic_energy_cut" : "true", "coherent" : "true", "min_scatter_energy" : 5e-5, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "summary", "POT" : 2.71e21, "pi0_per_POT" : 0.1145}
+        #d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "eps" : 1e-3, "efficiency" : CCM_EFFICIENCY, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "NCE_electron", "det_switch" : "lanl", "samplesize" : 20000, "sumlog" : "CCM_Events/CCM_electron.dat", "outlog" : "CCM_Events/CCM_electron_{}".format(str(marr[0])),"model" : "Dark_Photon",  "min_scatter_energy" : 0, "max_scatter_energy" : 1, "burn_max" : 1000, "output_mode" : "comprehensive", "pi0_per_POT" : 0.1145}
         #d={"POT" : 2.25e22,"mv" : marr[0], "alpha_D" : 0.5, "mdm" : marr[1], "channels" : [_pion_decay], "signal_chan" : "Signal_Decay", "det_switch" : "lanl", "samplesize" : 1000, "sumlog" : "CCM_Events/CCM_DP_Decays.dat","model" : "Dark_Photon", "coherent" : "false", "burn_max" : 1000, "output_mode" : "comprehensive", "pi0_per_POT" : 0.1145, "outlog" : "CCM_Events/CCM_DP_{}.dat".format(str(marr[0])),"weighted" : "true","eps" : 1e-4,"min_scatter_energy" : 0, "max_scatter_energy" : 1}
         lanl_eval(d)
         #d.update({"min_scatter_energy" : 250e-6, "sumlog" : "Events/CCM_250kev.dat"})
