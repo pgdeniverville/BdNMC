@@ -23,7 +23,7 @@ all: main
 
 main : $(OBJ)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $@ $^
-	
+
 %.o : %.cpp $(DEPDIR)/%.d
 	$(COMPILE.cpp) -c $(OUTPUT_OPTION) $@ $<
 	$(POSTCOMPILE)
