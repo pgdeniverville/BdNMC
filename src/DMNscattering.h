@@ -14,6 +14,10 @@ double Ef_to_N_Theta(double E, double Ef, double mdm, double m);
 
 //Form factors
 double CoherentFormFactor(double q, double A);
+double F1N(double q);
+double F2N(double q);
+double F1P(double q);
+double F2P(double q);
 
 double RadiusFunction(double);
 

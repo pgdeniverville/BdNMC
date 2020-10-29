@@ -1,3 +1,4 @@
+
 #include "detector.h"
 #include <cmath>
 #include <vector>
@@ -34,10 +35,13 @@ double detector_sphere::Ldet (Particle &DM) {
 	double Ldetenter, Ldetexit;
     double A, B, C;	
 //cout << DM.name << " " << DM.E << " " << DM.px << " " << DM.py << " " << DM.pz << " " << DM.m << " " << DM.origin_coords[0] << " " << DM.origin_coords[1] << " " << DM.origin_coords[2] << " " << DM.origin_coords[3] << " " << DM.end_coords[0] << " " << DM.end_coords[1] << " " << DM.end_coords[2] << " " << DM.end_coords[3] << std::endl;
+
+    //cout << "Detector Report" << endl;
+    //DM.report(cout);
     b[0]=DM.px;b[1]=DM.py;b[2]=DM.pz;
 	o[0]=r[0]-DM.origin_coords[0];o[1]=r[1]-DM.origin_coords[1];o[2]=r[2]-DM.origin_coords[2];
 	/*
-	for(int i=0; i<3; i++)
+    for(int i=0; i<3; i++)
 		cout << " r" << i << "=" << r[i];
 	
 	for(int i=0; i<3; i++)
@@ -47,15 +51,17 @@ double detector_sphere::Ldet (Particle &DM) {
 	for(int i=0; i<3; i++)
 		cout << " o" << i << "=" << o[i];
 	cout << endl;	
-	*/
+    */
     A = ip(b,b);
     B = -2*ip(o,b);
     C = ip(o,o)-pow(Rdet,2);
 	
+    //cout << A << " " << B << " " << C << endl;
+
 	if((pow(B,2)-4*A*C)<0||A==0){
         return 0.0;
     }
-	
+
 	//DM.report(std::cout);
 
     Ldetenter = (-B-sqrt(pow(B,2)-4*A*C))/(2*A); 
@@ -67,6 +73,10 @@ double detector_sphere::Ldet (Particle &DM) {
 
 	if(Ldetexit<0)
 		Ldetexit=0;
+
+    if(DM.END_SET&&DM.dec_time<Ldetexit){
+        Ldetexit = DM.END_SET;
+    }
 
     if(Ldetexit>Ldetenter){
         //deprecate this as soon as possible
@@ -171,28 +181,62 @@ double detector_cylinder::Ldet (Particle &DM){
             }
         }
     }
-    //DM.report(cout); 
-    //cout << "B1 " << B1 << " B2 " << B2 << " B3 " << B3 << " B4 " << B4 << endl;
-    //cout << "b1 " << b[0] << " b2 " << b[1] << " b3 " << b[2] << endl;
-    //cout << "o1 " << o[0] << " o2 " << o[1] << " o3 " << o[2] << endl;
-    //cout << "l1 " << l[0] << " l2 " << l[1] << " l3 " << l[2] << endl;
-    //cout << "ip(b,b) " << sqrt(ip(b,b)) << endl; 
+/*
+    DM.report(cout); 
+    cout << "B1 " << B1 << " B2 " << B2 << " B3 " << B3 << " B4 " << B4 << endl;
+    cout << "b1 " << b[0] << " b2 " << b[1] << " b3 " << b[2] << endl;
+    cout << "o1 " << o[0] << " o2 " << o[1] << " o3 " << o[2] << endl;
+    cout << "l1 " << l[0] << " l2 " << l[1] << " l3 " << l[2] << endl;
+    cout << "ip(b,b) " << sqrt(ip(b,b)) << endl; 
     
-    //cout << crossings.size() << endl;
-
+    cout << crossings.size() << endl;
+*/
     if(crossings.size()==0)
         return 0.0;
     else if(crossings.size()==2){
         //cout << "Cylinder recorded a hit " << crossings[0] << " " << crossings[1] << endl;
+        //cout << "crossings " << crossings[0] << " " << crossings[1] << " " << abs((crossings[1]-crossings[0])*sqrt(ip(b,b))) << endl;
+
+        //DM.report(cout);
+
+        if(crossings[0]>crossings[1]){
+            double tmp = crossings[0];
+            crossings[0] = crossings[1];
+            crossings[1] = tmp;
+        }
+/* DEBUG STUFF
+        if(DM.END_SET){
+            cout << "DM_SET!\n";
+            DM.report(cout);
+            cout << "Decay Time = " << DM.dec_time << " Momentum  " << sqrt(ip(b,b)) << " " << DM.Momentum() << " Decay distance = " << DM.dec_time*sqrt(ip(b,b)) << " crossings= " << crossings[0] << " " <<crossings[1] << " distances = " << crossings[0]*sqrt(ip(b,b)) << " " << crossings[1]*sqrt(ip(b,b)) << endl;
+
+        }
+*/
+
+        if(DM.END_SET&&DM.dec_time<crossings[1]){
+            if(DM.dec_time<crossings[0]){
+                //cout << "Miss due to early decay\n";
+                return 0.0;
+            }
+            crossings[1]=DM.dec_time;
+        }
+
         DM.crossing[0] = crossings[0];
         DM.crossing[1] = crossings[1];
+        
         //cout << DM.crossing[0] << endl;
         //DM.report(cout); 
         //cout << "crossing0 " << crossings[0]*sqrt(ip(b,b))  <<  " L " << (crossings[1]-crossings[0])*sqrt(ip(b,b)) << endl;
+        //DM.report();
+        //cout << "det_int=" << abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b))) << endl;
         return abs((DM.crossing[1]-DM.crossing[0])*sqrt(ip(b,b)));
     }
     else if(crossings.size()==1){
+        if(DM.END_SET&&DM.dec_time<crossings[0])
+            crossings[0]=DM.dec_time;
         DM.crossing[1] = crossings[0];
+        //DM.report();
+        //cout << "det_int=" << crossings[0]*sqrt(ip(b,b)) << endl;
         return crossings[0]*sqrt(ip(b,b));
     }
     else
@@ -224,20 +268,15 @@ detector_cuboid::detector_cuboid(double x, double y, double z, double detwidth, 
     face_dist[0]=detwidth;
     face_dist[1]=detheight;
     face_dist[2]=detlength;
-    //dim[0]=pow(detwidth/2.0,2);
-    //dim[1]=pow(detheight/2.0,2);
-    //dim[2]=pow(detlength/2.0,2);
     for(int i = 0; i<3; i++){
         XYX_rotate(detPhi,detTheta,detPsi,face[i]);
         for(int j=0; j<3; j++)
             face[i+3][j]=-face[i][j];
-    }
-   /* 
+    }/*
     for(int i=0; i<6; i++){
       cout << face[i][0] << " " <<face[i][1] << " " <<face[i][2] << endl;
     }
-    */
-
+*/
 }
 
 double detector_cuboid::Ldet (Particle &DM){
@@ -278,7 +317,7 @@ double detector_cuboid::Ldet (Particle &DM){
         double bot1 = ip(b,face[i]);
         if(bot1==0){
             double dist=(ip(face[i],face[i])+ip(o,face[i]))/face_dist[i]*2;
-            //cout << "dist1 = " << dist << endl;
+      //      cout << "dist1 = " << dist << endl;
             if(dist<0){
                 dist*=-1;
             }
@@ -289,7 +328,7 @@ double detector_cuboid::Ldet (Particle &DM){
             if(dist<0){
                 dist*=-1;
             }
-            //cout << "dist2 = " << dist << endl;
+        //    cout << "dist2 = " << dist << endl;
             if(dist>face_dist[i]){
                 return 0.0;
             }
@@ -301,9 +340,15 @@ double detector_cuboid::Ldet (Particle &DM){
         double detc1 = ft1/bot1;
         double detc2 = ft2/ip(b,face[i+3]);
         bool enter=false;
-        //cout << "i=" << i << " ft1=" << ft1 << " ft2=" << ft2 << " detc1= " << detc1 << " detc2=" << detc2 << endl; 
+        // cout << "i=" << i << " ft1=" << ft1 << " ft2=" << ft2 << " detc1= " << detc1 << " detc2=" << detc2 << endl; 
+        //  Particle DM_test(DM);
+        //  DM_test.Generate_Position(detc1);
+        //  DM_test.report();
+        //  Particle DM_test2(DM);
+        //  DM_test.Generate_Position(detc2);
+        //  DM_test.report();
         if(ft1<=0){
-            //cout << "Entry found\n";
+           // cout << "Entry found\n";
             enter=true;
         }
         else if(ft2<=0){
@@ -316,7 +361,7 @@ double detector_cuboid::Ldet (Particle &DM){
         if(enter){
             if(detc1>detc2){//Every entry face has an opposite exit face.
                 //cout << "This one should return zero! " << detc1 << ">" << detc2 << endl;
-                //zero_later=true; 
+                //zero_later=true;
                 return 0.0;
             }
             if(detc1>entry){
@@ -335,46 +380,11 @@ double detector_cuboid::Ldet (Particle &DM){
             exit=detc2;
         }
     }  
-/*
-    for(int i=0; i<6; i++){
-        double bot = ip(b,face[i]);
-        //cout << "i=" << i << endl;
-        //cout << "bot=" << bot << endl;
-        if(bot==0){
-            continue;
-        }
-        double ft = ip(o,face[i])+ip(face[i],face[i]);
-        //cout << "ft" << i << "= " << ft << endl;
-        //cout << face[i][0] << " " << face[i][1] << " " << face[i][2] << endl;
-        //cout << ip(o,face[i]) << endl;
-        //cout << ip(face[i],face[i]) << endl;
-        
-        if(ft==0){
-            continue;
-        }
-        double detcross=ft/bot;
-        //cout << "detcross=" << detcross << endl;
-        
-        if(ft<0){
-            cout << "entry"<< endl;
-            if(detcross<0){
-                return 0.0;
-            }
-            if(detcross>entry){
-                entry=detcross;
-            }
-        }
-        else if(detcross>0){
-            cout << "exit" << endl;
-            if(exit==0||detcross<exit){
-                exit=detcross;
-            }
-        }      
-    }*/
-    //cout << "exit=" << exit << " entry=" << entry << endl;
-   /* if(zero_later){
-        return 0.0;
-    } */ 
+
+    //cout << entry << " " << exit << endl;
+
+    if(DM.END_SET&&DM.dec_time<exit)
+        exit = DM.dec_time;
     if(entry>=exit||entry<0)
         return 0.0;
     else{

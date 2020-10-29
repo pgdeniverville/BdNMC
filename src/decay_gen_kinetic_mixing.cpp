@@ -88,12 +88,13 @@ bool pion_decay_gen::GenDM(std::list<Particle>& vec, std::function<double(Partic
     }
     else
         DecayDM(darkmatter1, darkmatter2, darkphoton, meson);
-/*
+/*    
     darkmatter1.report(cout);
     darkmatter2.report(cout);
     darkphoton.report(cout);
     meson.report(cout);
-*/
+  */  
+    
     vec.push_back(meson);
  	intersect1=det_int(darkmatter1);
     intersect2=det_int(darkmatter2);

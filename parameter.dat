@@ -8,6 +8,8 @@
 #Give your run a name. If no name is supplied, one will be generated from the current time.
 #run 14506
 
+model Dark_Photon
+
 #Model Parameters
 epsilon 1e-3
 dark_matter_mass 0.005
@@ -87,7 +89,7 @@ production_distribution pi0_sanfordwang
 
 #Scattering Parameters
 #Choose from NCE_nucleon, NCE_electron, Pion_Inelastic, Inelastic_Delta_to_Gamma or NCE_nucleon_baryonic.
-signal_channel NCE_nucleon
+signal_channel NCE_electron
 #scatter_dist_filename Source/data/DIS.dat
 
 #Add this line to use coherent scattering rather than incoherent scattering.

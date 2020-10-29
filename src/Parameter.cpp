@@ -1,3 +1,4 @@
+
 #include "Parameter.h"
 #include <vector>
 #include <map>
@@ -64,8 +65,6 @@ void parse_parameter_file(const string &filename, map<string, string> &parammap)
 
 }//end of parse_parameter_file
 
-
-
 bool production_channel::query_dist_param(const string &key, double &var){
     try{
         if(dist_param_map.count(key)==1){
@@ -83,6 +82,7 @@ bool production_channel::query_dist_param(const string &key, double &var){
 production_distribution::production_distribution(){
 	dist_mod = "";
 }
+
 double production_distribution::get_offset(int i){
 	if(i>3||i<0){
 		std::cerr << "Out of domain for get_offset\n";
@@ -147,13 +147,18 @@ production_channel::production_channel(){
 	particle_list_file="";
    	sanfordwang_file="";
    	parton_V_n_file=""; 
-	parton_V_p_file=""; 
-	meson_per_pi0=-1; 
+	parton_V_p_file="";
+	meson_per_pi0=1; 
 	PTMAX=-1; 
 	PTMIN=0;
     ZMIN=-1;
    	ZMAX=-1;
 	particle_list_position=false;
+    tolerance=5e-2;
+    energy_bins=100;
+    QMIN=1.3;
+    max_meson_mom=-1;
+    num_per_pot=0;
 	dist_mods = std::unique_ptr<list<production_distribution> > (new list<production_distribution>);
 }
 
@@ -198,7 +203,15 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.parton_V_n_file=val;
 			else if(key==parton_V_proton_file_key)
 				tmpprod.parton_V_p_file=val;
-			else if(key==zmax_key)
+            else if(key==proton_pdf_file_key)
+                tmpprod.proton_pdf_file=val;
+            else if(key==neutron_pdf_file_key)
+                tmpprod.neutron_pdf_file=val;
+            else if(key==prod_tolerance_key)
+                tmpprod.tolerance=stod(val);
+			else if(key==energy_bins_key)
+                tmpprod.energy_bins=stod(val);
+            else if(key==zmax_key)
 				tmpprod.ZMAX=stod(val);
 			else if(key==zmin_key)
 				tmpprod.ZMIN=stod(val);
@@ -206,9 +219,16 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				tmpprod.PTMAX=stod(val);
             else if(key==ptmin_key)
                 tmpprod.PTMIN=stod(val);
-			else if(key==part_list_pos_key){
-				if(lowercase(val)=="true")
+			else if(key==qmin_key)
+                tmpprod.QMIN=stod(val);
+            else if(key==meson_per_pi0_key)
+                tmpprod.meson_per_pi0=stod(val);
+            else if(key==Num_per_POT_key)
+                tmpprod.num_per_pot=stod(val);
+            else if(key==part_list_pos_key){
+				if(lowercase(val)=="true"){
 					tmpprod.particle_list_position=true;
+                }
 			}
 			else if(key == sanford_wang_key || key == distribution_parameter_key){
 				parse_parameter_file(val, tmpprod.dist_param_map);
@@ -218,9 +238,10 @@ production_channel parse_production_channel(std::ifstream &instream, string &hol
 				(tmpprod.dist_mods)->push_back(parse_distribution_mod(instream, hold, key, val, line_num, error_state, last_pos));
 				instream.seekg(last_pos);
                 continue;
-
-			//	cout << hold << endl;
 			}
+            else if(key==max_meson_mom_key){
+                tmpprod.max_meson_mom=stod(val);
+            }
 			else{
 				line_num--;
 				break;
@@ -307,6 +328,7 @@ Parameter::Parameter(std::ifstream &instream){
         integrity=0;
         while(getline(instream, hold)){
 			line_num++;
+            //cout << line_num << ": " << hold << endl;
 			//cout << "Position: " << instream.tellg() << endl;
 			//cout << "parameter parser line " << line_num << ": " << hold << endl;
             if((error_state=split_string(hold, key, val))==0);
@@ -342,9 +364,10 @@ Parameter::Parameter(std::ifstream &instream){
         for(vector<_material>::iterator it = mat_vec.begin(); it != mat_vec.end(); ++it){
             det->add_material(it->n_density, it->p_num, it->n_num, it->e_num,it->mass,it->name);
         }
-        Set_String(modelkey,model_name,keymap,"Hidden_Sector_DM");
+        Set_String(modelkey,model_name,keymap,"Dark_Photon");
         Set_Model_Parameters(keymap);    
         Set_Double(POTkey, POT, keymap);
+        Set_Double(min_event_key,min_event,keymap,-1.0);
 		Set_Double(pi0_ratio_key,pi0ratio,keymap,0.9);
 		Set_Integer("samplesize", samplesize, keymap);
         //Production Channel
@@ -360,7 +383,9 @@ Parameter::Parameter(std::ifstream &instream){
             cerr << "No signal channel selected\n";
             integrity=-1;
         }
-        Set_Bool(coherent_key, coherent, keymap, false); 
+        Set_Bool(coherent_key, coherent, keymap, false);
+        Set_Bool(kinetic_energy_cut_key,kinetic_energy_cut,keymap,false);
+        Set_Bool(weighted_key, weighted, keymap, false); 
 		Set_String(output_mode_key, output_mode, keymap, out_mode_def);	
 		Set_String(run_key, run_name, keymap, std::to_string(time(NULL)));	
 		for(list<production_channel>::iterator iter = prodlist->begin(); iter!=prodlist->end(); iter++)
@@ -403,10 +428,9 @@ Parameter::Parameter(std::ifstream &instream){
 		Set_Integer(repeat_key, repeat, keymap, 1);
 		Set_Integer(seed_key, seed, keymap, -1);
 		
-		Set_Integer(max_trials_key,max_trials,keymap,-1);
+		Set_Long(max_trials_key,max_trials,keymap,-1);
 
 		Set_Double(efficiency_key, efficiency, keymap, 1.0);
-		Set_Double(meson_per_pi0_key, meson_per_pi0, keymap, -1.0);
 		//output file
         if(keymap.count(outkey)==1){
             output_file = keymap[outkey];
@@ -563,6 +587,23 @@ void Parameter::Set_Integer(const string &key, int &var, map<string, string> &ke
     }
 }
 
+void Parameter::Set_Long(const string &key, long long int &var, map<string, string> &keymap){
+    try{
+        if(keymap.count(key)==1){
+            var = stoll(keymap[key]);
+        }
+        else{
+            cerr << key << " not set." << endl;
+            integrity = -1;
+        }
+    }
+    catch(exception& e){
+            cerr << "Invalid model parameter: " << key << endl;
+            integrity = -1;
+    }
+}
+
+
 void Parameter::Set_Integer(const string &key, int &var, map<string, string> &keymap, const int &def){
     try{
         if(keymap.count(key)==1){
@@ -577,6 +618,22 @@ void Parameter::Set_Integer(const string &key, int &var, map<string, string> &ke
             integrity = -1;
     }
 }
+
+void Parameter::Set_Long(const string &key, long long int &var, map<string, string> &keymap, const long long int &def){
+    try{
+        if(keymap.count(key)==1){
+            var = stoll(keymap[key]);
+        }
+        else{
+            var = def;
+        }
+    }
+    catch(exception& e){
+            cerr << "Invalid model parameter: " << key << endl;
+            integrity = -1;
+    }
+}
+
 
 void Parameter::Set_String(const string &key, string &var, map<string, string> &keymap, const string &def){
 	if(keymap.count(key)==1)
@@ -602,10 +659,10 @@ void Parameter::Set_Target_Parameters(map<string, string> &keymap){
 }
 
 void Parameter::Set_Model_Parameters(map<string, string> &keymap){
-    Set_Double(dmkey, mass_dm, keymap);
-    Set_Double(Vkey, mass_V, keymap);
-    Set_Double(epskey, epsilon, keymap);
-    Set_Double(alkey, alpha_D, keymap);
+    Set_Double(dmkey, mass_dm, keymap,0.01);
+    Set_Double(Vkey, mass_V, keymap,0.1);
+    Set_Double(epskey, epsilon, keymap,1e-3);
+    Set_Double(alkey, alpha_D, keymap,0.1);
 }
 
 bool Parameter::Query_Map(const string key, double& val){

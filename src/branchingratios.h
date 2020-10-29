@@ -1,7 +1,9 @@
 #ifndef GUARD_branchingratios_h
 #define GUARD_branchingratios_h
 
+#include <complex>
 
+double RRATIO(double sqrt_s);
 
 //KINETIC MIXING
 double bretatoVgamma(double mv, double mx, double kappa, double alphaD);
@@ -13,7 +15,6 @@ double Gamma_V(double mv, double mx, double kappa, double alphaD);
 double Gamma_V_to_leptons(double mv, double kappa, double ml);
 double Gamma_V_to_hadrons(double mv, double kappa);
 double Gamma_V_to_visible(double mv, double kappa);
-
 
 double GammaV_to_dm_dm(double mv, double mx, double kappa, double alphaD);
 double brrho_to_V(double mv, double mx, double kappa, double alphaD);
@@ -57,6 +58,9 @@ double breta_to_gamma_dm_dm_baryonic(double mv, double mx, double kappa, double 
 double bromega_to_Vb(double mv, double mx, double kappa, double alphaD);
 double brphi_to_Vb(double mv, double mx, double kappa, double alphaD);
 
+namespace Inelastic_DM{
+    double Gamma_A_to_dm1_dm2(double mass_dp,double mass_dm1,double mass_dm2, double alpha_D);
+}
 
 /*
  * This namespace is for dark photon coupled to axion. It has a lot of
@@ -76,5 +80,16 @@ namespace Ax_DP {
     double Br_dp_to_hadrons(double mA, double ma, double Gagpg, double eps, double ep);
 }
 
+namespace Dark_Scalar{
+    double betha(double m_S, double m);
+    double S_to_2leptons(double epsilon, double m_S, double m_lepton);
+    std::complex<double> form_factor(double x);
+    double S_to_2photon(double epsilon_l, double epsilon_q, double epsilon_w, double m_S);
+}
+
+//GENERIC FUNCTIONS
+
+double brem_split_pseudoscalar(double z, double pt2, double mA, double g);
+double Gamma_pseudoscalar_to_2fermion(double g, double m_parent, double m_daughter);
 
 #endif

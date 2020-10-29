@@ -1,3 +1,6 @@
+#ifndef Guard_pk
+#define Guard_pk
+
 #include <vector>
 #include <string>
 
@@ -20,13 +23,21 @@ const string prodkey = "production_channel";
 const string meson_per_pi0_key = "meson_per_pi0";
 const string parton_V_neutron_file_key = "parton_V_neutron_file";
 const string parton_V_proton_file_key = "parton_V_proton_file";
+const string proton_pdf_file_key = "proton_pdf_file_path";
+const string neutron_pdf_file_key = "neutron_pdf_file_path";
 const string sanford_wang_key = "sanfordwang_file";
 const string distribution_parameter_key = "distribution_parameter_file";
+const string Num_per_POT_key = "num_per_pot";
+const string max_meson_mom_key="max_meson_momentum";
+
 const string ptmax_key = "ptmax";
 const string ptmin_key = "ptmin";
 const string zmin_key = "zmin";
 const string zmax_key = "zmax";
 const string part_list_pos_key = "particle_list_position";
+const string prod_tolerance_key = "tolerance";
+const string energy_bins_key = "energy_bins";
+const string qmin_key = "qmin";
 
 const string dist_mod_key = "dist_mod";
 const string pos_offset_key = "position_offset";
@@ -41,6 +52,7 @@ const string epskey = "epsilon";
 const string alkey = "alpha_D";
 const string signalkey = "signal_channel";
 const string coherent_key = "coherent";
+const string weighted_key = "weighted";
 const string outkey = "output_file";
 const string sumkey = "summary_file";
 const string output_mode_key = "output_mode"; const string out_mode_def = "comprehensive";
@@ -53,8 +65,14 @@ const string repeat_key = "repeat_count";
 const string max_trials_key = "max_trials";
 const string seed_key = "seed";
 const string p_cross_key = "proton_target_cross_section";
+const string min_event_key = "min_event";
+
+const string kinetic_energy_cut_key = "kinetic_energy_cut";
+
 
 vector<string> spherearr = {"radius","x-position","y-position","z-position"};
 vector<string> cylinderarr = {"radius","length","x-position","y-position","z-position","det-theta","det-phi"};
 vector<string> cuboidarr = {"length","width","height","x-position","y-position","z-position","det-phi","det-theta","det-psi"};
 const string run_key = "run";
+
+#endif
