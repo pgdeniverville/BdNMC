@@ -1,12 +1,13 @@
 #include "constants.h"
 #include "branchingratios.h"
 #include "Scatter.h"
-#include <cmath>
 #include "decay.h"
 #include "DMgenerator.h"
 #include "Model.h"
 #include "Kinematics.h"
 #include "SignalDecay.h"
+
+#include <cmath>
 
 using std::string;
 using std::vector;
@@ -88,7 +89,6 @@ double Axion_Dark_Photon::Axion_DP_electron_Amp(double s, double t, double mA, d
     return -pow(Gagpg*G_ELEC,2)*(pow(mA,4)*(2*mR*mR+t)-2*mA*mA*t*(mR*mR+s+t)+t*(2*pow(mR*mR-s,2)+2*s*t+t*t))/2.0/t/t;
 }
 
-
 //Factor of 2*MASS_ELECTRON from change of variable to E4 from t, dt = 2 me dE4.
 double Axion_Dark_Photon::dsigma_a_to_DP(double E1lab, double E4, double mA, double mR){
     double s = two_to_two_scattering::s_lab(E1lab, 0, mR);
@@ -141,6 +141,7 @@ bool Axion_Dark_Photon::Set_Model_Parameters(Parameter& par){
         par.Query_Map("gagg", Gagg);
         par.Query_Map("gagpg", Gagpg);
         par.Query_Map("gagpgp", Gagpgp);
+        par.Query_Map("gaee", Gaee);
         return true;
     }
     return false;

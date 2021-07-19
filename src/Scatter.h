@@ -1,11 +1,12 @@
 #ifndef GUARD_scatter_h
 #define GUARD_scatter_h
-#include <iostream>
 #include "detector.h"
 #include "Particle.h"
 #include "Integrator.h"
 #include "Random.h"
 #include "DMgenerator.h"
+
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <list>

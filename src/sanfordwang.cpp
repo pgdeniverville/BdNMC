@@ -1,8 +1,9 @@
 #include "sanfordwang.h"
 #include "Random.h"
-#include <math.h>
-#include <iostream>
 #include "constants.h"
+
+#include <cmath>
+#include <iostream>
 
 using std::cout;
 using std::endl;

@@ -1,8 +1,9 @@
 #include "SignalDecay.h"
 #include "constants.h"
-#include <cmath>
 #include "Kinematics.h"
 #include "decay.h"
+
+#include <cmath>
 
 using std::list;
 using std::vector;

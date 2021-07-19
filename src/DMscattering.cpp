@@ -1,10 +1,11 @@
 #include "DMscattering.h"
-#include <cmath>
-#include <stdlib.h>
-#include <iostream>
 #include "Random.h"
 #include "Kinematics.h"
 #include "constants.h"
+
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 
 using std::cout; using std::endl;
 

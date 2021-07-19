@@ -1,5 +1,6 @@
 #include "Kinematics.h"
-#include <math.h>
+
+#include <cmath>
 #include <iostream>
 
 using std::cout; using std::endl;

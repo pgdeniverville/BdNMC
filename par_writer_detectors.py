@@ -7,6 +7,9 @@ def Cylinder(f,xpos,ypos,zpos,radius,length,theta,phi):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
 
+def Cuboid(f,xpos,ypos,zpos,width,length,height,phi,theta,psi):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
 
 def miniboone_detector(f,xpos=0.0,ypos=-1.9,zpos=491.0,radius=5.0):
     f.write("\ndetector sphere\n")
@@ -38,6 +41,18 @@ def dune_mpd_detector(f,xpos=0.0,ypos=0.0,zpos=581.0,radius=2.5, length=5, theta
     f.write('\n')
     f.write(High_pressure_argon_string)
 
+def dune_detector(f,xpos=0.0, ypos=0.0, zpos=573, width=3, height =2, length =5, theta=0, phi=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Argon_LAr_string)
+
+def dune_detector_off_axis(f,xpos=30, ypos=0.0, zpos=573, width=3, height =2, length =5, theta=0, phi=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5}\ndet-phi {6}\ndet-theta {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
+    f.write('\n')
+    f.write(Argon_LAr_string)
+
 def test_sphere(f,xpos=0.0,ypos=0.0,zpos=0.0,radius=1.0):
     f.write("\ndetector sphere\n")
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\n".format(str(xpos),str(ypos),str(zpos),str(radius)))
@@ -61,6 +76,13 @@ def test_cuboid(f,xpos=0.0,ypos=0.0,zpos=0.0,height=1.0,length=1.0,width=1.0,the
     f.write(Hydrogen_string)
     f.write('\n')
     f.write(Carbon_string)
+
+def bebc_detector(f,xpos=0.0,ypos=0.0,zpos=405,height=3.49,radius=1.23,theta=math.pi/2.0,phi=0):
+    Cylinder(f,xpos,ypos,zpos,height,radius,theta,phi)
+    f.write('\n')
+    f.write(BEBC_Hydrogen)
+    f.write('\n')
+    f.write(BEBC_Neon)
 
 MINOS_absorber_z=270
 MINOS_target_z=950
@@ -121,17 +143,19 @@ def NOvA_detector(f,xpos=0.0,ypos=NOvA_target_d*math.sin(NOvA_Target_Angle),zpos
 def NOvA_absorber_detector(f):
     NOvA_detector(f,xpos=0.0,ypos=NOvA_absorber_d*math.sin(NOvA_Absorber_Angle),zpos=NOvA_absorber_d*math.cos(NOvA_Absorber_Angle))
 
-def SBND_detector(f,xpos=0.0,ypos=0,zpos=112.0,radius=2.38,length=4.76,theta=0,phi=0):
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+def SBND_detector(f,xpos=0.457,ypos=0,zpos=110,width=4,length=5,height=4,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')
-    f.write(Argon_string)
+    #Need to figure out what it's made of!
+    f.write(Argon_LAr_string)
 
-def SBND_detector_old(f,xpos=0.0,ypos=0,zpos=62.0,width=2.38,length=4.76,theta=0,phi=0):
-    f.write("\ndetector cylinder\n");
-    f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
+def SBND_dump_detector(f,xpos=0.457,ypos=0,zpos=60,width=4,length=5,height=4,phi=0,theta=0,psi=0):
+    f.write("\ndetector cuboid\n");
+    f.write("x-position {0}\ny-position {1}\nz-position {2}\nwidth {3}\nlength {4}\nheight {5} \ndet-theta {6}\ndet-phi {7}\ndet-psi {8}".format(str(xpos),str(ypos),str(zpos),str(width),str(length),str(height),str(phi),str(theta),str(psi)))
     f.write('\n')
-    f.write(Argon_string)
+    #Need to figure out what it's made of!
+    f.write(Argon_LAr_string)
 
 SHIP_Side=1.92856
 
@@ -153,6 +177,13 @@ def t2k_ND280(f):
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\ndet-theta {4}\ndet-phi {5}\nlength {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(dettheta),str(detphi),str(length),str(length)))
     f.write('\n')
     f.write(ND280_string)
+
+#This is 2 tons of water in an FGD, really they only have 1.1 tons of material each.
+def t2k_FGD(f):
+    print("This detector doesn't have accurate geometry and is only 2 tons of material. Improve for physics running.")
+    Cuboid(f,xpos=11,ypos=0,zpos=280,width=2.3,length=0.35,height=2.4,phi=0,theta=0.0436332,psi=0)
+    f.write('\n')
+    f.write(Water_string)
 
 def t2k_superK1000(f):
     xpos=12867.7;ypos=0;zpos=294719;detphi=0;radius=190.5;dettheta=1.5708;length=410;
@@ -199,7 +230,7 @@ def coherent_detector_NaI(f,xpos=20.0,ypos=0.0,zpos=0.0,radius=0.601,length=2*0.
     f.write('\n')
     f.write(Sodium_Iodide_string)
 0.08
-def coherent_detector_CsI(f,xpos=19.6,ypos=0.0,zpos=0.0,radius=0.08,length=2*0.08,theta=pi/2.0,phi=pi/2.0):
+def coherent_detector_CsI(f,xpos=19.3,ypos=0.0,zpos=0.0,radius=0.08,length=2*0.08,theta=pi/2.0,phi=pi/2.0):
     f.write("\ndetector cylinder\n");
     f.write("x-position {0}\ny-position {1}\nz-position {2}\nradius {3}\nlength {4}\ndet-theta {5}\ndet-phi {6}\n".format(str(xpos),str(ypos),str(zpos),str(radius),str(length),str(theta),str(phi)))
     f.write('\n')
@@ -290,3 +321,12 @@ def miniboone_detector_modular(f,radius=5.0):
     f.write(Hydrogen_string)
     f.write('\n')
     f.write(Carbon_string)
+
+argoneut_Angle = 0.0523599; #3 Degrees down.
+argoneut_z = 1033;
+argoneut_y = -61;
+argoneut_x = 0;
+def argoneut_detector(f):
+    Cuboid(f,xpos=argoneut_x,ypos=argoneut_y,zpos=argoneut_z,width=0.47,height=0.4,length=0.9,phi=argoneut_Angle,theta=0,psi=0)
+    f.write('\n')
+    f.write(Argon_LAr_string)

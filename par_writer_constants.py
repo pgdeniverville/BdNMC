@@ -31,7 +31,7 @@ Empty_string = "material Vacuum\nnumber_density 0\nproton_number 0\nneutron_numb
 
 Hydrogen_string = "material Hydrogen\nnumber_density 7.26942e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
-Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneutron_number 8\nelectron_number 8\nmass 0.94578\nmaterial Hydrogen\nnumber_density 6.68368e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
+Water_string = "material Oxygen\nnumber_density 3.34184e22\nproton_number 8\nneutron_number 8\nelectron_number 8\nmass 15.999\nmaterial Hydrogen\nnumber_density 6.68368e22\nproton_number 1\nneutron_number 0\nelectron_number 1\nmass 0.945778\n"
 
 Carbon_string = "material Carbon\nnumber_density 3.63471e22\nproton_number 6\nneutron_number 6\nelectron_number 6\nmass 11.2593\n"
 
@@ -63,3 +63,7 @@ MINOS_string = "material Steel\nnumber_density 5e24\nproton_number 1\nneutron_nu
 NOvA_string = "material Liquid_Scintillator\nnumber_density 5.16e22\nproton_number 8\nneutron_number 6\nelectron_number 8\nmass 14.011"
 
 High_pressure_argon_string="material Argon\nnumber_density 1.48e20\nproton_number 18\nproton_number 18\nneutron_number 22\nelectron_number 18\nmass {0}\n".format(str(39.948*0.938))
+
+BEBC_Hydrogen = "material Hydrogen\nnumber_density 7.07e21\nproton_number 1\nneutron_number 1\nelectron_number 1\nmass 0.938"
+
+BEBC_Neon = "material Neon\nnumber_density 2.01e22\nproton_number 10\nneutron_number 10\nelectron_number 10\nmass 18.9286"

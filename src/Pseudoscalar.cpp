@@ -7,12 +7,13 @@
 #include "Proton_Brem.h"
 
 #include <memory>
-#include <math.h>
+#include <cmath>
 
 using std::cerr; using std::vector;
 using std::string; using std::function;
 using std::max; using std::min;
 using std::cout; using std::endl;
+using std::bind;
 
 using std::shared_ptr;
 

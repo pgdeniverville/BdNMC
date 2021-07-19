@@ -1,10 +1,10 @@
 #ifndef GUARD_DMscattering_h
 #define GUARD_DMscattering_h
 
-#include <memory>
-
 #include "Particle.h"
 #include "detector.h"
+
+#include <memory>
 
 double ThetaEe (double,double,double);
 double EeTheta (double,double,double);

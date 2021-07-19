@@ -2,6 +2,7 @@
 #define DISTRIBUTION_H
 
 #include "Particle.h"
+
 #include <list>
 #include <memory>
 #include <string>

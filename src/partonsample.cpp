@@ -1,11 +1,13 @@
-
-#include <vector>
 #include "Random.h"
 #include "partonsample.h"
+
 #include <iostream>
+#include <vector>
 
 using std::shared_ptr;
+
 //No error checking here! It's awful!
+
 parton_sample::parton_sample(std::string &pfilename, std::string &nfilename, double proton_n, double neutron_n){
 	pmax_n=0;
 	pmax_p=0;

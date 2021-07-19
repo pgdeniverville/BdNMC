@@ -4,8 +4,9 @@
 #include "Integrator.h"
 #include "Random.h"
 #include "Kinematics.h"
-#include <cmath>
 #include "constants.h"
+
+#include <cmath>
 
 using std::endl;
 using std::cout;

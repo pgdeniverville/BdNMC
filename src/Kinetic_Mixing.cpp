@@ -9,13 +9,14 @@
 #include "Position_Distributions.h"
 #include "branchingratios.h"
 #include "Scatter.h"
-#include <cmath>
 #include "decay.h"
 #include "DMgenerator.h"
 #include "Model.h"
 #include "Kinematics.h"
 #include "SignalDecay.h"
 #include "constants.h"
+
+#include <cmath>
 
 using std::string;
 using std::vector;
@@ -185,11 +186,11 @@ bool Kinetic_Mixing::Prepare_Production_Channel(std::string prodchoice, std::str
             prodchoice=="V_decay_baryonic"){
 		Dist->set_mass(mass_dp);
 		DMGen = std::shared_ptr<DMGenerator>(new V_decay_gen(mass_dp,mass_dm,epsilon,alpha_D,proddist));
-		 if(proddist=="proton_brem"){
+		 if(proddist=="proton_brem" or proddist=="proton_brem_baryonic"){
             if(prodchan.ptmax()<prodchan.ptmin() || prodchan.zmax() < 0 || prodchan.zmax()<prodchan.zmin() || prodchan.zmin() < 0){
                     std::cerr << "Invalid properties for production_distribution proton_brem." << endl;
                     return -1;
-            }   
+            }
             std::shared_ptr<Proton_Brem_Distribution> pbd(new Proton_Brem_Distribution(par.Beam_Energy(),epsilon,mass_dp,prodchan.ptmax(),prodchan.zmax(),prodchan.zmin(),alpha_D,proddist,prodchan.ptmin()));
             Vnum = pbd->V_prod_rate()*par.Protons_on_Target();//V_decay should return a branching ratio for this. If it doesn't, I will have to change it in the future. prodchan.Num_per_pot()
             DMGen->Set_Channel_Name("Dark_Bremsstrahlung");

@@ -131,6 +131,8 @@ def write_model(f,context):
         f.write('gagg {}\n'.format(str(context["gagg"])))
         f.write('gagpg {}\n'.format(str(context["gagpg"])))
         f.write('gagpgp {}\n'.format(str(context["gagpgp"])))
+    if(model=="Axion_Dark_Photon"):
+        f.write("axion_mass {}\n".format(str(context["axion_mass"])))
 
 #############
 #EXPERIMENTS#

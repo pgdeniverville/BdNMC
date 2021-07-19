@@ -5,6 +5,7 @@
 #include <memory>
 
 double dsigmadEdmP(double E, double Edm, double mdm, double mV, double alphaprime, double kappa);
+double dsigmadEdmP_test(double E, double Edm, double mdm, double mV, double alphaprime, double kappa, double mass);
 double dsigmadEdmP_coherent(double E, double Edm, double mdm, double mV, double alphaprime, double kappa, double A, double Z);
 double dsigmadEdmN(double E, double Edm, double mdm, double mV, double alphaprime, double kappa);
 

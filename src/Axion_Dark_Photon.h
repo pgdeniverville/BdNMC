@@ -20,9 +20,14 @@ class Axion_Dark_Photon {
         void Branching_Ratios(std::vector<double> &br){br=branching_ratios;}
         void Final_States(std::vector<std::vector<Particle> >& fl){fl=final_states;}
         void Set_Model_Parameters(Parameter* par);
+        //Axion-Photon-Photon
         double GAGG(){return Gagg;}
+        //Axion-Photon-Dark Photon
         double GAGPG(){return Gagpg;}
+        //Axion-Dark Photon-Dark Photon
         double GAGPGP(){return Gagpgp;}
+        //Axion-Electron-Electron
+        double GAEE(){return Gaee}
         //This will be expanded later to accept string arguments and
         //provide specific reports based on channel.
         void Report(std::ostream&, double tot=0);
@@ -32,6 +37,7 @@ class Axion_Dark_Photon {
         double epsilon;
         double eprime;
         double Gagg, Gagpg, Gagpgp;
+        double Gaee=0;
 
         double lifetime;
         std::vector<double> branching_ratios;

@@ -3,12 +3,12 @@
 #include "DMNscattering.h"
 #include "DMNscattering_Baryonic.h"
 #include "Kinematics.h"
-#include <cmath>
-#include <iostream>
 #include "Random.h"
-#include <algorithm>
 #include "constants.h"
 
+#include <cmath>
+#include <iostream>
+#include <algorithm>
 
 const double mp = MASS_PROTON;
 const double mn = MASS_NEUTRON;

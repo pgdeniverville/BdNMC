@@ -1,11 +1,12 @@
 #ifndef GUARD_SignalDecay_h
 #define GUARD_SignalDecay_h
 
-#include <iostream>
 #include "detector.h"
 #include "Particle.h"
 #include "Random.h"
 #include "Scatter.h"
+
+#include <iostream>
 #include <vector>
 #include <list>
 #include <string>

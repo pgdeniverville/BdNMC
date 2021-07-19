@@ -1,12 +1,12 @@
 #include "Random.h"
 #include "Proton_Brem_Distribution.h"
-#include <math.h>
-#include <iostream>
-#include <functional>
 #include "Integrator.h"
 #include "branchingratios.h"
 #include "constants.h"
 
+#include <cmath>
+#include <iostream>
+#include <functional>
 #include <complex>
 
 using std::complex;
@@ -34,6 +34,7 @@ Proton_Brem_Distribution::Proton_Brem_Distribution(double Beam_E, double epsilon
 	sppM = pow(2*mp+Mpp,2);
 	set_mass(mA);
 	calc_V_prod_rate();
+	cout << model << endl;
 }
 
 //Total proton-proton scattering cross section

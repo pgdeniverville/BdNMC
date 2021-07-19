@@ -1,13 +1,14 @@
 #include "Scatter.h"
 #include "DMscattering.h"
-#include <cmath>
-#include <stdlib.h>
-#include <iostream>
 #include "Random.h"
 #include "Kinematics.h"
-#include <algorithm>
 #include "constants.h"
+
 #include <list>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 
 
 using std::list;

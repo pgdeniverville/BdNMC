@@ -1,5 +1,6 @@
 
 #include "detector.h"
+
 #include <cmath>
 #include <vector>
 #include <iostream>

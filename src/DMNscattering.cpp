@@ -1,9 +1,9 @@
 //#include "Event.h"
 #include "DMNscattering.h"
-
-#include <iostream>
 #include "Kinematics.h"
 #include "constants.h"
+
+#include <iostream>
 
 //All masses are defined in terms of GeV.
 const double mp = MASS_PROTON;
@@ -20,7 +20,7 @@ const double aMP [7] = { 1 , 3.104 , 1.428 , 0.1112 , -0.006981 , 0.0003705, -0.
 const double aMN [7] = { 1, 3.043, 0.8548 , 0.6806, -0.1287, 0.008912, 0};
 const double GEP0 = 1; const double GMP0 = mup; const double GMN0 = mun;
 
-const double suppression_constant = 1.0;
+const double suppression_constant = 0.9;
 
 double A(double, double, double, const double);
 double B(double, double, double, const double);
@@ -46,19 +46,36 @@ using std::cout; using std::endl;
 const double R_a=0.52;
 const double R_s=0.9;
 
+//static bool DEBUG_FORM_FACTOR = true;
+
+
+double RadiusFunction(double A){
+    return sqrt(pow(1.23*pow(A,1.0/3.0)-0.6,2)+7.0/3.0*pow(pi*R_a,2)-5*pow(R_s,2))/0.197;
+}
+/*
 double RadiusFunction(double A){
     return sqrt(pow(1.23*pow(A,1.0/3.0)-0.6,2)+7.0/3.0*pow(pi*R_a,2)-5*pow(R_s,2));
 }
-
+*/
 double BesselJ1(double x){
     return (sin(x)/x-cos(x))/x;
 }
 
+
+//Should check if I should be using exp(-s q) with s = 1/0.197
+/*
 double CoherentFormFactor(double q, double A){
     if(q==0)
         return 1.0;
     return 3.0/(q*RadiusFunction(A))*BesselJ1(q*RadiusFunction(A))*exp(-suppression_constant*q*q/2.0);
 }
+*/
+double CoherentFormFactor(double q, double A){
+    if(q==0)
+        return 1.0;
+    return 3.0/(q*RadiusFunction(A))*BesselJ1(q*RadiusFunction(A))*exp(-pow(suppression_constant*q/0.197,2)/2);
+}
+
 /* Returns the differential scattering cross section between a proton and 
  * a dark matter particle for initial dark matter energy E and final 
  * dark matter energy Edm. All energies in GeV.
@@ -74,10 +91,25 @@ double dsigmadEdmP(double E, double Edm,  double mdm, double mV, double alphapri
         /((pow((pow(mV,2) + 2*mp * (E - Edm)),2))*(E*E - pow(mdm, 2)));
 }
 
+double dsigmadEdmAtom(double E, double Edm,  double mdm, double mV, double alphaprime, double kappa, double mass)
+{
+    return alphaprime * alphaEM * pow(kappa,2)*pi * pow(4*E*mass - 2*(E-Edm)*mass,2)/(2*mass*(pow((pow(mV,2) + 2*mass * (E - Edm)),2))*(E*E - pow(mdm, 2)));
+}
+
 double dsigmadEdmP_coherent(double E, double Edm,  double mdm, double mV, double alphaprime, double kappa, double A, double Z)
 {
     double mass = (A-Z)*mn+Z*mp;
-    return pow(Z,2)*pow(CoherentFormFactor(sqrt(2*mass*(E-Edm)),A),2)*dsigmadEdmP(E, Edm, mdm, mV, alphaprime, kappa);
+    //double Ein=0.1;
+    /*for(double q=0; q<=0.1; q+=0.0001){
+        cout << q << " " << CoherentFormFactor(q, A) << endl;
+    }
+    throw -1;
+    
+    for(double Eout = Ein; Eout >= Ein-0.001; Eout-=0.000001){
+        cout <<  Ein-Eout << " " <<  2*mp*(Ein-Eout) << " " <<  2*mass*(Ein-Eout) << " " << dsigmadEdmP(Ein, Eout, mdm, mV, alphaprime, kappa) << " " <<  dsigmadEdmAtom(Ein, Eout, mdm, mV, alphaprime, kappa, mass) << " " << sqrt(2*mass*(Ein-Eout)) << " " << CoherentFormFactor(sqrt(2*mass*(Ein-Eout)),A) << endl;
+    }
+    throw -1;*/
+    return pow(Z,2)*pow(CoherentFormFactor(sqrt(2*mass*(E-Edm)),A),2)*dsigmadEdmAtom(E, Edm, mdm, mV, alphaprime, kappa,mass);
 }
 
 double dsigmadEdmN(double E, double Edm,  double mdm, double mV, double alphaprime, double kappa)
@@ -98,7 +130,7 @@ double A(double E, double Edm, double mdm, const double mN){
 double B(double E, double Edm, double mdm, const double mN){
     return (Edm-E)*(pow((Edm+E),2)+2*mN*(Edm-E)-4*pow(mdm,2));
 }
-    
+   
 double C(double E, double Edm, double mdm, const double mN){
     return (Edm - E) * (mN*(E-Edm)+2*pow(mdm,2));
 }

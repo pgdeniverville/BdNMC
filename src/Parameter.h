@@ -1,14 +1,15 @@
 #ifndef Parameter_h
 #define Parameter_h
 
+#include "detector.h"
+
+#include <memory>
 #include <ios>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <map>
 #include <list>
-#include "detector.h"
-#include <memory>
 
 class production_distribution{
 	public:

@@ -2,7 +2,7 @@
 #include "Kinematics.h"
 #include "constants.h"
 
-#include <math.h>
+#include <cmath>
 
 using std::vector; using std::function;
 using std::cout; using std::endl;

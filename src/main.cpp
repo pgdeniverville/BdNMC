@@ -1,29 +1,14 @@
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <vector>
-#include <list>
-#include <string>
-#include <functional>
-#include <cstdlib>
-#include <exception>
-#include <numeric>
-#include <memory>
-#include <climits>
+
 
 #include "record.h"
-
 #include "constants.h"
-
 #include "Distribution.h"
 #include "sanfordwang.h"
 #include "BurmanSmith.h"
 #include "BMPT_dist.h"
 #include "Model.h"
-
 #include "Integrator.h"
 #include "detector.h"
-
 #include "Particle.h"
 #include "Random.h"
 #include "decay.h"
@@ -37,6 +22,18 @@
 #include "Position_Distributions.h"
 #include "SignalDecay.h"
 
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <vector>
+#include <list>
+#include <string>
+#include <functional>
+#include <cstdlib>
+#include <exception>
+#include <numeric>
+#include <memory>
+#include <climits>
 
 //Plotting stuff
 //#include "DMNscattering.h"
@@ -374,7 +371,6 @@ int main(int argc, char* argv[]){
         cout << "pMax less than tolerance limit, skipping remainder of run\n";
     }
     else{
-    	//cout << "Beginning loop\n" << endl;
         for(; (nevent < samplesize) && ((trials < trials_max)||(trials_max<=0)); trials++){
             int i;
             scatter_switch = false;
@@ -414,13 +410,11 @@ int main(int argc, char* argv[]){
                         //may need to replace this with a list<Particle> later
                         //cout << SigGen->get_pMax() << endl;
                         //If pMax=0, all events are accepted.
+                        //cout << "Testing hit\n";
                         if(par->Weighted_Events()){
                         	SigGen->set_pMax(0);
                         }
                         if(SigGen->probscatter(det, vec, iter)){
-                            //cout << "Scatter?\n"; 
-                            //cout << "Made it inside the probscatter if\n";
-                            //cout << "prob = " << SigGen->get_pMax() << endl;
                             double timing_prob_factor;
 							if(timing_cut>0){
                                 timing_prob_factor=t_delay_fraction(timing_cut,sqrt(pow(iter->end_coords[0],2)+pow(iter->end_coords[1],2)+pow(iter->end_coords[2],2)),iter->Speed());
@@ -450,15 +444,13 @@ int main(int argc, char* argv[]){
                 }
                 *comprehensive_out << endl;
                 Record_Particles(*comprehensive_out, vec);
-                *comprehensive_out << "endevent " << nevent << endl << endl;    
+                *comprehensive_out << "endevent " << nevent << endl << endl;
             }
             else if(scatter_switch){
                 ++nevent;
 	        }
         } 
     }
-	cout << "Run complete\n";
-
     //This will be moved later.
 
     if(outmode=="summary"||outmode=="dm_detector_distribution"||

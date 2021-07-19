@@ -2,13 +2,13 @@
 #ifndef GUARD_Particle_h
 #define GUARD_Particle_h
 
+#include "Random.h"
+
 #include <cmath>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <functional>
-
-#include "Random.h"
 
 class Particle{
 	

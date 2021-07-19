@@ -7,6 +7,7 @@
 
 #include "Parameter.h"//This is annoying. I should get rid of it if I refactor.
 #include "Distribution.h"
+
 #include <string>
 
 class sanfordwang: public Distribution{

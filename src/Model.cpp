@@ -66,7 +66,6 @@ void Model::Prepare_Model(Parameter& par){
             cerr << "Something wrong with distribution!" << endl;
             throw -1;
         }
-
         //Specific model handles the production channel
         if(!this->Prepare_Production_Channel(prodchoice, proddist, *proditer, DMGen, PartDist, Vnum, par)){
             cerr << "Something wrong with prod_chan " << prodchoice << "!" << endl;
@@ -92,7 +91,7 @@ bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string 
     //Eventually all of the main distributions will be handled here.
     //Remember that proditer->func() becomes prodchan.func()!
 
-    if(proddist=="proton_beam" || proddist=="proton_brem"){
+    if(proddist=="proton_beam" || proddist=="proton_brem" || proddist=="proton_brem_baryonic"){
         Dist = std::shared_ptr<Distribution>(new BeamDistribution(par.Beam_Energy(),MASS_PROTON));
     }
     else if(proddist=="burmansmith"){

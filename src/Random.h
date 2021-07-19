@@ -6,9 +6,9 @@
  Returns random numbers from a special distributions of popular algorithms
  */
 
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include <random>
 #include <functional>
 #include <chrono>

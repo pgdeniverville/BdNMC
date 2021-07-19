@@ -1,8 +1,9 @@
 #include "Particle.h"
 #include "Kinematics.h"
-#include <iostream>
 #include "constants.h"
+
 #include <iomanip>
+#include <iostream>
 
 using std::cout; using std::endl;
 

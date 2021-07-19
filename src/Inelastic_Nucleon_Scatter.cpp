@@ -3,13 +3,14 @@
 #include "minimization.h"
 #include "DMNscattering.h"
 #include "Kinematics.h"
-#include <cmath>
-#include <iostream>
 #include "Random.h"
-#include <algorithm>
 #include "constants.h"
+
 #include <fstream>
 #include <memory>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
 
 const double mp = MASS_PROTON;
 const double mn = MASS_NEUTRON;

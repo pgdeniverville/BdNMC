@@ -2,12 +2,13 @@
 #include "minimization.h"
 #include "DMNscattering_Baryonic.h"
 #include "Kinematics.h"
+#include "Random.h"
+#include "constants.h"
+
+#include <list>
 #include <cmath>
 #include <iostream>
-#include "Random.h"
 #include <algorithm>
-#include "constants.h"
-#include <list>
 
 using std::list;
 using std::cout; using std::endl;

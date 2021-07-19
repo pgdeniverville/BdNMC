@@ -1,7 +1,6 @@
 #include "Model.h"
 #include "branchingratios.h"
 #include "Scatter.h"
-#include <cmath>
 #include "decay.h"
 #include "DMgenerator.h"
 #include "Model.h"
@@ -9,11 +8,10 @@
 #include "SignalDecay.h"
 #include "constants.h"
 #include "Proton_Brem_Distribution.h"
-
 #include "DMNscattering.h"
 
 #include <iomanip>      // std::setprecision
-
+#include <cmath>
 
 using std::string;
 using std::vector;
@@ -30,8 +28,6 @@ const double off_shell_ratio=1.8;
 const string GM_form_factor_filename = "data/delta_production_form_factor.dat";
 
 bool Inelastic_Dark_Matter::Set_Model_Parameters(Parameter& par){
-    cout << "Made it here.\n";
-
     if(!par.Query_Map("dark_photon_mass",mass_dp)){
         std::cerr << par.Model_Name() << " requires dark_photon_mass to be defined.\n";
         return false;
@@ -102,6 +98,8 @@ void Inelastic_Dark_Matter::Evaluate_Widths(){
     // width_dm2_to_dm1_hadrons=Three_Body_Decay_Space::integrate_decay_width(d2width_hadrons,mass_dm2,MASS_MUON,MASS_MUON,mass_dm1);;
     
     dm2width = width_dm2_to_muon_muon_dm1+width_dm2_to_elec_elec_dm1;
+
+    cout << "Lifetime of dm2 = " << hbar/dm2width << endl;
 
 }
 
@@ -272,14 +270,49 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
 
     Particle dark_photon(mass_dp);
     dark_photon.name="Dark_Photon";
+    dark_photon.width = A_width();
 
     Particle dm1(mass_dm1);
     dm1.name = "Dark_Matter_1";
 
     Particle dm2(mass_dm2);
     dm2.name = "Dark_Matter_2";
+    dm2.width =  dm2_width();
 
     string sig_choice = par.Signal_Channel();
+
+    std::shared_ptr<General_Decay_Generator> dm2_gen_dec(new General_Decay_Generator());
+
+    if(sig_choice!="DP_Signal_Decay"&&sig_choice!="DM2_Signal_Decay"&&dm2_width()>0){
+      Particle electron(MASS_ELECTRON);
+      electron.name = "DM2_Electron";
+      Particle positron(MASS_ELECTRON);
+      positron.name = "DM2_Positron";
+
+      Particle muon(MASS_MUON);
+      muon.name = "DM2_Muon";
+      Particle antimuon(MASS_MUON);
+      antimuon.name = "DM2_Antimuon";
+
+      if(mass_dm2>mass_dm1+2*MASS_ELECTRON){
+          std::function<double(double,double,double,double,double,double)> func = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
+
+          std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen(new Three_Body_Decay_Gen(dm2,electron,positron,dm1,string("Decay_Electron_Positron_DM1"),hbar/dm2_width(),width_dm2_to_elec_elec_dm1,func));
+
+          dp_3decay_gen->record_parent = false;            
+
+          dm2_gen_dec->Add_Decay_Channel(dp_3decay_gen, width_dm2_to_elec_elec_dm1);
+      } 
+      if(mass_dm2>mass_dm1+2*MASS_MUON){
+          std::function<double(double,double,double,double,double,double)> func2 = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
+
+          std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen_2(new Three_Body_Decay_Gen(dm2,muon,antimuon,dm1,string("Decay_Muon_Antimuon_DM1"),hbar/dm2_width(),width_dm2_to_muon_muon_dm1,func2));
+
+          dp_3decay_gen_2->record_parent = false;
+
+          dm2_gen_dec->Add_Decay_Channel(dp_3decay_gen_2, width_dm2_to_muon_muon_dm1);
+      }
+    }
 
     if(prodchoice=="pi0_decay"||prodchoice=="eta_decay"){
         double lifetime;
@@ -348,11 +381,8 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
                 tmp_gen->Burn_In(1000);
                 tmp_gen->set_Off_Shell(true);
                 DMGen = tmp_gen;
-
-                if(sig_choice!="DM2_Signal_Decay"&&dm2width>0){
-                    std::cerr << "Need to add DM2 decay! Check Model file.\n";
-                    throw -1;
-                }
+                if(sig_choice!="DM2_Signal_Decay"&&dm2width>0)
+                  tmp_gen->Toggle_Daughter_Decay(2, dm2_gen_dec);
             }
             else{
                 cout << "Turning on the on-shell decay of the Dark Photon with lifetime of " << hbar/A_width() << " seconds\n";
@@ -365,15 +395,17 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
 
                 tmp_gen2->d1=true;
                 tmp_gen2->record_parent=true;
-                meson_decay_gen->Toggle_Daughter_Decay(2,tmp_gen2);
 
                 if(sig_choice!="DM2_Signal_Decay"&&dm2width>0){
-                    std::cerr << "Need to add DM2 decay! Check Model file.\n";
-                    throw -1;
+                  tmp_gen2->Toggle_Daughter_Decay(2, dm2_gen_dec);
                 }
+
+                meson_decay_gen->Toggle_Daughter_Decay(2,tmp_gen2);
                 DMGen = meson_decay_gen;
-            }       
+            }
         }
+
+
 
         Vnum=DMGen->BranchingRatio()*par.Protons_on_Target()*prodchan.Meson_Per_Pi0()*par.Pi0_per_POT();
 
@@ -393,6 +425,9 @@ bool Inelastic_Dark_Matter::Prepare_Production_Channel(std::string prodchoice, s
             DMGen = invis_dec;
             if(sig_choice=="DM2_Signal_Decay"){
                 invis_dec->d1=false;
+            }
+            if(sig_choice!="DM2_Signal_Decay"){
+              invis_dec->Toggle_Daughter_Decay(2, dm2_gen_dec);
             }
             //Option for decaying dm2 needs to be included for electron scatter.
         }
@@ -502,6 +537,7 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
             return true;
         }
         else if(sig_choice=="Electron_Scatter" || sig_choice=="NCE_electron"){
+            //cout << "Electron_Scatter setup begins\n";
             Particle electron(MASS_ELECTRON);
             electron.name="Electron";
             Particle dm1_r(mass_dm1);
@@ -510,25 +546,17 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
             dm2_r.name = "Recoil_Dark_Matter_2";
             
             //Need to add decay of DM2 later on.
-            /*if(dm2_width()>0){
-                Particle dm1_f(mass_dm1);
-                axion_f.name="Decay_dm1";
-                Particle photon_f(0);
-                photon_f.name = "Decay_Photon";
-                std::shared_ptr<Two_Body_Decay_Gen> invis_dec(new Two_Body_Decay_Gen(A_to_a_gamma_width(mass_axion, mass_dp)/A_width(mass_axion, mass_dp),mass_dp,string("Recoil_Dark_Photon"),photon_f,axion_f,hbar/A_width(mass_axion, mass_dp)));
-                invis_dec->record_parent=false;
-                ttts->add_decay(string("Recoil_Dark_Photon"),invis_dec);
-            }
-            */
+            
             //dm1+e->dm2+e
             std::shared_ptr<Linear_Interpolation> dm1_cross;
             std::shared_ptr<Linear_Interpolation> dm1_cross_max;
             
-
             std::function<double(double,double)> f_dm1_to_dm2 = std::bind(&Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e,this,_1,_2,mass_dm1,mass_dm2,MASS_ELECTRON);
             
             std::function<double(double)> ER_min_dm1 = std::bind(&Two_to_Two_Scatter::scatmin,*ttts,_1,mass_dm1,MASS_ELECTRON,mass_dm2,MASS_ELECTRON);
             std::function<double(double)> ER_max_dm1 = std::bind(&Two_to_Two_Scatter::scatmax,*ttts,_1,mass_dm1,MASS_ELECTRON,mass_dm2,MASS_ELECTRON);
+
+            //cout << "Prepare dm1_to_dm2 cross\n";
 
             Prepare_Cross_Section(f_dm1_to_dm2, ER_min_dm1, ER_max_dm1, dm1_cross,dm1_cross_max, mass_dm1, par.Max_DM_Energy(),par.EDM_RES());
             
@@ -544,11 +572,12 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
             std::function<double(double)> ER_min_dm2 = std::bind(&Two_to_Two_Scatter::scatmin,*ttts,_1,mass_dm2,MASS_ELECTRON,mass_dm1,MASS_ELECTRON);
             std::function<double(double)> ER_max_dm2 = std::bind(&Two_to_Two_Scatter::scatmax,*ttts,_1,mass_dm2,MASS_ELECTRON,mass_dm1,MASS_ELECTRON);
 
+            //cout << "Prepare dm2_to_dm1 cross\n";
+
             Prepare_Cross_Section(f_dm2_to_dm1, ER_min_dm2, ER_max_dm2,dm2_cross,dm2_cross_max, mass_dm2, par.Max_DM_Energy(),par.EDM_RES());
 
             function<double(double)> dm2_cross_func = bind(&Linear_Interpolation::Interpolate,*dm2_cross,_1);
             function<double(double)> dm2_cross_max_func = bind(&Linear_Interpolation::Interpolate,*dm2_cross_max,_1);
-
 
             double ENtot =(par.Get_Detector())->ENtot();
             ttts->add_channel(dm1_r, electron, MASS_ELECTRON, dm2_cross_func, dm2_cross_max_func, f_dm2_to_dm1, ENtot,"Dark_Matter_2");
@@ -605,6 +634,42 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
                 std::cerr << "Non-coherent Nucleon_Scatter and NCE_Nucleon channels are not yet implemented.\n";
                 throw -1;
                 //Don't need this yet, I'll implement it when I do.
+            }
+        }
+
+        if(dm2_width()>0){
+            Particle dm2(mass_dm2);
+            dm2.name = "Recoil_Dark_Matter_2";
+            dm2.width = dm2_width();
+            Particle electron(MASS_ELECTRON);
+            electron.name = "Decay_Electron";
+            Particle positron(MASS_ELECTRON);
+            positron.name = "Decay_Positron";
+            Particle dm1(mass_dm1);
+            dm1.name = "Decay_Dark_Matter_1";
+
+            Particle muon(MASS_MUON);
+            muon.name = "Decay_Muon";
+            Particle antimuon(MASS_MUON);
+            antimuon.name = "Decay_Antimuon";
+
+
+            if(mass_dm2>mass_dm1+2*MASS_ELECTRON){
+                std::function<double(double,double,double,double,double,double)> func = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
+
+                std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen(new Three_Body_Decay_Gen(dm2,electron,positron,dm1,string("Decay_Electron_Positron_DM1"),hbar/dm2_width(),width_dm2_to_elec_elec_dm1,func));
+
+                dp_3decay_gen->record_parent = false;            
+                ttts->add_decay(string("Recoil_Dark_Matter_2"),dp_3decay_gen);
+            } 
+            if(mass_dm2>mass_dm1+2*MASS_MUON){
+                std::function<double(double,double,double,double,double,double)> func2 = std::bind(&Inelastic_Dark_Matter::Amplitude2_dm2_to_lepton_lepton_dm1,this,_1,_2,_3,_4,_5,_6);
+
+                std::shared_ptr<Three_Body_Decay_Gen> dp_3decay_gen_2(new Three_Body_Decay_Gen(dm2,muon,antimuon,dm1,string("Decay_Muon_Antimuon_DM1"),hbar/dm2_width(),width_dm2_to_muon_muon_dm1,func2));
+
+                dp_3decay_gen_2->record_parent = false;
+
+                ttts->add_decay(string("Recoil_Dark_Matter_2"),dp_3decay_gen_2);
             }
         }
         Sig_list.push_back(ttts);

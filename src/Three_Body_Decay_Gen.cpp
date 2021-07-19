@@ -1,11 +1,11 @@
 #include "decay.h"
 #include "DMgenerator.h"
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
 #include "constants.h"
 #include "Integrator.h"
 
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
 
 using std::shared_ptr; using std::function;
 using std::bind; using std::cout;
@@ -27,7 +27,7 @@ Three_Body_Decay_Gen::Three_Body_Decay_Gen(Particle& Parent, Particle& Daughter1
     daughter3 = Particle(Daughter3);
 
     Set_Channel_Name(prodstring);
-    
+
 //  cout << tot*resx*resy*8*pi*pi << endl;
     //commented temporarily until I can determine the issue.
     //branchingratio=8*pi*pi*SimpsonCubature(d2width,daughter1.m+daughter2.m,mother.m-daughter3.m,100,-1,1,100)/mother.width;
@@ -152,17 +152,16 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
     }
 
     Three_Body_Decay(parent, daughter1, daughter2, daughter3, pmax, amp);
-/*
-    cout << "preReport on THREE_BODY_DECAY " << Channel_Name() << "\n";
-    parent.report();
-    daughter1.report(cout);
-    cout << det_int(daughter1) << endl;
-    daughter2.report(cout);
-    cout << det_int(daughter2) << endl;
-    daughter3.report(cout);
-    cout << det_int(daughter3) << endl;
-    cout << "\n\n";
-*/
+
+    /*//Debug
+    if(parent.name=="Recoil_Dark_Matter_2"){
+        cout << "3body\n";
+        parent.report();
+        daughter1.report();
+        daughter2.report();
+        daughter3.report();
+    }*/
+
     bool intersect=false;
     std::list<Particle>::iterator bookmark = vec.end();
     if(d1_unstable&&(d1_decay->GenDM(vec, det_int, daughter1))){
@@ -183,20 +182,7 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
         bookmark = vec.end();
         intersect=true;
     }
-/*    if(parent.name=="Dark_Photon"){
-    cout << "Report on THREE_BODY_DECAY " << Channel_Name() << "\n";
-    parent.report();
-    cout << det_int(parent) << endl;
-    daughter1.report(cout);
-    cout << det_int(daughter1) << endl;
-    daughter2.report(cout);
-    cout << det_int(daughter2) << endl;
-    daughter3.report(cout);
-    cout << det_int(daughter3) << endl;
-    cout << "\n\n";
-    throw -1;
-    }
-*/
+
     //Need to decay these daughter particles!
     if(d1&&(det_int(daughter1)>0)){
     //    cout << "daughter1 hit!\n";
@@ -213,12 +199,6 @@ bool Three_Body_Decay_Gen::GenDM(std::list<Particle>& vec, std::function<double(
         intersect=true;
         vec.push_back(daughter3);    
     }
-/*
-    cout << "EVENT GEN\n";
-    parent.report(cout);
-    daughter1.report(cout);
-    daughter2.report(cout);
-    daughter3.report(cout);
-*/
+
     return intersect;
 }

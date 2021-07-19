@@ -5,14 +5,18 @@
 #include "Integrator.h"
 #include "detector.h"
 
+//This could have been a namespace.
+
 class DMNscattering_Baryonic{
 public:
 	static double dsigmadEdmP(double E, double Edm,  double mdm, double mV, double alD, double kappa);
+	static double dsigmadEdmAtom(double E, double Edm,  double mdm, double mV, double alD, double kappa, double mass);
 	static double dsigmadEdmP_coherent(double E, double Edm,  double mdm, double mV, double alphaprime, double kappa, double A, double Z);
 	static double dsigmadEdmN(double E, double Edm,  double mdm, double mV, double alD, double kappa);
 	//Kinematic Limits
 	static double Efmin(double En, double mdm, double m);
 	static double Ef_to_N_Theta(double En, double Ef, double mdm, double m);
+	static double nucleon_recoil_energy(double Edm, double mdm, double mN, double theta);
 	//void TEST();
 	static double RadiusFunction(double A);
 	static double CoherentFormFactor(double q, double A);

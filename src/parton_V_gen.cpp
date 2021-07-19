@@ -1,11 +1,12 @@
 #include "DMgenerator.h"
 #include "branchingratios.h"
 #include "decay.h"
+#include "constants.h"
+#include "Integrator.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include "constants.h"
-#include "Integrator.h"
 
 parton_V_gen::parton_V_gen(double MV, double MX, double kap, double alp, const std::string chan){
     set_model_params(MV, MX, kap, alp);

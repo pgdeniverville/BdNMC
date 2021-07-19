@@ -1,10 +1,9 @@
 //#include "Event.h"
 #include "DMNscattering_Baryonic.h"
+#include "Kinematics.h"
+#include "constants.h"
 
 #include <iostream>
-#include "Kinematics.h"
-#include "Random.h"
-#include "constants.h"
 
 //All masses are defined in terms of GeV.
 const double mp = MASS_PROTON;
@@ -35,8 +34,8 @@ const double R_s=0.9;
 
 
 
-double DMNscattering_Baryonic::RadiusFunction(double A){
-    return sqrt(pow(1.23*pow(A,1.0/3.0)-0.6,2)+7.0/3.0*pow(pi*R_a,2)-5*pow(R_s,2));
+double DMNscattering_Baryonic::RadiusFunction(double A){    
+    return sqrt(pow(1.23*pow(A,1.0/3.0)-0.6,2)+7.0/3.0*pow(pi*R_a,2)-5*pow(R_s,2))/0.197;
 }
 
 double DMNscattering_Baryonic::BesselJ1(double x){
@@ -46,8 +45,7 @@ double DMNscattering_Baryonic::BesselJ1(double x){
 double DMNscattering_Baryonic::CoherentFormFactor(double q, double A){
     if(q==0)
         return 1.0;
-    return 3.0/(q*RadiusFunction(A))*BesselJ1(q*RadiusFunction(A))*exp(-suppression_constant*q);
-}
+    return 3.0/(q*RadiusFunction(A))*BesselJ1(q*RadiusFunction(A))*exp(-pow(suppression_constant*q/0.197,2)/2);}
 
 
 /*Coefficients in the scattering cross section.*/
@@ -187,10 +185,17 @@ double DMNscattering_Baryonic::dsigmadEdmP(double E, double Edm,  double mdm, do
         /((pow((pow(mV,2) + 2*mp * (E - Edm)),2))*(E*E - pow(mdm, 2)));
 }
 
+//This is almost certainly incomplete
+//I'll need to add a second alpha_D at some point.
+double DMNscattering_Baryonic::dsigmadEdmAtom(double E, double Edm,  double mdm, double mV, double alD, double kappa, double mass){
+    return pow(alD,2) *pi * pow(4*E*mass - 2*(E-Edm)*mass,2)/(2*mass*(pow((pow(mV,2) + 2*mass * (E - Edm)),2))*(E*E - pow(mdm, 2)));
+}
+
 double DMNscattering_Baryonic::dsigmadEdmP_coherent(double E, double Edm,  double mdm, double mV, double alphaprime, double kappa, double A, double Z)
-{
+{   
     double mass = (A-Z)*mn+Z*mp;
-    return pow(A,2)*pow(CoherentFormFactor(sqrt(2*mass*(E-Edm))/GeVtofm,A),2)*dsigmadEdmP(E, Edm, mdm, mV, alphaprime, kappa);
+    //cout << DMNscattering_Baryonic::dsigmadEdmAtom(E, Edm, mdm, mV, alphaprime, kappa, mass) << endl;
+    return pow(A,2)*pow(CoherentFormFactor(sqrt(2*mass*(E-Edm)),A),2)*DMNscattering_Baryonic::dsigmadEdmAtom(E, Edm, mdm, mV, alphaprime, kappa, mass);
 }
 
 double DMNscattering_Baryonic::dsigmadEdmN(double E, double Edm,  double mdm, double mV, double alD, double kappa)
@@ -199,6 +204,10 @@ double DMNscattering_Baryonic::dsigmadEdmN(double E, double Edm,  double mdm, do
         F1Nb(2*mn*(E-Edm),alD,kappa) * F2Nb(2*mn*(E-Edm),alD,kappa) * C(E, Edm, mdm, mn) - \
         1.0/4.0 * pow(F2Nb(2*mn*(E-Edm),alD,kappa),2) * B(E, Edm, mdm, mn)) \
         /((pow((pow(mV,2) + 2*mn * (E - Edm)),2))*(E*E - pow(mdm, 2)));
+}
+
+double DMNscattering_Baryonic::nucleon_recoil_energy(double Edm, double mdm, double mN, double theta){
+    return mN*(3*Edm*Edm+4*Edm*mN+2*mN*mN-mdm*mdm+(Edm*Edm-mdm*mdm)*cos(2*theta))/(Edm*Edm+4*Edm*mN+2*mN*mN+mdm*mdm+(mdm*mdm-Edm*Edm)*cos(2*theta));
 }
 
 double DMNscattering_Baryonic::Efmin(double En, double mdm, double m)

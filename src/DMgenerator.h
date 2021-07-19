@@ -2,6 +2,7 @@
 #define GUARD_DMgenerator_h
 
 #include "Particle.h"
+
 #include <string>
 #include <vector>
 #include <list>
@@ -25,7 +26,7 @@ class DMGenerator{
         virtual ~DMGenerator(){};
         bool record_parent = true;
     protected:
-        virtual void Evaluate_Branching_Ratio() {};
+        virtual void Evaluate_Branching_Ratio(){};
         double mv, mx, kappa, alphaD;
         bool OFF_SHELL = false;
         std::string chan_name;
@@ -151,6 +152,25 @@ class Do_Nothing_Gen: public DMGenerator{
     private:
         void Evaluate_Branching_Ratio();
         std::string Part_Name="";
+};
+
+//This class holds a list of decay generators for a single particle, and picks one to run based on the relative branching ratios.
+class General_Decay_Generator: public DMGenerator{
+    public:
+        General_Decay_Generator(){return;}
+        bool GenDM(std::list<Particle>& vec, std::function<double(Particle&)> det_int, Particle& part);
+        void Add_Decay_Channel(std::shared_ptr<DMGenerator> decay_gen, double partial_width){decay_channels.push_back(decay_gen); partial_widths.push_back(partial_width); total_width+=partial_width;}
+        void set_total_width(double twidth){total_width=twidth;}
+    private:
+        void Evaluate_Branching(){
+            branchingratio=0; 
+            for(std::vector<std::shared_ptr<DMGenerator>>::size_type i = 0; i < decay_channels.size(); i++){
+                branchingratio+=decay_channels[i]->BranchingRatio();
+            }
+        }
+        double total_width;
+        std::vector<std::shared_ptr<DMGenerator> > decay_channels;
+        std::vector<double> partial_widths;
 };
 
 //Defined in V_decay_gen.cpp

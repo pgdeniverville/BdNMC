@@ -1,9 +1,10 @@
 #include "decay.h"
 #include "constants.h"
-#include <iostream>
-#include <fstream>
 #include "Kinematics.h"
 #include "Integrator.h"
+
+#include <iostream>
+#include <fstream>
 
 //std::ofstream datalog_decay("decaylog.dat",std::ios::out);
 

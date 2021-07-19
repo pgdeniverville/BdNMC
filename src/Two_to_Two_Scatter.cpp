@@ -33,6 +33,8 @@ void Two_to_Two_Scatter::add_channel(Particle& out_state, Particle& end_state, d
 
 //This creates Particle objects for the recoiling particles.
 bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<Particle>& partlist, std::list<Particle>::iterator& partit){
+    //cout << "Two_to_Two_Scatter Probscatter triggering\n" << endl;
+    //partit->report();
     //This one is the more important recoil particle!
     Particle recoil(0);
     //This one tends to be invisible!
@@ -45,14 +47,30 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<P
         //recoil2 handled by probscatter, which passes it off to scatterevent!
         Link_Particles(*partit, recoil2);
         partlist.insert(std::next(partit),recoil2);
-        //Not obvious that this handles multiple possible decay channels from one particle?
+        cout << "Checking for Decays in the detector\n";
         if(parent_name_vec.size()>0){
             std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
+            double u1 = Random::Flat(0,1);
+            double u2 = Random::Flat(0,1);
             for(unsigned int i = 0; i!=parent_name_vec.size(); i++){
-                if(parent_name_vec[i]==recoil.name)
-                    decay_gen_vec[i]->GenDM(partlist, det_int, recoil);
-                if(parent_name_vec[i]==recoil2.name)
-                    decay_gen_vec[i]->GenDM(partlist, det_int, recoil2);
+                if(parent_name_vec[i]==recoil.name and u1!=-1){
+                    if(decay_gen_vec[i]->BranchingRatio() > u1){
+                        decay_gen_vec[i]->GenDM(partlist, det_int, recoil);
+                        u1=-1;
+                    }
+                    else{
+                        u1-=decay_gen_vec[i]->BranchingRatio();
+                    }
+                }
+                if(parent_name_vec[i]==recoil2.name and u2!=-1){
+                    if(decay_gen_vec[i]->BranchingRatio() > u2){
+                        decay_gen_vec[i]->GenDM(partlist, det_int, recoil2);
+                        u2=-1;
+                    }
+                    else{
+                        u2-=decay_gen_vec[i]->BranchingRatio();
+                    }
+                }
             }
         }
         return true;
@@ -63,7 +81,6 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<P
 //This samples the scattering cross-section, useful for burn-in, where
 //we do not care what the final state particles are.
 bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle& part){
-//    cout << "Hi there!" << endl;
 
     double LXDet = m_to_cm*(det->Ldet(part));
     double total=0; vector<double> prob;
@@ -152,9 +169,9 @@ void Two_to_Two_Scatter::scatterevent (Particle &part, double targ_mass, Particl
     double dsigmax = Xmax(part.E);
     double xe,thetaN,phiN,pN;
     //part.report(); 
-    //cout << "Efmax=" << Efmax << " Efmin = " << Efmin << endl;
     while(true){
         xe = Random::Flat(Efmin,Efmax);//Recoil energy
+        //cout << "Efmax=" << Efmax << " Efmin = " << Efmin << endl;
         //cout << "xe = " << xe << " dsigmax = " << dsigmax << " Xsec = " << Xsec(xe) << endl; 
         if(Xsec(xe)/dsigmax > Random::Flat(0,1)){
             thetaN =  Theta_from_E4(part.E, xe, part.m, targ_mass, recoil2.m, recoil.m);

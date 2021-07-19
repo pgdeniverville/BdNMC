@@ -2,6 +2,7 @@
 #include "Distribution.h"
 #include "Particle_List.h"
 #include "Kinematics.h"
+
 #include <vector>
 #include <exception>
 #include <cmath>
@@ -41,7 +42,7 @@ int Particle_List::load_particle_batch(){
 		instream.seekg(0);
 	}*/
 	string hold;
-	cout << "loading particles\n";
+	cout << "Particle_List.cpp is loading particles\n";
 	while(std::getline(instream, hold)){
 		if((error_state=parse_line(hold))==0){
 			i++;

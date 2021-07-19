@@ -1,5 +1,6 @@
 #include "BurmanSmith.h"
 #include "constants.h"
+
 #include <algorithm>
 #include <iostream>
 

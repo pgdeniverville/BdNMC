@@ -3,11 +3,11 @@
 #include "Random.h"
 #include "Kinematics.h"
 #include "constants.h"
+
 #include <functional>
 #include <cmath>
 #include <iostream>
 #include <iomanip>
-
 #include <fstream>
 #include <vector>
 #include <memory>

@@ -1,8 +1,8 @@
 #include "BMPT_dist.h"
-
 #include "constants.h"
 #include "Random.h"
-#include <math.h>
+
+#include <cmath>
 #include <iostream>
 
 const double mp = MASS_PROTON;

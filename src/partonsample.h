@@ -1,12 +1,13 @@
 #ifndef PARTONSAMPLE_H
 #define PARTONSAMPLE_H
 
+#include "Integrator.h"
+#include "Distribution.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <memory>
-#include "Integrator.h"
-#include "Distribution.h"
 
 class parton_sample : public Distribution{
 

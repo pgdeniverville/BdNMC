@@ -1,12 +1,14 @@
-#include <iostream>
-#include <string>
-#include <memory>
 #include "Kinematics.h"
 #include "Distribution.h"
 #include "Particle_List.h"
 #include "sanfordwang.h"
 #include "BMPT_dist.h"
 #include "Parameter.h"
+
+#include <iostream>
+#include <string>
+#include <memory>
+
 using std::cout;
 using std::endl;
 

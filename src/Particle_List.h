@@ -1,12 +1,13 @@
 #ifndef PARTICLE_LIST_H
 #define PARTICLE_LIST_H
 
+#include "Distribution.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <list>
 #include <memory>
-#include "Distribution.h"
 
 struct _part{
 	double px,py,pz,E,x,y,z,t;

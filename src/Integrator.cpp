@@ -1,11 +1,10 @@
 #include "Integrator.h"
 #include "minimization.h"
 #include "Random.h"
-
-#include <cmath>
-#include <stdexcept>
-#include <iostream>
 #include "constants.h"
+
+#include <iostream>
+
 
 using std::cout; using std::endl;
 using std::cerr;

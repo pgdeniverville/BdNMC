@@ -193,6 +193,21 @@ class Kinetic_Mixing : public Model{
         double alpha_D, mass_dp, mass_dm, epsilon;
 };
 
+class Baryonic_Dark_Matter : public Model{
+    public:
+        Baryonic_Dark_Matter(Parameter& par) : Model(par){};
+        bool Prepare_Signal_Channel(Parameter& par);
+        bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
+        bool Set_Model_Parameters(Parameter& par);
+        void Report_Model();
+        void Report(std::ostream& out);
+        void Branching_Ratios(){};
+    private:
+        //model parameters
+        //May need a second alpha_D at some point.
+        double alpha_D, mass_dp, mass_dm, epsilon;
+};
+
 class Scalar_Mediator : public Model{
     public:
         Scalar_Mediator(Parameter &par) : Model(par){};

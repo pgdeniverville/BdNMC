@@ -1,10 +1,11 @@
 #include "DMgenerator.h"
 #include "branchingratios.h"
 #include "decay.h"
+#include "constants.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include "constants.h"
 
 using std::cout; using std::endl;
 
