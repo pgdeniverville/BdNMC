@@ -1,6 +1,6 @@
 CXXFLAGS = -std=c++14 -Wall 
 
-VPATH = ../src:header
+VPATH = ../src:header:../BdNMC_LANL/src
 #:../src/cteq_pdf_reader
 
 CXX = g++

@@ -1,11 +1,12 @@
 #include "Scatter.h"
 
 #include "minimization.h"
-#include "DMNscattering.h"
 #include "Kinematics.h"
 #include "Random.h"
 #include "constants.h"
 #include "decay.h"
+
+#include "../BdNMC_LANL/src/DMNscattering.h"
 
 #include <cmath>
 #include <iostream>

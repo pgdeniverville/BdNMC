@@ -8,7 +8,7 @@
 #include "SignalDecay.h"
 #include "constants.h"
 #include "Proton_Brem_Distribution.h"
-#include "DMNscattering.h"
+#include "../BdNMC_LANL/src/DMNscattering.h"
 
 #include <iomanip>      // std::setprecision
 #include <cmath>

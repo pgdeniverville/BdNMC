@@ -1,5 +1,3 @@
-
-
 #include "record.h"
 #include "constants.h"
 #include "Distribution.h"
@@ -35,9 +33,6 @@
 #include <memory>
 #include <climits>
 
-//Plotting stuff
-//#include "DMNscattering.h"
-//#include "DMscattering.h"
 
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
