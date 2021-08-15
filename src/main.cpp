@@ -35,10 +35,6 @@
 #include <memory>
 #include <climits>
 
-//Plotting stuff
-//#include "DMNscattering.h"
-//#include "DMscattering.h"
-
 using std::cout;    using std::endl;
 using std::vector;  using std::string;
 using std::bind;    using std::function;
