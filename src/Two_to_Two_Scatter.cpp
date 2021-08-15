@@ -47,7 +47,7 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, std::list<P
         //recoil2 handled by probscatter, which passes it off to scatterevent!
         Link_Particles(*partit, recoil2);
         partlist.insert(std::next(partit),recoil2);
-        cout << "Checking for Decays in the detector\n";
+        //cout << "Checking for Decays in the detector\n";
         if(parent_name_vec.size()>0){
             std::function<bool(Particle&)> det_int = bind(&detector::Ldet,det,_1);
             double u1 = Random::Flat(0,1);
@@ -132,14 +132,15 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
         }
         total+=prob.back();
     }
+    //cout << "Total probability=" << total << endl;
     if(total > pMax*Random::Flat(0,1)){
         if(total > pMax){
             pMax = total;
         }
         //cout << "Accepted for scattering\n";
-        //part.report(cout);
+        //part.report();
         double u=Random::Flat(0,1);
-        double p=0; 
+        double p=0;
         for(int i = 0; i < chan_number; i++){
             p+=prob[i];
             if(p/total > u){
@@ -148,7 +149,8 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
                 recoil = recoil_particle[i];
                 recoil2 = out_particle[i];
                 //cout << scatmax(part.E, part.m, target_mass[i], recoil2.m, recoil.m) << " " << scatmin(part.E, part.m, target_mass[i], recoil2.m, recoil.m) << endl;
-                if(scatmax(part.E, part.m, target_mass[i], recoil2.m, recoil.m) < scatmin(part.E, part.m, target_mass[i], recoil2.m, recoil.m)){
+                //If scatmax = scatimn, we should also reject, it'll never work.
+                if(scatmax(part.E, part.m, target_mass[i], recoil2.m, recoil.m) <= scatmin(part.E, part.m, target_mass[i], recoil2.m, recoil.m)){
                     return false;
                 }
                 scatterevent(part, target_mass[i], recoil,recoil2,Xsec,cross_maxima[i]);
@@ -164,6 +166,7 @@ bool Two_to_Two_Scatter::probscatter(std::shared_ptr<detector>& det, Particle &p
 }
 
 void Two_to_Two_Scatter::scatterevent (Particle &part, double targ_mass, Particle &recoil, Particle &recoil2, std::function<double(double)> Xsec,std::function<double(double)> Xmax){
+    //cout << "scatterevent start\n";
     double Efmax = scatmax(part.E, part.m, targ_mass, recoil2.m,recoil.m);
     double Efmin = scatmin(part.E, part.m, targ_mass, recoil2.m, recoil.m); 
     double dsigmax = Xmax(part.E);

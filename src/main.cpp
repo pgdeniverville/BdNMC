@@ -123,6 +123,7 @@ int main(int argc, char* argv[]){
     }
 	cout << "Parameter read successfully\n";
     //Initializing Random Number Generator
+
     if(par->Seed()>=0)
 		Random(par->Seed());
 	else
@@ -392,9 +393,12 @@ int main(int argc, char* argv[]){
             list<Particle>::iterator iter;
             list<Particle>::iterator nextit;
 
-            //cout << "nevent = " << nevent << endl;
-
             if(DMGen_list[i]->GenDM(vec, det_int, dist_part)){
+	            //cout << "nevent = " << nevent << endl;
+	            /*for(std::list<Particle>::iterator it = vec.begin(); it != vec.end(); it++){
+	            	it->report();
+	            }*/
+
                 //Yes, this list is named vec.
                 iter = vec.begin();
                 for(nextit=next(iter) ; iter != vec.end();iter=nextit++){
@@ -497,19 +501,11 @@ int main(int argc, char* argv[]){
 		signal+=signal_list[i];
  	}
 
-
-    /*if(outmode=="dm_detector_distribution"){
-        *comprehensive_out << "Total " << trials << " " << POT << " " << Vnumtot << " " << samplesize << " " << (double)NDM/(2*trials) << " " << endl;
-    }*/
-
 	if(outmode=="summary"||outmode=="comprehensive"){
 		*summary_out << "Total ";
 		model->Report(*summary_out);
 		*summary_out << signal << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
     }
-//    if(outmode=="summary"||outmode=="comprehensive"){
-//        *summary_out << "Total " << mv  <<  " "  << mdm << " " << signal << " " << kappa << " " << alD << " " << sigchoice << " " << POT << " " << par->Efficiency() << " " << samplesize << " " << endl;
-//    }
     else if(outmode=="dm_detector_distribution"){
     	cout << "Outputting summary" << endl;
     	*summary_out << "Total ";

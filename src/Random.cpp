@@ -1,4 +1,5 @@
 #include "Random.h"
+#include <iostream>
 
 std::default_random_engine generator;
 std::uniform_real_distribution<double> distribution;
@@ -7,12 +8,15 @@ std::uniform_real_distribution<double> distribution;
 // Set seed from the system timer or initiate seed yourself
 //
 Random::Random(){
-    generator = std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count());
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    generator = std::default_random_engine(seed);
     distribution = std::uniform_real_distribution<double>(0.0,1.0);
+    std::cout << "Seed=" << seed << std::endl;
 }
 Random::Random(unsigned seed){ 
     generator = std::default_random_engine(seed);
     distribution = std::uniform_real_distribution<double>(0.0,1.0);
+    std::cout << "Seed=" << seed << std::endl;
 }
 
 //------------------------------------------------------------------------------

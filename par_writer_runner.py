@@ -1195,7 +1195,8 @@ pi0_per_POT_400=4.05251;
 BEBC_POT=3e18
 meson_per_pi0_400= {'pi0_decay' : '1.0', 'eta_decay' : str(eta_per_POT_400/eta_per_POT_400), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
 
-eps_data = np.loadtxt("data/claudia_eps.csv",delimiter=',')
+eps_data = np.loadtxt("data/g_2_eps_lower.csv",delimiter=',')
+eps_data[:,0]*=1000
 eps_func = interp1d(eps_data[:,0],eps_data[:,1])
 
 pythia_400=True
@@ -1219,21 +1220,45 @@ def execute_bebc(genlist=True):
 
     channs={_brem,_pion_decay,_eta_decay}
     #vmarr={30,60,90,150,200,250,300}
-    #vmarr={40,50,70,80,100,110,120,130,140,160,170,180,190,220,240,260,280,325,350,375,400,450,500,550,600}
-    vmarr={301}
+    #vmarr={40,50,70,80,100,110,120,130,140,160,170,180,190,220,240,260,280,325,350,375,400,450,500,550,600.650,700,750,770,}
+    vmarr={30,40,50,60,70,80,90,100,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,425,450,475,500,530,540,550,600,650,700,760,770,773,777,779,790,800,900,1000}
+    #vmarr={700}
+    #vmarr={301}
     epsarr={1e-3}
     #epsarr={1e-8}
     #vmarr={120}
+    d={'prod_chan' : channs, 'signal_chan' : 'Electron_Scatter', 'particle_list_pi0' : "data/particle_list_400gev_pion.dat", 'particle_list_eta' : "data/particle_list_400gev_eta.dat", 'alpha_D' : 0.1, 'pi0_per_POT' : pi0_per_POT_400, 'model' : 'Inelastic_Dark_Matter', 'samplesize' : 50000, 'output_mode' : 'comprehensive', 'efficiency' : 1, 'sumlog' : "../bdnmc_events/BEBC/bebc_summary.dat","meson_per_pi0" : meson_per_pi0_400, 'beam_energy' : 400, "POT" : BEBC_POT, "dm_energy_resolution" : 0.2, "max_scatter_energy" : 400, "min_scatter_energy" : 0, "weighted" : "false"}
     mass_ratio=4
     delta=1
     mass_arr=[[mv,mv/mass_ratio, mv/mass_ratio*(1+delta),eps_func(mv)] for mv in vmarr]
     print(mass_arr)
-    d={'prod_chan' : channs, 'signal_chan' : 'Electron_Scatter', 'particle_list_pi0' : "data/particle_list_400gev_pion.dat", 'particle_list_eta' : "data/particle_list_400gev_eta.dat", 'alpha_D' : 0.1, 'pi0_per_POT' : pi0_per_POT_400, 'model' : 'Inelastic_Dark_Matter', 'samplesize' : 100, 'output_mode' : 'comprehensive', 'efficiency' : 1, 'sumlog' : "../bdnmc_events/BEBC/bebc_summary.dat","meson_per_pi0" : meson_per_pi0_400, 'beam_energy' : 400, "POT" : BEBC_POT, "dm_energy_resolution" : 0.1, "max_scatter_energy" : 400, "min_scatter_energy" : 0, "weighted" : "false"}
     for marr in mass_arr:
-        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2],"eps" : marr[3],'outlog' : "../bdnmc_events/BEBC/Claudia_eps/bebc_IDM_{}_{}_{}.dat".format(marr[0],marr[1],marr[3])})
+        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2],"eps" : marr[3],'outlog' : "../bdnmc_events/BEBC/Claudia_Delta1/bebc_IDM_{}.dat".format(marr[0])})
         gen_eval(d, bebc_detector)
-
-
+    '''
+    mass_ratio=3
+    delta=0.9
+    mass_arr=[[mv,mv/mass_ratio, mv/mass_ratio*(1+delta),eps_func(mv)] for mv in vmarr]
+    print(mass_arr)
+    for marr in mass_arr:
+        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2],"eps" : marr[3],'outlog' : "../bdnmc_events/BEBC/Claudia_Delta0.9/bebc_IDM_{}.dat".format(marr[0])})
+        gen_eval(d, bebc_detector)
+    mass_ratio=3
+    delta=0.4
+    mass_arr=[[mv,mv/mass_ratio, mv/mass_ratio*(1+delta),eps_func(mv)] for mv in vmarr]
+    print(mass_arr)
+    for marr in mass_arr:
+        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2],"eps" : marr[3],'outlog' : "../bdnmc_events/BEBC/Claudia_Delta0.4/bebc_IDM_{}.dat".format(marr[0])})
+        gen_eval(d, bebc_detector)
+    mass_ratio=6
+    delta=3.5
+    mass_arr=[[mv,mv/mass_ratio, mv/mass_ratio*(1+delta),eps_func(mv)] for mv in vmarr]
+    print(mass_arr)
+    for marr in mass_arr:
+        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2],"eps" : marr[3],'outlog' : "../bdnmc_events/BEBC/Claudia_Delta3.5/bebc_IDM_{}.dat".format(marr[0])})
+        gen_eval(d, bebc_detector)
+    '''
+    
 pythia_120=True
 def execute_numi(genlist=True):
     pi0_per_POT_numi=2.86

@@ -122,6 +122,8 @@ class Axion_Dark_Photon : public Model{
         void Branching_Ratios(){};
     private:
         double mass_axion, mass_dp, Gagg, Gagpg, Gagpgp, epsilon;
+        //New parameters, coupling to electrons.
+        double Gaee;
         double pi0_decay_amplitude2(double m12s, double s, double mgamma, double ma, double mA);
         double pi0_decay_amplitude2_b(double m12, double CosTheta, double m0, double m1, double m2, double m3);
         double pi0_decay_amplitude2_c(double m12s, double s, double m0, double m1, double m2, double m3);
