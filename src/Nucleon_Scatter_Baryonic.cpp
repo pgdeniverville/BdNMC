@@ -1,10 +1,9 @@
 #include "Scatter.h"
 #include "minimization.h"
+#include "DMNscattering_Baryonic.h"
 #include "Kinematics.h"
 #include "Random.h"
 #include "constants.h"
-
-#include "../BdNMC_LANL/src/DMNscattering_Baryonic.h"
 
 #include <list>
 #include <cmath>
