@@ -9,6 +9,7 @@ class Proton_Brem_Distribution : public Distribution{
 		
 	public:
 		Proton_Brem_Distribution(double Beam_E, double epsilon, double mA, double ptmax, double zmax, double zmin, double alphaD, std::string &mode, double ptmin=0);
+		~Proton_Brem_Distribution(){};
 		double V_prod_rate(){return vprodrate;}
 		double d2N_proton_brem_to_V(double z, double pt2);
 		void sample_particle(Particle &);

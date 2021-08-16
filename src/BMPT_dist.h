@@ -10,6 +10,7 @@ class BMPT : public Distribution{
         //void pionGen(Particle &);
         //void pionGen(double &, double &, double &, double &);
         BMPT(double beam_Energy, int Mass_Number, int part_choice=0);
+        ~BMPT(){};
         void sample_momentum(double&,double&,double&);
 		void sample_particle(Particle &);
 		double Invariant_Cross_Section(double p, double theta);//E \times d^3\sigma/dp^3

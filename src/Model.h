@@ -31,7 +31,7 @@ double load_form_factor(const std::string& filename, std::shared_ptr<Linear_Inte
 class Model{
     public:
         Model(Parameter& par){Model_Name=par.Model_Name(); Vnumtot=0;}
-        ~Model(){};
+        virtual ~Model(){};
         //This is the only point at which the Model class gets access to a
         //Parameter object. It should use this opportunity to prepare DMGen_list, PartDist_list and Signal_list.
         //Should probably move this implementation into a Model.cpp
@@ -75,6 +75,7 @@ class Model{
 class Inelastic_Dark_Matter : public Model{
     public:
         Inelastic_Dark_Matter(Parameter& par) : Model(par){};
+        ~Inelastic_Dark_Matter(){};
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);
@@ -114,6 +115,7 @@ class Axion_Dark_Photon : public Model{
     public:
         //Might not be enough, we'll see.
         Axion_Dark_Photon(Parameter& par) : Model(par){};
+        ~Axion_Dark_Photon(){};
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);
@@ -149,7 +151,7 @@ class Pseudoscalar : public Model{
     public:
         //Calling Model constructor, it does everything we need.
         Pseudoscalar(Parameter& par) : Model(par){};
-        //~Pseudoscalar(){};
+        ~Pseudoscalar(){};
         //bool Set_Model_Parame ters(Parameter& par);
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
@@ -184,6 +186,7 @@ class Pseudoscalar : public Model{
 class Kinetic_Mixing : public Model{
     public:
         Kinetic_Mixing(Parameter& par) : Model(par){};
+        ~Kinetic_Mixing(){};
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);
@@ -198,6 +201,7 @@ class Kinetic_Mixing : public Model{
 class Baryonic_Dark_Matter : public Model{
     public:
         Baryonic_Dark_Matter(Parameter& par) : Model(par){};
+        ~Baryonic_Dark_Matter(){}
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Vnum, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);
@@ -213,6 +217,7 @@ class Baryonic_Dark_Matter : public Model{
 class Scalar_Mediator : public Model{
     public:
         Scalar_Mediator(Parameter &par) : Model(par){};
+        ~Scalar_Mediator(){};
         bool Prepare_Signal_Channel(Parameter& par);
         bool Prepare_Production_Channel(std::string prodchoice, std::string proddist, production_channel& prodchan, std::shared_ptr<DMGenerator>& DMGen, std::shared_ptr<Distribution>&, double& Scalar_num, Parameter& par);
         bool Set_Model_Parameters(Parameter& par);

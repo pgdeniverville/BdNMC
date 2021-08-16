@@ -407,7 +407,7 @@ Linear_Interpolation2::Linear_Interpolation2(vector<double> Xvals, vector<double
     xmax = Xvals.back();
 }
 
-//Finds the index i corresponding to the largest x[i]<=xval.
+//Finds the index i corresponding to the largest x[i]<=xval using binary search.
 double Find_Index(const double xval, const vector<double>& xvals){
     unsigned L = 0;
     unsigned R = xvals.size()-1;

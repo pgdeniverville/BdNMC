@@ -112,6 +112,9 @@ bool Model::Prepare_Production_Distribution(std::string prodchoice, std::string 
         else if(proddist=="bpmt_k0"){
             meson_choice=PDG::K0;
         }
+        else{
+            meson_choice=PDG::PI0;
+        }
         cout << "Energy = " << par.Beam_Energy() << endl;
         cout << "Mass Number = " << par.Target_P_Num()+par.Target_N_Num() << endl;
         cout << "Setting maximum meson momentum = " << prodchan.Maximum_Meson_Momentum() << endl;

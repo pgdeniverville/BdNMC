@@ -11,7 +11,7 @@
 class Distribution {
 	public:
 		Distribution(){part_mass=0;}
-		~Distribution(){};
+		virtual ~Distribution(){};
 		void Sample_Particle(Particle &part)
 		{
 			part.Set_Mass(part_mass);
@@ -36,6 +36,7 @@ class Distribution {
 class DoNothingDist : public Distribution{
     public:
         void sample_particle(Particle &part){return;}
+        ~DoNothingDist(){};
 };
 
 //This samples the proton beam itself. Currently it
@@ -44,6 +45,7 @@ class DoNothingDist : public Distribution{
 class BeamDistribution: public Distribution{
 	public:
 		BeamDistribution(double Energy, double mass){beam_energy=Energy; beam_mass = mass;}
+		~BeamDistribution(){};
 	private:
 		double beam_energy, beam_mass;
 		void sample_particle(Particle &);

@@ -356,4 +356,4 @@ namespace Three_Body_Decay_Space{
 
         //At this point, each of the daughter particles should be given a chance to decay by its own DMGenerator. Handled in Three_Body_Decay_Gen.cpp!
     }
-};
+}

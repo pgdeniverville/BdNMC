@@ -109,7 +109,7 @@ void Proton_Brem_Distribution::calc_V_prod_rate(){
 		vprodrate = SimpsonCubature(func,ZMIN,ZMAX,100,PTMIN,PTMAX,100);//Will need to tweak this. Hopefully come up with a more general algorithm at some point.
 
 	max_prod=d2N_proton_brem_to_V(ZMIN,PTMIN);
-};
+}
 
 void Proton_Brem_Distribution::sample_particle(Particle &part){
 	double mom, theta, phi;

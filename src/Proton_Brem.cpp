@@ -43,7 +43,7 @@ void Proton_Brem::calc_V_prod_rate(){
 
     branchingratio = V_prod_rate();
     max_prod=d2N_proton_brem_to_out(ZMIN,PTMIN);
-};
+}
 
 double Proton_Brem::d2N_proton_brem_to_out(double z, double pt2){
     return sigmapp(2*MASS_PROTON*(Beam_Energy-sqrt(MA*MA+pt2+z*z*(pow(Beam_Energy,2)-pow(MASS_PROTON,2)))))/sigmapp(2*MASS_PROTON*Beam_Energy)*dsig(z,pt2);

@@ -110,7 +110,7 @@ int Particle_List::parse_line(string& line){
 		}
 		partlist.push_back(_part(px,py,pz,E,x,y,z,t));
 	}
-	catch(std::exception e){
+	catch(std::exception const & e){
 		cout << "parse_line encounterd error: " << e.what() << endl;
 		return -1;
 	}

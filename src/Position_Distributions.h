@@ -5,6 +5,7 @@
 //Call this with position_offset
 class Position_Offset : public Distribution{
 	public:
+		~Position_Offset(){};
 		Position_Offset(double x, double y, double z, double t) : Distribution(), X(x), Y(y), Z(z), T(t){};
 		void sample_particle(Particle &part);
 	private:

@@ -24,7 +24,7 @@ double RandomIntegrate2(std::function<double(double,double)> f, double xmin, dou
 class Interpolation1D{
     public:
         Interpolation1D(){IS_CDF=false;}
-        ~Interpolation1D(){};
+        virtual ~Interpolation1D(){};
         virtual double Interpolate(double Xval) = 0;
         double operator()(const double x){return Interpolate(x);}
         double Max(){return xmax;}
