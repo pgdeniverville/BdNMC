@@ -8,8 +8,8 @@
 const double mp = MASS_PROTON;
 const double mn = MASS_NEUTRON;
 
-const int pi0_choice=0;
-const int k0_choice=1;
+const int pi0_choice=PDG::PI0;
+const int k0_choice=PDG::K0;
 
 //BMPT fit parameters
 

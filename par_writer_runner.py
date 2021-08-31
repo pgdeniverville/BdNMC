@@ -1221,7 +1221,8 @@ def execute_bebc(genlist=True):
     channs={_brem,_pion_decay,_eta_decay}
     #vmarr={30,60,90,150,200,250,300}
     #vmarr={40,50,70,80,100,110,120,130,140,160,170,180,190,220,240,260,280,325,350,375,400,450,500,550,600.650,700,750,770,}
-    vmarr={30,40,50,60,70,80,90,100,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,425,450,475,500,530,540,550,600,650,700,760,770,773,777,779,790,800,900,1000}
+    #vmarr={30,40,50,60,70,80,90,100,110,115,120,125,130,132,134,135,137,140,150,160,180,200,220,250,300,350,400,425,450,475,500,530,540,550,600,650,700,760,770,773,777,779,790,800,900,1000}
+    vmarr={90}
     #vmarr={700}
     #vmarr={301}
     epsarr={1e-3}
@@ -1278,7 +1279,7 @@ def execute_numi(genlist=True):
         np.random.shuffle(arr1)
         np.savetxt("data/particle_list_numi_eta.dat", arr1)
         meson_per_pi0_numi= {'pi0_decay' : '1.0', 'eta_decay' : str(0.32/pi0_per_POT_numi), 'rho_decay' : str(0.11), 'omega_decay' : '0.11', 'phi_decay' : str(0.02)}
-    mxarr=[30,50,100,250]
+    mxarr=[30]
     dmDelta=0.05
     massarr=[[3*mx,mx,mx*(1+dmDelta)] for mx in mxarr]
     #d=({"signal_chan" : "Signal_Decay", "output_mode" : "summary", "samplesize" : 1000, "model" : "Dark_Photon","min_scatter_energy" : 5, "min_scatter_angle" : 0});
@@ -1286,7 +1287,7 @@ def execute_numi(genlist=True):
     d_list=[]
     d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nova.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 0, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nova", "eps" : 1e-4, "alpha_D" : 0.5, "weighted" : 'true', 'POT' : 2.97e20});
     for marr in massarr:
-        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "IDM_Events/nova_{}_{}.dat".format(marr[0],marr[1])})
+        d.update({"mv" : marr[0], "mdm1" : marr[1], "mdm2" : marr[2], "outlog" : "Events/nova_{}_{}.dat".format(marr[0],marr[1])})
         numi_eval(d)
     d=({"channels" : [_pion_decay,_eta_decay,_brem], "signal_chan" : "DM2_Signal_Decay", "output_mode" : "comprehensive", "samplesize" : 50000,  "sumlog" : "IDM_Events/nova_abs.dat", "model" : "Inelastic_Dark_Matter", "min_scatter_energy" : 0, "max_scatter_energy" : 120, "min_scatter_angle" : 0, "max_scatter_angle" : 6, "det_switch" : "nova_absorber", "eps" : 1e-4, "alpha_D" : 0.5, "weighted" : 'true', 'POT' : 0.5e20});
     for marr in massarr:
