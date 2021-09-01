@@ -8,6 +8,7 @@
 #include <exception>
 #include <ctime>
 #include <locale>
+#include <algorithm>
 
 using std::exception;
 using std::string;
@@ -21,15 +22,21 @@ using std::list;
 //All defaults should be stored here at some point.
 
 int split_string(string &hold, string &key, string &val){
-    if(hold.length()==0||hold[0]=='#')
+    if(hold.length()==0||hold[0]=='#'||hold[0]=='\n'||hold[0]=='\r'){
         return 0;
+    }
     
     std::size_t space_pos;
-    if((space_pos = hold.find(" "))==std::string::npos)
+    if((space_pos = hold.find(" "))==std::string::npos){
         return -1;
+    }
     
     key = hold.substr(0,space_pos);
     val = hold.substr(space_pos+1, hold.find(" ", space_pos+1));
+    
+    while(val.back()=='\r' || val.back()=='\n' || val.back()==' '){
+        val.erase(val.end()-1);
+    }
     return 1;
 }
 
@@ -334,6 +341,7 @@ Parameter::Parameter(std::ifstream &instream){
             else if(error_state==-1){
                 cerr << line_num << ": Improperly formatted input: ";
                 cerr << hold << "\n";
+                cerr << int(hold[0]) << endl;
             }
             else if(error_state!=1){
                 cerr << "Unknown error code: " << error_state << "\n";
