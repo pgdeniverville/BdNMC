@@ -1,13 +1,13 @@
-production_channel pi0_decay
-production_distribution particle_list
-particle_list_file data/particle_list_400gev_pion.dat
-particle_list_position false
-meson_per_pi0 1.0
-production_channel eta_decay
-production_distribution particle_list
-particle_list_file data/particle_list_400gev_eta.dat
-particle_list_position false
-meson_per_pi0 1.0
+#production_channel pi0_decay
+#production_distribution particle_list
+#particle_list_file data/particle_list_400gev_pion.dat
+#particle_list_position false
+#meson_per_pi0 1.0
+#production_channel eta_decay
+#production_distribution particle_list
+#particle_list_file data/particle_list_400gev_eta.dat
+#particle_list_position false
+#meson_per_pi0 1.0
 production_channel V_decay
 production_distribution proton_brem
 zmax 0.9
@@ -23,7 +23,7 @@ min_scatter_angle 0.0
 max_scatter_angle 6.5973445725385655
 #dm_energy_resolution 0.2
 dm_energy_resolution 2
-weighted false
+weighted true
 n_num_target 4
 p_num_target 4
 beam_energy 400
@@ -35,10 +35,10 @@ epsilon 0.001
 alpha_D 0.1
 POT 3e+18
 signal_channel Electron_Scatter
-output_file bebc_IDM.dat
+output_file bebc_brem_IDM.dat
 summary_file bebc_summary.dat
-output_mode comprehensive
-samplesize 1000
+output_mode summary
+samplesize 100000
 coherent false
 pi0_per_POT 4.05251
 
