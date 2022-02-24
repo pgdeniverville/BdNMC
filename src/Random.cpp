@@ -1,7 +1,7 @@
 #include "Random.h"
 #include <iostream>
 
-std::default_random_engine generator;
+std::mt19937 generator;
 std::uniform_real_distribution<double> distribution;
 //------------------------------------------------------------------------------
 // The constructors
@@ -9,12 +9,14 @@ std::uniform_real_distribution<double> distribution;
 //
 Random::Random(){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    generator = std::default_random_engine(seed);
+    //generator = std::default_random_engine(seed);
+    generator = std::mt19937(seed);
     distribution = std::uniform_real_distribution<double>(0.0,1.0);
     std::cout << "Seed=" << seed << std::endl;
 }
 Random::Random(unsigned seed){ 
-    generator = std::default_random_engine(seed);
+    //generator = std::default_random_engine(seed);
+    generator = std::mt19937(seed);
     distribution = std::uniform_real_distribution<double>(0.0,1.0);
     std::cout << "Seed=" << seed << std::endl;
 }

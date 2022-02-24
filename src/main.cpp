@@ -429,7 +429,7 @@ int main(int argc, char* argv[]){
                             else{
                             	scat_list[i]+=timing_prob_factor;
                             }
-                            scatter_switch = true;	
+                            scatter_switch = true;
                         }
                         else{
                             iter = vec.erase(iter);

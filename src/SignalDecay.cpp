@@ -14,7 +14,7 @@ using namespace std::placeholders;
 
 double decay_probability(double t1, double t2, double lifetime){
     //cout << "dec_prob_report\n" << "exp(-t1/tau)=" << exp(-t1/lifetime) << " exp(-t2/tau)=" << exp(-t2/lifetime) << " prob=" << exp(-t1/lifetime) - exp(-t2/lifetime) <<  endl;
-    return abs(exp(-t2/lifetime) - exp(-t1/lifetime));
+    return fabs(exp(-t2/lifetime) - exp(-t1/lifetime));
 }
 
 double generate_decay_time(double t1, double t2, double lifetime){
@@ -254,7 +254,6 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, Particle &Parent
         time2 = ttmp;
     }
     double prob = decay_probability(time1, time2, Lifetime*boost_calc(Parent.m,Parent.E));
-
     //Parent.report(cout);
     //cout << "MOM: " << Parent.Momentum() << " crossing1: " << Parent.crossing[0] << " crossing2: " << Parent.crossing[1] << " Speed: " << Parent.Speed() << endl; 
     //cout << "Lifetime: " << Lifetime << " Lifetime_Actual: " << Lifetime*Parent.E/Parent.m << " time1: " << time1 << " time2: " << time2 << " pos1: " << speed_of_light*time1 << " pos2: "<< speed_of_light*time2 << " prob: " << prob << endl;
