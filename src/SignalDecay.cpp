@@ -154,12 +154,14 @@ SignalDecay_2::SignalDecay_2(double lifetime, std::vector<std::shared_ptr<DMGene
     }
 }
 
+
+//This is the version used for the main simulation loop, it does generate final states.
 bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& partlist, list<Particle>::iterator& Parentit){
    
     if(Parentit->E<Escatmin)
         return false;
 
-  //  cout << "Begin probscatter for " << Parentit->name << endl;
+    cout << "Begin probscatter for " << Parentit->name << endl;
 
     double time1 = (*Parentit).Momentum()*(Parentit->crossing[0])/(*Parentit).Speed()/speed_of_light;
     double time2 = (*Parentit).Momentum()*(Parentit->crossing[1])/(*Parentit).Speed()/speed_of_light;
@@ -168,17 +170,17 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         time1 = time2;
         time2 = ttmp;
     }
-/*
+
     Parentit->report();
     cout << "Energy=" << Parentit->E << " Lifetime=" << Lifetime*boost_calc(Parentit->m,Parentit->E) << " Speed=" << Parentit->Speed() << " Boost=" << boost_calc(Parentit->m,Parentit->E) << " t1=" << time1 << " t2=" << time2 << endl;
 
     cout << "z1=" << time1*Parentit->Speed()*speed_of_light*Parentit->pz/Parentit->Momentum() << " z2=" << time2*Parentit->Speed()*speed_of_light*Parentit->pz/Parentit->Momentum() <<endl;
-*/
+
     double prob = decay_probability(time1, time2, Lifetime*boost_calc(Parentit->m,Parentit->E));
 
     double u = Random::Flat(0,1);
 
-  //  cout << prob << " " << pMax << " " << u*pMax << endl;
+    cout << prob << " " << pMax << " " << u*pMax << endl;
 
 
     if(prob>u*pMax){
@@ -206,11 +208,11 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         Parentit->Increment_Time(timegen);
         Parentit->EVENT_SET=true;
 
-        /*
+        
         cout << "Decay!\n";
         cout << "decay timegen=" << timegen << endl;
         Parentit->report();
-        */
+        
         double br_chan = Random::Flat(0,br_total);
         unsigned i;
 
@@ -222,19 +224,18 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
         }
 
         std::function<double(Particle&)> det_int = bind(&detector::Ldet,det,_1);
-/*
+
         cout << "parent before submission to GenDM\n";
         Parentit->report();
-*/
 
         Channels[i]->GenDM(partlist, det_int, *Parentit);
 
-/*        cout << "Reporting partlist" << endl;
+        cout << "Reporting partlist" << endl;
         for(list<Particle>::iterator it = partlist.begin(); it != partlist.end(); it++){
             it->report();
         }
         cout << "End partlist\n\n";
-*/
+
         //No cuts yet. Not sure how to implement them. I'll do post-processing for now.
         return true;
     }
@@ -242,6 +243,8 @@ bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, list<Particle>& 
     return false;
 }
 
+
+//This is the version used for burn-in, it doesn't generate final states.
 bool SignalDecay_2::probscatter(std::shared_ptr<detector>& det, Particle &Parent){
     if(Parent.E<Escatmin)
         return false;
