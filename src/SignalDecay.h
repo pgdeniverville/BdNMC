@@ -87,7 +87,8 @@ class SignalDecay_2: public Scatter{
        //void Generate_Position(std::shared_ptr<detector>& det, Particle &DM, std::vector<Particle> &scat); 
 
     private: 
-        double Lifetime,br_total;
+        double Lifetime=0;
+        double br_total=0;
         std::vector<std::string> Channel_Name;
         std::vector<std::shared_ptr<DMGenerator> > Channels;
         double min_energy;
