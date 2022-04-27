@@ -36,6 +36,7 @@ public:
     double M(unsigned int index) {return matvec[index].mass;}
     std::string matname(unsigned int index) {return matvec[index].matname;}
     unsigned mat_num() {return matvec.size();}
+    //These return the total number density of these components!
     double PNtot(){ return p_num_tot;}
     double NNtot(){ return n_num_tot;}
     double ENtot(){ return e_num_tot;}
