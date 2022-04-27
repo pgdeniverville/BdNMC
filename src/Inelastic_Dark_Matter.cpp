@@ -539,7 +539,7 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
             Sig_list.push_back(ttts);
             return true;
         }
-        void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state, double in_mass, double targ_mass, std::function<double(double,double)> &dsig, double num_density, const std::string in_state, double Max_Energy, double EDM_RES){
+        //void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state, double in_mass, double targ_mass, std::function<double(double,double)> &dsig, double num_density, const std::string in_state, double Max_Energy, double EDM_RES){
 
         else if(sig_choice=="Electron_Scatter" || sig_choice=="NCE_electron"){
             //cout << "Electron_Scatter setup begins\n";
@@ -581,6 +581,16 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
                 }
             }
             else{
+                    Particle proton(MASS_PROTON);
+                    Particle neutron(MASS_NEUTRON);
+
+                    double PNtot = det->PNtot();
+
+                    std::function<double(double,double)> f_dm1_to_dm2 = std::bind(&Inelastic_Dark_Matter::coherent_dsigma_dm_p_to_dm_p,this,_1,_2,mass_dm1,mass_dm2,A,Z,Atom.m);
+                    ttts->Build_Channel(dm2_r, Atom, mass_dm1, det->M(i), f_dm1_to_dm2, ndensity, "Dark_Matter_1", par.Max_DM_Energy(), par.EDM_RES());
+
+                    std::function<double(double,double)> f_dm2_to_dm1 = std::bind(&Inelastic_Dark_Matter::coherent_dsigma_dm_p_to_dm_p,this,_1,_2,mass_dm2,mass_dm1,A,Z,Atom.m);
+                    ttts->Build_Channel(dm1_r, Atom, mass_dm2, det->M(i), f_dm2_to_dm1, ndensity, "Dark_Matter_2", par.Max_DM_Energy(),par.EDM_RES());
 
             }
         }
