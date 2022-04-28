@@ -220,7 +220,7 @@ void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state,
         std::function<double(double)> ER_min = std::bind(&Two_to_Two_Scatter::scatmin,*this,_1,in_mass,targ_mass,out_state.m, end_state.m);
         std::function<double(double)> ER_max = std::bind(&Two_to_Two_Scatter::scatmax,*this,_1,in_mass,targ_mass,out_state.m, end_state.m);
 
-        std::function<double(double)> f = std::bind(dsig,1.8,_1);
+//        std::function<double(double)> f = std::bind(dsig,1.8,_1);
 
 //        cout << f(1.4) << endl;
 //        cout << DoubleExponential_adapt(f, ER_min(1.8), ER_max(1.8), 200, 0.1, 1e-4) << endl;;
@@ -231,7 +231,10 @@ void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state,
         function<double(double)> cross_func = bind(&Linear_Interpolation::Interpolate,cross,_1);
         function<double(double)> cross_max_func = bind(&Linear_Interpolation::Interpolate,cross_max,_1);
 
-//        cout << cross_func(1) << endl;
+
+        /*for(int i = 1; i<=20; i+=1){
+            cout << i << " " << cross_func(i) << " " << cross_max_func(i) << endl;
+        }*/
 
         add_channel(out_state, end_state, targ_mass, cross_func, cross_max_func, dsig, num_density, in_state);
 }

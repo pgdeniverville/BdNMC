@@ -402,10 +402,13 @@ int main(int argc, char* argv[]){
                     if(std::find(sig_part_vec.begin(),sig_part_vec.end(), iter->name)!=sig_part_vec.end()){
                         NDM_list[i]++;
                         if(outmode=="dm_detector_distribution"){
+                        	double ldet = det->Ldet(*iter);
+                        	if(ldet <= 0)
+                        		continue;
                             *comprehensive_out << DMGen_list[i]->Channel_Name() << " " << det->Ldet(*iter) << " ";
                             iter->report(*comprehensive_out);
                             scatter_switch=true;
-                            continue;;
+                            continue;
                         }
                         //may need to replace this with a list<Particle> later
                         //cout << SigGen->get_pMax() << endl;
