@@ -487,13 +487,15 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         ttts->set_energy_limits(par.Min_Scatter_Energy(),par.Max_Scatter_Energy());
         ttts->set_angle_limits(par.Max_Angle(),par.Min_Angle());
 
+        std::shared_ptr<detector> det=par.Get_Detector();
+
         if(sig_choice=="Pion_Inelastic" or sig_choice == "Pion_Inelastic_Charged" or sig_choice=="Inelastic_Delta_to_Gamma"){
 
             GM_form_factor = std::shared_ptr<Linear_Interpolation>();
             MAX_Q2=load_form_factor(GM_form_factor_filename, GM_form_factor);
 
-            double PNtot =(par.Get_Detector())->PNtot();
-            double NNtot =(par.Get_Detector())->NNtot();
+            double PNtot =det->PNtot();
+            double NNtot =det->NNtot();
 
             Particle Delta(MASS_DELTA);
             Delta.name="Recoil_Delta";
@@ -536,17 +538,13 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
                 std::shared_ptr<Two_Body_Decay_Gen> photondec(new Two_Body_Decay_Gen(Delta_to_gamma, MASS_DELTA, "Recoil_Delta", photon, decay_nucleon));
                 ttts->add_decay("Recoil_Delta", photondec);
             }
-            Sig_list.push_back(ttts);
-            return true;
         }
-        //void Two_to_Two_Scatter::Build_Channel(Particle& out_state, Particle& end_state, double in_mass, double targ_mass, std::function<double(double,double)> &dsig, double num_density, const std::string in_state, double Max_Energy, double EDM_RES){
-
         else if(sig_choice=="Electron_Scatter" || sig_choice=="NCE_electron"){
             //cout << "Electron_Scatter setup begins\n";
             Particle electron(MASS_ELECTRON);
             electron.name="Electron";
 
-            double ENtot =(par.Get_Detector())->ENtot();
+            double ENtot =det->ENtot();
             
             //Decay of DM2 is handled further down.
             
@@ -560,7 +558,6 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
 
         }
         else if(sig_choice=="Nucleon_Scatter" || sig_choice=="NCE_nucleon"){
-            std::shared_ptr<detector> det=par.Get_Detector();
  
             //Coherent scattering handles each atom in the detector material separately.
             if(par.Coherent()){     
@@ -581,16 +578,27 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
                 }
             }
             else{
-                    Particle proton(MASS_PROTON);
-                    Particle neutron(MASS_NEUTRON);
+                Particle proton(MASS_PROTON);
+                proton.name="Proton";
+                Particle neutron(MASS_NEUTRON);
+                neutron.name="Neutron";
 
-                    double PNtot = det->PNtot();
+                double PNtot = det->PNtot();   
+                double NNtot = det->NNtot();
 
-                    std::function<double(double,double)> f_dm1_to_dm2 = std::bind(&Inelastic_Dark_Matter::coherent_dsigma_dm_p_to_dm_p,this,_1,_2,mass_dm1,mass_dm2,A,Z,Atom.m);
-                    ttts->Build_Channel(dm2_r, Atom, mass_dm1, det->M(i), f_dm1_to_dm2, ndensity, "Dark_Matter_1", par.Max_DM_Energy(), par.EDM_RES());
+                //double Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double mR, int target){
 
-                    std::function<double(double,double)> f_dm2_to_dm1 = std::bind(&Inelastic_Dark_Matter::coherent_dsigma_dm_p_to_dm_p,this,_1,_2,mass_dm2,mass_dm1,A,Z,Atom.m);
-                    ttts->Build_Channel(dm1_r, Atom, mass_dm2, det->M(i), f_dm2_to_dm1, ndensity, "Dark_Matter_2", par.Max_DM_Energy(),par.EDM_RES());
+                std::function<double(double,double)> f_dm1_to_dm2 = std::bind(&Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N,this,_1,_2, mass_dm1,mass_dm2,MASS_PROTON,0);
+                ttts->Build_Channel(dm2_r, proton, mass_dm1, MASS_PROTON, f_dm1_to_dm2, PNtot, "Dark_Matter_1", par.Max_DM_Energy(), par.EDM_RES());
+
+                std::function<double(double,double)> f_dm2_to_dm1 = std::bind(&Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N,this,_1,_2, mass_dm2,mass_dm1,MASS_PROTON,0);
+                ttts->Build_Channel(dm1_r, proton, mass_dm2, MASS_PROTON, f_dm2_to_dm1, PNtot, "Dark_Matter_2", par.Max_DM_Energy(),par.EDM_RES());
+
+                std::function<double(double,double)> f_dm1_to_dm2n = std::bind(&Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N,this,_1,_2, mass_dm1,mass_dm2,MASS_NEUTRON,1);
+                ttts->Build_Channel(dm2_r, neutron, mass_dm1, MASS_NEUTRON, f_dm1_to_dm2n, NNtot, "Dark_Matter_1", par.Max_DM_Energy(), par.EDM_RES());
+
+                std::function<double(double,double)> f_dm2_to_dm1n = std::bind(&Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N,this,_1,_2,mass_dm2,mass_dm1,MASS_NEUTRON,1);
+                ttts->Build_Channel(dm1_r, neutron, mass_dm2, MASS_NEUTRON, f_dm2_to_dm1n, NNtot, "Dark_Matter_2", par.Max_DM_Energy(),par.EDM_RES());
 
             }
         }
