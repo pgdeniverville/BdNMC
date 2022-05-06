@@ -20,7 +20,8 @@ public:
     Particle& operator=(const Particle& part);
     
 
-    double   m, px, py, pz, E;//Eventually, these variables are going to be made private.
+    double m=0;
+    double px=0, py=0, pz=0, E=0;//Eventually, these variables are going to be made private.
     double width=0;
     std::string name;
     double   Theta();

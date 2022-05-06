@@ -28,8 +28,8 @@ void Link_Particles_Immediate(Particle &parent, Particle &child){
 //using std::cout; using std::endl;
 //Should update to use Set_Origin and Set_Time
 Particle::Particle(double mass){
+    //Need to use Set_Mass here as Energy is not calculated by anything.
     Set_Mass(mass);
-    ThreeMomentum(0,0,0);
     for(int i=0; i<4; i++){
         origin_coords[i]=0.0;
 		end_coords[i]=0.0;
@@ -41,8 +41,9 @@ Particle::Particle(double mass){
 
 //Should one of these just call the other one?
 Particle::Particle(const Particle &part){
-	Set_Mass(part.m);
-	ThreeMomentum(part.px,part.py,part.pz);
+    //Don't need to use Set_Mass here as energy will be calculated by ThreeMomentum.
+	m=part.m;
+    ThreeMomentum(part.px,part.py,part.pz);
 	for(int i=0; i<4; i++){
         origin_coords[i]=part.origin_coords[i];
 		end_coords[i]=part.end_coords[i];
@@ -57,7 +58,8 @@ Particle::Particle(const Particle &part){
 }
 
 Particle& Particle::operator=(const Particle& part){
-	Set_Mass(part.m);
+    //Don't need to use Set_Mass here as energy will be calculated by ThreeMomentum.
+	m=part.m;
 	ThreeMomentum(part.px,part.py,part.pz);
 	for(int i=0; i<4; i++){
         origin_coords[i]=part.origin_coords[i];

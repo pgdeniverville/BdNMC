@@ -149,10 +149,11 @@ double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e(double E1lab, double E4, doubl
     return 2*mR*1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_e_to_dm_e_amp(s,two_to_two_scattering::t_lab(E4,mR,mR),mass_dm_in,mass_dm_out,mR);
 }
 
-double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in, double mass_dm_out, double mR){
+//This looks a bit weird./*
+/*double Inelastic_Dark_Matter::dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in, double mass_dm_out, double mR){
     double s = two_to_two_scattering::s_lab(E1lab, mass_dm_in, mR);
     return 1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_e_to_dm_e_amp(s,t,mass_dm_in,mass_dm_out,mR);
-}
+}*/
 
 //Target=1 means neutron, anything else means proton
 double Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double mR, int target){
@@ -162,10 +163,10 @@ double Inelastic_Dark_Matter::dsigma_dm_N_to_dm_N(double E1lab, double E4, doubl
         return 0;
     }
     if(target==1){
-        return 2*mR*1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_n_to_dm_n_amp(s,t,mass_dm_in,mass_dm_out,mR);        
+        return 2*mR*1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_N_to_dm_N_amp(s,t,mass_dm_in,mass_dm_out,mR,target);        
     }
     else{
-        return 2*mR*1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_p_to_dm_p_amp(s,t,mass_dm_in,mass_dm_out,mR);
+        return 2*mR*1/64.0/pi/pow(mR,2)/(pow(E1lab,2)-pow(mass_dm_in,2))*dm_N_to_dm_N_amp(s,t,mass_dm_in,mass_dm_out,mR,target);
     }
 }
 
@@ -187,28 +188,31 @@ double Inelastic_Dark_Matter::coherent_dsigma_dm_p_to_dm_p(double E1lab, double 
     return pow(Z,2)*pow(CoherentFormFactor(sqrt(-t_full),A),2)*dsigma_dm_N_to_dm_N(E1lab, E4_proton, mass_dm_in, mass_dm_out, MASS_PROTON, 0);
 }
 
-double Inelastic_Dark_Matter::dm_n_to_dm_n_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR){
-    return (8*pow(pi,2)*(-4*F1N(-t)*F2N(-t)*(mass_dm_in + mass_dm_out)*(pow(mass_dm_in - mass_dm_out,2) - t)*(2*pow(mR,2) + t) + 
-       4*pow(F1N(-t),2)*(2*(pow(mass_dm_in*mass_dm_out + pow(mR,2),2) - 
-             (pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + pow(s,2)) - 
-          (pow(mass_dm_in - mass_dm_out,2) - 2*s)*t + pow(t,2)) + 
-       pow(F2N(-t),2)*(-2*pow(pow(mass_dm_in,2) - pow(mass_dm_out,2),2)*pow(mR,2) - 
-          (pow(mass_dm_in,4) + pow(mass_dm_out,4) - 4*mass_dm_in*mass_dm_out*pow(mR,2) + 2*pow(mR,4) - 
-             2*(pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + 2*pow(s,2))*t + 
-          (pow(mass_dm_in + mass_dm_out,2) + 2*(pow(mR,2) - s))*pow(t,2)))*alpha_D*alphaEM*pow(epsilon,2))/
-   pow(pow(mass_dp,2) - t,2);
-}
-
-double Inelastic_Dark_Matter::dm_p_to_dm_p_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR){
-    return (8*pow(pi,2)*(-4*F1P(-t)*F2P(-t)*(mass_dm_in + mass_dm_out)*(pow(mass_dm_in - mass_dm_out,2) - t)*(2*pow(mR,2) + t) + 
-       4*pow(F1P(-t),2)*(2*(pow(mass_dm_in*mass_dm_out + pow(mR,2),2) - 
-             (pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + pow(s,2)) - 
-          (pow(mass_dm_in - mass_dm_out,2) - 2*s)*t + pow(t,2)) + 
-       pow(F2P(-t),2)*(-2*pow(pow(mass_dm_in,2) - pow(mass_dm_out,2),2)*pow(mR,2) - 
-          (pow(mass_dm_in,4) + pow(mass_dm_out,4) - 4*mass_dm_in*mass_dm_out*pow(mR,2) + 2*pow(mR,4) - 
-             2*(pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + 2*pow(s,2))*t + 
-          (pow(mass_dm_in + mass_dm_out,2) + 2*(pow(mR,2) - s))*pow(t,2)))*alpha_D*alphaEM*pow(epsilon,2))/
-   pow(pow(mass_dp,2) - t,2);
+double Inelastic_Dark_Matter::dm_N_to_dm_N_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR, int target){
+    double F1,F2;
+    /*
+    F1=1;F2=1;
+    cout << s << " " << t << " " << (pow(pi,2)*(16*F1*F2*pow(mR,2)*(pow(mass_dm_in - mass_dm_out,2) - t)*(pow(mass_dm_in + mass_dm_out,2) + 2*t) + 
+       32*pow(F1,2)*pow(mR,2)*(2*(pow(mass_dm_in*mass_dm_out + pow(mR,2),2) - (pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + pow(s,2)) - 
+          (pow(mass_dm_in - mass_dm_out,2) - 2*s)*t + pow(t,2)) + pow(F2,2)*
+        (-4*pow(pow(mass_dm_in,2) - pow(mass_dm_out,2),2)*pow(mR,2) - 
+          (pow(mass_dm_in,4) - 16*mass_dm_in*mass_dm_out*pow(mR,2) + 2*pow(mass_dm_in,2)*(pow(mass_dm_out,2) + 2*pow(mR,2) - 2*s) + pow(pow(mass_dm_out,2) + 2*pow(mR,2) - 2*s,2))*
+           t + (pow(mass_dm_in + mass_dm_out,2) + 8*pow(mR,2) - 4*s)*pow(t,2)))*alpha_D*alphaEM*pow(epsilon,2))/(pow(mR,2)*pow(pow(mass_dp,2) - t,2)) << endl;*/
+    //Neutron if target==1, Proton otherwise
+    if(target==1){
+        F1 = F1N(-t);
+        F2 = F2N(-t);
+    }
+    else{
+        F1 = F1P(-t);
+        F2 = F2P(-t);
+    }
+    return (pow(pi,2)*(16*F1*F2*pow(mR,2)*(pow(mass_dm_in - mass_dm_out,2) - t)*(pow(mass_dm_in + mass_dm_out,2) + 2*t) + 
+       32*pow(F1,2)*pow(mR,2)*(2*(pow(mass_dm_in*mass_dm_out + pow(mR,2),2) - (pow(mass_dm_in,2) + pow(mass_dm_out,2) + 2*pow(mR,2))*s + pow(s,2)) - 
+          (pow(mass_dm_in - mass_dm_out,2) - 2*s)*t + pow(t,2)) + pow(F2,2)*
+        (-4*pow(pow(mass_dm_in,2) - pow(mass_dm_out,2),2)*pow(mR,2) - 
+          (pow(mass_dm_in,4) - 16*mass_dm_in*mass_dm_out*pow(mR,2) + 2*pow(mass_dm_in,2)*(pow(mass_dm_out,2) + 2*pow(mR,2) - 2*s) + pow(pow(mass_dm_out,2) + 2*pow(mR,2) - 2*s,2))*
+           t + (pow(mass_dm_in + mass_dm_out,2) + 8*pow(mR,2) - 4*s)*pow(t,2)))*alpha_D*alphaEM*pow(epsilon,2))/(pow(mR,2)*pow(pow(mass_dp,2) - t,2));
 }
 
 //m1, m2 can be either dm1 or dm2, whichever is inbound.
@@ -470,7 +474,6 @@ bool Inelastic_Dark_Matter::Prepare_Signal_Channel(Parameter& par){
         // cout << "s=" << s << endl; 
 
         // cout << dm_e_to_dm_e_amp(s,-1e-6,mass_dm1,mass_dm2,MASS_ELECTRON) << endl;
-
 
         Particle dm1_r(mass_dm1);
         dm1_r.name = "Recoil_Dark_Matter_1";

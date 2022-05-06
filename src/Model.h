@@ -91,13 +91,13 @@ class Inelastic_Dark_Matter : public Model{
     private:
         double dsigma_dm_e_to_dm_e(double E1lab, double E4, double mass_dm_in,double mass_dm_out, double mR);
         double dm_e_to_dm_e_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR);
-        double dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in,double mass_dm_out, double mR);
+        //double dsigma_dm_e_to_dm_e_2(double E1lab, double t, double mass_dm_in,double mass_dm_out, double mR);
         double dsigma_dm_N_to_dm_Delta(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double mN, double delta);
         double amp_dm_N_to_dm_Delta(double s, double t, double m1, double m2, double mN, double mD);
         double coherent_dsigma_dm_p_to_dm_p(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double A, double Z, double mass);
         double dsigma_dm_N_to_dm_N(double E1lab, double E4, double mass_dm_in, double mass_dm_out, double mR, int target);
-        double dm_n_to_dm_n_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR);
-        double dm_p_to_dm_p_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR);
+        double dm_N_to_dm_N_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR, int target);
+        //double dm_p_to_dm_p_amp(double s, double t, double mass_dm_in, double mass_dm_out, double mR);
         void Evaluate_Widths();
         double GM(double q2);
         //mass_dm2 is assumed to be heavier.

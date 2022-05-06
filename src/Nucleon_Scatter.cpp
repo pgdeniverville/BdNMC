@@ -44,6 +44,7 @@ Nucleon_Scatter::Nucleon_Scatter(double Emini, double Emaxi, double Eresi, doubl
     //cout << "Escatmin= " << Escatmin << " Escatmax= " << Escatmax << endl; 
 	min_angle=-1;//Set min_angle to less than zero so it always passes cut.
 	max_angle=2*pi+1;//Set max_angle to larger than 2*pi so it always passes cut.
+    //These may be changed by Scatter.h later on with its angle setting methods.
     coherent=cohere;
     if(coherent){
         if(det==NULL){
