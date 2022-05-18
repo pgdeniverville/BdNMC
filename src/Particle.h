@@ -57,7 +57,7 @@ public:
     double crossing[2];//This keeps track of when a particle crosses through a detector. This will eventually replace det_cross in detector objects!
     double dec_time=0;//tracks when a particle is destroyed by scattering or decay if END_SET=true. Multiply by momentum() to retrieve distance.
     bool END_SET=false;//Indicates that this particle decays or scatters at a distance of Momentum()*dec_time.
-    bool EVENT_SET;//I am going to have to be careful with this variable.
+    bool EVENT_SET=false;//I am going to have to be careful with this variable.
     
     //Going to revamp output soon. my_id will be its position in the particle list. Every particle will keep track of its parent. Option for both parents if produced in scattering, but parent_2 mostly unused.
     int my_id=-1;

@@ -168,7 +168,7 @@ class General_Decay_Generator: public DMGenerator{
                 branchingratio+=decay_channels[i]->BranchingRatio();
             }
         }
-        double total_width;
+        double total_width=0;
         std::vector<std::shared_ptr<DMGenerator> > decay_channels;
         std::vector<double> partial_widths;
 };
